@@ -26,7 +26,7 @@ public class SendShortMessageDemo {
     //短信签名-可在短信控制台中找到
     private final String signName = "贺辰枫";
     //短信模板-可在短信控制台中找到
-    private final String templateCode = "SMS_117285213";
+    private final String templateCode = "SMS_117295305";
 
     //手机号
     private final String[] phoneNumbers = {"18601925625", "13456900808", "13805761625", "18958170178","18600166393"};
