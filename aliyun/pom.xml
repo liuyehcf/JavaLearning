@@ -13,21 +13,25 @@
 
 
     <dependencies>
-        <dependency>
-            <groupId>com.aliyun.openservices</groupId>
-            <artifactId>ons-client</artifactId>
-        </dependency>
-
+        <!-- log -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
         </dependency>
 
+        <!-- MessageQueue -->
+        <dependency>
+            <groupId>com.aliyun.openservices</groupId>
+            <artifactId>ons-client</artifactId>
+        </dependency>
+
+        <!-- Object Storage Service-->
         <dependency>
             <groupId>com.aliyun.oss</groupId>
             <artifactId>aliyun-sdk-oss</artifactId>
         </dependency>
 
+        <!-- Short Message Service -->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>sdk-core</artifactId>
@@ -42,6 +46,22 @@
             <version>1.0</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/short_message/aliyun-java-sdk-dysmsapi-1.0.0.jar</systemPath>
+        </dependency>
+
+        <!-- Face Identification -->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
         </dependency>
     </dependencies>
 </project>
