@@ -1,4 +1,4 @@
-package org.liuyehcf.aliyun.face.detection;
+package org.liuyehcf.aliyun.face;
 
 import java.io.BufferedReader;
 import java.io.IOException;

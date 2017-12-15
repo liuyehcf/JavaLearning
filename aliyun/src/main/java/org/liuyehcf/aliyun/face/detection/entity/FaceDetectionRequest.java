@@ -1,13 +1,16 @@
 package org.liuyehcf.aliyun.face.detection.entity;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 /**
  * Created by Liuye on 2017/12/15.
  */
 
-public class FaceDetectionRequestBodyEntity {
+public class FaceDetectionRequest {
     private int type;
 
-    private String image_url;
+    @JSONField(name = "image_url")
+    private String imageUrl;
 
     private String content;
 
@@ -19,12 +22,12 @@ public class FaceDetectionRequestBodyEntity {
         this.type = type;
     }
 
-    public String getImage_url() {
-        return image_url;
+    public String getImageUrl() {
+        return imageUrl;
     }
 
-    public void setImage_url(String image_url) {
-        this.image_url = image_url;
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public String getContent() {
