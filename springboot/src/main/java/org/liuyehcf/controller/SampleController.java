@@ -29,10 +29,10 @@ public class SampleController {
         return sampleService.login(request);
     }
 
-    @RequestMapping(value = "/add", method = RequestMethod.GET)
+    @RequestMapping(value = "/compute", method = RequestMethod.GET)
     @ResponseBody
-    public String getKey(@RequestParam String value1, @RequestParam String value2) {
-        return sampleService.add(value1,value2);
+    public String compute(@RequestParam String value1, @RequestParam String value2, @RequestHeader String operator) {
+        return sampleService.compute(value1, value2, operator);
     }
 
 }

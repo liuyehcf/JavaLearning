@@ -12,12 +12,13 @@ import java.net.URL;
  * Created by Liuye on 2017/12/15.
  */
 public class URLConnectionDemo {
-    public static void doGet() {
+    public static void doGet(String value1, String value2, String operator) {
         try {
-            URL url = new URL("http://localhost:8080/add?value1=1&value2=2");
+            URL url = new URL("http://localhost:8080/compute?value1=" + value1 + "&value2=" + value2);
 
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
+            conn.setRequestProperty("operator", operator);
             conn.setDoInput(true);
 
             conn.connect();
@@ -43,7 +44,6 @@ public class URLConnectionDemo {
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");//todo 必须有
             conn.setRequestProperty("Content-Type", "application/json");//todo 必须有
-
             conn.setDoInput(true);
             conn.setDoOutput(true);//todo 必须有
 
@@ -69,7 +69,10 @@ public class URLConnectionDemo {
     }
 
     public static void main(String[] args) {
-        doGet();
+        doGet("1", "2", "+");
+        doGet("1", "2", "-");
+        doGet("1", "2", "*");
+        doGet("1", "2", "/");
         doPost();
     }
 }

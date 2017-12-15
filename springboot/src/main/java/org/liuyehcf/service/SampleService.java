@@ -20,9 +20,23 @@ public class SampleService {
         return loginResponse;
     }
 
-    public String add(String value1, String value2) {
-        return Float.toString(
-                Float.parseFloat(value1)
-                        + Float.parseFloat(value2));
+    public String compute(String value1, String value2, String operator) {
+        switch (operator) {
+            case "+":
+                return Float.toString(
+                        Float.parseFloat(value1)
+                                + Float.parseFloat(value2));
+            case "-":
+                return Float.toString(
+                        Float.parseFloat(value1)
+                                - Float.parseFloat(value2));
+            case "*":
+                return Float.toString(
+                        Float.parseFloat(value1)
+                                * Float.parseFloat(value2));
+            default:
+                return "wrong operation";
+        }
+
     }
 }
