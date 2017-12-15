@@ -33,6 +33,4 @@ public class OuterEntity<T> {
     public void setMiddleEntity(T middleEntity) {
         this.middleEntity = middleEntity;
     }
-
-    public OuterEntity(){}
 }

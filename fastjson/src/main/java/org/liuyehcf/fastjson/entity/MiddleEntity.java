@@ -33,7 +33,4 @@ public class MiddleEntity<T> {
     public void setInnerEntity(T innerEntity) {
         this.innerEntity = innerEntity;
     }
-
-    public MiddleEntity() {
-    }
 }

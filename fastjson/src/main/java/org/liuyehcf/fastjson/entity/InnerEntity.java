@@ -23,7 +23,4 @@ public class InnerEntity {
     public void setName(String name) {
         this.name = name;
     }
-
-    public InnerEntity() {
-    }
 }

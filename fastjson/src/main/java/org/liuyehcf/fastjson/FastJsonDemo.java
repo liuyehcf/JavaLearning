@@ -11,7 +11,7 @@ import org.liuyehcf.fastjson.entity.OuterEntity;
  */
 public class FastJsonDemo {
     public static void main(String[] args) {
-        OuterEntity<MiddleEntity> outerEntity = new OuterEntity<>();
+        OuterEntity<MiddleEntity<InnerEntity>> outerEntity = new OuterEntity<>();
         MiddleEntity<InnerEntity> middleEntity = new MiddleEntity<>();
         InnerEntity innerEntity = new InnerEntity();
 
@@ -26,7 +26,6 @@ public class FastJsonDemo {
         outerEntity.setName("outerEntity");
         outerEntity.setMiddleEntity(middleEntity);
 
-
         String json = JSON.toJSONString(outerEntity);
 
         System.out.println(json);
@@ -37,5 +36,7 @@ public class FastJsonDemo {
                 });
 
         System.out.println(parsedOuterEntity.getMiddleEntity().getClass().getName());
+        System.out.println(parsedOuterEntity.getMiddleEntity().getInnerEntity().getClass().getName());
+
     }
 }

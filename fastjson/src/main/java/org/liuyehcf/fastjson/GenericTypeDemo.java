@@ -1,7 +1,5 @@
 package org.liuyehcf.fastjson;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.List;
 
 /**
@@ -9,25 +7,9 @@ import java.util.List;
  */
 public class GenericTypeDemo<T> {
 
-    private static class MyTypeReference<T> {
-        private final Type type;
-
-        private MyTypeReference() {
-            Type superClass = getClass().getGenericSuperclass();
-
-            Type type = ((ParameterizedType) superClass).getActualTypeArguments()[0];
-
-            this.type = type;
-        }
-
-        public Type getType() {
-            return type;
-        }
-    }
-
     public static void main(String[] args) {
         System.out.println(
-                new MyTypeReference<List<String>>() {
+                new MyTypeReference<List<List<String>>>() {
                     // override nothing
                 }.getType().getTypeName());
     }
