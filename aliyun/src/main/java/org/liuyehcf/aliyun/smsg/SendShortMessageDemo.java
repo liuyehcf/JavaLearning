@@ -9,6 +9,7 @@ import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
 import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
+import org.liuyehcf.aliyun.AccessUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -28,12 +29,7 @@ public class SendShortMessageDemo {
     //短信模板-可在短信控制台中找到
     private final String templateCode = "SMS_117295305";
 
-    //手机号
-    private final String[] phoneNumbers = {"18601925625", "13456900808", "13805761625", "18958170178","18600166393"};
-
-    // TODO 此处需要替换成开发者自己的AK(在阿里云访问控制台寻找)
-    private final String accessKeyId = "LTAIROQDd1PQvWnk";
-    private final String accessKeySecret = "3QdEITYZ8G6mtdjySaytP8QmBxlexT";
+    private final String[] phoneNumbers = {"18601925625", "13456900808", "13805761625", "18958170178", "18600166393"};
 
     private final int LENGTH_OF_VERIFICATION_CODE = 6;
 
@@ -69,7 +65,7 @@ public class SendShortMessageDemo {
         if (acsClient == null) {
             try {
                 //初始化acsClient,暂不支持region化
-                IClientProfile profile = DefaultProfile.getProfile("cn-hangzhou", accessKeyId, accessKeySecret);
+                IClientProfile profile = DefaultProfile.getProfile("cn-hangzhou", AccessUtils.ACCESS_KEY, AccessUtils.ACCESS_SECRET_KEY);
                 DefaultProfile.addEndpoint("cn-hangzhou", "cn-hangzhou", product, domain);
                 acsClient = new DefaultAcsClient(profile);
             } catch (ClientException exception) {

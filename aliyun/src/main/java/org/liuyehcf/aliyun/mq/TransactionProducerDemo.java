@@ -9,6 +9,7 @@ import com.aliyun.openservices.ons.api.transaction.LocalTransactionExecuter;
 import com.aliyun.openservices.ons.api.transaction.TransactionProducer;
 import com.aliyun.openservices.ons.api.transaction.TransactionStatus;
 import com.aliyun.openservices.shade.com.alibaba.rocketmq.client.log.ClientLogger;
+import org.liuyehcf.aliyun.AccessUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,9 +30,9 @@ public class TransactionProducerDemo {
         // 您在控制台创建的Producer ID。注意：事务消息的Producer ID不能与其他类型消息的Producer ID共用
         properties.put(PropertyKeyConst.ProducerId, "PID_org_liuyehcf_mq_test_productor1");
         // 阿里云身份验证，在阿里云服务器管理控制台创建
-        properties.put(PropertyKeyConst.AccessKey, "LTAIROQDd1PQvWnk");
+        properties.put(PropertyKeyConst.AccessKey, AccessUtils.ACCESS_KEY);
         // 阿里云身份验证，在阿里云服务器管理控制台创建
-        properties.put(PropertyKeyConst.SecretKey, "3QdEITYZ8G6mtdjySaytP8QmBxlexT");
+        properties.put(PropertyKeyConst.SecretKey, AccessUtils.ACCESS_SECRET_KEY);
         // 设置 TCP 接入域名（此处以公共云生产环境为例）
         properties.put(PropertyKeyConst.ONSAddr,
                 "http://onsaddr-internet.aliyun.com/rocketmq/nsaddr4client-internet");

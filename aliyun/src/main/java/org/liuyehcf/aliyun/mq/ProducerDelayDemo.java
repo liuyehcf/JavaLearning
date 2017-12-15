@@ -1,6 +1,7 @@
 package org.liuyehcf.aliyun.mq;
 
 import com.aliyun.openservices.ons.api.*;
+import org.liuyehcf.aliyun.AccessUtils;
 
 import java.util.Date;
 import java.util.Properties;
@@ -14,9 +15,9 @@ public class ProducerDelayDemo {
         // 您在控制台创建的 Producer ID
         properties.put(PropertyKeyConst.ProducerId, "PID_org_liuyehcf_mq_test_productor1");
         // AccessKey 阿里云身份验证，在阿里云服务器管理控制台创建
-        properties.put(PropertyKeyConst.AccessKey, "LTAIROQDd1PQvWnk");
+        properties.put(PropertyKeyConst.AccessKey, AccessUtils.ACCESS_KEY);
         // SecretKey 阿里云身份验证，在阿里云服务器管理控制台创建
-        properties.put(PropertyKeyConst.SecretKey, "3QdEITYZ8G6mtdjySaytP8QmBxlexT");
+        properties.put(PropertyKeyConst.SecretKey, AccessUtils.ACCESS_SECRET_KEY);
         // 设置 TCP 接入域名（此处以公共云生产环境为例）
         properties.put(PropertyKeyConst.ONSAddr,
                 "http://onsaddr-internet.aliyun.com/rocketmq/nsaddr4client-internet");

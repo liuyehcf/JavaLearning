@@ -4,6 +4,7 @@ import com.aliyun.oss.ClientException;
 import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.OSSException;
 import com.aliyun.oss.model.*;
+import org.liuyehcf.aliyun.AccessUtils;
 
 import java.io.*;
 
@@ -12,8 +13,6 @@ import java.io.*;
  */
 public class OOSDemo {
     private static String endpoint = "http://oss-cn-hangzhou.aliyuncs.com";
-    private static String accessKeyId = "LTAIROQDd1PQvWnk";
-    private static String accessKeySecret = "3QdEITYZ8G6mtdjySaytP8QmBxlexT";
     private static String bucketName = "liuyehcf-bucket-test";
     private static String key = "test_key";
 
@@ -21,7 +20,7 @@ public class OOSDemo {
         /*
          * Constructs a client instance with your account for accessing OSS
          */
-        OSSClient ossClient = new OSSClient(endpoint, accessKeyId, accessKeySecret);
+        OSSClient ossClient = new OSSClient(endpoint, AccessUtils.ACCESS_KEY, AccessUtils.ACCESS_SECRET_KEY);
 
         System.out.println("Getting Started with OSS SDK for Java\n");
 
