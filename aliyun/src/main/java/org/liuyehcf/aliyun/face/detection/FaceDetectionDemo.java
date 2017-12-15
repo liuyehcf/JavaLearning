@@ -13,7 +13,7 @@ public class FaceDetectionDemo {
 
     private static final String IMAGE_URL = "https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3746075707,1914896074&fm=27&gp=0.jpg";
 
-    private static String getRequestBodyEntityWithUrl() {
+    private static String createRequestBody() {
         FaceDetectionRequestBodyEntity requestBodyEntity = new FaceDetectionRequestBodyEntity();
         requestBodyEntity.setType(0);
         requestBodyEntity.setImage_url(IMAGE_URL);
@@ -23,7 +23,7 @@ public class FaceDetectionDemo {
     public static void main(String[] args) throws Exception {
         String responseString = AESDecode.sendPost(
                 URL,
-                getRequestBodyEntityWithUrl(),
+                createRequestBody(),
                 AccessUtils.ACCESS_KEY,
                 AccessUtils.ACCESS_SECRET_KEY);
 

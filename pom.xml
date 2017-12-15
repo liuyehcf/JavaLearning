@@ -25,6 +25,7 @@
         <module>aliyun</module>
         <module>slf4j</module>
         <module>redis</module>
+        <module>fastjson</module>
     </modules>
 
     <properties>
