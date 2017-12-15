@@ -26,6 +26,7 @@
         <module>slf4j</module>
         <module>redis</module>
         <module>fastjson</module>
+        <module>http</module>
     </modules>
 
     <properties>
@@ -103,7 +104,6 @@
                 <artifactId>spring-jdbc</artifactId>
                 <version>${spring.version}</version>
             </dependency>
-
 
             <!-- AOP -->
             <dependency>
