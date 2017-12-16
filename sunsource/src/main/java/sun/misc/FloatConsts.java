@@ -79,7 +79,7 @@ public class FloatConsts {
     public static final int SIGNIF_BIT_MASK = 0x007FFFFF;
 
     static {
-        // verify bit masks cover all bit positions and that the bit
+        // verification bit masks cover all bit positions and that the bit
         // masks are non-overlapping
         assert (((SIGN_BIT_MASK | EXP_BIT_MASK | SIGNIF_BIT_MASK) == ~0) &&
                 (((SIGN_BIT_MASK & EXP_BIT_MASK) == 0) &&

@@ -1,4 +1,4 @@
-package org.liuyehcf.aliyun.face.verify.entity;
+package org.liuyehcf.aliyun.face.verification.entity;
 
 import com.alibaba.fastjson.annotation.JSONField;
 

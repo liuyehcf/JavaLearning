@@ -159,7 +159,7 @@ public class UUDecoder extends CharacterDecoder {
         }
 	
 	/* 
-	 * Now we think its begin, (we've seen ^be) so verify it here.
+	 * Now we think its begin, (we've seen ^be) so verification it here.
          */
         while ((c != '\n') && (c != '\r')) {
             c = inStream.read();

@@ -424,7 +424,7 @@ public class ProxyGenerator {
 
 	/*
 	 * For each set of proxy methods with the same signature,
-	 * verify that the methods' return types are compatible.
+	 * verification that the methods' return types are compatible.
 	 */
         for (List<ProxyMethod> sigmethods : proxyMethods.values()) {
             checkReturnTypes(sigmethods);
