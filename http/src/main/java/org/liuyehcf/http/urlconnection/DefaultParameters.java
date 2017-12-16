@@ -1,4 +1,4 @@
-package org.liuyehcf.http;
+package org.liuyehcf.http.urlconnection;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;

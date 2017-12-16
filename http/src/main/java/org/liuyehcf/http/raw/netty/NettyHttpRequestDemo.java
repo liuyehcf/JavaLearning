@@ -1,7 +1,6 @@
-package org.liuyehcf.http.netty;
+package org.liuyehcf.http.raw.netty;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -9,8 +8,9 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.http.*;
-import org.liuyehcf.http.netty.handler.EchoInBoundHandler;
-import org.liuyehcf.http.netty.handler.EchoOutBoundHandler;
+import org.liuyehcf.http.raw.HttpRequestBuilder;
+import org.liuyehcf.http.raw.netty.handler.EchoInBoundHandler;
+import org.liuyehcf.http.raw.netty.handler.EchoOutBoundHandler;
 
 import java.net.URI;
 
@@ -51,8 +51,7 @@ public class NettyHttpRequestDemo {
             request.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
             request.headers().set(HttpHeaders.Names.CONTENT_LENGTH, request.content().readableBytes());
 
-            String single = "GET http://127.0.0.1:8080/home HTTP/1.1\r\n\n";
-            channel.writeAndFlush(request).sync();
+            channel.writeAndFlush(request);
 
             channelFuture.channel().closeFuture().sync();
         } catch (Exception e) {
@@ -60,13 +59,5 @@ public class NettyHttpRequestDemo {
         } finally {
             workerGroup.shutdownGracefully();
         }
-    }
-
-    private static String buildRequest() {
-        HttpRequestBuilder builder = new HttpRequestBuilder();
-        builder.url("/home");
-        String s = builder.build();
-        System.out.println(s);
-        return s;
     }
 }

@@ -1,4 +1,4 @@
-package org.liuyehcf.http;
+package org.liuyehcf.http.urlconnection;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -69,10 +69,10 @@ public class URLConnectionDemo {
     }
 
     public static void main(String[] args) {
-        doGet("1", "2", "+");
-        doGet("1", "2", "-");
-        doGet("1", "2", "*");
-        doGet("1", "2", "/");
+//        doGet("1", "2", "+");
+//        doGet("1", "2", "-");
+//        doGet("1", "2", "*");
+//        doGet("1", "2", "/");
         doPost();
     }
 }
