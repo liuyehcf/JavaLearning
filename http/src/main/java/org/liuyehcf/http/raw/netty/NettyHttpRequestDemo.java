@@ -81,7 +81,13 @@ public class NettyHttpRequestDemo {
 
             Channel channel = channelFuture.channel();
 
-            channel.writeAndFlush(buildRequest());
+
+            String requestContent = buildRequest();
+
+            System.out.print("\n\n>>>>>>>>>>>>>>>>HTTP REQUEST<<<<<<<<<<<<<<<<\n\n");
+            System.out.println(requestContent);
+
+            channel.writeAndFlush(requestContent);
 
             channelFuture.channel().closeFuture().sync();
         } catch (Exception e) {
@@ -102,7 +108,7 @@ public class NettyHttpRequestDemo {
     }
 
     public static void main(String[] args) {
-        doRequestWithNettyBuiltInRequest();
+        //doRequestWithNettyBuiltInRequest();
         doRequestWithMyRequest();
     }
 }

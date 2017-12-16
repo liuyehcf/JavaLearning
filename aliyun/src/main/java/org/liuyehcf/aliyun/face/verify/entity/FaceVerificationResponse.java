@@ -18,16 +18,17 @@ public class FaceVerificationResponse {
     private String requestId;
 
     @JSONField(name = "confidence")
-    private float confidence;
+    private double confidence;
 
     @JSONField(name = "thresholds")
-    private float[] thresholds;
+    private double[] thresholds;
 
     @JSONField(name = "rectA")
     private int[] rectA;
 
     @JSONField(name = "rectB")
     private int[] rectB;
+
 
     public int getErrno() {
         return errno;
@@ -53,19 +54,19 @@ public class FaceVerificationResponse {
         this.requestId = requestId;
     }
 
-    public float getConfidence() {
+    public double getConfidence() {
         return confidence;
     }
 
-    public void setConfidence(float confidence) {
+    public void setConfidence(double confidence) {
         this.confidence = confidence;
     }
 
-    public float[] getThresholds() {
+    public double[] getThresholds() {
         return thresholds;
     }
 
-    public void setThresholds(float[] thresholds) {
+    public void setThresholds(double[] thresholds) {
         this.thresholds = thresholds;
     }
 
@@ -88,8 +89,8 @@ public class FaceVerificationResponse {
     @Override
     public String toString() {
         return "errno :" + getErrno() + "\n"
-                + "errMsg :" + getErrMsg() + "\n"
-                + "requestId :" + getRequestId() + "\n"
+                + "err_msg :" + getErrMsg() + "\n"
+                + "request_id :" + getRequestId() + "\n"
                 + "confidence :" + getConfidence() + "\n"
                 + "thresholds :" + Arrays.toString(getThresholds()) + "\n"
                 + "rectA :" + Arrays.toString(getRectA()) + "\n"

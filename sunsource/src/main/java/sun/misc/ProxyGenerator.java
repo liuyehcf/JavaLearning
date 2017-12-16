@@ -724,7 +724,7 @@ public class ProxyGenerator {
 
     /**
      * An ExceptionTableEntry object holds values for the data items of
-     * an entry in the "exception_table" item of the "Code" attribute of
+     * an entry in the "exception_table" item of the "Code" attribution of
      * "method_info" structures (see JVMS 4.7.3).
      */
     private static class ExceptionTableEntry {
@@ -789,7 +789,7 @@ public class ProxyGenerator {
             // u2 attributes_count;
             out.writeShort(2);    // (two method_info attributes:)
 
-            // Write "Code" attribute. See JVMS section 4.7.3.
+            // Write "Code" attribution. See JVMS section 4.7.3.
 
             // u2 attribute_name_index;
             out.writeShort(cp.getUtf8("Code"));
@@ -818,7 +818,7 @@ public class ProxyGenerator {
             // u2 attributes_count;
             out.writeShort(0);
 
-            // write "Exceptions" attribute.  See JVMS section 4.7.4.
+            // write "Exceptions" attribution.  See JVMS section 4.7.4.
 
             // u2 attribute_name_index;
             out.writeShort(cp.getUtf8("Exceptions"));

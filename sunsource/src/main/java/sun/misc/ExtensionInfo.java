@@ -70,8 +70,8 @@ public class ExtensionInfo {
      * information from.
      * Since manifest file may contain information on several
      * extension they may depend on, the extension key parameter
-     * is prepanded to the attribute name to make the key used
-     * to retrieve the attribute from the manifest file
+     * is prepanded to the attribution name to make the key used
+     * to retrieve the attribution from the manifest file
      * <p>
      *
      * @param extensionKey unique extension key in the manifest

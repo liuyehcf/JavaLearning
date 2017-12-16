@@ -1,13 +1,13 @@
-package org.liuyehcf.aliyun.face.detection.entity;
+package org.liuyehcf.aliyun.face.attribution.entity;
 
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.util.Arrays;
 
 /**
- * Created by Liuye on 2017/12/15.
+ * Created by HCF on 2017/12/16.
  */
-public class FaceDetectionResponse {
+public class FaceAttributionResponse {
     @JSONField(name = "errno")
     private int errno;
 
@@ -37,6 +37,24 @@ public class FaceDetectionResponse {
 
     @JSONField(name = "iris")
     private double[] iris;
+
+    @JSONField(name = "gender")
+    private int[] gender;
+
+    @JSONField(name = "age")
+    private int[] age;
+
+    @JSONField(name = "expression")
+    private int[] expression;
+
+    @JSONField(name = "glass")
+    private int[] glass;
+
+    @JSONField(name = "dense_fea_len")
+    private int denseFeaLen;
+
+    @JSONField(name = "dense_fea")
+    private double[] denseFea;
 
     public int getErrno() {
         return errno;
@@ -118,6 +136,54 @@ public class FaceDetectionResponse {
         this.iris = iris;
     }
 
+    public int[] getGender() {
+        return gender;
+    }
+
+    public void setGender(int[] gender) {
+        this.gender = gender;
+    }
+
+    public int[] getAge() {
+        return age;
+    }
+
+    public void setAge(int[] age) {
+        this.age = age;
+    }
+
+    public int[] getExpression() {
+        return expression;
+    }
+
+    public void setExpression(int[] expression) {
+        this.expression = expression;
+    }
+
+    public int[] getGlass() {
+        return glass;
+    }
+
+    public void setGlass(int[] glass) {
+        this.glass = glass;
+    }
+
+    public int getDenseFeaLen() {
+        return denseFeaLen;
+    }
+
+    public void setDenseFeaLen(int denseFeaLen) {
+        this.denseFeaLen = denseFeaLen;
+    }
+
+    public double[] getDenseFea() {
+        return denseFea;
+    }
+
+    public void setDenseFea(double[] denseFea) {
+        this.denseFea = denseFea;
+    }
+
     @Override
     public String toString() {
         return "errno: " + getErrno() + "\n"
@@ -129,6 +195,12 @@ public class FaceDetectionResponse {
                 + "pose: " + Arrays.toString(getPose()) + "\n"
                 + "landmark_num: " + getLandmarkNum() + "\n"
                 + "landmark: " + Arrays.toString(getLandmark()) + "\n"
-                + "iris: " + Arrays.toString(getIris());
+                + "iris: " + Arrays.toString(getIris()) + "\n"
+                + "gender: " + Arrays.toString(getGender()) + "\n"
+                + "age: " + Arrays.toString(getAge()) + "\n"
+                + "expression: " + Arrays.toString(getExpression()) + "\n"
+                + "glass: " + Arrays.toString(getGlass()) + "\n"
+                + "dense_fea_len: " + getDenseFeaLen() + "\n"
+                + "denseFea: " + Arrays.toString(getDenseFea());
     }
 }

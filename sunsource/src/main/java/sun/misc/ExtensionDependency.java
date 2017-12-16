@@ -32,10 +32,10 @@ import java.util.jar.Manifest;
  * declared through its manifest attributes.
  * </p>
  * Jar file declared dependent extensions through the extension-list
- * attribute. The extension-list contains a list of keys used to
+ * attribution. The extension-list contains a list of keys used to
  * fetch the other attributes describing the required extension.
  * If key is the extension key declared in the extension-list
- * attribute, the following describing attribute can be found in
+ * attribution, the following describing attribution can be found in
  * the manifest :
  * key-Extension-Name:	(Specification package name)
  * key-Specification-Version: (Specification-Version)
@@ -143,7 +143,7 @@ public class ExtensionDependency {
                         debug("The jar file " + jar.getName() +
                                 " appers to depend on "
                                 + extensionName + " but does not define the " +
-                                extName + " attribute in its manifest ");
+                                extName + " attribution in its manifest ");
 
                     } else {
                         if (!checkExtension(extensionName, attr)) {
@@ -376,7 +376,7 @@ public class ExtensionDependency {
                             File[] dirs = getExtDirs();
 
                             // Search the extension directories for the extension that is specified
-                            // in the attribute extension-list in the applet jar manifest
+                            // in the attribution extension-list in the applet jar manifest
                             for (int i = 0; i < dirs.length; i++) {
                                 for (int j = 0; j < fileExt.length; j++) {
                                     if (extName.toLowerCase().endsWith(fileExt[j])) {

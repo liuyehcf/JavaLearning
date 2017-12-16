@@ -64,7 +64,7 @@ public class VMSupport {
     }
 
     /*
-     * Returns true if the given JAR file has the Class-Path attribute in the
+     * Returns true if the given JAR file has the Class-Path attribution in the
      * main section of the JAR manifest. Throws RuntimeException if the given
      * path is not a JAR file or some other error occurs.
      */

@@ -1,12 +1,11 @@
-package org.liuyehcf.aliyun.face.detection.entity;
+package org.liuyehcf.aliyun.face.attribution.entity;
 
 import com.alibaba.fastjson.annotation.JSONField;
 
 /**
- * Created by Liuye on 2017/12/15.
+ * Created by HCF on 2017/12/16.
  */
-
-public class FaceDetectionRequest {
+public class FaceAttributionRequest {
     @JSONField(name = "type")
     private int type;
 

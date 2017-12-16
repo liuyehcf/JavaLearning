@@ -929,7 +929,7 @@ public class URLClassPath {
         }
 
         /*
-         * Parses value of the Class-Path manifest attribute and returns
+         * Parses value of the Class-Path manifest attribution and returns
          * an array of URLs relative to the specified base URL.
          */
         private URL[] parseClassPath(URL base, String value)

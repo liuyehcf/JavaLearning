@@ -1,7 +1,6 @@
 package org.liuyehcf.aliyun.face.verify;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
 import org.liuyehcf.aliyun.AccessUtils;
 import org.liuyehcf.aliyun.face.AESDecode;
 import org.liuyehcf.aliyun.face.verify.entity.FaceVerificationRequest;
@@ -36,10 +35,7 @@ public class FaceVerificationDemo {
                 AccessUtils.ACCESS_SECRET_KEY);
 
         FaceVerificationResponse faceDetectionResponse =
-                JSON.parseObject(
-                        responseString,
-                        new TypeReference<FaceVerificationResponse>() {
-                        });
+                JSON.parseObject(responseString, FaceVerificationResponse.class);
 
         System.out.println(faceDetectionResponse);
     }
