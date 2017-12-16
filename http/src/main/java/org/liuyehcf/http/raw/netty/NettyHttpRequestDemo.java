@@ -18,7 +18,7 @@ import java.net.URI;
  * Created by HCF on 2017/12/16.
  */
 public class NettyHttpRequestDemo {
-    public static void main(String[] args) {
+    public static void doRequestWithNettyBuiltInRequest() {
         NioEventLoopGroup workerGroup = new NioEventLoopGroup();
 
         try {
@@ -37,11 +37,11 @@ public class NettyHttpRequestDemo {
                         }
                     });
 
+            // todo 需要启动String Boot模块中的web应用作为服务端
             ChannelFuture channelFuture = bootstrap.connect("localhost", 8080).sync();
 
             Channel channel = channelFuture.channel();
 
-            // todo 需要启动String Boot模块中的web应用作为服务端
             URI uri = new URI("http://127.0.0.1:8080/home");
             DefaultFullHttpRequest request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET,
                     uri.toASCIIString());
@@ -59,5 +59,50 @@ public class NettyHttpRequestDemo {
         } finally {
             workerGroup.shutdownGracefully();
         }
+    }
+
+    public static void doRequestWithMyRequest() {
+        NioEventLoopGroup workerGroup = new NioEventLoopGroup();
+
+        try {
+            Bootstrap bootstrap = new Bootstrap();
+            bootstrap.group(workerGroup)
+                    .channel(NioSocketChannel.class)
+                    .handler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        protected void initChannel(SocketChannel socketChannel) throws Exception {
+                            socketChannel.pipeline().addLast(new EchoInBoundHandler());
+                            socketChannel.pipeline().addLast(new EchoOutBoundHandler());
+                        }
+                    });
+
+            // todo 需要启动String Boot模块中的web应用作为服务端
+            ChannelFuture channelFuture = bootstrap.connect("localhost", 8080).sync();
+
+            Channel channel = channelFuture.channel();
+
+            channel.writeAndFlush(buildRequest());
+
+            channelFuture.channel().closeFuture().sync();
+        } catch (Exception e) {
+
+        } finally {
+            workerGroup.shutdownGracefully();
+        }
+    }
+
+    private static String buildRequest() {
+        HttpRequestBuilder httpRequestBuilder = new HttpRequestBuilder();
+        httpRequestBuilder
+                .method("GET")
+                .url("http://127.0.0.1:8080/home")
+                .addHeader("Host", "8080")
+                .addHeader("Connection", "close");
+        return httpRequestBuilder.build();
+    }
+
+    public static void main(String[] args) {
+        doRequestWithNettyBuiltInRequest();
+        doRequestWithMyRequest();
     }
 }

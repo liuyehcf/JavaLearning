@@ -65,14 +65,21 @@ public class HttpRequestBuilder {
 
         if (body != null) {
             int bodyLength = body.getBytes().length;
-            if (!headers.containsKey(CONTENT_LENGTH.toLowerCase())) {
+            if (!headers.containsKey(CONTENT_LENGTH)) {
                 throw new RuntimeException("设置了请求Body，单位设置长度参数<content-length>");
             }
 
-            String key = headers.get(CONTENT_LENGTH.toLowerCase());
+            String key = headers.get(CONTENT_LENGTH);
 
             if (Integer.parseInt(key) != bodyLength) {
                 throw new RuntimeException("Body长度参数<content-length>设置错误");
+            }
+        } else {
+            String key;
+            if (headers.containsKey(CONTENT_LENGTH)
+                    && (key = headers.get(CONTENT_LENGTH)) != null
+                    && Integer.parseInt(key) != 0) {
+                throw new RuntimeException("Body为空，但是Body长度参数<content-length>不为0");
             }
         }
     }

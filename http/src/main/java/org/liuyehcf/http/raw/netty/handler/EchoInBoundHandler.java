@@ -14,26 +14,25 @@ import io.netty.util.ReferenceCountUtil;
 public class EchoInBoundHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-//        ByteBuf in = (ByteBuf) msg;
-//        try {
-//            while (in.isReadable()) { // (1)
-//                System.out.print((char) in.readByte());
-//                System.out.flush();
-//            }
-//        } finally {
-//            ReferenceCountUtil.release(msg); // (2)
-//        }
-        if (msg instanceof HttpResponse)
-        {
+
+        if (msg instanceof HttpResponse) {
             HttpResponse response = (HttpResponse) msg;
             System.out.println("CONTENT_TYPE:" + response.headers().get(HttpHeaders.Names.CONTENT_TYPE));
-        }
-        if(msg instanceof HttpContent)
-        {
+        } else if (msg instanceof HttpContent) {
             HttpContent content = (HttpContent)msg;
             ByteBuf buf = content.content();
             System.out.println(buf.toString(io.netty.util.CharsetUtil.UTF_8));
             buf.release();
+        } else {
+            ByteBuf in = (ByteBuf) msg;
+            try {
+                while (in.isReadable()) { // (1)
+                    System.out.print((char) in.readByte());
+                    System.out.flush();
+                }
+            } finally {
+                ReferenceCountUtil.release(msg); // (2)
+            }
         }
     }
 }
