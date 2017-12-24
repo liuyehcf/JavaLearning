@@ -5,6 +5,6 @@ package org.liuyehcf.jdkproxy;
  */
 public class Chinese implements Person {
     public void sayHello() {
-        System.out.println("JdkProxyDemo says hello");
+        System.out.println("Chinese says hello");
     }
 }

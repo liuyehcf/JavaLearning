@@ -3,8 +3,6 @@ package org.liuyehcf.jdkproxy;
 import sun.misc.ProxyGenerator;
 
 import java.io.FileOutputStream;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
 /**
@@ -16,7 +14,6 @@ public class JdkProxyDemo {
 
     public static void main(String[] args) throws Exception {
 
-
         Chinese target = new Chinese();
 
         JdkProxyHandler jdkProxyHandler = new JdkProxyHandler(target);
@@ -25,7 +22,11 @@ public class JdkProxyDemo {
 
         p.sayHello();
 
-        byte[] classFile = ProxyGenerator.generateProxyClass("MyProxy", JdkProxyDemo.class.getInterfaces());
+        saveClassFileOfProxy();
+    }
+
+    private static void saveClassFileOfProxy() {
+        byte[] classFile = ProxyGenerator.generateProxyClass("MyProxy", Chinese.class.getInterfaces());
 
         FileOutputStream out;
 
