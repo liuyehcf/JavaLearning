@@ -9,14 +9,17 @@
         http://www.springframework.org/schema/aop
         http://www.springframework.org/schema/aop/spring-aop.xsd">
     <context:component-scan base-package="org.liuyehcf.spring.aop"/>
+
     <aop:aspectj-autoproxy/>
 
     <bean id="simpleMethodInterceptor" class="org.liuyehcf.spring.aop.SimpleMethodInterceptor"/>
+    <bean id="simpleBeforeMethodAdvisor" class="org.liuyehcf.spring.aop.SimpleBeforeMethodAdvisor"/>
 
     <aop:config>
         <aop:pointcut id="simplePointcut" expression="execution(* org.liuyehcf.spring.aop.HelloService.*(..))"/>
 
         <aop:advisor advice-ref="simpleMethodInterceptor" pointcut-ref="simplePointcut"/>
+        <aop:advisor advice-ref="simpleBeforeMethodAdvisor" pointcut-ref="simplePointcut"/>
 
     </aop:config>
 </beans>
