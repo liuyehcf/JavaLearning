@@ -28,10 +28,11 @@
         <module>fastjson</module>
         <module>http</module>
         <module>proxy</module>
+        <module>springaop</module>
     </modules>
 
     <properties>
-        <spring.version>4.1.6.RELEASE</spring.version>
+        <spring.version>RELEASE</spring.version>
         <mybatis.version>3.2.3</mybatis.version>
         <mybatis.spring.version>1.2.1</mybatis.spring.version>
         <aspectjrt.version>1.6.11</aspectjrt.version>
@@ -91,6 +92,12 @@
             <!-- Spring -->
             <dependency>
                 <groupId>org.springframework</groupId>
+                <artifactId>spring-beans</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
                 <artifactId>spring-core</artifactId>
                 <version>${spring.version}</version>
             </dependency>
@@ -112,6 +119,13 @@
                 <artifactId>spring-jdbc</artifactId>
                 <version>${spring.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-aop</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+
 
             <!-- AOP -->
             <dependency>
