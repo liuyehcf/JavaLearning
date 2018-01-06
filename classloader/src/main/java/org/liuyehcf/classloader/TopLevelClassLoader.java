@@ -1,11 +1,10 @@
 package org.liuyehcf.classloader;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 
 /**
  * Created by HCF on 2018/1/6.
+ * 位于上层的ClassLoader，破坏了原有的双亲委派结构，插入到Ext与Bootstrap类加载器之间
  */
 public class TopLevelClassLoader extends AbstractClassLoader {
     private static TopLevelClassLoader instance = new TopLevelClassLoader();
@@ -42,21 +41,10 @@ public class TopLevelClassLoader extends AbstractClassLoader {
     }
 
     public static void main(String[] args) throws Exception {
+        Class clazz = Class.forName(TEST_CLASS);
 
-        Class clazz = Class.forName("org.liuyehcf.datastructure.tree.bplustree.BPlusTree");
-
-        Constructor constructor = clazz.getConstructor(int.class);
-
-        Object obj = constructor.newInstance(5);
-
-        System.err.println("ClassLoader: " + obj.getClass().getClassLoader());
-
-        Method methodInsert = clazz.getMethod("insert", int.class);
-        Method methodPrint = clazz.getMethod("levelOrderTraverse");
-
-        methodInsert.invoke(obj, 3);
-        methodInsert.invoke(obj, 4);
-        methodInsert.invoke(obj, 5);
-        methodPrint.invoke(obj);
+        AbstractClassLoader.testTemplate(clazz);
     }
+
+
 }
