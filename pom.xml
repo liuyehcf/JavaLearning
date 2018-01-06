@@ -29,6 +29,7 @@
         <module>http</module>
         <module>proxy</module>
         <module>springaop</module>
+        <module>classloader</module>
     </modules>
 
     <properties>
