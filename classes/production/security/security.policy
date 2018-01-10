@@ -1,0 +1,3 @@
+grant codeBase "file:/Users/HCF/Workspaces/IdeaWorkspace/JavaLearning/security/src/main/resources/security-1.0-SNAPSHOT.jar" {
+    permission java.io.FilePermission "/Users/HCF/Workspaces/IdeaWorkspace/JavaLearning/security/src/main/resources/targetDir/*", "write, read, delete";
+};

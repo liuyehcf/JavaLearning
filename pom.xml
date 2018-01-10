@@ -30,6 +30,7 @@
         <module>proxy</module>
         <module>springaop</module>
         <module>classloader</module>
+        <module>security</module>
     </modules>
 
     <properties>
