@@ -1,3 +1,4 @@
-grant codeBase "file:/Users/HCF/Workspaces/IdeaWorkspace/JavaLearning/security/src/main/resources/security-1.0-SNAPSHOT.jar" {
-    permission java.io.FilePermission "/Users/HCF/Workspaces/IdeaWorkspace/JavaLearning/security/src/main/resources/targetDir/*", "write, read, delete";
+grant codeBase "file:./security/src/main/resources/security-1.0-SNAPSHOT.jar" {
+    permission java.io.FilePermission "./security/src/main/resources/targetDir/*", "write, read, delete";
+    permission java.util.PropertyPermission "user.dir", "read";
 };

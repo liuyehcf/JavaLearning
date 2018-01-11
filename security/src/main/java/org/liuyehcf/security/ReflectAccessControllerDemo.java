@@ -11,8 +11,8 @@ import java.net.URLClassLoader;
  */
 public class ReflectAccessControllerDemo {
 
-    private static final String TARGET_DIR = "/Users/HCF/Workspaces/IdeaWorkspace/JavaLearning/security/src/main/resources/targetDir";
-    private static final String JAR = "/Users/HCF/Workspaces/IdeaWorkspace/JavaLearning/security/src/main/resources/security-1.0-SNAPSHOT.jar";
+    private static final String TARGET_DIR = "./security/src/main/resources/targetDir";
+    private static final String JAR = "./security/src/main/resources/security-1.0-SNAPSHOT.jar";
     private static final String TEST_CLASS = "org.liuyehcf.security.FileUtils";
 
     public static void main(String[] args) {
