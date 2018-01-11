@@ -11,8 +11,8 @@ import java.net.URLClassLoader;
  */
 public class ReflectAccessControllerDemo {
 
-    private static final String TARGET_DIR = "./security/src/main/resources/targetDir";
-    private static final String JAR = "./security/src/main/resources/security-1.0-SNAPSHOT.jar";
+    private static final String TARGET_DIR = "security/src/main/resources/targetDir";
+    private static final String JAR = "security/src/main/resources/external.jar";
     private static final String TEST_CLASS = "org.liuyehcf.security.FileUtils";
 
     public static void main(String[] args) {
@@ -27,6 +27,8 @@ public class ReflectAccessControllerDemo {
             return;
         }
 
+        System.setSecurityManager(new SecurityManager());
+
         Method createFileMethod;
         Method createFilePrivilegeMethod;
         try {
@@ -36,8 +38,6 @@ public class ReflectAccessControllerDemo {
             e.printStackTrace();
             return;
         }
-
-        System.setSecurityManager(new SecurityManager());
 
         try {
             createFileMethod.invoke(null, TARGET_DIR, "file1.md");
