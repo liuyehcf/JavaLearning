@@ -12,9 +12,9 @@ import java.util.Vector;
  * Created by HCF on 2018/1/6.
  */
 public abstract class AbstractClassLoader extends URLClassLoader {
-    private static final String JAR_DIR = "file:./classloader/src/main/resources/algorithm-1.0-SNAPSHOT.jar";
+    private static final String JAR_DIR = "file:./classloader/src/main/resources/external.jar";
 
-    private static final URL JAR_URL;
+    static final URL JAR_URL;
 
     static {
         try {
@@ -24,27 +24,22 @@ public abstract class AbstractClassLoader extends URLClassLoader {
         }
     }
 
-    final static String TEST_CLASS = "org.liuyehcf.datastructure.tree.bplustree.BPlusTree";
+    final static String TEST_CLASS = "org.liuyehcf.classloader.SubObject";
 
     public AbstractClassLoader() {
         super(new URL[]{JAR_URL});
     }
 
     public static void testTemplate(Class clazz) throws Exception {
-        Constructor constructor = clazz.getConstructor(int.class);
+        Constructor constructor = clazz.getConstructor();
 
-        Object obj = constructor.newInstance(5);
+        Object obj = constructor.newInstance();
 
         System.err.println("ClassLoader: " + obj.getClass().getClassLoader());
         printAllLoadedClasses(obj.getClass().getClassLoader());
 
-        Method methodInsert = clazz.getMethod("insert", int.class);
-        Method methodPrint = clazz.getMethod("levelOrderTraverse");
-
-        methodInsert.invoke(obj, 3);
-        methodInsert.invoke(obj, 4);
-        methodInsert.invoke(obj, 5);
-        methodPrint.invoke(obj);
+        Method method = clazz.getMethod("sayHello");
+        method.invoke(obj);
     }
 
     private static void printAllLoadedClasses(ClassLoader classLoader) throws Exception {
