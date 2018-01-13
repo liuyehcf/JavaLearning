@@ -13,7 +13,6 @@
         <module>concurrent</module>
         <module>algorithm</module>
         <module>test</module>
-        <module>spring</module>
         <module>framework</module>
         <module>io</module>
         <module>office</module>

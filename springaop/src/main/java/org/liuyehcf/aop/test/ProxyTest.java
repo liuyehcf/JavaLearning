@@ -1,10 +1,10 @@
 package org.liuyehcf.aop.test;
 
+import org.junit.Test;
 import org.liuyehcf.aop.ForumService;
 import org.liuyehcf.aop.ForumServiceImpl;
 import org.liuyehcf.aop.cglib.CglibProxy;
 import org.liuyehcf.aop.jdkdp.PerformanceHandler;
-import org.junit.Test;
 
 import java.lang.reflect.Proxy;
 
