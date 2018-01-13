@@ -32,44 +32,12 @@
         <module>security</module>
         <module>jni</module>
         <module>springioc</module>
+        <module>markdownformat</module>
     </modules>
 
     <properties>
         <spring.version>RELEASE</spring.version>
-        <mybatis.version>3.2.3</mybatis.version>
-        <mybatis.spring.version>1.2.1</mybatis.spring.version>
-        <aspectjrt.version>1.6.11</aspectjrt.version>
-        <slf4j.version>1.7.5</slf4j.version>
-        <log.version>1.2.16</log.version>
-        <junit.version>4.12</junit.version>
-        <mysql.connector.version>5.1.29</mysql.connector.version>
-        <commons.dbcp.version>1.4</commons.dbcp.version>
-        <easymock.version>3.1</easymock.version>
-        <mockito.version>1.10.19</mockito.version>
-        <cglib.version>2.2.2</cglib.version>
-        <jodconverter.version>2.2.0</jodconverter.version>
-        <netty.version>4.1.17.Final</netty.version>
-        <com.aliyun.mq.version>1.7.0.Final</com.aliyun.mq.version>
-        <com.aliyun.oos.version>2.8.2</com.aliyun.oos.version>
-        <jedis.version>2.9.0</jedis.version>
-        <httpclient.version>4.5.2</httpclient.version>
-        <commonscodec.version>1.11</commonscodec.version>
-        <fastjson.version>1.2.42</fastjson.version>
     </properties>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.6.0</version>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 
     <dependencyManagement>
         <dependencies>
@@ -77,19 +45,19 @@
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
-                <version>${junit.version}</version>
+                <version>4.12</version>
             </dependency>
 
             <dependency>
                 <groupId>org.easymock</groupId>
                 <artifactId>easymock</artifactId>
-                <version>${easymock.version}</version>
+                <version>3.1</version>
             </dependency>
 
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-all</artifactId>
-                <version>${mockito.version}</version>
+                <version>1.10.19</version>
             </dependency>
 
             <!-- Spring -->
@@ -134,52 +102,52 @@
             <dependency>
                 <groupId>org.aspectj</groupId>
                 <artifactId>aspectjrt</artifactId>
-                <version>${aspectjrt.version}</version>
+                <version>1.6.11</version>
             </dependency>
             <dependency>
                 <groupId>org.aspectj</groupId>
                 <artifactId>aspectjweaver</artifactId>
-                <version>${aspectjrt.version}</version>
+                <version>1.6.11</version>
             </dependency>
 
             <!-- Log -->
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-log4j12</artifactId>
-                <version>${slf4j.version}</version>
+                <version>1.7.5</version>
             </dependency>
 
             <!-- MyBatis -->
             <dependency>
                 <groupId>org.mybatis</groupId>
                 <artifactId>mybatis</artifactId>
-                <version>${mybatis.version}</version>
+                <version>3.2.3</version>
             </dependency>
 
             <dependency>
                 <groupId>org.mybatis</groupId>
                 <artifactId>mybatis-spring</artifactId>
-                <version>${mybatis.spring.version}</version>
+                <version>1.2.1</version>
             </dependency>
 
             <!-- Mysql driver -->
             <dependency>
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
-                <version>${mysql.connector.version}</version>
+                <version>5.1.29</version>
             </dependency>
 
             <dependency>
                 <groupId>commons-dbcp</groupId>
                 <artifactId>commons-dbcp</artifactId>
-                <version>${commons.dbcp.version}</version>
+                <version>1.4</version>
             </dependency>
 
             <!-- Office -->
             <dependency>
                 <groupId>com.artofsolving</groupId>
                 <artifactId>jodconverter</artifactId>
-                <version>${jodconverter.version}</version>
+                <version>2.2.0</version>
             </dependency>
 
 
@@ -187,14 +155,14 @@
             <dependency>
                 <groupId>cglib</groupId>
                 <artifactId>cglib</artifactId>
-                <version>${cglib.version}</version>
+                <version>2.2.2</version>
             </dependency>
 
             <!-- Netty -->
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-all</artifactId>
-                <version>${netty.version}</version>
+                <version>4.1.17.Final</version>
             </dependency>
 
 
@@ -202,13 +170,13 @@
             <dependency>
                 <groupId>com.aliyun.openservices</groupId>
                 <artifactId>ons-client</artifactId>
-                <version>${com.aliyun.mq.version}</version>
+                <version>1.7.0.Final</version>
             </dependency>
 
             <dependency>
                 <groupId>com.aliyun.oss</groupId>
                 <artifactId>aliyun-sdk-oss</artifactId>
-                <version>${com.aliyun.oos.version}</version>
+                <version>2.8.2</version>
             </dependency>
 
 
@@ -216,7 +184,7 @@
             <dependency>
                 <groupId>redis.clients</groupId>
                 <artifactId>jedis</artifactId>
-                <version>${jedis.version}</version>
+                <version>2.9.0</version>
             </dependency>
 
 
@@ -224,23 +192,44 @@
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
-                <version>${httpclient.version}</version>
+                <version>4.5.2</version>
             </dependency>
 
             <!-- Encode/Decode -->
             <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
-                <version>${commonscodec.version}</version>
+                <version>1.11</version>
             </dependency>
 
             <!-- JSON -->
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>fastjson</artifactId>
-                <version>${fastjson.version}</version>
+                <version>1.2.42</version>
+            </dependency>
+
+            <!-- Logback -->
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>1.2.3</version>
             </dependency>
         </dependencies>
 
     </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.6.0</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
