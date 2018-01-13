@@ -11,7 +11,7 @@ import java.util.Set;
  */
 
 public class FormatContext {
-    public FormatContext(File[] files) {
+    public FormatContext(File[] files, String sourceDir) {
         fileNames = new HashSet<String>();
         int i = 0;
         for (File file : files) {
@@ -19,9 +19,12 @@ public class FormatContext {
                 throw new RuntimeException();
             }
         }
+        this.sourceDir = sourceDir;
     }
 
     private File file;
+
+    private final String sourceDir;
 
     private Set<String> fileNames;
 
@@ -33,6 +36,10 @@ public class FormatContext {
 
     public File getFile() {
         return this.file;
+    }
+
+    public String getSourceDir() {
+        return sourceDir;
     }
 
     public boolean containsFileName(String name) {

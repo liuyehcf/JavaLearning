@@ -22,7 +22,7 @@ public class FormatEngine {
 
     private List<String> originalFileContent;
 
-    public FormatEngine(boolean indentation, File[] files) {
+    public FormatEngine(boolean indentation, File[] files, String sourceDir) {
         processors = new ArrayList<>();
 
         processors.add(new IndexProcessor(indentation));
@@ -31,8 +31,9 @@ public class FormatEngine {
         processors.add(new InnerLinkProcessor());
         processors.add(new RedundantEmptyLineProcessor());
         processors.add(new CodeProcessor());
+        processors.add(new ImageAddressCheckProcess());
 
-        formatContext = new FormatContext(files);
+        formatContext = new FormatContext(files, sourceDir);
     }
 
     public void format(File inputFile) {
@@ -166,7 +167,7 @@ public class FormatEngine {
         if (args == null || args.length != 2)
             throw new RuntimeException("Wrong param num");
 
-        File baseDir = new File(args[0]);
+        File baseDir = new File(args[0] + "/_posts");
         String param = args[1];
 
         if (!baseDir.isDirectory())
@@ -183,7 +184,7 @@ public class FormatEngine {
             }
         });
 
-        FormatEngine engine = new FormatEngine(param.equalsIgnoreCase("true"), files);
+        FormatEngine engine = new FormatEngine(param.equalsIgnoreCase("true"), files, args[0]);
 
         for (File file : files) {
             engine.format(file);
