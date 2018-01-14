@@ -3,8 +3,6 @@ package org.liuyehcf.markdownformat;
 import org.liuyehcf.markdownformat.context.DefaultFileContext;
 import org.liuyehcf.markdownformat.context.DefaultProcessorContext;
 import org.liuyehcf.markdownformat.dto.BootParamDTO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 

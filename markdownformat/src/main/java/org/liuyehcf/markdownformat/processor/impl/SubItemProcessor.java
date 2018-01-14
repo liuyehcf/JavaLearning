@@ -5,7 +5,6 @@ import org.liuyehcf.markdownformat.context.FileContext;
 import org.liuyehcf.markdownformat.context.LineElement;
 import org.liuyehcf.markdownformat.context.LineIterator;
 import org.liuyehcf.markdownformat.processor.PreFileProcessor;
-import org.liuyehcf.markdownformat.util.StringUtils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
