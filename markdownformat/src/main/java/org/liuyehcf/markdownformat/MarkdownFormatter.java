@@ -1,6 +1,7 @@
 package org.liuyehcf.markdownformat;
 
 import org.liuyehcf.markdownformat.context.DefaultFileContext;
+import org.liuyehcf.markdownformat.context.DefaultProcessorContext;
 import org.liuyehcf.markdownformat.dto.BootParamDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,17 +11,26 @@ import java.io.File;
 import static org.liuyehcf.markdownformat.constant.ErrorConstant.WRONG_PARAMS;
 import static org.liuyehcf.markdownformat.constant.ParamConstant.DEFAULT_FILE_DIRECTORY_SIMPLE_NAME;
 import static org.liuyehcf.markdownformat.constant.ParamConstant.DEFAULT_IMAGE_DIRECTORY_SIMPLE_NAME;
+import static org.liuyehcf.markdownformat.log.CommonLogger.logger;
 
 /**
  * Created by HCF on 2018/1/13.
  */
 public class MarkdownFormatter {
-    private static final Logger logger = LoggerFactory.getLogger(MarkdownFormatter.class);
 
     public static void main(String[] args) {
         BootParamDTO bootParamDTO = prepareParamDTO(args);
 
         DefaultFileContext fileContext = new DefaultFileContext(bootParamDTO);
+        DefaultProcessorContext processorContext = new DefaultProcessorContext();
+
+        while (fileContext.hasNextFile()) {
+            // 处理当前文件
+            processorContext.process(fileContext);
+
+            // 移动指针
+            fileContext.moveForward();
+        }
     }
 
     private static BootParamDTO prepareParamDTO(String[] args) {

@@ -2,11 +2,13 @@ package org.liuyehcf.markdownformat.context;
 
 import org.liuyehcf.markdownformat.dto.BootParamDTO;
 
-import java.io.File;
-import java.io.FileFilter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+
+import static org.liuyehcf.markdownformat.log.CommonLogger.logger;
 
 /**
  * Created by HCF on 2018/1/13.
@@ -23,7 +25,7 @@ public class DefaultFileContext implements FileContext {
 
     private List<File> files;
 
-    private LineContext lineContext;
+    private LinkedList<LineElement> lineElements;
 
     public DefaultFileContext(BootParamDTO paramDTO) {
         rootDirectory = paramDTO.getRootDirectory();
@@ -51,8 +53,21 @@ public class DefaultFileContext implements FileContext {
     }
 
     @Override
-    public LineContext getCurrentLineContext() {
-        return lineContext;
+    public File getCurrentFile() {
+        return files.get(index);
+    }
+
+    @Override
+    public LineIterator getLineIteratorOfCurrentFile() {
+        if (lineElements == null) {
+            try {
+                readCurrentFile();
+            } catch (IOException e) {
+                logger.error(e.getMessage());
+                throw new RuntimeException(e);
+            }
+        }
+        return new DefaultLineIterator(lineElements);
     }
 
     @Override
@@ -71,12 +86,57 @@ public class DefaultFileContext implements FileContext {
     }
 
     @Override
-    public boolean isFinished() {
+    public boolean hasNextFile() {
         return index < files.size();
     }
 
     @Override
     public void moveForward() {
         index++;
+        lineElements = null;
+    }
+
+    private void readCurrentFile() throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader(files.get(index)));
+
+        String line;
+        lineElements = new LinkedList<>();
+
+        while ((line = reader.readLine()) != null) {
+            if (line.contains("```")) {
+                //cache "```" itself
+                lineElements.add(new DefaultLineElement(line, true));
+
+                while ((line = reader.readLine()) != null && !line.contains("```")) {
+                    lineElements.add(new DefaultLineElement(line, true));
+                }
+
+                if (line == null) {
+                    logger.error("``` No pairs appear");
+                    throw new RuntimeException();
+                }
+
+                //cache "```" itself
+                lineElements.add(new DefaultLineElement(line, true));
+
+            } else {
+
+                lineElements.add(new DefaultLineElement(line, false));
+            }
+        }
+    }
+
+    @Override
+    public boolean containsFile(String name) {
+        if (!name.endsWith(".md")) {
+            name = name + ".md";
+        }
+
+        for (File file : files) {
+            if (file.getName().equals(name)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

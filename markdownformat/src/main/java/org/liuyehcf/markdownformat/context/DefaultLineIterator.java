@@ -6,9 +6,9 @@ import java.util.ListIterator;
 /**
  * Created by HCF on 2018/1/14.
  */
-public class DefaultLineContext implements LineContext {
+public class DefaultLineIterator implements LineIterator {
 
-    private ListIterator<String> iterator;
+    private ListIterator<LineElement> iterator;
 
     private boolean isPreviousValid;
 
@@ -16,30 +16,25 @@ public class DefaultLineContext implements LineContext {
 
     private boolean isNextValid;
 
-    private String previousLine;
+    private LineElement previousLine;
 
-    private String currentLine;
+    private LineElement currentLine;
 
-    private String nextLine;
+    private LineElement nextLine;
 
-    public DefaultLineContext(LinkedList<String> lines) {
+    public DefaultLineIterator(LinkedList<LineElement> lines) {
         iterator = lines.listIterator();
     }
 
     @Override
-    public boolean hasPreviousLine() {
-        return iterator.hasPrevious();
-    }
-
-    @Override
-    public boolean hasNextLine() {
+    public boolean isNotFinish() {
         return iterator.hasNext();
     }
 
     @Override
-    public String getPreviousLine() {
+    public LineElement getPreviousLineElement() {
         if (!isPreviousValid) {
-            if (hasPreviousLine()) {
+            if (iterator.hasPrevious()) {
                 previousLine = iterator.previous();
                 iterator.next();
             } else {
@@ -51,7 +46,7 @@ public class DefaultLineContext implements LineContext {
     }
 
     @Override
-    public String getCurrentLine() {
+    public LineElement getCurrentLineElement() {
         if (!isCurrentValid) {
             currentLine = iterator.next();
             iterator.previous();
@@ -61,10 +56,10 @@ public class DefaultLineContext implements LineContext {
     }
 
     @Override
-    public String getNextLine() {
+    public LineElement getNextLineElement() {
         if (!isNextValid) {
             iterator.next();
-            if (hasNextLine()) {
+            if (isNotFinish()) {
                 nextLine = iterator.next();
                 iterator.previous();
             } else {
@@ -77,26 +72,49 @@ public class DefaultLineContext implements LineContext {
     }
 
     @Override
-    public void moveForward() {
-        previousLine = getCurrentLine();
-        currentLine = getNextLine();
+    public void insertPrevious(LineElement lineElement) {
+        iterator.add(lineElement);
 
-        isPreviousValid = true;
-        isCurrentValid = true;
-        isNextValid = false;
+        setInValid();
+    }
 
+    @Override
+    public void insertNext(LineElement lineElement) {
         iterator.next();
+
+        iterator.add(lineElement);
+
+        iterator.previous();
+        iterator.previous();
+
+        setInValid();
+    }
+
+    @Override
+    public void removePreviousLine() {
+        iterator.previous();
+        iterator.remove();
+
+        setInValid();
+    }
+
+    @Override
+    public void moveForward() {
+        iterator.next();
+
+        setInValid();
     }
 
     @Override
     public void moveBackward() {
-        nextLine = getCurrentLine();
-        currentLine = getPreviousLine();
-
-        isNextValid = true;
-        isCurrentValid = true;
-        isPreviousValid = false;
-
         iterator.previous();
+
+        setInValid();
+    }
+
+    private void setInValid() {
+        isNextValid = false;
+        isCurrentValid = false;
+        isPreviousValid = false;
     }
 }
