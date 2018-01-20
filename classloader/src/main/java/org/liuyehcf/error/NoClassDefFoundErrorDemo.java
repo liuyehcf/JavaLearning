@@ -6,7 +6,8 @@ public class NoClassDefFoundErrorDemo {
         try {
             Class.forName("org.liuyehcf.error.WrongClass");
         } catch (Throwable e) {
-            //e.printStackTrace();
+            // 这里必须用Throwable吃掉
+            e.printStackTrace();
         }
 
         System.out.println("使用");
