@@ -33,6 +33,7 @@
         <module>jni</module>
         <module>springioc</module>
         <module>markdownformat</module>
+        <module>logback</module>
     </modules>
 
     <properties>
