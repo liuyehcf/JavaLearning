@@ -21,7 +21,7 @@ public class SampleController {
 
 
     @ApiOperation(value = "POST DEMO", notes = "POST NOTES")
-    @ApiImplicitParam(name = "param", value = "参数1", required = true, dataType = "String")
+    @ApiImplicitParam(name = "param", value = "参数", required = true, dataType = "String")
     @RequestMapping(value = "/post", method = RequestMethod.POST)
     @ResponseBody
     public String postDemo(@RequestBody String param) {
