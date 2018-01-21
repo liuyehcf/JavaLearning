@@ -2,19 +2,29 @@ package org.liuyehcf.error;
 
 public class NoClassDefFoundErrorDemo {
     public static void main(String[] args) {
-        System.out.println("加载类");
         try {
-            Class.forName("org.liuyehcf.error.WrongClass");
+            Class.forName("org.liuyehcf.error.InitializeThrowError");
         } catch (Throwable e) {
-            // 这里必须用Throwable吃掉
+            // 这里捕获到的是java.lang.ExceptionInInitializerError
             e.printStackTrace();
         }
 
-        System.out.println("使用");
         try {
-            WrongClass.INSTANCE.sayHello();
+            InitializeThrowError.INSTANCE.sayHello();
         } catch (Throwable e) {
             e.printStackTrace();
         }
+    }
+}
+
+class InitializeThrowError {
+    public static final InitializeThrowError INSTANCE = new InitializeThrowError();
+
+    public InitializeThrowError() {
+        throw new RuntimeException();
+    }
+
+    public void sayHello() {
+        System.out.println("hello, world!");
     }
 }
