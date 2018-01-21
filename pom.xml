@@ -34,6 +34,7 @@
         <module>springioc</module>
         <module>markdownformat</module>
         <module>logback</module>
+        <module>swagger</module>
     </modules>
 
     <properties>
