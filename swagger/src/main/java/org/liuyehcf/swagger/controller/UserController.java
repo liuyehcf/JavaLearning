@@ -33,11 +33,11 @@ public class UserController {
     }
 
     @ApiOperation(value = "GET_USER_API_2", notes = "获取User方式2")
-    @RequestMapping(value = "getApi2/{id}", method = RequestMethod.GET)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "用户id", required = true, paramType = "path", dataType = "int"),
             @ApiImplicitParam(name = "name", value = "用户名字", required = true, paramType = "query", dataType = "String")
     })
+    @RequestMapping(value = "getApi2/{id}", method = RequestMethod.GET)
     @ResponseBody
     public User getUserByIdAndName2(
             @PathVariable int id,
