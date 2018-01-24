@@ -3,7 +3,9 @@ package org.liuyehcf.compile.grammar.regex;
 import org.junit.Test;
 import org.liuyehcf.compile.grammar.regex.util.TestCaseBuilder;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

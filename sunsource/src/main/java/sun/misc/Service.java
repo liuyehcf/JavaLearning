@@ -200,6 +200,102 @@ public final class Service {
         return names.iterator();
     }
 
+    /**
+     * Locates and incrementally instantiates the available providers of a
+     * given service using the given class loader.
+     * <p>
+     * <p> This method transforms the name of the given service class into a
+     * provider-configuration filename as described above and then uses the
+     * <tt>getResources</tt> method of the given class loader to find all
+     * available files with that name.  These files are then read and parsed to
+     * produce a list of provider-class names.  The iterator that is returned
+     * uses the given class loader to lookup and then instantiate each element
+     * of the list.
+     * <p>
+     * <p> Because it is possible for extensions to be installed into a running
+     * Java virtual machine, this method may return different results each time
+     * it is invoked. <p>
+     *
+     * @param service The service's abstract service class
+     * @param loader  The class loader to be used to load provider-configuration files
+     *                and instantiate provider classes, or <tt>null</tt> if the system
+     *                class loader (or, failing that the bootstrap class loader) is to
+     *                be used
+     * @return An <tt>Iterator</tt> that yields provider objects for the given
+     * service, in some arbitrary order.  The iterator will throw a
+     * <tt>ServiceConfigurationError</tt> if a provider-configuration
+     * file violates the specified format or if a provider class cannot
+     * be found and instantiated.
+     * @throws ServiceConfigurationError If a provider-configuration file violates the specified format
+     *                                   or names a provider class that cannot be found and instantiated
+     * @see #providers(Class)
+     * @see #installedProviders(Class)
+     */
+    public static Iterator providers(Class service, ClassLoader loader)
+            throws ServiceConfigurationError {
+        return new LazyIterator(service, loader);
+    }
+
+    /**
+     * Locates and incrementally instantiates the available providers of a
+     * given service using the context class loader.  This convenience method
+     * is equivalent to
+     * <p>
+     * <pre>
+     *   ClassLoader cl = Thread.currentThread().getContextClassLoader();
+     *   return Service.providers(service, cl);
+     * </pre>
+     *
+     * @param service The service's abstract service class
+     * @return An <tt>Iterator</tt> that yields provider objects for the given
+     * service, in some arbitrary order.  The iterator will throw a
+     * <tt>ServiceConfigurationError</tt> if a provider-configuration
+     * file violates the specified format or if a provider class cannot
+     * be found and instantiated.
+     * @throws ServiceConfigurationError If a provider-configuration file violates the specified format
+     *                                   or names a provider class that cannot be found and instantiated
+     * @see #providers(Class, ClassLoader)
+     */
+    public static Iterator providers(Class service)
+            throws ServiceConfigurationError {
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        return Service.providers(service, cl);
+    }
+
+    /**
+     * Locates and incrementally instantiates the available providers of a
+     * given service using the extension class loader.  This convenience method
+     * simply locates the extension class loader, call it
+     * <tt>extClassLoader</tt>, and then does
+     * <p>
+     * <pre>
+     *   return Service.providers(service, extClassLoader);
+     * </pre>
+     * <p>
+     * If the extension class loader cannot be found then the system class
+     * loader is used; if there is no system class loader then the bootstrap
+     * class loader is used.
+     *
+     * @param service The service's abstract service class
+     * @return An <tt>Iterator</tt> that yields provider objects for the given
+     * service, in some arbitrary order.  The iterator will throw a
+     * <tt>ServiceConfigurationError</tt> if a provider-configuration
+     * file violates the specified format or if a provider class cannot
+     * be found and instantiated.
+     * @throws ServiceConfigurationError If a provider-configuration file violates the specified format
+     *                                   or names a provider class that cannot be found and instantiated
+     * @see #providers(Class, ClassLoader)
+     */
+    public static Iterator installedProviders(Class service)
+            throws ServiceConfigurationError {
+        ClassLoader cl = ClassLoader.getSystemClassLoader();
+        ClassLoader prev = null;
+        while (cl != null) {
+            prev = cl;
+            cl = cl.getParent();
+        }
+        return Service.providers(service, prev);
+    }
 
     /**
      * Private inner class implementing fully-lazy provider lookup
@@ -259,113 +355,13 @@ public final class Service {
                         "Provider " + cn + " could not be instantiated: " + x,
                         x);
             }
-            return null;	/* This cannot happen */
+            return null;    /* This cannot happen */
         }
 
         public void remove() {
             throw new UnsupportedOperationException();
         }
 
-    }
-
-
-    /**
-     * Locates and incrementally instantiates the available providers of a
-     * given service using the given class loader.
-     * <p>
-     * <p> This method transforms the name of the given service class into a
-     * provider-configuration filename as described above and then uses the
-     * <tt>getResources</tt> method of the given class loader to find all
-     * available files with that name.  These files are then read and parsed to
-     * produce a list of provider-class names.  The iterator that is returned
-     * uses the given class loader to lookup and then instantiate each element
-     * of the list.
-     * <p>
-     * <p> Because it is possible for extensions to be installed into a running
-     * Java virtual machine, this method may return different results each time
-     * it is invoked. <p>
-     *
-     * @param service The service's abstract service class
-     * @param loader  The class loader to be used to load provider-configuration files
-     *                and instantiate provider classes, or <tt>null</tt> if the system
-     *                class loader (or, failing that the bootstrap class loader) is to
-     *                be used
-     * @return An <tt>Iterator</tt> that yields provider objects for the given
-     * service, in some arbitrary order.  The iterator will throw a
-     * <tt>ServiceConfigurationError</tt> if a provider-configuration
-     * file violates the specified format or if a provider class cannot
-     * be found and instantiated.
-     * @throws ServiceConfigurationError If a provider-configuration file violates the specified format
-     *                                   or names a provider class that cannot be found and instantiated
-     * @see #providers(Class)
-     * @see #installedProviders(Class)
-     */
-    public static Iterator providers(Class service, ClassLoader loader)
-            throws ServiceConfigurationError {
-        return new LazyIterator(service, loader);
-    }
-
-
-    /**
-     * Locates and incrementally instantiates the available providers of a
-     * given service using the context class loader.  This convenience method
-     * is equivalent to
-     * <p>
-     * <pre>
-     *   ClassLoader cl = Thread.currentThread().getContextClassLoader();
-     *   return Service.providers(service, cl);
-     * </pre>
-     *
-     * @param service The service's abstract service class
-     * @return An <tt>Iterator</tt> that yields provider objects for the given
-     * service, in some arbitrary order.  The iterator will throw a
-     * <tt>ServiceConfigurationError</tt> if a provider-configuration
-     * file violates the specified format or if a provider class cannot
-     * be found and instantiated.
-     * @throws ServiceConfigurationError If a provider-configuration file violates the specified format
-     *                                   or names a provider class that cannot be found and instantiated
-     * @see #providers(Class, ClassLoader)
-     */
-    public static Iterator providers(Class service)
-            throws ServiceConfigurationError {
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        return Service.providers(service, cl);
-    }
-
-
-    /**
-     * Locates and incrementally instantiates the available providers of a
-     * given service using the extension class loader.  This convenience method
-     * simply locates the extension class loader, call it
-     * <tt>extClassLoader</tt>, and then does
-     * <p>
-     * <pre>
-     *   return Service.providers(service, extClassLoader);
-     * </pre>
-     * <p>
-     * If the extension class loader cannot be found then the system class
-     * loader is used; if there is no system class loader then the bootstrap
-     * class loader is used.
-     *
-     * @param service The service's abstract service class
-     * @return An <tt>Iterator</tt> that yields provider objects for the given
-     * service, in some arbitrary order.  The iterator will throw a
-     * <tt>ServiceConfigurationError</tt> if a provider-configuration
-     * file violates the specified format or if a provider class cannot
-     * be found and instantiated.
-     * @throws ServiceConfigurationError If a provider-configuration file violates the specified format
-     *                                   or names a provider class that cannot be found and instantiated
-     * @see #providers(Class, ClassLoader)
-     */
-    public static Iterator installedProviders(Class service)
-            throws ServiceConfigurationError {
-        ClassLoader cl = ClassLoader.getSystemClassLoader();
-        ClassLoader prev = null;
-        while (cl != null) {
-            prev = cl;
-            cl = cl.getParent();
-        }
-        return Service.providers(service, prev);
     }
 
 }

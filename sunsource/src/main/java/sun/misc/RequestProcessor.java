@@ -12,8 +12,8 @@ package sun.misc;
  * in arbitrary threads, and to be posted for execution in a non-restricted
  * thread.
  *
- * @version %I%, %G%
  * @author Steven B. Byrne
+ * @version %I%, %G%
  */
 
 
@@ -29,6 +29,29 @@ public class RequestProcessor implements Runnable {
     public static void postRequest(Request req) {
         lazyInitialize();
         requestQueue.enqueue(req);
+    }
+
+    /**
+     * This method initiates the request processor thread.  It is safe
+     * to call it after the thread has been started.  It provides a way for
+     * clients to deliberately control the context in which the request
+     * processor thread is created
+     */
+    public static synchronized void startProcessing() {
+        if (dispatcher == null) {
+            dispatcher = new Thread(new RequestProcessor(), "Request Processor");
+            dispatcher.setPriority(Thread.NORM_PRIORITY + 2);
+            dispatcher.start();
+        }
+    }
+
+    /**
+     * This method performs lazy initialization.
+     */
+    private static synchronized void lazyInitialize() {
+        if (requestQueue == null) {
+            requestQueue = new Queue();
+        }
     }
 
     /**
@@ -51,31 +74,6 @@ public class RequestProcessor implements Runnable {
             } catch (InterruptedException e) {
                 // do nothing at the present time.
             }
-        }
-    }
-
-
-    /**
-     * This method initiates the request processor thread.  It is safe
-     * to call it after the thread has been started.  It provides a way for
-     * clients to deliberately control the context in which the request
-     * processor thread is created
-     */
-    public static synchronized void startProcessing() {
-        if (dispatcher == null) {
-            dispatcher = new Thread(new RequestProcessor(), "Request Processor");
-            dispatcher.setPriority(Thread.NORM_PRIORITY + 2);
-            dispatcher.start();
-        }
-    }
-
-
-    /**
-     * This method performs lazy initialization.
-     */
-    private static synchronized void lazyInitialize() {
-        if (requestQueue == null) {
-            requestQueue = new Queue();
         }
     }
 

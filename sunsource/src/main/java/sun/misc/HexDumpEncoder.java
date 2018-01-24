@@ -23,8 +23,8 @@ import java.io.PrintStream;
  * by ascii coded hexadecimal bytes followed by the ASCII representation of
  * the bytes or '.' if they are not valid bytes.
  *
- * @version    %I%, %G%
  * @author Chuck McManis
+ * @version %I%, %G%
  */
 
 public class HexDumpEncoder extends CharacterEncoder {

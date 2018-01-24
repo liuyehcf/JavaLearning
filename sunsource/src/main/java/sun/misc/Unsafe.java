@@ -24,7 +24,13 @@ import java.security.ProtectionDomain;
 
 public final class Unsafe {
 
-    private static native void registerNatives();
+    /**
+     * This constant differs from all results that will ever be returned from
+     * {@link #staticFieldOffset}, {@link #objectFieldOffset},
+     * or {@link #arrayBaseOffset}.
+     */
+    public static final int INVALID_FIELD_OFFSET = -1;
+    private static final Unsafe theUnsafe = new Unsafe();
 
     static {
         registerNatives();
@@ -33,7 +39,13 @@ public final class Unsafe {
     private Unsafe() {
     }
 
-    private static final Unsafe theUnsafe = new Unsafe();
+    private static native void registerNatives();
+
+    /// peek and poke operations
+    /// (compilers should optimize these to memory ops)
+
+    // These work on object fields in the Java heap.
+    // They will not work on elements of packed arrays.
 
     /**
      * Provides the caller with the capability of performing unsafe
@@ -71,12 +83,6 @@ public final class Unsafe {
             throw new SecurityException("Unsafe");
         return theUnsafe;
     }
-
-    /// peek and poke operations
-    /// (compilers should optimize these to memory ops)
-
-    // These work on object fields in the Java heap.
-    // They will not work on elements of packed arrays.
 
     /**
      * Fetches a value from a given Java variable.
@@ -404,6 +410,8 @@ public final class Unsafe {
         return getDouble(o, (long) offset);
     }
 
+    // These work on values in the C heap.
+
     /**
      * @deprecated As of 1.4.1, cast the 32-bit offset argument to a long.
      * See {@link #staticFieldOffset}.
@@ -412,8 +420,6 @@ public final class Unsafe {
     public void putDouble(Object o, int offset, double x) {
         putDouble(o, (long) offset, x);
     }
-
-    // These work on values in the C heap.
 
     /**
      * Fetches a value from a given memory address.  If the address is zero, or
@@ -509,6 +515,8 @@ public final class Unsafe {
      */
     public native long getAddress(long address);
 
+    /// wrappers for malloc, realloc, free:
+
     /**
      * Stores a native pointer into a given memory address.  If the address is
      * zero, or does not point into a block obtained from {@link
@@ -520,8 +528,6 @@ public final class Unsafe {
      * @see #getAddress(long)
      */
     public native void putAddress(long address, long x);
-
-    /// wrappers for malloc, realloc, free:
 
     /**
      * Allocates a new block of native memory, of the given size in bytes.  The
@@ -593,6 +599,8 @@ public final class Unsafe {
         copyMemory(null, srcAddress, null, destAddress, bytes);
     }
 
+    /// random queries
+
     /**
      * Disposes of a block of native memory, as obtained from {@link
      * #allocateMemory} or {@link #reallocateMemory}.  The address passed to
@@ -601,15 +609,6 @@ public final class Unsafe {
      * @see #allocateMemory
      */
     public native void freeMemory(long address);
-
-    /// random queries
-
-    /**
-     * This constant differs from all results that will ever be returned from
-     * {@link #staticFieldOffset}, {@link #objectFieldOffset},
-     * or {@link #arrayBaseOffset}.
-     */
-    public static final int INVALID_FIELD_OFFSET = -1;
 
     /**
      * Returns the offset of a field, truncated to 32 bits.

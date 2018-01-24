@@ -10,6 +10,14 @@ import java.util.*;
  */
 public abstract class TestCaseBuilder {
 
+    private static char[] alphabetCharacters = new char[256];
+
+    static {
+        for (char c = 0; c < 256; c++) {
+            alphabetCharacters[c] = c;
+        }
+    }
+
     protected final String regex;
     int index = 0;
     LinkedList<String> contentStack = new LinkedList<>();
@@ -31,14 +39,6 @@ public abstract class TestCaseBuilder {
             randomTestCases.addAll(RandomCaseBuilder.getRandomTestCasesWithRegex(regex));
         }
         return randomTestCases;
-    }
-
-    private static char[] alphabetCharacters = new char[256];
-
-    static {
-        for (char c = 0; c < 256; c++) {
-            alphabetCharacters[c] = c;
-        }
     }
 
     private static Set<Character> getOppositeChars(Set<Character> excludedChars) {
@@ -127,10 +127,128 @@ public abstract class TestCaseBuilder {
 
     protected abstract Set<String> getTestCasesWithRegex(String regex);
 
+    void pushCurStackUnion() {
+        if (curContent != null) {
+            contentStack.push(curContent);
+            curContent = null;
+        }
+    }
+
+    void popToCurStackUnion() {
+        if (!contentStack.isEmpty())
+            curContent = contentStack.pop();
+        else
+            curContent = null;
+    }
+
+    String getCombinedStringOfCurGroup() {
+        LinkedList<String> curRevokeStack = new LinkedList<>();
+
+        StringBuilder sb = new StringBuilder();
+
+        while (!contentStack.isEmpty()) {
+            String peekContent = contentStack.pop();
+            sb.insert(0, peekContent);
+            curRevokeStack.push(peekContent);
+        }
+
+        revokeHelper.push(curRevokeStack);
+
+        return sb.toString();
+    }
+
+    List<List<String>> getTestCasesOfAllParts(String combinedStringOfCurGroup) {
+
+        List<List<String>> testCasesOfAllParts = new ArrayList<>();
+        testCasesOfAllParts.add(Arrays.asList(combinedStringOfCurGroup));
+
+        addAllAdjacentOrParts(testCasesOfAllParts);
+
+        return testCasesOfAllParts;
+    }
+
+    private void addAllAdjacentOrParts(List<List<String>> testCasesOfAllParts) {
+        do {
+            testCasesOfAllParts.add(getTestCasesOfNextPart());
+        } while (hasNext() && getCurChar() == '|');
+    }
+
+    void revokeCombinedStringOfCurGroup() {
+        LinkedList<String> curRevokeStack = revokeHelper.pop();
+
+        while (!curRevokeStack.isEmpty()) {
+            contentStack.push(curRevokeStack.pop());
+        }
+    }
+
+    String copy(String origin, int times) {
+        String s = "";
+        while (times-- > 0) {
+            s += origin;
+        }
+        return s;
+    }
+
+    List<Character> getAllOptionalChars() {
+        index++;
+        boolean isNot = (getCurChar() == '^');
+
+        Set<Character> optionalChars = new HashSet<>();
+        if (isNot) index++;
+
+        do {
+            if (getCurChar() == '\\') {
+                index++;
+                for (Symbol symbol : EscapedUtil.getSymbolsOfEscapedCharInMiddleParenthesis(getCurChar())) {
+                    optionalChars.add(symbol.getSymbol().charAt(0));
+                }
+            } else {
+                optionalChars.add(getCurChar());
+            }
+            index++;
+        } while (getCurChar() != ']');
+
+        index++;
+
+        if (isNot) {
+            optionalChars = getOppositeChars(optionalChars);
+        }
+
+        return new ArrayList<>(optionalChars);
+    }
+
+    List<String> getTestCasesOfNextPart() {
+        int count = 1;
+        index++;
+        int startIndex = index, endIndex;
+        while (hasNext() && count > 0) {
+            if (getCurChar() == '(') {
+                count++;
+            } else if (getCurChar() == ')') {
+                count--;
+            }
+            index++;
+        }
+
+        if (count == 0) {
+            endIndex = index - 1;
+        } else {
+            endIndex = index;
+        }
+
+        return new ArrayList<>(getTestCasesWithRegex(regex.substring(startIndex, endIndex)));
+    }
+
     private static final class EachCaseBuilder extends TestCaseBuilder {
 
         public EachCaseBuilder(String regex) {
             super(regex);
+        }
+
+        static Set<String> getEachTestCasesWithRegex(String regex) {
+            EachCaseBuilder testCaseBuilder = new EachCaseBuilder(regex);
+            testCaseBuilder.build();
+            return testCaseBuilder.testCases;
         }
 
         @Override
@@ -264,12 +382,6 @@ public abstract class TestCaseBuilder {
         protected Set<String> getTestCasesWithRegex(String regex) {
             return getEachTestCasesWithRegex(regex);
         }
-
-        static Set<String> getEachTestCasesWithRegex(String regex) {
-            EachCaseBuilder testCaseBuilder = new EachCaseBuilder(regex);
-            testCaseBuilder.build();
-            return testCaseBuilder.testCases;
-        }
     }
 
     private static final class RandomCaseBuilder extends TestCaseBuilder {
@@ -277,6 +389,12 @@ public abstract class TestCaseBuilder {
 
         public RandomCaseBuilder(String regex) {
             super(regex);
+        }
+
+        static Set<String> getRandomTestCasesWithRegex(String regex) {
+            RandomCaseBuilder testCaseBuilder = new RandomCaseBuilder(regex);
+            testCaseBuilder.backtracking();
+            return testCaseBuilder.testCases;
         }
 
         @Override
@@ -309,7 +427,6 @@ public abstract class TestCaseBuilder {
 
             backtracking();
         }
-
 
         @Override
         protected void processWhenEncounteredStar() {
@@ -385,124 +502,6 @@ public abstract class TestCaseBuilder {
         protected Set<String> getTestCasesWithRegex(String regex) {
             return getRandomTestCasesWithRegex(regex);
         }
-
-        static Set<String> getRandomTestCasesWithRegex(String regex) {
-            RandomCaseBuilder testCaseBuilder = new RandomCaseBuilder(regex);
-            testCaseBuilder.backtracking();
-            return testCaseBuilder.testCases;
-        }
-    }
-
-    void pushCurStackUnion() {
-        if (curContent != null) {
-            contentStack.push(curContent);
-            curContent = null;
-        }
-    }
-
-    void popToCurStackUnion() {
-        if (!contentStack.isEmpty())
-            curContent = contentStack.pop();
-        else
-            curContent = null;
-    }
-
-    String getCombinedStringOfCurGroup() {
-        LinkedList<String> curRevokeStack = new LinkedList<>();
-
-        StringBuilder sb = new StringBuilder();
-
-        while (!contentStack.isEmpty()) {
-            String peekContent = contentStack.pop();
-            sb.insert(0, peekContent);
-            curRevokeStack.push(peekContent);
-        }
-
-        revokeHelper.push(curRevokeStack);
-
-        return sb.toString();
-    }
-
-    List<List<String>> getTestCasesOfAllParts(String combinedStringOfCurGroup) {
-
-        List<List<String>> testCasesOfAllParts = new ArrayList<>();
-        testCasesOfAllParts.add(Arrays.asList(combinedStringOfCurGroup));
-
-        addAllAdjacentOrParts(testCasesOfAllParts);
-
-        return testCasesOfAllParts;
-    }
-
-    private void addAllAdjacentOrParts(List<List<String>> testCasesOfAllParts) {
-        do {
-            testCasesOfAllParts.add(getTestCasesOfNextPart());
-        } while (hasNext() && getCurChar() == '|');
-    }
-
-    void revokeCombinedStringOfCurGroup() {
-        LinkedList<String> curRevokeStack = revokeHelper.pop();
-
-        while (!curRevokeStack.isEmpty()) {
-            contentStack.push(curRevokeStack.pop());
-        }
-    }
-
-    String copy(String origin, int times) {
-        String s = "";
-        while (times-- > 0) {
-            s += origin;
-        }
-        return s;
-    }
-
-    List<Character> getAllOptionalChars() {
-        index++;
-        boolean isNot = (getCurChar() == '^');
-
-        Set<Character> optionalChars = new HashSet<>();
-        if (isNot) index++;
-
-        do {
-            if (getCurChar() == '\\') {
-                index++;
-                for (Symbol symbol : EscapedUtil.getSymbolsOfEscapedCharInMiddleParenthesis(getCurChar())) {
-                    optionalChars.add(symbol.getSymbol().charAt(0));
-                }
-            } else {
-                optionalChars.add(getCurChar());
-            }
-            index++;
-        } while (getCurChar() != ']');
-
-        index++;
-
-        if (isNot) {
-            optionalChars = getOppositeChars(optionalChars);
-        }
-
-        return new ArrayList<>(optionalChars);
-    }
-
-    List<String> getTestCasesOfNextPart() {
-        int count = 1;
-        index++;
-        int startIndex = index, endIndex;
-        while (hasNext() && count > 0) {
-            if (getCurChar() == '(') {
-                count++;
-            } else if (getCurChar() == ')') {
-                count--;
-            }
-            index++;
-        }
-
-        if (count == 0) {
-            endIndex = index - 1;
-        } else {
-            endIndex = index;
-        }
-
-        return new ArrayList<>(getTestCasesWithRegex(regex.substring(startIndex, endIndex)));
     }
 }
 

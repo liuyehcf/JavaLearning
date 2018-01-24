@@ -9,18 +9,18 @@ public class Production {
     private final Symbol nonAlphabetSymbol;
     private final SymbolString symbolString;
 
+    public Production(Symbol nonAlphabetSymbol,
+                      SymbolString symbolString) {
+        this.nonAlphabetSymbol = nonAlphabetSymbol;
+        this.symbolString = symbolString;
+    }
+
     public Symbol getNonAlphabetSymbol() {
         return nonAlphabetSymbol;
     }
 
     public SymbolString getSymbolString() {
         return symbolString;
-    }
-
-    public Production(Symbol nonAlphabetSymbol,
-                      SymbolString symbolString) {
-        this.nonAlphabetSymbol = nonAlphabetSymbol;
-        this.symbolString = symbolString;
     }
 
     @Override

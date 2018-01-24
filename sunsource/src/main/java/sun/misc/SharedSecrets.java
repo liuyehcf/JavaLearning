@@ -45,24 +45,20 @@ public class SharedSecrets {
         javaUtilJarAccess = access;
     }
 
-    public static void setJavaLangAccess(JavaLangAccess jla) {
-        javaLangAccess = jla;
-    }
-
     public static JavaLangAccess getJavaLangAccess() {
         return javaLangAccess;
     }
 
-    public static void setJavaNetAccess(JavaNetAccess jna) {
-        javaNetAccess = jna;
+    public static void setJavaLangAccess(JavaLangAccess jla) {
+        javaLangAccess = jla;
     }
 
     public static JavaNetAccess getJavaNetAccess() {
         return javaNetAccess;
     }
 
-    public static void setJavaIOAccess(JavaIOAccess jia) {
-        javaIOAccess = jia;
+    public static void setJavaNetAccess(JavaNetAccess jna) {
+        javaNetAccess = jna;
     }
 
     public static JavaIOAccess getJavaIOAccess() {
@@ -72,8 +68,8 @@ public class SharedSecrets {
         return javaIOAccess;
     }
 
-    public static void setJavaIOFileDescriptorAccess(JavaIOFileDescriptorAccess jiofda) {
-        javaIOFileDescriptorAccess = jiofda;
+    public static void setJavaIOAccess(JavaIOAccess jia) {
+        javaIOAccess = jia;
     }
 
     public static JavaIOFileDescriptorAccess getJavaIOFileDescriptorAccess() {
@@ -83,9 +79,8 @@ public class SharedSecrets {
         return javaIOFileDescriptorAccess;
     }
 
-    public static void setJavaSecurityProtectionDomainAccess
-            (JavaSecurityProtectionDomainAccess jspda) {
-        javaSecurityProtectionDomainAccess = jspda;
+    public static void setJavaIOFileDescriptorAccess(JavaIOFileDescriptorAccess jiofda) {
+        javaIOFileDescriptorAccess = jiofda;
     }
 
     public static JavaSecurityProtectionDomainAccess
@@ -94,5 +89,10 @@ public class SharedSecrets {
             unsafe.ensureClassInitialized(ProtectionDomain.class);
         }
         return javaSecurityProtectionDomainAccess;
+    }
+
+    public static void setJavaSecurityProtectionDomainAccess
+            (JavaSecurityProtectionDomainAccess jspda) {
+        javaSecurityProtectionDomainAccess = jspda;
     }
 }

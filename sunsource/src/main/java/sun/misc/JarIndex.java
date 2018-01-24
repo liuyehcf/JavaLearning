@@ -30,27 +30,9 @@ import java.util.zip.ZipFile;
 public class JarIndex {
 
     /**
-     * The hash map that maintains mappings from
-     * package/classe/resource to jar file list(s)
-     */
-    private HashMap indexMap;
-
-    /**
-     * The hash map that maintains mappings from
-     * jar file to package/class/resource lists
-     */
-    private HashMap jarMap;
-
-    /*
-     * An ordered list of jar file names.
-     */
-    private String[] jarFiles;
-
-    /**
      * The index file name.
      */
     public static final String INDEX_NAME = "META-INF/INDEX.LIST";
-
     /**
      * true if, and only if, sun.misc.JarIndex.metaInfFilenames is set to true.
      * If true, the names of the files in META-INF, and its subdirectories, will
@@ -58,6 +40,20 @@ public class JarIndex {
      */
     private static final boolean metaInfFilenames =
             "true".equals(System.getProperty("sun.misc.JarIndex.metaInfFilenames")) ? true : false;
+    /**
+     * The hash map that maintains mappings from
+     * package/classe/resource to jar file list(s)
+     */
+    private HashMap indexMap;
+    /**
+     * The hash map that maintains mappings from
+     * jar file to package/class/resource lists
+     */
+    private HashMap jarMap;
+    /*
+     * An ordered list of jar file names.
+     */
+    private String[] jarFiles;
 
     /**
      * Constructs a new, empty jar index.
@@ -289,10 +285,10 @@ public class JarIndex {
                 (new InputStreamReader(is, "UTF8"));
         String line = null;
         String currentJar = null;
-        
+
         /* an ordered list of jar file names */
         Vector jars = new Vector();
-        
+
         /* read until we see a .jar line */
         while ((line = br.readLine()) != null && !line.endsWith(".jar")) ;
 

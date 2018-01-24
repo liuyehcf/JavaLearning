@@ -29,15 +29,15 @@ public class Sort {
      * quicksort the array of objects.
      *
      * @param arr[] - an array of objects
-     * @param left - the start index - from where to begin sorting
+     * @param left  - the start index - from where to begin sorting
      * @param right - the last index.
-     * @param comp - an object that implemnts the Compare interface to resolve thecomparison.
+     * @param comp  - an object that implemnts the Compare interface to resolve thecomparison.
      */
     public static void quicksort(Object arr[], int left, int right, Compare comp) {
         int i, last;
 
         if (left >= right) { /* do nothing if array contains fewer than two */
-            return; 	     /* two elements */
+            return;         /* two elements */
         }
         swap(arr, left, (left + right) / 2);
         last = left;

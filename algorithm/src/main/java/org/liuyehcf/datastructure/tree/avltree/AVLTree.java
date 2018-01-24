@@ -11,6 +11,8 @@ public class AVLTree {
     private AVLTreeNode root;
 
     private AVLTreeNode nil;
+    private Map<AVLTreeNode, Integer> highMap;
+
 
     public AVLTree() {
         nil = new AVLTreeNode(0);
@@ -19,7 +21,6 @@ public class AVLTree {
         nil.parent = nil;
         root = nil;
     }
-
 
     public void insert(int val) {
         AVLTreeNode x = root;
@@ -114,7 +115,6 @@ public class AVLTree {
         return y;
     }
 
-
     /**
      * 右旋
      *
@@ -143,9 +143,6 @@ public class AVLTree {
         updateHigh(x);
         return x;
     }
-
-
-    private Map<AVLTreeNode, Integer> highMap;
 
     private boolean check() {
         highMap = new HashMap<AVLTreeNode, Integer>();
@@ -196,7 +193,7 @@ public class AVLTree {
 
 
     public void delete(int val) {
-        AVLTreeNode z = search(root,val);
+        AVLTreeNode z = search(root, val);
         if (z == nil) {
             throw new RuntimeException();
         }
@@ -226,7 +223,7 @@ public class AVLTree {
             y.left.parent = y;
 
             transplant(z, y);
-            y.h=z.h;//todo 这里高度必须维护
+            y.h = z.h;//todo 这里高度必须维护
             //todo 这里不需要更新p的高度,因为p的子树的高度此时并不知道是否正确,因此更新也没有意义,这也是deleteFixBalance必须遍历到root的原因
         }
         if (p != nil)
@@ -315,8 +312,8 @@ class TestAVLTree {
             Collections.shuffle(list, random);
 
             for (int i = 0; i < M; i++) {
-                int k=list.get(list.size()-1);
-                list.remove(list.size()-1);
+                int k = list.get(list.size() - 1);
+                list.remove(list.size() - 1);
                 avlTree.delete(k);
             }
 

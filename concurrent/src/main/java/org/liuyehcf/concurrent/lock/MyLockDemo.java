@@ -11,15 +11,25 @@ import java.util.concurrent.locks.AbstractQueuedSynchronizer;
  */
 public class MyLockDemo {
 
-    private final Sync sync=new Sync();
+    private final Sync sync = new Sync();
 
-    private static final class Sync extends AbstractQueuedSynchronizer{
+    public void lock() {
+        sync.acquire(1);
+        System.out.println(System.nanoTime() + ", " + Thread.currentThread() + " is hold the lock");
+    }
 
-        private final AtomicInteger resources=new AtomicInteger();
+    public void unlock() {
+        System.out.println(System.nanoTime() + ", " + Thread.currentThread() + " is release the lock\n");
+        sync.release(1);
+    }
+
+    private static final class Sync extends AbstractQueuedSynchronizer {
+
+        private final AtomicInteger resources = new AtomicInteger();
 
         @Override
         protected boolean tryAcquire(int arg) {
-            return resources.compareAndSet(0,arg);
+            return resources.compareAndSet(0, arg);
         }
 
         @Override
@@ -27,16 +37,6 @@ public class MyLockDemo {
             resources.set(0);
             return true;
         }
-    }
-
-    public void lock(){
-        sync.acquire(1);
-        System.out.println(System.nanoTime()+", "+Thread.currentThread() + " is hold the lock");
-    }
-
-    public void unlock(){
-        System.out.println(System.nanoTime()+", "+Thread.currentThread() + " is release the lock\n");
-        sync.release(1);
     }
 }
 

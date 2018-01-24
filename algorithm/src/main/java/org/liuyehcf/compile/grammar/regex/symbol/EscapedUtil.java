@@ -22,6 +22,23 @@ public class EscapedUtil {
     private static List<Symbol> escaped_s;
     private static List<Symbol> escaped_S;
 
+    static {
+        initializeEscaped_any();
+        initializeEscaped_or();
+        initializeEscaped_star();
+        initializeEscaped_add();
+        initializeEscaped_leftMiddleParenthesis();
+        initializeEscaped_rightMiddleParenthesis();
+        initializeEscaped_leftSmallParenthesis();
+        initializeEscaped_rightSmallParenthesis();
+        initializeEscaped_d();
+        initializeEscaped_D();
+        initializeEscaped_w();
+        initializeEscaped_W();
+        initializeEscaped_s();
+        initializeEscaped_S();
+    }
+
     public static List<Symbol> getSymbolsOfEscapedChar(char c) {
         switch (c) {
             case '.':
@@ -78,23 +95,6 @@ public class EscapedUtil {
             default:
                 throw new RuntimeException();
         }
-    }
-
-    static {
-        initializeEscaped_any();
-        initializeEscaped_or();
-        initializeEscaped_star();
-        initializeEscaped_add();
-        initializeEscaped_leftMiddleParenthesis();
-        initializeEscaped_rightMiddleParenthesis();
-        initializeEscaped_leftSmallParenthesis();
-        initializeEscaped_rightSmallParenthesis();
-        initializeEscaped_d();
-        initializeEscaped_D();
-        initializeEscaped_w();
-        initializeEscaped_W();
-        initializeEscaped_s();
-        initializeEscaped_S();
     }
 
     private static void initializeEscaped_any() {
@@ -182,13 +182,13 @@ public class EscapedUtil {
 
     private static void initializeEscaped_s() {
         List<Symbol> symbols = new ArrayList<>();
-        symbols.add(Symbol.getAlphabetSymbolWithChar((char)9));
-        symbols.add(Symbol.getAlphabetSymbolWithChar((char)10));
-        symbols.add(Symbol.getAlphabetSymbolWithChar((char)11));
-        symbols.add(Symbol.getAlphabetSymbolWithChar((char)12));
-        symbols.add(Symbol.getAlphabetSymbolWithChar((char)13));
-        symbols.add(Symbol.getAlphabetSymbolWithChar((char)32));
-        escaped_s=Collections.unmodifiableList(new ArrayList<>(symbols));
+        symbols.add(Symbol.getAlphabetSymbolWithChar((char) 9));
+        symbols.add(Symbol.getAlphabetSymbolWithChar((char) 10));
+        symbols.add(Symbol.getAlphabetSymbolWithChar((char) 11));
+        symbols.add(Symbol.getAlphabetSymbolWithChar((char) 12));
+        symbols.add(Symbol.getAlphabetSymbolWithChar((char) 13));
+        symbols.add(Symbol.getAlphabetSymbolWithChar((char) 32));
+        escaped_s = Collections.unmodifiableList(new ArrayList<>(symbols));
     }
 
     private static void initializeEscaped_S() {

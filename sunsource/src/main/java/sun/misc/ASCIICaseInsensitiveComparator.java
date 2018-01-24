@@ -21,26 +21,6 @@ public class ASCIICaseInsensitiveComparator implements Comparator {
     public static final Comparator CASE_INSENSITIVE_ORDER =
             new ASCIICaseInsensitiveComparator();
 
-    public int compare(Object o1, Object o2) {
-        String s1 = (String) o1;
-        String s2 = (String) o2;
-        int n1 = s1.length(), n2 = s2.length();
-        int minLen = n1 < n2 ? n1 : n2;
-        for (int i = 0; i < minLen; i++) {
-            char c1 = s1.charAt(i);
-            char c2 = s2.charAt(i);
-            assert c1 <= '\u007F' && c2 <= '\u007F';
-            if (c1 != c2) {
-                c1 = (char) toLower(c1);
-                c2 = (char) toLower(c2);
-                if (c1 != c2) {
-                    return c1 - c2;
-                }
-            }
-        }
-        return n1 - n2;
-    }
-
     /**
      * A case insensitive hash code method to go with the case insensitive
      * compare() method.
@@ -81,5 +61,25 @@ public class ASCIICaseInsensitiveComparator implements Comparator {
 
     static int toUpper(int ch) {
         return isLower(ch) ? (ch - 0x20) : ch;
+    }
+
+    public int compare(Object o1, Object o2) {
+        String s1 = (String) o1;
+        String s2 = (String) o2;
+        int n1 = s1.length(), n2 = s2.length();
+        int minLen = n1 < n2 ? n1 : n2;
+        for (int i = 0; i < minLen; i++) {
+            char c1 = s1.charAt(i);
+            char c2 = s2.charAt(i);
+            assert c1 <= '\u007F' && c2 <= '\u007F';
+            if (c1 != c2) {
+                c1 = (char) toLower(c1);
+                c2 = (char) toLower(c2);
+                if (c1 != c2) {
+                    return c1 - c2;
+                }
+            }
+        }
+        return n1 - n2;
     }
 }

@@ -51,11 +51,11 @@ public class TestParkUnpark {
             @Override
             public void run() {
                 System.out.println(currentThread() + " is going to park");
-                    LockSupport.park();
-                    System.out.println(currentThread() +
-                            (currentThread().isInterrupted()?
-                                    "is interrupted from park":
-                                    "is unpark from park"));
+                LockSupport.park();
+                System.out.println(currentThread() +
+                        (currentThread().isInterrupted() ?
+                                "is interrupted from park" :
+                                "is unpark from park"));
                 System.out.println();
             }
         };

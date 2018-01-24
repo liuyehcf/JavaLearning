@@ -19,7 +19,7 @@ public class EchoInBoundHandler extends ChannelInboundHandlerAdapter {
             HttpResponse response = (HttpResponse) msg;
             System.out.println("CONTENT_TYPE:" + response.headers().get(HttpHeaders.Names.CONTENT_TYPE));
         } else if (msg instanceof HttpContent) {
-            HttpContent content = (HttpContent)msg;
+            HttpContent content = (HttpContent) msg;
             ByteBuf buf = content.content();
             System.out.println(buf.toString(io.netty.util.CharsetUtil.UTF_8));
             buf.release();

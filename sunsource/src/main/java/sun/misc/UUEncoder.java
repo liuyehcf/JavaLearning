@@ -44,8 +44,8 @@ import java.io.PrintStream;
  *
  * @author Chuck McManis
  * @version %I%, %G%
- * @see        CharacterEncoder
- * @see        UUDecoder
+ * @see CharacterEncoder
+ * @see UUDecoder
  */
 public class UUEncoder extends CharacterEncoder {
 

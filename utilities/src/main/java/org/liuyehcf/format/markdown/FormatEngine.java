@@ -36,6 +36,37 @@ public class FormatEngine {
         formatContext = new FormatContext(files, sourceDir);
     }
 
+    public static void main(String[] args) {
+
+        if (args == null || args.length != 2)
+            throw new RuntimeException("Wrong param num");
+
+        File baseDir = new File(args[0] + "/_posts");
+        String param = args[1];
+
+        if (!baseDir.isDirectory())
+            throw new RuntimeException("Please type correct base path");
+
+        if (!param.equalsIgnoreCase("true") && !param.equalsIgnoreCase("false")) {
+            throw new RuntimeException("Please type correct param");
+        }
+
+        File[] files = baseDir.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return name.endsWith(".md");
+            }
+        });
+
+        FormatEngine engine = new FormatEngine(param.equalsIgnoreCase("true"), files, args[0]);
+
+        for (File file : files) {
+            engine.format(file);
+        }
+
+        System.out.println("finished");
+    }
+
     public void format(File inputFile) {
 
         resetFormatEngineWithFile(inputFile);
@@ -160,36 +191,5 @@ public class FormatEngine {
         }
 
         writer.flush();
-    }
-
-    public static void main(String[] args) {
-
-        if (args == null || args.length != 2)
-            throw new RuntimeException("Wrong param num");
-
-        File baseDir = new File(args[0] + "/_posts");
-        String param = args[1];
-
-        if (!baseDir.isDirectory())
-            throw new RuntimeException("Please type correct base path");
-
-        if (!param.equalsIgnoreCase("true") && !param.equalsIgnoreCase("false")) {
-            throw new RuntimeException("Please type correct param");
-        }
-
-        File[] files = baseDir.listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return name.endsWith(".md");
-            }
-        });
-
-        FormatEngine engine = new FormatEngine(param.equalsIgnoreCase("true"), files, args[0]);
-
-        for (File file : files) {
-            engine.format(file);
-        }
-
-        System.out.println("finished");
     }
 }

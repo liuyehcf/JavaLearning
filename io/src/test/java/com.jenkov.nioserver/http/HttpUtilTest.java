@@ -1,6 +1,6 @@
 package com.jenkov.nioserver.http;
 
-import org.junit.*;
+import org.junit.Test;
 
 import java.io.UnsupportedEncodingException;
 

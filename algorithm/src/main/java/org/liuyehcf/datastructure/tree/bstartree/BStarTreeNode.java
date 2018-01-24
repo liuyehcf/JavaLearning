@@ -30,19 +30,19 @@ public class BStarTreeNode {
      */
     BStarTreeNode next;
 
-    public BStarTreeNode(int t){
-        n=0;
-        keys=new int[6*t];
-        children=new BStarTreeNode[6*t];
-        isLeaf=false;
-        next=null;
+    public BStarTreeNode(int t) {
+        n = 0;
+        keys = new int[6 * t];
+        children = new BStarTreeNode[6 * t];
+        isLeaf = false;
+        next = null;
     }
 
-    public String toString(){
-        StringBuilder sb=new StringBuilder();
-        sb.append("{ size: "+n+", keys: [");
-        for(int i=0;i<n;i++){
-            sb.append(keys[i]+", ");
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{ size: " + n + ", keys: [");
+        for (int i = 0; i < n; i++) {
+            sb.append(keys[i] + ", ");
         }
         sb.append("] }");
         return sb.toString();

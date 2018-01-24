@@ -5,7 +5,9 @@ import org.liuyehcf.compile.grammar.regex.composition.Matcher;
 import org.liuyehcf.compile.grammar.regex.composition.SymbolString;
 import org.liuyehcf.compile.grammar.regex.symbol.Symbol;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static org.liuyehcf.compile.grammar.regex.nfa.NfaBuildIterator.createNfaClosuresMap;
 
@@ -17,6 +19,11 @@ public class Nfa implements Matcher {
 
     private List<NfaClosure> groupNfaClosures;
 
+    public Nfa(GrammarDefinition grammar) {
+        this.grammar = grammar;
+        init();
+    }
+
     public List<NfaClosure> getGroupNfaClosures() {
         return groupNfaClosures;
     }
@@ -24,11 +31,6 @@ public class Nfa implements Matcher {
     private NfaClosure getWholeNfaClosure() {
         assert !groupNfaClosures.isEmpty();
         return groupNfaClosures.get(0);
-    }
-
-    public Nfa(GrammarDefinition grammar) {
-        this.grammar = grammar;
-        init();
     }
 
     private void init() {

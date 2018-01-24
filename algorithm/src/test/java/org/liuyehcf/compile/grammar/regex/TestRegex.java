@@ -1,12 +1,9 @@
 package org.liuyehcf.compile.grammar.regex;
 
-import org.junit.Test;
 import org.liuyehcf.compile.grammar.regex.composition.GrammarDefinition;
 import org.liuyehcf.compile.grammar.regex.composition.Production;
 import org.liuyehcf.compile.grammar.regex.composition.SymbolString;
 import org.liuyehcf.compile.grammar.regex.symbol.Symbol;
-
-import java.util.regex.Pattern;
 
 /**
  * Created by Liuye on 2017/10/24.

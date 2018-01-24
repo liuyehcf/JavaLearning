@@ -12,6 +12,11 @@ import org.liuyehcf.aliyun.face.detection.entity.FaceDetectionResponse;
  */
 public class FaceDetectionDemo {
 
+    public static void main(String[] args) {
+        new UrlFaceDetection().detect();
+        new ContentFaceDetection().detect();
+    }
+
     private static abstract class FaceDetectionTemplate {
         private static final String URL = "https://dtplus-cn-shanghai.data.aliyuncs.com/face/detect";
 
@@ -62,11 +67,6 @@ public class FaceDetectionDemo {
             requestBody.setContent(Base64EncoderUtils.encodeWithPath(PATH));
             return JSON.toJSONString(requestBody);
         }
-    }
-
-    public static void main(String[] args) {
-        new UrlFaceDetection().detect();
-        new ContentFaceDetection().detect();
     }
 }
 

@@ -1,10 +1,10 @@
 package org.liuyehcf.interceptor.test;
 
+import org.junit.Test;
 import org.liuyehcf.interceptor.AfterMethodInterceptor;
 import org.liuyehcf.interceptor.BeforeMethodInterceptor;
 import org.liuyehcf.interceptor.base.DefaultMethodInvocation;
 
-import org.junit.*;
 /**
  * Created by liuye on 2017/5/19 0019.
  */

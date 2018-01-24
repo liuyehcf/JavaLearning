@@ -271,7 +271,7 @@ public class BPlusTree {
         y.n++;
         z.n--;
 
-        x.keys[i]=y.keys[y.n-1];
+        x.keys[i] = y.keys[y.n - 1];
     }
 
     private void shiftToRight(BPlusTreeNode x, int i) {
@@ -292,7 +292,7 @@ public class BPlusTree {
         y.n++;
         p.n--;
 
-        x.keys[i]=p.keys[p.n-1];
+        x.keys[i] = p.keys[p.n - 1];
     }
 
     public void levelOrderTraverse() {

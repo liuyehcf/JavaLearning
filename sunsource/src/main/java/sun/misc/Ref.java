@@ -33,6 +33,19 @@ public abstract class Ref {
     private SoftReference soft = null;
 
     /**
+     * Constructs a new Ref.
+     */
+    public Ref() {
+    }
+
+    /**
+     * Constructs a new Ref that initially points to thing.
+     */
+    public Ref(Object thing) {
+        setThing(thing);
+    }
+
+    /**
      * Returns a pointer to the object referenced by this Ref.  If the object
      * has been thrown away by the garbage collector, it will be
      * reconstituted. This method does everything necessary to ensure that the garbage
@@ -88,19 +101,6 @@ public abstract class Ref {
         SoftReference s = soft;
         if (s == null) return null;
         return s.get();
-    }
-
-    /**
-     * Constructs a new Ref.
-     */
-    public Ref() {
-    }
-
-    /**
-     * Constructs a new Ref that initially points to thing.
-     */
-    public Ref(Object thing) {
-        setThing(thing);
     }
 
 }

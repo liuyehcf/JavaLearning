@@ -1,5 +1,10 @@
 package org.liuyehcf;
 
+import com.artofsolving.jodconverter.DocumentConverter;
+import com.artofsolving.jodconverter.openoffice.connection.OpenOfficeConnection;
+import com.artofsolving.jodconverter.openoffice.connection.SocketOpenOfficeConnection;
+import com.artofsolving.jodconverter.openoffice.converter.OpenOfficeDocumentConverter;
+
 import java.io.File;
 import java.net.ConnectException;
 import java.util.ArrayList;
@@ -8,11 +13,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Pattern;
-
-import com.artofsolving.jodconverter.DocumentConverter;
-import com.artofsolving.jodconverter.openoffice.connection.OpenOfficeConnection;
-import com.artofsolving.jodconverter.openoffice.connection.SocketOpenOfficeConnection;
-import com.artofsolving.jodconverter.openoffice.converter.OpenOfficeDocumentConverter;
 
 
 /**
@@ -28,45 +28,12 @@ public class ConvertOfficeToPdf {
      */
     private static volatile int totalFiles;
 
-    private static final class ConvertTask implements Runnable {
-        private File inputFile;
-        private File outputFile;
-        private static final ReentrantLock lock = new ReentrantLock();
-
-        public ConvertTask(File inputFile, File outputFile) {
-            this.inputFile = inputFile;
-            this.outputFile = outputFile;
-        }
-
-        public void run() {
-            long start = System.currentTimeMillis();
-            // connect to an OpenOffice.org instance running on port 8100
-            OpenOfficeConnection connection = new SocketOpenOfficeConnection(8100);
-            try {
-                connection.connect();
-
-                // convert
-                DocumentConverter converter = new OpenOfficeDocumentConverter(connection);
-                converter.convert(inputFile, outputFile);
-            } catch (ConnectException cex) {
-                cex.printStackTrace();
-            } finally {
-                // close the connection
-                if (connection != null) {
-                    connection.disconnect();
-                    connection = null;
-                }
-            }
-            long end = System.currentTimeMillis();
-            try {
-                lock.lock();
-                System.out.println("生成" + outputFile.getName() + "耗费：" + (end - start) / 1000 + "秒, 还剩" + (--totalFiles) + "个word文档待转换");
-            } finally {
-                lock.unlock();
-            }
-        }
+    public static void main(String[] args) throws Exception {
+        String sourceDirect = "F:\\Notes";//word文档根目录
+        String destinationDirect = "F:\\PDF";//转入PDF的目录
+        ConvertOfficeToPdf converter = new ConvertOfficeToPdf();
+        converter.convert(sourceDirect, destinationDirect);
     }
-
 
     public void convert(String sourceDirect, String destinationDirect) {
         List<File> docList = new ArrayList<File>();
@@ -115,11 +82,43 @@ public class ConvertOfficeToPdf {
         return splits[0];
     }
 
-    public static void main(String[] args) throws Exception {
-        String sourceDirect = "F:\\Notes";//word文档根目录
-        String destinationDirect = "F:\\PDF";//转入PDF的目录
-        ConvertOfficeToPdf converter = new ConvertOfficeToPdf();
-        converter.convert(sourceDirect, destinationDirect);
+    private static final class ConvertTask implements Runnable {
+        private static final ReentrantLock lock = new ReentrantLock();
+        private File inputFile;
+        private File outputFile;
+
+        public ConvertTask(File inputFile, File outputFile) {
+            this.inputFile = inputFile;
+            this.outputFile = outputFile;
+        }
+
+        public void run() {
+            long start = System.currentTimeMillis();
+            // connect to an OpenOffice.org instance running on port 8100
+            OpenOfficeConnection connection = new SocketOpenOfficeConnection(8100);
+            try {
+                connection.connect();
+
+                // convert
+                DocumentConverter converter = new OpenOfficeDocumentConverter(connection);
+                converter.convert(inputFile, outputFile);
+            } catch (ConnectException cex) {
+                cex.printStackTrace();
+            } finally {
+                // close the connection
+                if (connection != null) {
+                    connection.disconnect();
+                    connection = null;
+                }
+            }
+            long end = System.currentTimeMillis();
+            try {
+                lock.lock();
+                System.out.println("生成" + outputFile.getName() + "耗费：" + (end - start) / 1000 + "秒, 还剩" + (--totalFiles) + "个word文档待转换");
+            } finally {
+                lock.unlock();
+            }
+        }
     }
 }
 

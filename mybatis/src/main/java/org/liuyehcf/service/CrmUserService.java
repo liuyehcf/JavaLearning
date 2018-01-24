@@ -15,6 +15,7 @@ public interface CrmUserService {
 
     /**
      * 利用XML配置声明式事务
+     *
      * @param crmUser
      * @return
      */
@@ -22,6 +23,7 @@ public interface CrmUserService {
 
     /**
      * 利用注解配置声明式事务
+     *
      * @param crmUser
      * @return
      */

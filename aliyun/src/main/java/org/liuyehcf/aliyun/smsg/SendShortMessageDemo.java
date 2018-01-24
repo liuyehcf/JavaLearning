@@ -37,6 +37,10 @@ public class SendShortMessageDemo {
 
     private Random random = new Random();
 
+    public static void main(String[] args) throws ClientException, InterruptedException {
+        new SendShortMessageDemo().sendSmsPipeLine();
+    }
+
     private SendSmsResponse sendSmsTo(String phoneNumber) {
         setSystemProperties();
 
@@ -109,7 +113,6 @@ public class SendShortMessageDemo {
 
         return sb.toString();
     }
-
 
     private QuerySendDetailsResponse querySendDetails(String phoneNumber, String bizId) {
 
@@ -188,9 +191,5 @@ public class SendShortMessageDemo {
 
             System.out.println("\n\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n");
         }
-    }
-
-    public static void main(String[] args) throws ClientException, InterruptedException {
-        new SendShortMessageDemo().sendSmsPipeLine();
     }
 }

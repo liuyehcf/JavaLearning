@@ -45,8 +45,7 @@ public class ProducerTimingDemo {
             // 发送消息，只要不抛异常就是成功
             SendResult sendResult = producer.send(msg);
             System.out.println("Message Id:" + sendResult.getMessageId());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             // 消息发送失败，需要进行重试处理，可重新发送这条消息或持久化这条数据进行补偿处理
             System.out.println(new Date() + " Send mq message failed. Topic is:" + msg.getTopic());
             e.printStackTrace();

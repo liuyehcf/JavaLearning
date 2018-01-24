@@ -1,6 +1,6 @@
 package com.jenkov.nioserver;
 
-import org.junit.*;
+import org.junit.Test;
 
 /**
  * Created by jjenkov on 18-10-2015.

@@ -1,5 +1,6 @@
 package org.liuyehcf.markdownformat.util;
 
+import org.liuyehcf.markdownformat.context.LineElement;
 import org.liuyehcf.markdownformat.context.LineIterator;
 
 /**
@@ -7,16 +8,16 @@ import org.liuyehcf.markdownformat.context.LineIterator;
  */
 public class LineIteratorUtils {
     public static boolean previousLineIsEmpty(LineIterator iterator) {
-        String previousLine = iterator.getPreviousLineElement().getContent();
+        LineElement previousLineElement = iterator.getPreviousLineElement();
 
-        return (previousLine != null
-                && StringUtils.isBlankLine(previousLine));
+        return (previousLineElement != null
+                && StringUtils.isBlankLine(previousLineElement.getContent()));
     }
 
     public static boolean nextLineIsEmpty(LineIterator iterator) {
-        String nextLine = iterator.getNextLineElement().getContent();
+        LineElement nextLineElement = iterator.getNextLineElement();
 
-        return (nextLine != null
-                && StringUtils.isBlankLine(nextLine));
+        return (nextLineElement != null
+                && StringUtils.isBlankLine(nextLineElement.getContent()));
     }
 }

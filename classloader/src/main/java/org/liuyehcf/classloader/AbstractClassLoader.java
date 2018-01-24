@@ -12,9 +12,9 @@ import java.util.Vector;
  * Created by HCF on 2018/1/6.
  */
 public abstract class AbstractClassLoader extends URLClassLoader {
-    private static final String JAR_DIR = "file:./classloader/src/main/resources/external.jar";
-
     static final URL JAR_URL;
+    final static String TEST_CLASS = "org.liuyehcf.classloader.SubObject";
+    private static final String JAR_DIR = "file:./classloader/src/main/resources/external.jar";
 
     static {
         try {
@@ -23,8 +23,6 @@ public abstract class AbstractClassLoader extends URLClassLoader {
             throw new RuntimeException(e);
         }
     }
-
-    final static String TEST_CLASS = "org.liuyehcf.classloader.SubObject";
 
     public AbstractClassLoader() {
         super(new URL[]{JAR_URL});

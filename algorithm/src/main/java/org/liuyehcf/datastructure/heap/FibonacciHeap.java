@@ -34,6 +34,90 @@ public class FibonacciHeap {
     private int n;//堆节点的总数
     private FibonacciHeapNode min;//最小节点(某个最小堆的根节点)
 
+    /**
+     * 合并两个斐波那契堆
+     *
+     * @param heap1
+     * @param heap2
+     * @return
+     */
+    private static FibonacciHeap union(FibonacciHeap heap1, FibonacciHeap heap2) {
+        FibonacciHeap heap;
+        if (heap1.min == null) {
+            heap = heap2;
+        } else if (heap2.min == null) {
+            heap = heap1;
+        } else {
+            FibonacciHeapNode temp = heap2.min.left;
+            heap2.min.left = heap1.min.left;
+            heap1.min.left.right = heap2.min;
+            heap1.min.left = temp;
+            temp.right = heap1.min;
+            if (heap1.min.key <= heap2.min.key) {
+                heap = heap1;
+            } else {
+                heap = heap2;
+            }
+            heap.n = heap1.n + heap2.n;
+        }
+        return heap;
+    }
+
+    /**
+     * 移除指定节点,仅需要维护left,right字段即可
+     */
+    private static void removeNodeFromRootChain(FibonacciHeapNode z) {
+        if (z.right != z) {
+            z.left.right = z.right;
+            z.right.left = z.left;
+        }
+    }
+
+    /**
+     * 将child插入到parent节点的孩子列表中,仅需要维护parent,left,right,child即可
+     *
+     * @param parent
+     * @param child
+     */
+    private static void insertAsChild(FibonacciHeapNode parent, FibonacciHeapNode child) {
+        FibonacciHeapNode firstChild = parent.child;
+        if (firstChild == null) {//parent节点没有孩子节点
+            //此时child将成为第一个孩子
+            parent.child = child;
+            child.left = child;
+            child.right = child;
+            child.parent = parent;
+        } else {//否则将child插入到孩子链表尾部
+            FibonacciHeapNode tail = firstChild.left;
+            //将其插入到链表尾
+            tail.right = child;
+            child.left = tail;
+
+            //维护环状链表
+            child.right = firstChild;
+            firstChild.left = child;
+
+            child.parent = parent;
+        }
+    }
+
+    public static void main(String[] args) {
+        FibonacciHeap heap1 = new FibonacciHeap();
+        Random random = new Random();
+        int N = 1000;
+        for (int i = 0; i < N; i++) {
+            heap1.insert(random.nextInt());
+            //System.out.println(heap1.min.key);
+        }
+
+        System.out.println("--------------------------------------------");
+
+        for (int i = 0; i < N; i++) {
+            FibonacciHeapNode extract = heap1.extractMin();
+            System.out.println(extract.key + ", " + heap1.n);
+        }
+    }
+
     public void insert(int key) {
         FibonacciHeapNode x = new FibonacciHeapNode(key);
 
@@ -66,35 +150,6 @@ public class FibonacciHeap {
     }
 
     /**
-     * 合并两个斐波那契堆
-     *
-     * @param heap1
-     * @param heap2
-     * @return
-     */
-    private static FibonacciHeap union(FibonacciHeap heap1, FibonacciHeap heap2) {
-        FibonacciHeap heap;
-        if (heap1.min == null) {
-            heap = heap2;
-        } else if (heap2.min == null) {
-            heap = heap1;
-        } else {
-            FibonacciHeapNode temp = heap2.min.left;
-            heap2.min.left = heap1.min.left;
-            heap1.min.left.right = heap2.min;
-            heap1.min.left = temp;
-            temp.right = heap1.min;
-            if (heap1.min.key <= heap2.min.key) {
-                heap = heap1;
-            } else {
-                heap = heap2;
-            }
-            heap.n = heap1.n + heap2.n;
-        }
-        return heap;
-    }
-
-    /**
      * 抽取最小节点
      *
      * @return
@@ -123,16 +178,6 @@ public class FibonacciHeap {
         }
         if (!checkMinHeap(this.min) || !uniqueDegreeAfterExtract()) throw new RuntimeException();
         return z;
-    }
-
-    /**
-     * 移除指定节点,仅需要维护left,right字段即可
-     */
-    private static void removeNodeFromRootChain(FibonacciHeapNode z) {
-        if (z.right != z) {
-            z.left.right = z.right;
-            z.right.left = z.left;
-        }
     }
 
     /**
@@ -196,34 +241,6 @@ public class FibonacciHeap {
         insertAsChild(x, y);
         x.degree++;
         y.marked = false;
-    }
-
-    /**
-     * 将child插入到parent节点的孩子列表中,仅需要维护parent,left,right,child即可
-     *
-     * @param parent
-     * @param child
-     */
-    private static void insertAsChild(FibonacciHeapNode parent, FibonacciHeapNode child) {
-        FibonacciHeapNode firstChild = parent.child;
-        if (firstChild == null) {//parent节点没有孩子节点
-            //此时child将成为第一个孩子
-            parent.child = child;
-            child.left = child;
-            child.right = child;
-            child.parent = parent;
-        } else {//否则将child插入到孩子链表尾部
-            FibonacciHeapNode tail = firstChild.left;
-            //将其插入到链表尾
-            tail.right = child;
-            child.left = tail;
-
-            //维护环状链表
-            child.right = firstChild;
-            firstChild.left = child;
-
-            child.parent = parent;
-        }
     }
 
     public void decreaseKey(FibonacciHeapNode node, int key) {
@@ -320,23 +337,6 @@ public class FibonacciHeap {
             node = node.right;
         } while (node != this.min);
         return true;
-    }
-
-    public static void main(String[] args) {
-        FibonacciHeap heap1 = new FibonacciHeap();
-        Random random = new Random();
-        int N = 1000;
-        for (int i = 0; i < N; i++) {
-            heap1.insert(random.nextInt());
-            //System.out.println(heap1.min.key);
-        }
-
-        System.out.println("--------------------------------------------");
-
-        for (int i = 0; i < N; i++) {
-            FibonacciHeapNode extract = heap1.extractMin();
-            System.out.println(extract.key + ", " + heap1.n);
-        }
     }
 }
 

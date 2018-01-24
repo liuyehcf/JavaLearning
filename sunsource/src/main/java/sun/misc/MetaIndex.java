@@ -125,9 +125,26 @@ public class MetaIndex {
     // jarMap is not strictly thread-safe when the meta index mechanism
     // is extended for user-provided jar files in future.
 
+    //----------------------------------------------------------------------
+    // Implementation only below this point
+    // @IllegalArgumentException if entries is null.
+    private MetaIndex(List<String> entries, boolean isClassOnlyJar)
+            throws IllegalArgumentException {
+        if (entries == null) {
+            throw new IllegalArgumentException();
+        }
+
+        contents = entries.toArray(new String[0]);
+        this.isClassOnlyJar = isClassOnlyJar;
+    }
+
     public static MetaIndex forJar(File jar) {
         return getJarMap().get(jar);
     }
+
+    //----------------------------------------------------------------------
+    // Public APIs
+    //
 
     // 'synchronized' is added to protect the jarMap from being modified
     // by multiple threads.
@@ -151,11 +168,11 @@ public class MetaIndex {
                 List<String> contents = new ArrayList<String>();
                 Map<File, MetaIndex> map = getJarMap();
 
-		/* Convert dir into canonical form. */
+                /* Convert dir into canonical form. */
                 dir = dir.getCanonicalFile();
-		/* Note: The first line should contain the version of
-		 * the meta-index file. We have to match the right version
-		 * before trying to parse this file. */
+                /* Note: The first line should contain the version of
+                 * the meta-index file. We have to match the right version
+                 * before trying to parse this file. */
                 line = reader.readLine();
                 if (line == null ||
                         !line.equals("% VERSION 2")) {
@@ -207,9 +224,17 @@ public class MetaIndex {
         }
     }
 
-    //----------------------------------------------------------------------
-    // Public APIs
-    //
+    private static Map<File, MetaIndex> getJarMap() {
+        if (jarMap == null) {
+            synchronized (MetaIndex.class) {
+                if (jarMap == null) {
+                    jarMap = new HashMap<File, MetaIndex>();
+                }
+            }
+        }
+        assert jarMap != null;
+        return jarMap;
+    }
 
     public boolean mayContain(String entry) {
         // Ask non-class file from class only jar returns false
@@ -226,31 +251,5 @@ public class MetaIndex {
             }
         }
         return false;
-    }
-
-
-    //----------------------------------------------------------------------
-    // Implementation only below this point
-    // @IllegalArgumentException if entries is null.
-    private MetaIndex(List<String> entries, boolean isClassOnlyJar)
-            throws IllegalArgumentException {
-        if (entries == null) {
-            throw new IllegalArgumentException();
-        }
-
-        contents = entries.toArray(new String[0]);
-        this.isClassOnlyJar = isClassOnlyJar;
-    }
-
-    private static Map<File, MetaIndex> getJarMap() {
-        if (jarMap == null) {
-            synchronized (MetaIndex.class) {
-                if (jarMap == null) {
-                    jarMap = new HashMap<File, MetaIndex>();
-                }
-            }
-        }
-        assert jarMap != null;
-        return jarMap;
     }
 }

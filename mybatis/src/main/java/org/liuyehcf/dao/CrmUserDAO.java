@@ -1,8 +1,8 @@
 package org.liuyehcf.dao;
 
-import org.liuyehcf.entity.CrmUser;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.JdbcType;
+import org.liuyehcf.entity.CrmUser;
 
 /**
  * Created by HCF on 2017/3/31.

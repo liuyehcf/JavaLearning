@@ -23,6 +23,16 @@ public class EchoServer {
         this.port = port;
     }
 
+    public static void main(String[] args) throws Exception {
+        int port;
+        if (args.length > 0) {
+            port = Integer.parseInt(args[0]);
+        } else {
+            port = 8080;
+        }
+        new EchoServer(port).run();
+    }
+
     public void run() throws Exception {
         EventLoopGroup bossGroup = new NioEventLoopGroup(); // (1)
         EventLoopGroup workerGroup = new NioEventLoopGroup();
@@ -57,15 +67,5 @@ public class EchoServer {
             workerGroup.shutdownGracefully();
             bossGroup.shutdownGracefully();
         }
-    }
-
-    public static void main(String[] args) throws Exception {
-        int port;
-        if (args.length > 0) {
-            port = Integer.parseInt(args[0]);
-        } else {
-            port = 8080;
-        }
-        new EchoServer(port).run();
     }
 }

@@ -75,8 +75,8 @@ public class Item3 {
             } else {
                 long lackA = average - A[i];
                 long lackB = average - B[i];
-                long temp1=ATakeFromRight(A, B, i, lackA);
-                long temp2=BTakeFromRight(A, B, i, lackB);
+                long temp1 = ATakeFromRight(A, B, i, lackA);
+                long temp2 = BTakeFromRight(A, B, i, lackB);
                 res += temp1;
                 res += temp2;
 //                long lackA = average - A[i];
@@ -174,48 +174,47 @@ class Item3_1 {
             if (A[i] >= average && B[i] >= average) {
                 long overA = A[i] - average;
                 long overB = B[i] - average;
-                A[i]=average;
-                B[i]=average;
+                A[i] = average;
+                B[i] = average;
                 if (overA > 0) A[i + 1] += overA;
                 if (overB > 0) B[i + 1] += overB;
                 res += overA + overB;
-            }
-            else if(A[i]>=average){
-                long overA=A[i]-average;
-                long lackB=average-B[i];
-                if(overA>=lackB){
-                    A[i]=average;
-                    B[i]=average;
-                    if(overA>lackB) A[i+1]+=overA-lackB;
-                    res+=overA;
-                }else{
-                    A[i]=average;
-                    B[i]=average;
-                    B[i+1]-=lackB-overA;
-                    res+=lackB;
+            } else if (A[i] >= average) {
+                long overA = A[i] - average;
+                long lackB = average - B[i];
+                if (overA >= lackB) {
+                    A[i] = average;
+                    B[i] = average;
+                    if (overA > lackB) A[i + 1] += overA - lackB;
+                    res += overA;
+                } else {
+                    A[i] = average;
+                    B[i] = average;
+                    B[i + 1] -= lackB - overA;
+                    res += lackB;
                 }
-            }else if(B[i]>=average){
-                long overB=B[i]-average;
-                long lackA=average-A[i];
-                if(overB>=lackA){
-                    A[i]=average;
-                    B[i]=average;
-                    if(overB>lackA) B[i+1]+=overB-lackA;
-                    res+=overB;
-                }else{
-                    A[i]=average;
-                    B[i]=average;
-                    A[i+1]-=lackA-overB;
-                    res+=lackA;
+            } else if (B[i] >= average) {
+                long overB = B[i] - average;
+                long lackA = average - A[i];
+                if (overB >= lackA) {
+                    A[i] = average;
+                    B[i] = average;
+                    if (overB > lackA) B[i + 1] += overB - lackA;
+                    res += overB;
+                } else {
+                    A[i] = average;
+                    B[i] = average;
+                    A[i + 1] -= lackA - overB;
+                    res += lackA;
                 }
-            }else{
-                long lackA=average-A[i];
-                long lackB=average-B[i];
-                A[i]=average;
-                B[i]=average;
-                A[i+1]-=lackA;
-                B[i+1]-=lackB;
-                res+=lackA+lackB;
+            } else {
+                long lackA = average - A[i];
+                long lackB = average - B[i];
+                A[i] = average;
+                B[i] = average;
+                A[i + 1] -= lackA;
+                B[i + 1] -= lackB;
+                res += lackA + lackB;
             }
         }
         System.out.println(res);

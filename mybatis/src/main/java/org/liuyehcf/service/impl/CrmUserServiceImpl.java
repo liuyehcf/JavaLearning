@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
  * Created by HCF on 2017/3/31.
  */
 @Service("crmUserServiceImpl")
-public class CrmUserServiceImpl implements CrmUserService{
+public class CrmUserServiceImpl implements CrmUserService {
     @Autowired
     private CrmUserDAO crmUserDAO;
 
@@ -23,7 +23,7 @@ public class CrmUserServiceImpl implements CrmUserService{
         return crmUserDAO.insertCrmUser(crmUser);
     }
 
-    public int updateCrmUser(CrmUser crmUser){
+    public int updateCrmUser(CrmUser crmUser) {
         return crmUserDAO.updateCrmUser(crmUser);
     }
 

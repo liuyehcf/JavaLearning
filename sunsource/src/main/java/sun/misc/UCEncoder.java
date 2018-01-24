@@ -51,10 +51,26 @@ import java.io.OutputStream;
  *
  * @author Chuck McManis
  * @version %I%, %G%
- * @see        CharacterEncoder
- * @see        UCDecoder
+ * @see CharacterEncoder
+ * @see UCDecoder
  */
 public class UCEncoder extends CharacterEncoder {
+
+    /* this is the UCE mapping of 0-63 to characters .. */
+    private final static byte map_array[] = {
+            //     0         1         2         3         4         5         6         7
+            (byte) '0', (byte) '1', (byte) '2', (byte) '3', (byte) '4', (byte) '5', (byte) '6', (byte) '7', // 0
+            (byte) '8', (byte) '9', (byte) 'A', (byte) 'B', (byte) 'C', (byte) 'D', (byte) 'E', (byte) 'F', // 1
+            (byte) 'G', (byte) 'H', (byte) 'I', (byte) 'J', (byte) 'K', (byte) 'L', (byte) 'M', (byte) 'N', // 2
+            (byte) 'O', (byte) 'P', (byte) 'Q', (byte) 'R', (byte) 'S', (byte) 'T', (byte) 'U', (byte) 'V', // 3
+            (byte) 'W', (byte) 'X', (byte) 'Y', (byte) 'Z', (byte) 'a', (byte) 'b', (byte) 'c', (byte) 'd', // 4
+            (byte) 'e', (byte) 'f', (byte) 'g', (byte) 'h', (byte) 'i', (byte) 'j', (byte) 'k', (byte) 'l', // 5
+            (byte) 'm', (byte) 'n', (byte) 'o', (byte) 'p', (byte) 'q', (byte) 'r', (byte) 's', (byte) 't', // 6
+            (byte) 'u', (byte) 'v', (byte) 'w', (byte) 'x', (byte) 'y', (byte) 'z', (byte) '(', (byte) ')'  // 7
+    };
+    private int sequence;
+    private byte tmp[] = new byte[2];
+    private CRC16 crc = new CRC16();
 
     /**
      * this clase encodes two bytes per atom
@@ -69,23 +85,6 @@ public class UCEncoder extends CharacterEncoder {
     protected int bytesPerLine() {
         return (48);
     }
-
-    /* this is the UCE mapping of 0-63 to characters .. */
-    private final static byte map_array[] = {
-            //     0         1         2         3         4         5         6         7
-            (byte) '0', (byte) '1', (byte) '2', (byte) '3', (byte) '4', (byte) '5', (byte) '6', (byte) '7', // 0
-            (byte) '8', (byte) '9', (byte) 'A', (byte) 'B', (byte) 'C', (byte) 'D', (byte) 'E', (byte) 'F', // 1
-            (byte) 'G', (byte) 'H', (byte) 'I', (byte) 'J', (byte) 'K', (byte) 'L', (byte) 'M', (byte) 'N', // 2
-            (byte) 'O', (byte) 'P', (byte) 'Q', (byte) 'R', (byte) 'S', (byte) 'T', (byte) 'U', (byte) 'V', // 3
-            (byte) 'W', (byte) 'X', (byte) 'Y', (byte) 'Z', (byte) 'a', (byte) 'b', (byte) 'c', (byte) 'd', // 4
-            (byte) 'e', (byte) 'f', (byte) 'g', (byte) 'h', (byte) 'i', (byte) 'j', (byte) 'k', (byte) 'l', // 5
-            (byte) 'm', (byte) 'n', (byte) 'o', (byte) 'p', (byte) 'q', (byte) 'r', (byte) 's', (byte) 't', // 6
-            (byte) 'u', (byte) 'v', (byte) 'w', (byte) 'x', (byte) 'y', (byte) 'z', (byte) '(', (byte) ')'  // 7
-    };
-
-    private int sequence;
-    private byte tmp[] = new byte[2];
-    private CRC16 crc = new CRC16();
 
     /**
      * encodeAtom - take two bytes and encode them into the correct

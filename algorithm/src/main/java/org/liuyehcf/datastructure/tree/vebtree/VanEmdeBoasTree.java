@@ -9,6 +9,10 @@ public class VanEmdeBoasTree {
 
     private VanEmdeBoasTreeNode root;
 
+    public VanEmdeBoasTree() {
+        root = new VanEmdeBoasTreeNode();
+    }
+
     /**
      * 计算出在当前节点下,索引x位于哪个子节点中
      * 即商
@@ -144,7 +148,6 @@ public class VanEmdeBoasTree {
         v.max = x;
     }
 
-
     public void insert(VanEmdeBoasTreeNode v, int x) {
         if (v.min == NIL) {
             insertEmpty(v, x);
@@ -166,9 +169,5 @@ public class VanEmdeBoasTree {
                 v.max = x;
             }
         }
-    }
-
-    public VanEmdeBoasTree() {
-        root = new VanEmdeBoasTreeNode();
     }
 }

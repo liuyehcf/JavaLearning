@@ -23,33 +23,22 @@ import java.util.TreeSet;
 
 public class GC {
 
-    private GC() {
-    }		/* To prevent instantiation */
-
-
     /* Latency-target value indicating that there's no active target
      */
     private static final long NO_TARGET = Long.MAX_VALUE;
-
     /* The current latency target, or NO_TARGET if there is no target
      */
     private static long latencyTarget = NO_TARGET;
-
     /* The daemon thread that implements the latency-target mechanism,
      * or null if there is presently no daemon thread
      */
     private static Thread daemon = null;
-
-    /* The lock object for the latencyTarget and daemon fields.  The daemon
-     * thread, if it exists, waits on this lock for notification that the
-     * latency target has changed.
-     */
-    private static class LatencyLock extends Object {
-    }
-
-    ;
     private static Object lock = new LatencyLock();
 
+    private GC() {
+    }        /* To prevent instantiation */
+
+    ;
 
     /**
      * Returns the maximum <em>object-inspection age</em>, which is the number
@@ -69,45 +58,52 @@ public class GC {
      */
     public static native long maxObjectInspectionAge();
 
+    /* Sets the latency target to the given value.
+     * Must be invoked while holding the lock.
+     */
+    private static void setLatencyTarget(long ms) {
+        latencyTarget = ms;
+        if (daemon == null) {
+            /* Create a new daemon thread */
+            Daemon.create();
+        } else {
+            /* Notify the existing daemon thread
+             * that the lateency target has changed
+             */
+            lock.notify();
+        }
+    }
+
+    /**
+     * Makes a new request for a garbage-collection latency of the given
+     * number of real-time milliseconds.  A low-priority daemon thread makes a
+     * best effort to ensure that the maximum object-inspection age never
+     * exceeds the smallest of the currently active requests.
+     *
+     * @param latency The requested latency
+     * @throws IllegalArgumentException If the given <code>latency</code> is non-positive
+     */
+    public static LatencyRequest requestLatency(long latency) {
+        return new LatencyRequest(latency);
+    }
+
+    /**
+     * Returns the current smallest garbage-collection latency request, or zero
+     * if there are no active requests.
+     */
+    public static long currentLatencyTarget() {
+        long t = latencyTarget;
+        return (t == NO_TARGET) ? 0 : t;
+    }
+
+    /* The lock object for the latencyTarget and daemon fields.  The daemon
+     * thread, if it exists, waits on this lock for notification that the
+     * latency target has changed.
+     */
+    private static class LatencyLock extends Object {
+    }
 
     private static class Daemon extends Thread {
-
-        public void run() {
-            for (; ; ) {
-                long l;
-                synchronized (lock) {
-
-                    l = latencyTarget;
-                    if (l == NO_TARGET) {
-            /* No latency target, so exit */
-                        GC.daemon = null;
-                        return;
-                    }
-
-                    long d = maxObjectInspectionAge();
-                    if (d >= l) {
-			/* Do a full collection.  There is a remote possibility
-			 * that a full collection will occurr between the time
-			 * we sample the inspection age and the time the GC
-			 * actually starts, but this is sufficiently unlikely
-			 * that it doesn't seem worth the more expensive JVM
-			 * interface that would be required.
-			 */
-                        System.gc();
-                        d = 0;
-                    }
-
-		    /* Wait for the latency period to expire,
-                     * or for notification that the period has changed
-		     */
-                    try {
-                        lock.wait(l - d);
-                    } catch (InterruptedException x) {
-                        continue;
-                    }
-                }
-            }
-        }
 
         private Daemon(ThreadGroup tg) {
             super(tg, "GC Daemon");
@@ -133,25 +129,44 @@ public class GC {
             AccessController.doPrivileged(pa);
         }
 
-    }
+        public void run() {
+            for (; ; ) {
+                long l;
+                synchronized (lock) {
 
+                    l = latencyTarget;
+                    if (l == NO_TARGET) {
+                        /* No latency target, so exit */
+                        GC.daemon = null;
+                        return;
+                    }
 
-    /* Sets the latency target to the given value.
-     * Must be invoked while holding the lock.
-     */
-    private static void setLatencyTarget(long ms) {
-        latencyTarget = ms;
-        if (daemon == null) {
-	    /* Create a new daemon thread */
-            Daemon.create();
-        } else {
-	    /* Notify the existing daemon thread
-             * that the lateency target has changed
-	     */
-            lock.notify();
+                    long d = maxObjectInspectionAge();
+                    if (d >= l) {
+                        /* Do a full collection.  There is a remote possibility
+                         * that a full collection will occurr between the time
+                         * we sample the inspection age and the time the GC
+                         * actually starts, but this is sufficiently unlikely
+                         * that it doesn't seem worth the more expensive JVM
+                         * interface that would be required.
+                         */
+                        System.gc();
+                        d = 0;
+                    }
+
+                    /* Wait for the latency period to expire,
+                     * or for notification that the period has changed
+                     */
+                    try {
+                        lock.wait(l - d);
+                    } catch (InterruptedException x) {
+                        continue;
+                    }
+                }
+            }
         }
-    }
 
+    }
 
     /**
      * Represents an active garbage-collection latency request.  Instances of
@@ -166,28 +181,10 @@ public class GC {
 
         /* Sorted set of active latency requests */
         private static SortedSet requests = null;
-
-        /* Examine the request set and reset the latency target if necessary.
-             * Must be invoked while holding the lock.
-             */
-        private static void adjustLatencyIfNeeded() {
-            if ((requests == null) || requests.isEmpty()) {
-                if (latencyTarget != NO_TARGET) {
-                    setLatencyTarget(NO_TARGET);
-                }
-            } else {
-                LatencyRequest r = (LatencyRequest) requests.first();
-                if (r.latency != latencyTarget) {
-                    setLatencyTarget(r.latency);
-                }
-            }
-        }
-
         /* The requested latency, or NO_TARGET
-             * if this request has been cancelled
-             */
+         * if this request has been cancelled
+         */
         private long latency;
-
         /* Unique identifier for this request */
         private long id;
 
@@ -204,6 +201,22 @@ public class GC {
                 }
                 requests.add(this);
                 adjustLatencyIfNeeded();
+            }
+        }
+
+        /* Examine the request set and reset the latency target if necessary.
+         * Must be invoked while holding the lock.
+         */
+        private static void adjustLatencyIfNeeded() {
+            if ((requests == null) || requests.isEmpty()) {
+                if (latencyTarget != NO_TARGET) {
+                    setLatencyTarget(NO_TARGET);
+                }
+            } else {
+                LatencyRequest r = (LatencyRequest) requests.first();
+                if (r.latency != latencyTarget) {
+                    setLatencyTarget(r.latency);
+                }
             }
         }
 
@@ -240,30 +253,6 @@ public class GC {
                     + "[" + latency + "," + id + "]");
         }
 
-    }
-
-
-    /**
-     * Makes a new request for a garbage-collection latency of the given
-     * number of real-time milliseconds.  A low-priority daemon thread makes a
-     * best effort to ensure that the maximum object-inspection age never
-     * exceeds the smallest of the currently active requests.
-     *
-     * @param latency The requested latency
-     * @throws IllegalArgumentException If the given <code>latency</code> is non-positive
-     */
-    public static LatencyRequest requestLatency(long latency) {
-        return new LatencyRequest(latency);
-    }
-
-
-    /**
-     * Returns the current smallest garbage-collection latency request, or zero
-     * if there are no active requests.
-     */
-    public static long currentLatencyTarget() {
-        long t = latencyTarget;
-        return (t == NO_TARGET) ? 0 : t;
     }
 
 }

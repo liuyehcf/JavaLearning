@@ -1,6 +1,6 @@
+import org.junit.Test;
 import org.liuyehcf.entity.CrmUser;
 import org.liuyehcf.service.CrmUserService;
-import org.junit.*;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 

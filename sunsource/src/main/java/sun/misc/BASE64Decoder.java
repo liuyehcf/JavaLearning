@@ -34,27 +34,13 @@ import java.io.PushbackInputStream;
  *    "BASE64Decoder: Not enough bytes for an atom."
  * </pre>
  *
- * @version    %I%, %G%
  * @author Chuck McManis
- * @see        CharacterEncoder
- * @see        BASE64Decoder
+ * @version %I%, %G%
+ * @see CharacterEncoder
+ * @see BASE64Decoder
  */
 
 public class BASE64Decoder extends CharacterDecoder {
-
-    /**
-     * This class has 4 bytes per atom
-     */
-    protected int bytesPerAtom() {
-        return (4);
-    }
-
-    /**
-     * Any multiple of 4 will do, 72 might be common
-     */
-    protected int bytesPerLine() {
-        return (72);
-    }
 
     /**
      * This character array provides the character to value map
@@ -71,7 +57,6 @@ public class BASE64Decoder extends CharacterDecoder {
             'w', 'x', 'y', 'z', '0', '1', '2', '3', // 6
             '4', '5', '6', '7', '8', '9', '+', '/'  // 7
     };
-
     private final static byte pem_convert_array[] = new byte[256];
 
     static {
@@ -84,6 +69,20 @@ public class BASE64Decoder extends CharacterDecoder {
     }
 
     byte decode_buffer[] = new byte[4];
+
+    /**
+     * This class has 4 bytes per atom
+     */
+    protected int bytesPerAtom() {
+        return (4);
+    }
+
+    /**
+     * Any multiple of 4 will do, 72 might be common
+     */
+    protected int bytesPerLine() {
+        return (72);
+    }
 
     /**
      * Decode one BASE64 atom into 1, 2, or 3 bytes of data.

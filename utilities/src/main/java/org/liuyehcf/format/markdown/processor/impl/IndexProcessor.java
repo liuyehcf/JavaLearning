@@ -12,12 +12,6 @@ import java.util.ListIterator;
  */
 public class IndexProcessor extends AbstractLineProcessor {
 
-    private boolean indentation;//是否需要缩进
-
-    public IndexProcessor(boolean indentation) {
-        this.indentation = indentation;
-    }
-
     private static final String[] tabStringAr = {
             "",
             "&emsp;",
@@ -26,14 +20,17 @@ public class IndexProcessor extends AbstractLineProcessor {
             "&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;",
             "&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;",
     };
+    private boolean indentation;//是否需要缩进
+    //1~6级标题
+    private int[] indexes = new int[6];
+
+    public IndexProcessor(boolean indentation) {
+        this.indentation = indentation;
+    }
 
     private String getTabString(int level) {
         return indentation ? tabStringAr[level] : "";
     }
-
-    //1~6级标题
-    private int[] indexes = new int[6];
-
 
     private void freshIndex(int level) {
         if (level <= 4) {

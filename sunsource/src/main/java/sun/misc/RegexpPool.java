@@ -19,9 +19,9 @@ import java.io.PrintStream;
  */
 
 public class RegexpPool {
+    private static final int BIG = 0x7FFFFFFF;
     private RegexpNode prefixMachine = new RegexpNode();
     private RegexpNode suffixMachine = new RegexpNode();
-    private static final int BIG = 0x7FFFFFFF;
     private int lastDepth = BIG;
 
     public RegexpPool() {
@@ -30,14 +30,14 @@ public class RegexpPool {
     /**
      * Add a regex expression to the pool of regex expressions.
      *
+     * @param re  The regex expression to add to the pool.
+     *            For now, only handles strings that either begin or end with
+     *            a '*'.
+     * @param ret The object to be returned when this regex expression is
+     *            matched.  If ret is an instance of the RegexpTarget class, ret.found
+     *            is called with the string fragment that matched the '*' as its
+     *            parameter.
      * @throws REException error
-     * @param    re The regex expression to add to the pool.
-     * For now, only handles strings that either begin or end with
-     * a '*'.
-     * @param    ret The object to be returned when this regex expression is
-     * matched.  If ret is an instance of the RegexpTarget class, ret.found
-     * is called with the string fragment that matched the '*' as its
-     * parameter.
      */
     public void add(String re, Object ret) throws REException {
         add(re, ret, false);
@@ -47,13 +47,13 @@ public class RegexpPool {
      * Replace the target for the regex expression with a different
      * target.
      *
-     * @param    re The regex expression to be replaced in the pool.
-     * For now, only handles strings that either begin or end with
-     * a '*'.
-     * @param    ret The object to be returned when this regex expression is
-     * matched.  If ret is an instance of the RegexpTarget class, ret.found
-     * is called with the string fragment that matched the '*' as its
-     * parameter.
+     * @param re  The regex expression to be replaced in the pool.
+     *            For now, only handles strings that either begin or end with
+     *            a '*'.
+     * @param ret The object to be returned when this regex expression is
+     *            matched.  If ret is an instance of the RegexpTarget class, ret.found
+     *            is called with the string fragment that matched the '*' as its
+     *            parameter.
      */
     public void replace(String re, Object ret) {
         try {
@@ -85,7 +85,7 @@ public class RegexpPool {
         if (len <= 0)
             return null;
 
-	/* March forward through the prefix machine */
+        /* March forward through the prefix machine */
         for (i = 0; p != null; i++) {
             if (p.result != null && p.depth < BIG
                     && (!p.exact || i == len)) {
@@ -96,7 +96,7 @@ public class RegexpPool {
             p = p.find(re.charAt(i));
         }
 
-	/* march backward through the suffix machine */
+        /* march backward through the suffix machine */
         p = suffixMachine;
         for (i = len; --i >= 0 && p != null; ) {
             if (p.result != null && p.depth < BIG) {
@@ -186,7 +186,7 @@ public class RegexpPool {
         int i;
         if (len <= 0)
             return null;
-    /* March forward through the prefix machine */
+        /* March forward through the prefix machine */
         for (i = 0; p != null; i++) {
             if (p.result != null && p.depth < lastMatchDepth
                     && (!p.exact || i == len)) {
@@ -199,7 +199,7 @@ public class RegexpPool {
                 break;
             p = p.find(s.charAt(i));
         }
-	/* march backward through the suffix machine */
+        /* march backward through the suffix machine */
         p = suffixMachine;
         for (i = len; --i >= 0 && p != null; ) {
             if (p.result != null && p.depth < lastMatchDepth) {

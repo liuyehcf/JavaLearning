@@ -8,7 +8,7 @@
 package sun.misc;
 
 /*
- * Exception when installation of an extension has failed for 
+ * Exception when installation of an extension has failed for
  * any reason
  *
  * @author  Jerome Dochez

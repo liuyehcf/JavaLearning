@@ -14,16 +14,12 @@ package sun.misc;
  */
 public abstract class LRUCache<N, V> {
 
-    private V[] oa = null;
     private final int size;
+    private V[] oa = null;
 
     public LRUCache(int size) {
         this.size = size;
     }
-
-    abstract protected V create(N name);
-
-    abstract protected boolean hasName(V ob, N name);
 
     public static void moveToFront(Object[] oa, int i) {
         Object ob = oa[i];
@@ -31,6 +27,10 @@ public abstract class LRUCache<N, V> {
             oa[j] = oa[j - 1];
         oa[0] = ob;
     }
+
+    abstract protected V create(N name);
+
+    abstract protected boolean hasName(V ob, N name);
 
     public V forName(N name) {
         if (oa == null) {

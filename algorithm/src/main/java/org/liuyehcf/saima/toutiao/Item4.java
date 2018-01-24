@@ -1,6 +1,8 @@
 package org.liuyehcf.saima.toutiao;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Scanner;
+import java.util.Set;
 
 /**
  * Created by HCF on 2017/4/18.

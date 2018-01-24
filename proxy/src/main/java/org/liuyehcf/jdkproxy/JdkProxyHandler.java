@@ -7,11 +7,11 @@ import java.lang.reflect.Method;
  * Created by Liuye on 2017/12/24.
  */
 public class JdkProxyHandler implements InvocationHandler {
+    private Object obj;
+
     public JdkProxyHandler(Object obj) {
         this.obj = obj;
     }
-
-    private Object obj;
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {

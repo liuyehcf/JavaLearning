@@ -2,7 +2,8 @@ package org.liuyehcf.datastructure.tree.rbtree;
 
 import java.util.*;
 
-import static org.liuyehcf.datastructure.tree.rbtree.Color.*;
+import static org.liuyehcf.datastructure.tree.rbtree.Color.BLACK;
+import static org.liuyehcf.datastructure.tree.rbtree.Color.RED;
 
 /**
  * Created by HCF on 2017/4/6.
@@ -12,6 +13,7 @@ public class RBTree {
     private RBTreeNode nil;
 
     private RBTreeNode root;
+    private boolean rule5;
 
     public RBTree() {
         nil = new RBTreeNode(0);
@@ -157,7 +159,6 @@ public class RBTree {
         return x;
     }
 
-
     public boolean search(int val) {
         RBTreeNode x = search(root, val);
         return x != nil;
@@ -280,8 +281,6 @@ public class RBTree {
         }
         x.color = BLACK;
     }
-
-    private boolean rule5;
 
     private boolean check() {
         if (root.color == RED) return false;

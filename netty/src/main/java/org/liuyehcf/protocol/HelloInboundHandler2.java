@@ -2,7 +2,6 @@ package org.liuyehcf.protocol;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.util.ReferenceCountUtil;
 
 /**
  * Created by HCF on 2017/12/5.
@@ -62,6 +61,7 @@ public class HelloInboundHandler2 extends ChannelInboundHandlerAdapter { // (1)
         System.out.println(promptMessage() + "<exceptionCaught>");
         ctx.fireExceptionCaught(cause);
     }
+
     private String promptMessage() {
         return "[Inbound-Hello2] : ";
     }

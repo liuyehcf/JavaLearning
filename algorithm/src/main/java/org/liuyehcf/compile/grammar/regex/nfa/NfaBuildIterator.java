@@ -10,32 +10,31 @@ import java.util.*;
  */
 class NfaBuildIterator {
 
-    private class StackUnion {
-        private NfaClosure nfaClosure;
+    private List<Symbol> symbols;
+    private int index;
+    private LinkedList<StackUnion> unions;
+    private NfaClosure curNfaClosure;
+    private List<NfaClosure> groupNfaClosures;
+    private GroupUtil groupUtil;
+    private NfaBuildIterator(List<Symbol> symbols) {
+        this.symbols = symbols;
+        index = 0;
+        unions = new LinkedList<>();
+        curNfaClosure = null;
+        groupNfaClosures = new ArrayList<>();
+        groupUtil = new GroupUtil();
+    }
 
-        private boolean isNfaClosure() {
-            return nfaClosure != null;
+    static List<NfaClosure> createNfaClosuresMap(List<Symbol> symbols) {
+        NfaBuildIterator buildIterator = new NfaBuildIterator(symbols);
+
+        while (buildIterator.hasNext()) {
+            buildIterator.processEachSymbol();
         }
 
-        private boolean isParallel() {
-            return !isNfaClosure();
-        }
+        buildIterator.finishWork();
 
-        private NfaClosure getNfaClosure() {
-            assert isNfaClosure();
-            return nfaClosure;
-        }
-
-        private StackUnion(NfaClosure nfaClosure) {
-            this.nfaClosure = nfaClosure;
-        }
-
-        @Override
-        public String toString() {
-            return isNfaClosure() ?
-                    getNfaClosure().toString() + " group[" + getNfaClosure().getGroup() + "]"
-                    : "Parallel";
-        }
+        return buildIterator.groupNfaClosures;
     }
 
     private StackUnion createStackUnitWithNfaClosure(NfaClosure nfaClosure) {
@@ -44,44 +43,6 @@ class NfaBuildIterator {
 
     private StackUnion createStackUnitWithParallelGroup() {
         return this.new StackUnion(null);
-    }
-
-    private static class GroupUtil {
-        private int groupCount = 0;
-        private LinkedList<Integer> groupStack;
-
-        public GroupUtil() {
-            groupStack = new LinkedList<>();
-            groupStack.push(0);
-        }
-
-        public int getCurGroup() {
-            return groupStack.peek();
-        }
-
-        public void enterGroup() {
-            groupStack.push(++groupCount);
-        }
-
-        public void exitGroup() {
-            groupStack.pop();
-        }
-    }
-
-    private List<Symbol> symbols;
-    private int index;
-    private LinkedList<StackUnion> unions;
-    private NfaClosure curNfaClosure;
-    private List<NfaClosure> groupNfaClosures;
-    private GroupUtil groupUtil;
-
-    private NfaBuildIterator(List<Symbol> symbols) {
-        this.symbols = symbols;
-        index = 0;
-        unions = new LinkedList<>();
-        curNfaClosure = null;
-        groupNfaClosures = new ArrayList<>();
-        groupUtil = new GroupUtil();
     }
 
     private void moveForward() {
@@ -163,18 +124,6 @@ class NfaBuildIterator {
                 return o1.getGroup() - o2.getGroup();
             }
         });
-    }
-
-    static List<NfaClosure> createNfaClosuresMap(List<Symbol> symbols) {
-        NfaBuildIterator buildIterator = new NfaBuildIterator(symbols);
-
-        while (buildIterator.hasNext()) {
-            buildIterator.processEachSymbol();
-        }
-
-        buildIterator.finishWork();
-
-        return buildIterator.groupNfaClosures;
     }
 
     private void processEachSymbol() {
@@ -455,5 +404,55 @@ class NfaBuildIterator {
         }
 
         preNfaClosure.setEndNfaStates(nextNfaClosure.getEndNfaStates());
+    }
+
+    private static class GroupUtil {
+        private int groupCount = 0;
+        private LinkedList<Integer> groupStack;
+
+        public GroupUtil() {
+            groupStack = new LinkedList<>();
+            groupStack.push(0);
+        }
+
+        public int getCurGroup() {
+            return groupStack.peek();
+        }
+
+        public void enterGroup() {
+            groupStack.push(++groupCount);
+        }
+
+        public void exitGroup() {
+            groupStack.pop();
+        }
+    }
+
+    private class StackUnion {
+        private NfaClosure nfaClosure;
+
+        private StackUnion(NfaClosure nfaClosure) {
+            this.nfaClosure = nfaClosure;
+        }
+
+        private boolean isNfaClosure() {
+            return nfaClosure != null;
+        }
+
+        private boolean isParallel() {
+            return !isNfaClosure();
+        }
+
+        private NfaClosure getNfaClosure() {
+            assert isNfaClosure();
+            return nfaClosure;
+        }
+
+        @Override
+        public String toString() {
+            return isNfaClosure() ?
+                    getNfaClosure().toString() + " group[" + getNfaClosure().getGroup() + "]"
+                    : "Parallel";
+        }
     }
 }

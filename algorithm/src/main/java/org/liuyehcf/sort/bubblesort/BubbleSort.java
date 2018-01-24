@@ -1,6 +1,6 @@
 package org.liuyehcf.sort.bubblesort;
 
-import static org.liuyehcf.sort.SortUtils.*;
+import static org.liuyehcf.sort.SortUtils.exchange;
 
 /**
  * Created by HCF on 2017/7/26.

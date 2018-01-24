@@ -79,15 +79,6 @@ public class Cache extends Dictionary {
      */
     private float loadFactor;
 
-    private void init(int initialCapacity, float loadFactor) {
-        if ((initialCapacity <= 0) || (loadFactor <= 0.0)) {
-            throw new IllegalArgumentException();
-        }
-        this.loadFactor = loadFactor;
-        table = new CacheEntry[initialCapacity];
-        threshold = (int) (initialCapacity * loadFactor);
-    }
-
     /**
      * Constructs a new, empty Cache with the specified initial
      * capacity and the specified load factor.
@@ -127,6 +118,15 @@ public class Cache extends Dictionary {
             // This should never happen
             throw new Error("panic");
         }
+    }
+
+    private void init(int initialCapacity, float loadFactor) {
+        if ((initialCapacity <= 0) || (loadFactor <= 0.0)) {
+            throw new IllegalArgumentException();
+        }
+        this.loadFactor = loadFactor;
+        table = new CacheEntry[initialCapacity];
+        threshold = (int) (initialCapacity * loadFactor);
     }
 
     /**
@@ -211,7 +211,7 @@ public class Cache extends Dictionary {
                     e.next = newTable[index];
                     newTable[index] = e;
                 } else
-                    count--;	/* remove entries that have disappeared */
+                    count--;    /* remove entries that have disappeared */
             }
         }
     }
@@ -244,7 +244,7 @@ public class Cache extends Dictionary {
                 e.setThing(value);
                 return old;
             } else if (e.check() == null)
-                ne = e;		/* reuse old flushed value */
+                ne = e;        /* reuse old flushed value */
         }
 
         if (count >= threshold) {

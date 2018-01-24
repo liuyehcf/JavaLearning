@@ -12,9 +12,9 @@ import java.lang.reflect.Method;
  */
 public class CglibProxy implements MethodInterceptor {
 
-    private Enhancer enhancer=new Enhancer();
+    private Enhancer enhancer = new Enhancer();
 
-    public Object getProxy(Class clazz){
+    public Object getProxy(Class clazz) {
         enhancer.setSuperclass(clazz);
         enhancer.setCallback(this);
         return enhancer.create();
@@ -22,7 +22,7 @@ public class CglibProxy implements MethodInterceptor {
 
     public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
         PerformanceMonitor.begin(o.getClass().getName() + "." + method.getName());
-        Object result= methodProxy.invokeSuper(o,objects);
+        Object result = methodProxy.invokeSuper(o, objects);
         PerformanceMonitor.end();
         return result;
     }

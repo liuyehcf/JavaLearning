@@ -8,8 +8,8 @@ import java.lang.reflect.Field;
  * Created by liuye on 2017/4/8 0008.
  */
 public class GetUnsafe {
-    public static void main(String[] args){
-        Unsafe unsafe=getUnsafe();
+    public static void main(String[] args) {
+        Unsafe unsafe = getUnsafe();
     }
 
     public static Unsafe getUnsafe() {

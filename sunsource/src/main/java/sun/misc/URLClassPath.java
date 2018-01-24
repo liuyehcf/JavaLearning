@@ -41,18 +41,14 @@ public class URLClassPath {
                 new sun.security.action.GetPropertyAction("sun.misc.URLClassPath.debug")) != null);
     }
 
-    /* The original search path of URLs. */
-    private ArrayList path = new ArrayList();
-
     /* The stack of unopened URLs */
     Stack urls = new Stack();
-
     /* The resulting search path of Loaders */
     ArrayList loaders = new ArrayList();
-
     /* Map of each URL opened to its corresponding Loader */
     HashMap<String, Loader> lmap = new HashMap<String, Loader>();
-
+    /* The original search path of URLs. */
+    private ArrayList path = new ArrayList();
     /* The jar protocol handler to use when creating new URLs */
     private URLStreamHandler jarHandler;
 
@@ -78,6 +74,73 @@ public class URLClassPath {
 
     public URLClassPath(URL[] urls) {
         this(urls, null);
+    }
+
+    /**
+     * Convert class path specification into an array of file URLs.
+     * <p>
+     * The path of the file is encoded before conversion into URL
+     * form so that reserved characters can safely appear in the path.
+     */
+    public static URL[] pathToURLs(String path) {
+        StringTokenizer st = new StringTokenizer(path, File.pathSeparator);
+        URL[] urls = new URL[st.countTokens()];
+        int count = 0;
+        while (st.hasMoreTokens()) {
+            File f = new File(st.nextToken());
+            try {
+                f = new File(f.getCanonicalPath());
+            } catch (IOException x) {
+                // use the non-canonicalized filename
+            }
+            try {
+                urls[count++] = ParseUtil.fileToEncodedURL(f);
+            } catch (IOException x) {
+            }
+        }
+
+        if (urls.length != count) {
+            URL[] tmp = new URL[count];
+            System.arraycopy(urls, 0, tmp, 0, count);
+            urls = tmp;
+        }
+        return urls;
+    }
+
+    /*
+     * Check whether the resource URL should be returned.
+     * Throw exception on failure.
+     * Called internally within this file.
+     */
+    static void check(URL url) throws IOException {
+        SecurityManager security = System.getSecurityManager();
+        if (security != null) {
+            URLConnection urlConnection = url.openConnection();
+            Permission perm = urlConnection.getPermission();
+            if (perm != null) {
+                try {
+                    security.checkPermission(perm);
+                } catch (SecurityException se) {
+                    // fallback to checkRead/checkConnect for pre 1.2
+                    // security managers
+                    if ((perm instanceof java.io.FilePermission) &&
+                            perm.getActions().indexOf("read") != -1) {
+                        security.checkRead(perm.getName());
+                    } else if ((perm instanceof
+                            java.net.SocketPermission) &&
+                            perm.getActions().indexOf("connect") != -1) {
+                        URL locUrl = url;
+                        if (urlConnection instanceof JarURLConnection) {
+                            locUrl = ((JarURLConnection) urlConnection).getJarFileURL();
+                        }
+                        security.checkConnect(locUrl.getHost(),
+                                locUrl.getPort());
+                    } else {
+                        throw se;
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -322,37 +385,6 @@ public class URLClassPath {
         }
     }
 
-    /**
-     * Convert class path specification into an array of file URLs.
-     * <p>
-     * The path of the file is encoded before conversion into URL
-     * form so that reserved characters can safely appear in the path.
-     */
-    public static URL[] pathToURLs(String path) {
-        StringTokenizer st = new StringTokenizer(path, File.pathSeparator);
-        URL[] urls = new URL[st.countTokens()];
-        int count = 0;
-        while (st.hasMoreTokens()) {
-            File f = new File(st.nextToken());
-            try {
-                f = new File(f.getCanonicalPath());
-            } catch (IOException x) {
-                // use the non-canonicalized filename
-            }
-            try {
-                urls[count++] = ParseUtil.fileToEncodedURL(f);
-            } catch (IOException x) {
-            }
-        }
-
-        if (urls.length != count) {
-            URL[] tmp = new URL[count];
-            System.arraycopy(urls, 0, tmp, 0, count);
-            urls = tmp;
-        }
-        return urls;
-    }
-
     /*
      * Check whether the resource URL should be returned.
      * Return null on security check failure.
@@ -366,42 +398,6 @@ public class URLClassPath {
         }
 
         return url;
-    }
-
-    /*
-     * Check whether the resource URL should be returned.
-     * Throw exception on failure.
-     * Called internally within this file.
-     */
-    static void check(URL url) throws IOException {
-        SecurityManager security = System.getSecurityManager();
-        if (security != null) {
-            URLConnection urlConnection = url.openConnection();
-            Permission perm = urlConnection.getPermission();
-            if (perm != null) {
-                try {
-                    security.checkPermission(perm);
-                } catch (SecurityException se) {
-                    // fallback to checkRead/checkConnect for pre 1.2
-                    // security managers
-                    if ((perm instanceof java.io.FilePermission) &&
-                            perm.getActions().indexOf("read") != -1) {
-                        security.checkRead(perm.getName());
-                    } else if ((perm instanceof
-                            java.net.SocketPermission) &&
-                            perm.getActions().indexOf("connect") != -1) {
-                        URL locUrl = url;
-                        if (urlConnection instanceof JarURLConnection) {
-                            locUrl = ((JarURLConnection) urlConnection).getJarFileURL();
-                        }
-                        security.checkConnect(locUrl.getHost(),
-                                locUrl.getPort());
-                    } else {
-                        throw se;
-                    }
-                }
-            }
-        }
     }
 
     /**
@@ -438,10 +434,10 @@ public class URLClassPath {
                     URLClassPath.check(url);
                 }
 
-		/*
-         * For a HTTP connection we use the HEAD method to
-	 	 * check if the resource exists.
-		 */
+                /*
+                 * For a HTTP connection we use the HEAD method to
+                 * check if the resource exists.
+                 */
                 URLConnection uc = url.openConnection();
                 if (uc instanceof HttpURLConnection) {
                     HttpURLConnection hconn = (HttpURLConnection) uc;
@@ -786,17 +782,17 @@ public class URLClassPath {
             boolean done = false;
             int count = 0;
             LinkedList jarFilesList = null;
-	    
-	    /* If there no jar files in the index that can potential contain
-	     * this resource then return immediately.
-	     */
+
+            /* If there no jar files in the index that can potential contain
+             * this resource then return immediately.
+             */
             if ((jarFilesList = index.get(name)) == null)
                 return null;
 
             do {
                 jarFiles = jarFilesList.toArray();
                 int size = jarFilesList.size();
-		/* loop through the mapped jar file list */
+                /* loop through the mapped jar file list */
                 while (count < size) {
                     String jarName = (String) jarFiles[count++];
                     JarLoader newLoader;
@@ -806,9 +802,9 @@ public class URLClassPath {
                         url = new URL(csu, jarName);
                         String urlNoFragString = URLUtil.urlNoFragString(url);
                         if ((newLoader = (JarLoader) lmap.get(urlNoFragString)) == null) {
-			    /* no loader has been set up for this jar file
-			     * before 
-			     */
+                            /* no loader has been set up for this jar file
+                             * before
+                             */
                             newLoader = (JarLoader)
                                     AccessController.doPrivileged(
                                             new PrivilegedExceptionAction() {
@@ -818,10 +814,10 @@ public class URLClassPath {
                                                 }
                                             });
 
-			    /* this newly opened jar file has its own index,
-			     * merge it into the parent's index, taking into
-			     * account the relative path.
-			     */
+                            /* this newly opened jar file has its own index,
+                             * merge it into the parent's index, taking into
+                             * account the relative path.
+                             */
                             JarIndex newIndex =
                                     ((JarLoader) newLoader).getIndex();
                             if (newIndex != null) {
@@ -829,8 +825,8 @@ public class URLClassPath {
                                 newIndex.merge(this.index, (pos == -1 ?
                                         null : jarName.substring(0, pos + 1)));
                             }
-			     
-			    /* put it in the global hashtable */
+
+                            /* put it in the global hashtable */
                             lmap.put(urlNoFragString, newLoader);
                         }
                     } catch (java.security.PrivilegedActionException pae) {
@@ -840,9 +836,9 @@ public class URLClassPath {
                     }
 
 
-		    /* Note that the addition of the url to the list of visited
-		     * jars incorporates a check for presence in the hashmap
-		     */
+                    /* Note that the addition of the url to the list of visited
+                     * jars incorporates a check for presence in the hashmap
+                     */
                     boolean visitedURL = !visited.add(URLUtil.urlNoFragString(url));
                     if (!visitedURL) {
                         try {
@@ -855,28 +851,28 @@ public class URLClassPath {
                             return newLoader.checkResource(name, check, entry);
                         }
 
-			/* Verify that at least one other resource with the
-			 * same package name as the lookedup resource is
-			 * present in the new jar
-		 	 */
+                        /* Verify that at least one other resource with the
+                         * same package name as the lookedup resource is
+                         * present in the new jar
+                         */
                         if (!newLoader.validIndex(name)) {
-			    /* the mapping is wrong */
+                            /* the mapping is wrong */
                             throw new InvalidJarIndexException("Invalid index");
                         }
                     }
 
-		    /* If newLoader is the current loader or if it is a
-		     * loader that has already been searched or if the new
-		     * loader does not have an index then skip it
-		     * and move on to the next loader. 
-		     */
+                    /* If newLoader is the current loader or if it is a
+                     * loader that has already been searched or if the new
+                     * loader does not have an index then skip it
+                     * and move on to the next loader.
+                     */
                     if (visitedURL || newLoader == this ||
                             newLoader.getIndex() == null) {
                         continue;
                     }
 
-		    /* Process the index of the new loader
-		     */
+                    /* Process the index of the new loader
+                     */
                     if ((res = newLoader.getResource(name, check, visited))
                             != null) {
                         return res;
@@ -965,8 +961,8 @@ public class URLClassPath {
         }
 
         /*
-             * Returns the URL for a resource with the specified name
-             */
+         * Returns the URL for a resource with the specified name
+         */
         URL findResource(final String name, boolean check) {
             Resource rsc = getResource(name, check);
             if (rsc != null) {

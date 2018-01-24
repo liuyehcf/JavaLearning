@@ -12,7 +12,7 @@ import java.lang.reflect.Method;
 public class CglibEnhancer implements MethodInterceptor {
     private Enhancer enhancer = new Enhancer();
 
-    public Object getProxy(Class clazz){
+    public Object getProxy(Class clazz) {
         enhancer.setSuperclass(clazz);
 
         enhancer.setCallback(this);
@@ -22,10 +22,10 @@ public class CglibEnhancer implements MethodInterceptor {
 
     @Override
     public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
-        System.out.println(method.getName()+"执行之前做一些准备工作");
+        System.out.println(method.getName() + "执行之前做一些准备工作");
         //Object result = method.invoke(obj, args); 想不通
-        Object result = methodProxy.invokeSuper(o,objects);
-        System.out.println(method.getName()+"执行之后做一些准备的工作");
+        Object result = methodProxy.invokeSuper(o, objects);
+        System.out.println(method.getName() + "执行之后做一些准备的工作");
         return result;
     }
 }

@@ -105,16 +105,16 @@ class Item2_1 {
         }
 
         int[][] sum = new int[N + 1][M + 1];
-        int res=-1;
+        int res = -1;
         for (int row = 1; row <= N; row++) {
             for (int col = 1; col <= M; col++) {
-                sum[row][col]=sum[row-1][col]+sum[row][col-1]-sum[row-1][col-1]+A[row-1][col-1];
+                sum[row][col] = sum[row - 1][col] + sum[row][col - 1] - sum[row - 1][col - 1] + A[row - 1][col - 1];
 
-                for(int i=1;i<=row;i++){
-                    for(int j=1;j<=col;j++){
-                        int temp=sum[row][col]-sum[row][j-1]-sum[i-1][col]+sum[i-1][j-1];
-                        if(temp<=K){
-                            res=Math.max(res,(row-i+1)*(col-j+1));
+                for (int i = 1; i <= row; i++) {
+                    for (int j = 1; j <= col; j++) {
+                        int temp = sum[row][col] - sum[row][j - 1] - sum[i - 1][col] + sum[i - 1][j - 1];
+                        if (temp <= K) {
+                            res = Math.max(res, (row - i + 1) * (col - j + 1));
                         }
                     }
                 }

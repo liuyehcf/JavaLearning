@@ -55,8 +55,8 @@ import java.io.PushbackInputStream;
  *
  * @author Chuck McManis
  * @version %I%, %G%
- * @see        CharacterDecoder
- * @see        UUEncoder
+ * @see CharacterDecoder
+ * @see UUEncoder
  */
 public class UUDecoder extends CharacterDecoder {
 
@@ -75,7 +75,10 @@ public class UUDecoder extends CharacterDecoder {
      * </pre>
      */
     public int mode;
-
+    /**
+     * This is used to decode the atoms
+     */
+    private byte decoderBuffer[] = new byte[4];
 
     /**
      * UU encoding specifies 3 bytes per atom.
@@ -91,11 +94,6 @@ public class UUDecoder extends CharacterDecoder {
     protected int bytesPerLine() {
         return (45);
     }
-
-    /**
-     * This is used to decode the atoms
-     */
-    private byte decoderBuffer[] = new byte[4];
 
     /**
      * Decode a UU atom. Note that if l is less than 3 we don't write
@@ -139,10 +137,10 @@ public class UUDecoder extends CharacterDecoder {
         String r;
         boolean sawNewLine;
 
-	/*
-     * This works by ripping through the buffer until it finds a 'begin'
-	 * line or the end of the buffer.
-	 */
+        /*
+         * This works by ripping through the buffer until it finds a 'begin'
+         * line or the end of the buffer.
+         */
         sawNewLine = true;
         while (true) {
             c = inStream.read();
@@ -157,9 +155,9 @@ public class UUDecoder extends CharacterDecoder {
             }
             sawNewLine = (c == '\n') || (c == '\r');
         }
-	
-	/* 
-	 * Now we think its begin, (we've seen ^be) so verification it here.
+
+        /*
+         * Now we think its begin, (we've seen ^be) so verification it here.
          */
         while ((c != '\n') && (c != '\r')) {
             c = inStream.read();
@@ -176,9 +174,9 @@ public class UUDecoder extends CharacterDecoder {
         }
         mode = Integer.parseInt(r.substring(4, 7));
         bufferName = r.substring(r.indexOf(' ', 6) + 1);
-	/* 
-	 * Check for \n after \r
-	 */
+        /*
+         * Check for \n after \r
+         */
         if (c == '\r') {
             c = inStream.read();
             if ((c != '\n') && (c != -1))

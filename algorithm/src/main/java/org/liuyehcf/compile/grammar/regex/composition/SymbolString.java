@@ -11,10 +11,6 @@ import java.util.List;
 public class SymbolString {
     private final List<Symbol> symbols;
 
-    public List<Symbol> getSymbols() {
-        return symbols;
-    }
-
     public SymbolString(Object... objects) {
         this.symbols = new ArrayList<>();
         for (Object obj : objects) {
@@ -30,6 +26,14 @@ public class SymbolString {
         }
     }
 
+    public SymbolString(List<Symbol> symbols) {
+        this.symbols = symbols;
+    }
+
+    public List<Symbol> getSymbols() {
+        return symbols;
+    }
+
     private void addCharToSymbols(char c) {
         this.symbols.add(Symbol.getAlphabetSymbolWithChar(c));
     }
@@ -37,10 +41,6 @@ public class SymbolString {
     private void addNonAlphabetSymbol(Symbol symbol) {
         assert !symbol.isOfAlphabet();
         this.symbols.add(symbol);
-    }
-
-    public SymbolString(List<Symbol> symbols) {
-        this.symbols = symbols;
     }
 
     @Override

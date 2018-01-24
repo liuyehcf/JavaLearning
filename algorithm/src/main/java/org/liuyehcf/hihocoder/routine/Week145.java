@@ -100,21 +100,21 @@ class Week145_1 {
 
             //dp[i][j]:表示前i关,总共答题j次的最少答对次数
             int[][] dp = new int[N + 1][M + 1];
-            for(int i=1;i<=N;i++){
+            for (int i = 1; i <= N; i++) {
                 Arrays.fill(dp[i], 2000);
             }
 
-            dp[0][0]=0;
+            dp[0][0] = 0;
 
             for (int i = 1; i <= N; i++) {//i为关卡号
-                int maxRight=(A[i-1]+S-1)/S;
-                for(int right=0;right<=maxRight;right++){
-                    int remainScore=A[i-1]-right*S;
-                    int wrong=0;
-                    if(remainScore>0)
-                        wrong=(remainScore+T-1)/T;
-                    for(int k=0;right+wrong+k<=M;k++){
-                        dp[i][right+wrong+k]=Math.min(dp[i][right+wrong+k],dp[i-1][k]+right);
+                int maxRight = (A[i - 1] + S - 1) / S;
+                for (int right = 0; right <= maxRight; right++) {
+                    int remainScore = A[i - 1] - right * S;
+                    int wrong = 0;
+                    if (remainScore > 0)
+                        wrong = (remainScore + T - 1) / T;
+                    for (int k = 0; right + wrong + k <= M; k++) {
+                        dp[i][right + wrong + k] = Math.min(dp[i][right + wrong + k], dp[i - 1][k] + right);
                     }
                 }
             }
@@ -219,7 +219,7 @@ class Week145_2 {
             int[][][] dp = new int[M + 1][M + 1][2];
             dp[0][0][0] = 0;
             dp[0][0][1] = 0;
-            int res=Integer.MAX_VALUE;
+            int res = Integer.MAX_VALUE;
 
             outer:
             for (int i = 0; i <= M; i++) {
@@ -247,47 +247,43 @@ class Week145_2 {
                             dp[i][j][0] = level;
                             dp[i][j][1] = score;
                         }
-                    }
-                    else{
-                        int level1=dp[i][j-1][0];
-                        int level2=dp[i-1][j][0];
-                        int score1=dp[i][j-1][1];
-                        int score2=dp[i-1][j][1];
+                    } else {
+                        int level1 = dp[i][j - 1][0];
+                        int level2 = dp[i - 1][j][0];
+                        int score1 = dp[i][j - 1][1];
+                        int score2 = dp[i - 1][j][1];
 
-                        score1+=T;
-                        score2+=S;
+                        score1 += T;
+                        score2 += S;
 
-                        if(score1>=A[level1]){
+                        if (score1 >= A[level1]) {
                             level1++;
-                            score1=0;
+                            score1 = 0;
                         }
 
-                        if(score2>=A[level2]){
+                        if (score2 >= A[level2]) {
                             level2++;
-                            score2=0;
+                            score2 = 0;
                         }
 
-                        if(level1>level2){
-                            dp[i][j][0]=level1;
-                            dp[i][j][1]=score1;
-                        }
-                        else if(level1<level2){
-                            dp[i][j][0]=level2;
-                            dp[i][j][1]=score2;
-                        }
-                        else{
-                            if(score1>=score2){
-                                dp[i][j][0]=level1;
-                                dp[i][j][1]=score1;
-                            }
-                            else{
-                                dp[i][j][0]=level2;
-                                dp[i][j][1]=score2;
+                        if (level1 > level2) {
+                            dp[i][j][0] = level1;
+                            dp[i][j][1] = score1;
+                        } else if (level1 < level2) {
+                            dp[i][j][0] = level2;
+                            dp[i][j][1] = score2;
+                        } else {
+                            if (score1 >= score2) {
+                                dp[i][j][0] = level1;
+                                dp[i][j][1] = score1;
+                            } else {
+                                dp[i][j][0] = level2;
+                                dp[i][j][1] = score2;
                             }
                         }
                     }
-                    if(dp[i][j][0]==N){
-                        res=i;
+                    if (dp[i][j][0] == N) {
+                        res = i;
                         break outer;
                     }
                 }

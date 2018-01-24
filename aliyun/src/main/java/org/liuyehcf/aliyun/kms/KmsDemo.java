@@ -6,12 +6,8 @@ import com.aliyuncs.http.FormatType;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.http.ProtocolType;
 import com.aliyuncs.kms.model.v20160120.*;
-import com.aliyuncs.kms.model.v20160120.ListKeysResponse.Key;
 import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
-
-import java.util.Iterator;
-import java.util.List;
 
 import static org.liuyehcf.aliyun.AccessUtils.ACCESS_KEY;
 import static org.liuyehcf.aliyun.AccessUtils.ACCESS_SECRET_KEY;

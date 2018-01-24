@@ -13,6 +13,11 @@ import org.liuyehcf.aliyun.face.attribution.entity.FaceAttributionResponse;
 public class FaceAttributionDemo {
 
 
+    public static void main(String[] args) throws Exception {
+        new UrlFaceAttribution().attribute();
+        new ContentFaceAttribution().attribute();
+    }
+
     private static abstract class FaceAttributionTemplate {
         private static final String URL = "https://dtplus-cn-shanghai.data.aliyuncs.com/face/attribute";
 
@@ -64,10 +69,5 @@ public class FaceAttributionDemo {
             requestBody.setContent(Base64EncoderUtils.encodeWithPath(PATH));
             return JSON.toJSONString(requestBody);
         }
-    }
-
-    public static void main(String[] args) throws Exception {
-        new UrlFaceAttribution().attribute();
-        new ContentFaceAttribution().attribute();
     }
 }

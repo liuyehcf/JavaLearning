@@ -20,17 +20,12 @@ import java.util.concurrent.TimeUnit;
  * Created by HCF on 2017/7/25.
  */
 public class Test {
-    private static Class<int[]> CLASS = int[].class;
-
-    private static List<Class<?>> classList = new ArrayList<Class<?>>();
-
     private static final int LEN = 5000;
-
     private static final int TIMES = 100;
-
     private static final int BOUND = 10;
-
     private static final Random random = new Random();
+    private static Class<int[]> CLASS = int[].class;
+    private static List<Class<?>> classList = new ArrayList<Class<?>>();
 
     private static void add(Class<?> clazz) {
         classList.add(clazz);

@@ -17,6 +17,12 @@ package sun.misc.resources;
 
 public class Messages_de extends java.util.ListResourceBundle {
 
+    private static final Object[][] contents = {
+            {"optpkg.versionerror", "FEHLER: In der JAR-Datei {0} wurde ein ung\u00fcltiges Versionsformat verwendet. Pr\u00fcfen Sie in der Dokumentation, welches Versionsformat unterst\u00fctzt wird."},
+            {"optpkg.attributeerror", "FEHLER: In der JAR-Datei {1} ist das erforderliche JAR-Manifestattribut {0} nicht gesetzt."},
+            {"optpkg.attributeserror", "FEHLER: In der JAR-Datei {0} sind einige erforderliche JAR-Manifestattribute nicht gesetzt."}
+    };
+
     /**
      * Returns the contents of this <code>ResourceBundle</code>.
      * <p>
@@ -26,11 +32,5 @@ public class Messages_de extends java.util.ListResourceBundle {
     public Object[][] getContents() {
         return contents;
     }
-
-    private static final Object[][] contents = {
-            {"optpkg.versionerror", "FEHLER: In der JAR-Datei {0} wurde ein ung\u00fcltiges Versionsformat verwendet. Pr\u00fcfen Sie in der Dokumentation, welches Versionsformat unterst\u00fctzt wird."},
-            {"optpkg.attributeerror", "FEHLER: In der JAR-Datei {1} ist das erforderliche JAR-Manifestattribut {0} nicht gesetzt."},
-            {"optpkg.attributeserror", "FEHLER: In der JAR-Datei {0} sind einige erforderliche JAR-Manifestattribute nicht gesetzt."}
-    };
 
 }

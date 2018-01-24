@@ -52,10 +52,15 @@ public class Cleaner
     // themselves from being GC'd before their referents
     //
     static private Cleaner first = null;
-
+    private final Runnable thunk;
     private Cleaner
             next = null,
             prev = null;
+
+    private Cleaner(Object referent, Runnable thunk) {
+        super(referent, dummyQueue);
+        this.thunk = thunk;
+    }
 
     private static synchronized Cleaner add(Cleaner cl) {
         if (first != null) {
@@ -89,13 +94,6 @@ public class Cleaner
         cl.prev = cl;
         return true;
 
-    }
-
-    private final Runnable thunk;
-
-    private Cleaner(Object referent, Runnable thunk) {
-        super(referent, dummyQueue);
-        this.thunk = thunk;
     }
 
     /**

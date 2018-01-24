@@ -54,13 +54,13 @@ import java.nio.ByteBuffer;
  * Several useful decoders have already been written and are
  * referenced in the See Also list below.
  *
- * @version    %G%, %I%
  * @author Chuck McManis
- * @see        CEFormatException
- * @see        CharacterEncoder
- * @see        UCDecoder
- * @see        UUDecoder
- * @see        BASE64Decoder
+ * @version %G%, %I%
+ * @see CEFormatException
+ * @see CharacterEncoder
+ * @see UCDecoder
+ * @see UUDecoder
+ * @see BASE64Decoder
  */
 
 public abstract class CharacterDecoder {

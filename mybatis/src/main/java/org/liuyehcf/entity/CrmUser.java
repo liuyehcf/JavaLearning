@@ -52,6 +52,6 @@ public class CrmUser {
 
     @Override
     public String toString() {
-        return "id: "+id+", "+firstName+lastName;
+        return "id: " + id + ", " + firstName + lastName;
     }
 }

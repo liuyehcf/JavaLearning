@@ -28,6 +28,8 @@ import java.util.jar.Manifest;
  * @since 1.2
  */
 public abstract class Resource {
+    private InputStream cis;
+
     /**
      * Returns the name of the Resource.
      */
@@ -52,8 +54,6 @@ public abstract class Resource {
      * Returns the length of the Resource data, or -1 if unknown.
      */
     public abstract int getContentLength() throws IOException;
-
-    private InputStream cis;
 
     /* Cache result in case getBytes is called after getByteBuffer. */
     private synchronized InputStream cachedInputStream() throws IOException {

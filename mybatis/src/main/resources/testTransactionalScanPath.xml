@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
-       xmlns:p="http://www.springframework.org/schema/p"
-       xsi:schemaLocation="http://www.springframework.org/schema/context
-	   http://www.springframework.org/schema/context/spring-context-3.0.xsd
-       http://www.springframework.org/schema/beans
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
        http://www.springframework.org/schema/beans/spring-beans-4.0.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
 
 
@@ -15,7 +11,6 @@
     配合TestAnnotationTransaction#testTransactionalScanPath()方法进行测试
     -->
     <bean id="crmUserServiceImpl" class="org.liuyehcf.service.impl.CrmUserServiceImpl"/>
-
 
 
     <!--引入资源文件,也可以在maven的pom文件中进行引入-->

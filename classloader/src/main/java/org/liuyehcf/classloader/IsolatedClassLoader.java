@@ -5,6 +5,14 @@ package org.liuyehcf.classloader;
  */
 public class IsolatedClassLoader extends AbstractClassLoader {
 
+    public static void main(String[] args) throws Exception {
+        ClassLoader classLoader = new IsolatedClassLoader();
+
+        Class clazz = classLoader.loadClass(TEST_CLASS);
+
+        AbstractClassLoader.testTemplate(clazz);
+    }
+
     @Override
     public Class<?> loadClass(String name) throws ClassNotFoundException {
 
@@ -16,14 +24,5 @@ public class IsolatedClassLoader extends AbstractClassLoader {
         }
 
         return findClass(name);
-    }
-
-
-    public static void main(String[] args) throws Exception {
-        ClassLoader classLoader = new IsolatedClassLoader();
-
-        Class clazz = classLoader.loadClass(TEST_CLASS);
-
-        AbstractClassLoader.testTemplate(clazz);
     }
 }

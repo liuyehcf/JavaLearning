@@ -25,6 +25,28 @@ public class DfaState {
 
     private boolean canReceive = false;
 
+    public static DfaState createDfaStateWithNfaStates(List<NfaState> nfaStates) {
+        LinkedList<NfaState> stack = new LinkedList<>();
+        stack.addAll(nfaStates);
+
+        DfaState dfaState = new DfaState();
+        dfaState.addNfaStates(nfaStates);
+
+        while (!stack.isEmpty()) {
+            NfaState nfaState = stack.pop();
+
+            for (NfaState nextNfaState : nfaState.getNextNfaStatesWithInputSymbol(Symbol._Epsilon)) {
+                if (dfaState.addNfaState(nextNfaState)) {
+                    stack.push(nextNfaState);
+                }
+            }
+        }
+
+        dfaState.setDescription();
+
+        return dfaState;
+    }
+
     public DfaStateDescription getDescription() {
         return description;
     }
@@ -140,27 +162,5 @@ public class DfaState {
     @Override
     public boolean equals(Object obj) {
         return this.description.equals(((DfaState) obj).description);
-    }
-
-    public static DfaState createDfaStateWithNfaStates(List<NfaState> nfaStates) {
-        LinkedList<NfaState> stack = new LinkedList<>();
-        stack.addAll(nfaStates);
-
-        DfaState dfaState = new DfaState();
-        dfaState.addNfaStates(nfaStates);
-
-        while (!stack.isEmpty()) {
-            NfaState nfaState = stack.pop();
-
-            for (NfaState nextNfaState : nfaState.getNextNfaStatesWithInputSymbol(Symbol._Epsilon)) {
-                if (dfaState.addNfaState(nextNfaState)) {
-                    stack.push(nextNfaState);
-                }
-            }
-        }
-
-        dfaState.setDescription();
-
-        return dfaState;
     }
 }

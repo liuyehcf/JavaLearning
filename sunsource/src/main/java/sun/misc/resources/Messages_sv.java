@@ -17,6 +17,12 @@ package sun.misc.resources;
 
 public class Messages_sv extends java.util.ListResourceBundle {
 
+    private static final Object[][] contents = {
+            {"optpkg.versionerror", "FEL: Ogiltigt versionsformat i {0} JAR-fil. Kontrollera i dokumentationen vilket versionsformat som st\u00f6ds."},
+            {"optpkg.attributeerror", "FEL: Det JAR manifest-attribut {0} som kr\u00e4vs \u00e4r inte angivet i {1} JAR-filen."},
+            {"optpkg.attributeserror", "FEL: Vissa JAR manifest-attribut som kr\u00e4vs \u00e4r inte angivna i {0} JAR-filen."}
+    };
+
     /**
      * Returns the contents of this <code>ResourceBundle</code>.
      * <p>
@@ -26,11 +32,5 @@ public class Messages_sv extends java.util.ListResourceBundle {
     public Object[][] getContents() {
         return contents;
     }
-
-    private static final Object[][] contents = {
-            {"optpkg.versionerror", "FEL: Ogiltigt versionsformat i {0} JAR-fil. Kontrollera i dokumentationen vilket versionsformat som st\u00f6ds."},
-            {"optpkg.attributeerror", "FEL: Det JAR manifest-attribut {0} som kr\u00e4vs \u00e4r inte angivet i {1} JAR-filen."},
-            {"optpkg.attributeserror", "FEL: Vissa JAR manifest-attribut som kr\u00e4vs \u00e4r inte angivna i {0} JAR-filen."}
-    };
 
 }

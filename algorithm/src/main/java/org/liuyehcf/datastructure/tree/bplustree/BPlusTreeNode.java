@@ -35,19 +35,19 @@ public class BPlusTreeNode {
      */
     BPlusTreeNode next;
 
-    public BPlusTreeNode(int t){
-        n=0;
-        keys=new int[2*t];
-        children=new BPlusTreeNode[2*t];
-        isLeaf=false;
-        next=null;
+    public BPlusTreeNode(int t) {
+        n = 0;
+        keys = new int[2 * t];
+        children = new BPlusTreeNode[2 * t];
+        isLeaf = false;
+        next = null;
     }
 
-    public String toString(){
-        StringBuilder sb=new StringBuilder();
-        sb.append("{ size: "+n+", keys: [");
-        for(int i=0;i<n;i++){
-            sb.append(keys[i]+", ");
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{ size: " + n + ", keys: [");
+        for (int i = 0; i < n; i++) {
+            sb.append(keys[i] + ", ");
         }
         sb.append("] }");
         return sb.toString();

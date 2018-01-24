@@ -13,6 +13,50 @@ import java.util.*;
  */
 public class Dfa implements Matcher {
 
+    private final Nfa nfa;
+    List<DfaState> startDfaStates = new ArrayList<>();
+
+    public Dfa(Nfa nfa) {
+        this.nfa = nfa;
+        init();
+    }
+
+    private void init() {
+        for (NfaClosure nfaClosure : nfa.getGroupNfaClosures()) {
+            startDfaStates.add(Transfer.getStartDfaStateFromNfaClosure(nfaClosure));
+        }
+    }
+
+    @Override
+    public boolean isMatch(String s) {
+        assert !startDfaStates.isEmpty();
+        DfaState curDfaState = startDfaStates.get(0);
+        for (int i = 0; i < s.length(); i++) {
+            DfaState nextDfaState = curDfaState.getNextDfaStateWithSymbol(
+                    Symbol.getAlphabetSymbolWithChar(s.charAt(i))
+            );
+            if (nextDfaState == null) return false;
+            curDfaState = nextDfaState;
+        }
+        return curDfaState.isCanReceive();
+    }
+
+    @Override
+    public void print() {
+        assert !startDfaStates.isEmpty();
+        startDfaStates.get(0).print();
+    }
+
+    @Override
+    public void printAllGroup() {
+        for (int group = 0; group < startDfaStates.size(); group++) {
+            System.out.println("Group [" + group + "]");
+            startDfaStates.get(group).print();
+
+            System.out.println("\n--------------\n");
+        }
+    }
+
     private static class Transfer {
         private final NfaClosure nfaClosure;
         private DfaState startDfaState;
@@ -21,13 +65,17 @@ public class Dfa implements Matcher {
         private Set<DfaState> markedDfaStates = new HashSet<>();
         private Set<DfaState> unMarkedDfaStates = new HashSet<>();
 
-        public DfaState getStartDfaState() {
-            return startDfaState;
-        }
-
         public Transfer(NfaClosure nfaClosure) {
             this.nfaClosure = nfaClosure;
             init();
+        }
+
+        public static DfaState getStartDfaStateFromNfaClosure(NfaClosure nfaClosure) {
+            return new Transfer(nfaClosure).getStartDfaState();
+        }
+
+        public DfaState getStartDfaState() {
+            return startDfaState;
         }
 
         private void init() {
@@ -85,56 +133,6 @@ public class Dfa implements Matcher {
             dfaState.setMarked();
             assert unMarkedDfaStates.remove(dfaState);
             assert markedDfaStates.add(dfaState);
-        }
-
-        public static DfaState getStartDfaStateFromNfaClosure(NfaClosure nfaClosure) {
-            return new Transfer(nfaClosure).getStartDfaState();
-        }
-    }
-
-    List<DfaState> startDfaStates = new ArrayList<>();
-
-    private final Nfa nfa;
-
-    public Dfa(Nfa nfa) {
-        this.nfa = nfa;
-        init();
-    }
-
-    private void init() {
-        for (NfaClosure nfaClosure : nfa.getGroupNfaClosures()) {
-            startDfaStates.add(Transfer.getStartDfaStateFromNfaClosure(nfaClosure));
-        }
-    }
-
-
-    @Override
-    public boolean isMatch(String s) {
-        assert !startDfaStates.isEmpty();
-        DfaState curDfaState = startDfaStates.get(0);
-        for (int i = 0; i < s.length(); i++) {
-            DfaState nextDfaState = curDfaState.getNextDfaStateWithSymbol(
-                    Symbol.getAlphabetSymbolWithChar(s.charAt(i))
-            );
-            if (nextDfaState == null) return false;
-            curDfaState = nextDfaState;
-        }
-        return curDfaState.isCanReceive();
-    }
-
-    @Override
-    public void print() {
-        assert !startDfaStates.isEmpty();
-        startDfaStates.get(0).print();
-    }
-
-    @Override
-    public void printAllGroup() {
-        for (int group = 0; group < startDfaStates.size(); group++) {
-            System.out.println("Group [" + group + "]");
-            startDfaStates.get(group).print();
-
-            System.out.println("\n--------------\n");
         }
     }
 }

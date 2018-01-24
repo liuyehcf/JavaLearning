@@ -15,18 +15,18 @@ import java.util.List;
  */
 public class HttpMessageReader implements IMessageReader {
 
-    private MessageBuffer messageBuffer    = null;
+    private MessageBuffer messageBuffer = null;
 
     private List<Message> completeMessages = new ArrayList<Message>();
-    private Message       nextMessage      = null;
+    private Message nextMessage = null;
 
     public HttpMessageReader() {
     }
 
     @Override
     public void init(MessageBuffer readMessageBuffer) {
-        this.messageBuffer        = readMessageBuffer;
-        this.nextMessage          = messageBuffer.getMessage();
+        this.messageBuffer = readMessageBuffer;
+        this.nextMessage = messageBuffer.getMessage();
         this.nextMessage.metaData = new HttpHeaders();
     }
 
@@ -35,7 +35,7 @@ public class HttpMessageReader implements IMessageReader {
         int bytesRead = socket.read(byteBuffer);
         byteBuffer.flip();
 
-        if(byteBuffer.remaining() == 0){
+        if (byteBuffer.remaining() == 0) {
             byteBuffer.clear();
             return;
         }
@@ -50,7 +50,7 @@ public class HttpMessageReader implements IMessageReader {
                 (HttpHeaders) this.nextMessage.metaData);
 
         //如果endIndex为-1则说明当前messageBuffer中的message是个partial message
-        if(endIndex != -1){
+        if (endIndex != -1) {
             //创建一个新的Message
             Message message = this.messageBuffer.getMessage();
             message.metaData = new HttpHeaders();

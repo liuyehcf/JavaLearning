@@ -6,16 +6,17 @@ import java.util.*;
  * Created by liuye on 2017/5/8 0008.
  */
 public class BStarTree {
+    private final int MIN_KEY_NUM;
+    private final int MAX_KEY_NUM;
+    private final int HALF_KEY_NUM;
     /**
      * 根节点
      */
     private BStarTreeNode root;
-
     /**
      * 叶节点链表头
      */
     private BStarTreeNode data;
-
     /**
      * B*树的度，非根节点且非叶节点最少含有4t个关键字，最多含有6t个关键字
      * 根节点关键字数量[0,6t]
@@ -23,12 +24,6 @@ public class BStarTree {
      * 叶节点最少关键字数量取一半是想要减少叶节点的数量，否则将会导致叶节点增多
      */
     private int t;
-
-    private final int MIN_KEY_NUM;
-
-    private final int MAX_KEY_NUM;
-
-    private final int HALF_KEY_NUM;
 
     public BStarTree(int t) {
         this.t = t;

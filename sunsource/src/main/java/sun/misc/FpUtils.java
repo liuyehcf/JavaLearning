@@ -36,7 +36,7 @@ public class FpUtils {
      * bit of the logical significand does not need to be explicitly
      * stored, thus "fractional_significand" instead of simply
      * "significand" in the figure above.
-     * 
+     *
      * For finite normal numbers, the numerical value encoded is
      *
      * (-1)^sign * 2^(exponent)*(1.fractional_significand)
@@ -51,7 +51,7 @@ public class FpUtils {
      * the high-order bit of the logical significand can be elided in
      * from the representation in either case since the bit's value is
      * implicit from the exponent value.
-     * 
+     *
      * The exponent field uses a biased representation; if the bits of
      * the exponent are interpreted as a unsigned integer E, the
      * exponent represented is E - E_bias where E_bias depends on the
@@ -89,7 +89,7 @@ public class FpUtils {
      * recommended functions or similar functions recommended or
      * required by IEEE 754R.  Discussion of various implementation
      * techniques for these functions have occurred in:
-     * 
+     *
      * W.J. Cody and Jerome T. Coonen, "Algorithm 772 Functions to
      * Support the IEEE Standard for Binary Floating-Point
      * Arithmetic," ACM Transactions on Mathematical Software,
@@ -100,15 +100,14 @@ public class FpUtils {
      * technical report UCB//CSD-98-1009.
      */
 
+    // Constants used in scalb
+    static double twoToTheDoubleScaleUp = powerOfTwoD(512);
+    static double twoToTheDoubleScaleDown = powerOfTwoD(-512);
     /**
      * Don't let anyone instantiate this class.
      */
     private FpUtils() {
     }
-
-    // Constants used in scalb
-    static double twoToTheDoubleScaleUp = powerOfTwoD(512);
-    static double twoToTheDoubleScaleDown = powerOfTwoD(-512);
 
     // Helper Methods
 
@@ -367,13 +366,13 @@ public class FpUtils {
                 } else {
                     long transducer = Double.doubleToRawLongBits(d);
 
-		/*
-         * To avoid causing slow arithmetic on subnormals,
-		 * the scaling to determine when d's significand
-		 * is normalized is done in integer arithmetic.
-		 * (there must be at least one "1" bit in the
-		 * significand since zero has been screened out.
-		 */
+                    /*
+                     * To avoid causing slow arithmetic on subnormals,
+                     * the scaling to determine when d's significand
+                     * is normalized is done in integer arithmetic.
+                     * (there must be at least one "1" bit in the
+                     * significand since zero has been screened out.
+                     */
 
                     // isolate significand bits
                     transducer &= DoubleConsts.SIGNIF_BIT_MASK;
@@ -439,13 +438,13 @@ public class FpUtils {
                 } else {
                     int transducer = Float.floatToRawIntBits(f);
 
-		/*
-		 * To avoid causing slow arithmetic on subnormals,
-		 * the scaling to determine when f's significand
-		 * is normalized is done in integer arithmetic.
-		 * (there must be at least one "1" bit in the
-		 * significand since zero has been screened out.
-		 */
+                    /*
+                     * To avoid causing slow arithmetic on subnormals,
+                     * the scaling to determine when f's significand
+                     * is normalized is done in integer arithmetic.
+                     * (there must be at least one "1" bit in the
+                     * significand since zero has been screened out.
+                     */
 
                     // isolate significand bits
                     transducer &= FloatConsts.SIGNIF_BIT_MASK;
@@ -546,43 +545,43 @@ public class FpUtils {
      * @author Joseph D. Darcy
      */
     public static double scalb(double d, int scale_factor) {
-	/*
-	 * This method does not need to be declared strictfp to
-	 * compute the same correct result on all platforms.  When
-	 * scaling up, it does not matter what order the
-	 * multiply-store operations are done; the result will be
-	 * finite or overflow regardless of the operation ordering.
-	 * However, to get the correct result when scaling down, a
-	 * particular ordering must be used.
-	 * 
-	 * When scaling down, the multiply-store operations are
-	 * sequenced so that it is not possible for two consecutive
-	 * multiply-stores to return subnormal results.  If one
-	 * multiply-store result is subnormal, the next multiply will
-	 * round it away to zero.  This is done by first multiplying
-	 * by 2 ^ (scale_factor % n) and then multiplying several
-	 * times by by 2^n as needed where n is the exponent of number
-	 * that is a covenient power of two.  In this way, at most one
-	 * real rounding error occurs.  If the double value set is
-	 * being used exclusively, the rounding will occur on a
-	 * multiply.  If the double-extended-exponent value set is
-	 * being used, the products will (perhaps) be exact but the
-	 * stores to d are guaranteed to round to the double value
-	 * set.
-	 *
-	 * It is _not_ a valid implementation to first multiply d by
-	 * 2^MIN_EXPONENT and then by 2 ^ (scale_factor %
-	 * MIN_EXPONENT) since even in a strictfp program double
-	 * rounding on underflow could occur; e.g. if the scale_factor
-	 * argument was (MIN_EXPONENT - n) and the exponent of d was a
-	 * little less than -(MIN_EXPONENT - n), meaning the final
-	 * result would be subnormal.
-	 *
-	 * Since exact reproducibility of this method can be achieved
-	 * without any undue performance burden, there is no
-	 * compelling reason to allow double rounding on underflow in
-	 * scalb.
-	 */
+        /*
+         * This method does not need to be declared strictfp to
+         * compute the same correct result on all platforms.  When
+         * scaling up, it does not matter what order the
+         * multiply-store operations are done; the result will be
+         * finite or overflow regardless of the operation ordering.
+         * However, to get the correct result when scaling down, a
+         * particular ordering must be used.
+         *
+         * When scaling down, the multiply-store operations are
+         * sequenced so that it is not possible for two consecutive
+         * multiply-stores to return subnormal results.  If one
+         * multiply-store result is subnormal, the next multiply will
+         * round it away to zero.  This is done by first multiplying
+         * by 2 ^ (scale_factor % n) and then multiplying several
+         * times by by 2^n as needed where n is the exponent of number
+         * that is a covenient power of two.  In this way, at most one
+         * real rounding error occurs.  If the double value set is
+         * being used exclusively, the rounding will occur on a
+         * multiply.  If the double-extended-exponent value set is
+         * being used, the products will (perhaps) be exact but the
+         * stores to d are guaranteed to round to the double value
+         * set.
+         *
+         * It is _not_ a valid implementation to first multiply d by
+         * 2^MIN_EXPONENT and then by 2 ^ (scale_factor %
+         * MIN_EXPONENT) since even in a strictfp program double
+         * rounding on underflow could occur; e.g. if the scale_factor
+         * argument was (MIN_EXPONENT - n) and the exponent of d was a
+         * little less than -(MIN_EXPONENT - n), meaning the final
+         * result would be subnormal.
+         *
+         * Since exact reproducibility of this method can be achieved
+         * without any undue performance burden, there is no
+         * compelling reason to allow double rounding on underflow in
+         * scalb.
+         */
 
         // magnitude of a power of two so large that scaling a finite
         // nonzero value by it would be guaranteed to over or
@@ -665,15 +664,15 @@ public class FpUtils {
         // Make sure scaling factor is in a reasonable range
         scale_factor = Math.max(Math.min(scale_factor, MAX_SCALE), -MAX_SCALE);
 
-	/*
-	 * Since + MAX_SCALE for float fits well within the double
-	 * exponent range and + float -> double conversion is exact
-	 * the multiplication below will be exact. Therefore, the
-	 * rounding that occurs when the double product is cast to
-	 * float will be the correctly rounded float result.  Since
-	 * all operations other than the final multiply will be exact,
-	 * it is not necessary to declare this method strictfp.
-	 */
+        /*
+         * Since + MAX_SCALE for float fits well within the double
+         * exponent range and + float -> double conversion is exact
+         * the multiplication below will be exact. Therefore, the
+         * rounding that occurs when the double product is cast to
+         * float will be the correctly rounded float result.  Since
+         * all operations other than the final multiply will be exact,
+         * it is not necessary to declare this method strictfp.
+         */
         return (float) ((double) f * powerOfTwoD(scale_factor));
     }
 

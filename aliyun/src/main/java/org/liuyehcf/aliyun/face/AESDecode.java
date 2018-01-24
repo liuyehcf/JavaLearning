@@ -1,5 +1,9 @@
 package org.liuyehcf.aliyun.face;
 
+import sun.misc.BASE64Encoder;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -11,11 +15,6 @@ import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import javax.crypto.spec.SecretKeySpec;
-
-import sun.misc.BASE64Encoder;
-
-import javax.crypto.Mac;
 
 
 @SuppressWarnings("restriction")

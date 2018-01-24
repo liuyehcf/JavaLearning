@@ -1,6 +1,6 @@
 package org.liuyehcf.nio;
 
-import org.junit.*;
+import org.junit.Test;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -12,7 +12,7 @@ import java.nio.channels.FileChannel;
  */
 public class TestNIO {
 
-    private static final int _1M=1000000;
+    private static final int _1M = 1000000;
 
     @Test
     public void testFileChannel() {
@@ -20,10 +20,10 @@ public class TestNIO {
         try {
             fileInputStream = new FileInputStream("H:\\testNio.txt");
 
-            FileChannel fileChannel=fileInputStream.getChannel();
-            ByteBuffer buffer= ByteBuffer.allocate(100*_1M);
+            FileChannel fileChannel = fileInputStream.getChannel();
+            ByteBuffer buffer = ByteBuffer.allocate(100 * _1M);
 
-            int readNum=fileChannel.read(buffer);
+            int readNum = fileChannel.read(buffer);
             System.out.println(readNum);
 
         } catch (IOException e) {

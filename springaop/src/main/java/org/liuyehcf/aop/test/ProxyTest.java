@@ -14,12 +14,12 @@ import java.lang.reflect.Proxy;
 public class ProxyTest {
 
     @Test
-    public void testJdkDp(){
-        ForumService target=new ForumServiceImpl();
+    public void testJdkDp() {
+        ForumService target = new ForumServiceImpl();
 
-        PerformanceHandler handler=new PerformanceHandler(target);
+        PerformanceHandler handler = new PerformanceHandler(target);
 
-        ForumService proxy=(ForumService) Proxy.newProxyInstance(
+        ForumService proxy = (ForumService) Proxy.newProxyInstance(
                 target.getClass().getClassLoader(),
                 target.getClass().getInterfaces(),
                 handler
@@ -29,8 +29,8 @@ public class ProxyTest {
     }
 
     @Test
-    public void testCGLib(){
-        CglibProxy proxy=new CglibProxy();
+    public void testCGLib() {
+        CglibProxy proxy = new CglibProxy();
         ForumServiceImpl forumService = (ForumServiceImpl) proxy.getProxy(ForumServiceImpl.class);
 
         forumService.removeForum(10);

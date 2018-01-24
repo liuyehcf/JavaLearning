@@ -33,7 +33,9 @@ public class ExtensionInfo {
     public static final int REQUIRE_IMPLEMENTATION_UPGRADE = 2;
     public static final int REQUIRE_VENDOR_SWITCH = 3;
     public static final int INCOMPATIBLE = 4;
-
+    // For I18N support
+    private static final ResourceBundle rb =
+            ResourceBundle.getBundle("sun.misc.resources.Messages");
     /**
      * <p>
      * attributes fully describer an extension. The underlying described
@@ -48,10 +50,6 @@ public class ExtensionInfo {
     public String vendor;
     public String vendorId;
     public String url;
-
-    // For I18N support
-    private static final ResourceBundle rb =
-            ResourceBundle.getBundle("sun.misc.resources.Messages");
 
 
     /**
@@ -197,7 +195,7 @@ public class ExtensionInfo {
 
     /*
      * <p>
-     * helper method to compare two versions. 
+     * helper method to compare two versions.
      * version are in the x.y.z.t pattern.
      * </p>
      * @param source version to compare to
@@ -217,7 +215,7 @@ public class ExtensionInfo {
 
     /*
      * <p>
-     * helper method to compare two versions. 
+     * helper method to compare two versions.
      * version are in the x.y.z.t pattern.
      * </p>
      * @param source version to compare to

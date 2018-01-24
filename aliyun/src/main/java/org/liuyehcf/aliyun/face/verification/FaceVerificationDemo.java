@@ -13,6 +13,11 @@ import org.liuyehcf.aliyun.face.verification.entity.FaceVerificationResponse;
  */
 public class FaceVerificationDemo {
 
+    public static void main(String[] args) throws Exception {
+        new UrlFaceVerification().verify();
+        new ContentFaceVerification().verify();
+    }
+
     private static abstract class FaceVerificationTemplate {
         private static final String URL = "https://dtplus-cn-shanghai.data.aliyuncs.com/face/verify";
 
@@ -66,11 +71,5 @@ public class FaceVerificationDemo {
             requestBody.setContent2(Base64EncoderUtils.encodeWithPath(PATH_2));
             return JSON.toJSONString(requestBody);
         }
-    }
-
-
-    public static void main(String[] args) throws Exception {
-        new UrlFaceVerification().verify();
-        new ContentFaceVerification().verify();
     }
 }

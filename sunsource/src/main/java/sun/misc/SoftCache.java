@@ -70,11 +70,11 @@ import java.util.*;
  * key set, the value set, and the entry set to yield successively smaller
  * numbers of elements.
  *
- * @version    %I%, %E%
  * @author Mark Reinhold
+ * @version %I%, %E%
+ * @see HashMap
+ * @see SoftReference
  * @since 1.2
- * @see        HashMap
- * @see        SoftReference
  */
 
 
@@ -91,65 +91,12 @@ public class SoftCache extends AbstractMap implements Map {
      */
 
 
-    static private class ValueCell extends SoftReference {
-        static private Object INVALID_KEY = new Object();
-        static private int dropped = 0;
-        private Object key;
-
-        private ValueCell(Object key, Object value, ReferenceQueue queue) {
-            super(value, queue);
-            this.key = key;
-        }
-
-        private static ValueCell create(Object key, Object value,
-                                        ReferenceQueue queue) {
-            if (value == null) return null;
-            return new ValueCell(key, value, queue);
-        }
-
-        private static Object strip(Object val, boolean drop) {
-            if (val == null) return null;
-            ValueCell vc = (ValueCell) val;
-            Object o = vc.get();
-            if (drop) vc.drop();
-            return o;
-        }
-
-        private boolean isValid() {
-            return (key != INVALID_KEY);
-        }
-
-        private void drop() {
-            super.clear();
-            key = INVALID_KEY;
-            dropped++;
-        }
-
-    }
-
-
     /* Hash table mapping keys to ValueCells */
     private Map hash;
-
     /* Reference queue for cleared ValueCells */
     private ReferenceQueue queue = new ReferenceQueue();
+    private Set entrySet = null;
 
-
-    /* Process any ValueCells that have been cleared and enqueued by the
-       garbage collector.  This method should be invoked once by each public
-       mutator in this class.  We don't invoke this method in public accessors
-       because that can lead to surprising ConcurrentModificationExceptions.
-     */
-    private void processQueue() {
-        ValueCell vc;
-        while ((vc = (ValueCell) queue.poll()) != null) {
-            if (vc.isValid()) hash.remove(vc.key);
-            else ValueCell.dropped--;
-        }
-    }
-
-
-    /* -- Constructors -- */
 
     /**
      * Construct a new, empty <code>SoftCache</code> with the given
@@ -164,6 +111,9 @@ public class SoftCache extends AbstractMap implements Map {
     public SoftCache(int initialCapacity, float loadFactor) {
         hash = new HashMap(initialCapacity, loadFactor);
     }
+
+
+    /* -- Constructors -- */
 
     /**
      * Construct a new, empty <code>SoftCache</code> with the given
@@ -185,8 +135,25 @@ public class SoftCache extends AbstractMap implements Map {
         hash = new HashMap();
     }
 
-
+    private static boolean valEquals(Object o1, Object o2) {
+        return (o1 == null) ? (o2 == null) : o1.equals(o2);
+    }
+
+
     /* -- Simple queries -- */
+
+    /* Process any ValueCells that have been cleared and enqueued by the
+       garbage collector.  This method should be invoked once by each public
+       mutator in this class.  We don't invoke this method in public accessors
+       because that can lead to surprising ConcurrentModificationExceptions.
+     */
+    private void processQueue() {
+        ValueCell vc;
+        while ((vc = (ValueCell) queue.poll()) != null) {
+            if (vc.isValid()) hash.remove(vc.key);
+            else ValueCell.dropped--;
+        }
+    }
 
     /**
      * Return the number of key-value mappings in this cache.  The time
@@ -203,6 +170,9 @@ public class SoftCache extends AbstractMap implements Map {
         return entrySet().isEmpty();
     }
 
+
+    /* -- Lookup and modification operations -- */
+
     /**
      * Return <code>true</code> if this cache contains a mapping for the
      * specified key.  If there is no mapping for the key, this method will not
@@ -213,9 +183,6 @@ public class SoftCache extends AbstractMap implements Map {
     public boolean containsKey(Object key) {
         return ValueCell.strip(hash.get(key), false) != null;
     }
-
-
-    /* -- Lookup and modification operations -- */
 
     /**
      * Create a value object for the given <code>key</code>.  This method is
@@ -297,6 +264,9 @@ public class SoftCache extends AbstractMap implements Map {
         return ValueCell.strip(hash.remove(key), true);
     }
 
+
+    /* -- Views -- */
+
     /**
      * Remove all mappings from this cache.
      */
@@ -305,13 +275,49 @@ public class SoftCache extends AbstractMap implements Map {
         hash.clear();
     }
 
-
-    /* -- Views -- */
-
-    private static boolean valEquals(Object o1, Object o2) {
-        return (o1 == null) ? (o2 == null) : o1.equals(o2);
+    /**
+     * Return a <code>Set</code> view of the mappings in this cache.
+     */
+    public Set entrySet() {
+        if (entrySet == null) entrySet = new EntrySet();
+        return entrySet;
     }
 
+    static private class ValueCell extends SoftReference {
+        static private Object INVALID_KEY = new Object();
+        static private int dropped = 0;
+        private Object key;
+
+        private ValueCell(Object key, Object value, ReferenceQueue queue) {
+            super(value, queue);
+            this.key = key;
+        }
+
+        private static ValueCell create(Object key, Object value,
+                                        ReferenceQueue queue) {
+            if (value == null) return null;
+            return new ValueCell(key, value, queue);
+        }
+
+        private static Object strip(Object val, boolean drop) {
+            if (val == null) return null;
+            ValueCell vc = (ValueCell) val;
+            Object o = vc.get();
+            if (drop) vc.drop();
+            return o;
+        }
+
+        private boolean isValid() {
+            return (key != INVALID_KEY);
+        }
+
+        private void drop() {
+            super.clear();
+            key = INVALID_KEY;
+            dropped++;
+        }
+
+    }
 
     /* Internal class for entries.
        Because it uses SoftCache.this.queue, this class cannot be static.
@@ -354,7 +360,6 @@ public class SoftCache extends AbstractMap implements Map {
 
     }
 
-
     /* Internal class for entry sets */
     private class EntrySet extends AbstractSet {
         Set hashEntries = hash.entrySet();
@@ -371,7 +376,7 @@ public class SoftCache extends AbstractMap implements Map {
                         ValueCell vc = (ValueCell) ent.getValue();
                         Object v = null;
                         if ((vc != null) && ((v = vc.get()) == null)) {
-			    /* Value has been flushed by GC */
+                            /* Value has been flushed by GC */
                             continue;
                         }
                         next = new Entry(ent, v);
@@ -411,17 +416,6 @@ public class SoftCache extends AbstractMap implements Map {
             else return false;
         }
 
-    }
-
-
-    private Set entrySet = null;
-
-    /**
-     * Return a <code>Set</code> view of the mappings in this cache.
-     */
-    public Set entrySet() {
-        if (entrySet == null) entrySet = new EntrySet();
-        return entrySet;
     }
 
 }

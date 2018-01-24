@@ -70,6 +70,12 @@ public class BankAlgorithm {
      */
     private Random random = new Random();
 
+    public static void main(String[] args) {
+        BankAlgorithm bankAlgorithm = new BankAlgorithm();
+
+        bankAlgorithm.serve();
+    }
+
     public void serve() {
         initialize();
 
@@ -122,7 +128,6 @@ public class BankAlgorithm {
         }
         throw new RuntimeException();
     }
-
 
     private int[] getRandomRequest(int processId) {
         int[] request = new int[RESOURCE_NUM];
@@ -252,11 +257,5 @@ public class BankAlgorithm {
         }
 
         if (!isSafeState()) throw new RuntimeException();
-    }
-
-    public static void main(String[] args) {
-        BankAlgorithm bankAlgorithm = new BankAlgorithm();
-
-        bankAlgorithm.serve();
     }
 }

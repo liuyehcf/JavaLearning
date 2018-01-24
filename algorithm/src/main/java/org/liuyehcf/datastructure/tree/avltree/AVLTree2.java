@@ -15,6 +15,8 @@ public class AVLTree2 {
     private AVLTreeNode root;
 
     private AVLTreeNode nil;
+    private Map<AVLTreeNode, Integer> highMap;
+
 
     public AVLTree2() {
         nil = new AVLTreeNode(0);
@@ -23,7 +25,6 @@ public class AVLTree2 {
         nil.parent = nil;
         root = nil;
     }
-
 
     public void insert(int val) {
         AVLTreeNode x = root;
@@ -133,7 +134,6 @@ public class AVLTree2 {
         return y;
     }
 
-
     /**
      * 右旋
      *
@@ -162,9 +162,6 @@ public class AVLTree2 {
         updateHigh(x);
         return x;
     }
-
-
-    private Map<AVLTreeNode, Integer> highMap;
 
     private boolean check() {
         highMap = new HashMap<AVLTreeNode, Integer>();

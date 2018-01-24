@@ -15,6 +15,27 @@ public class NfaClosure {
     private int group;
     private NfaClosure clonedNfaClosure;
 
+    public NfaClosure(NfaState startNfaState, List<NfaState> endNfaStates, int initialGroup) {
+        if (startNfaState == null) throw new RuntimeException();
+        this.startNfaState = startNfaState;
+        this.endNfaStates = endNfaStates;
+        this.group = initialGroup;
+    }
+
+    static NfaClosure getEmptyClosureForGroup(int group) {
+        NfaState startNfaState = new NfaState();
+        List<NfaState> endNfaStates = new ArrayList<>();
+        startNfaState.addInputSymbolAndNextNfaState(
+                Symbol._Epsilon, startNfaState
+        );
+        endNfaStates.add(startNfaState);
+        NfaClosure nfaClosure = new NfaClosure(
+                startNfaState,
+                endNfaStates,
+                group);
+        return nfaClosure;
+    }
+
     public NfaState getStartNfaState() {
         return startNfaState;
     }
@@ -25,13 +46,6 @@ public class NfaClosure {
 
     public void setEndNfaStates(List<NfaState> endNfaStates) {
         this.endNfaStates = endNfaStates;
-    }
-
-    public NfaClosure(NfaState startNfaState, List<NfaState> endNfaStates, int initialGroup) {
-        if (startNfaState == null) throw new RuntimeException();
-        this.startNfaState = startNfaState;
-        this.endNfaStates = endNfaStates;
-        this.group = initialGroup;
     }
 
     public int getGroup() {
@@ -120,20 +134,6 @@ public class NfaClosure {
         }
 
         clonedNfaClosure = new NfaClosure(clonedStartNfaState, clonedEndNfaStates, group);
-    }
-
-    static NfaClosure getEmptyClosureForGroup(int group) {
-        NfaState startNfaState = new NfaState();
-        List<NfaState> endNfaStates = new ArrayList<>();
-        startNfaState.addInputSymbolAndNextNfaState(
-                Symbol._Epsilon, startNfaState
-        );
-        endNfaStates.add(startNfaState);
-        NfaClosure nfaClosure = new NfaClosure(
-                startNfaState,
-                endNfaStates,
-                group);
-        return nfaClosure;
     }
 
     @Override

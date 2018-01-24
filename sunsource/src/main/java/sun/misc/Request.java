@@ -11,8 +11,8 @@ package sun.misc;
  * Requests are functor objects; that is, they provide part of the mechanism
  * for deferred function application.
  *
- * @version %I%, %G%
  * @author Steven B. Byrne
+ * @version %I%, %G%
  */
 
 abstract public class Request {

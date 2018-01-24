@@ -62,57 +62,6 @@ public final class Signal {
     private int number;
     private String name;
 
-    /* Returns the signal number */
-    public int getNumber() {
-        return number;
-    }
-
-    /**
-     * Returns the signal name.
-     *
-     * @return the name of the signal.
-     * @see Signal#Signal(String name)
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Compares the equality of two <code>Signal</code> objects.
-     *
-     * @param other the object to compare with.
-     * @return whether two <code>Signal</code> objects are equal.
-     */
-    public boolean equals(Object other) {
-        if (this == other) {
-            return true;
-        }
-        if (other == null || !(other instanceof Signal)) {
-            return false;
-        }
-        Signal other1 = (Signal) other;
-        return name.equals(other1.name) && (number == other1.number);
-    }
-
-    /**
-     * Returns a hashcode for this Signal.
-     *
-     * @return a hash code value for this object.
-     */
-    public int hashCode() {
-        return number;
-    }
-
-    /**
-     * Returns a string representation of this signal. For example, "SIGINT"
-     * for an object constructed using <code>new Signal ("INT")</code>.
-     *
-     * @return a string representation of the signal
-     */
-    public String toString() {
-        return "SIG" + name;
-    }
-
     /**
      * Constructs a signal from its name.
      *
@@ -215,4 +164,55 @@ public final class Signal {
 
     /* Raise a given signal number */
     private static native void raise0(int sig);
+
+    /* Returns the signal number */
+    public int getNumber() {
+        return number;
+    }
+
+    /**
+     * Returns the signal name.
+     *
+     * @return the name of the signal.
+     * @see Signal#Signal(String name)
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Compares the equality of two <code>Signal</code> objects.
+     *
+     * @param other the object to compare with.
+     * @return whether two <code>Signal</code> objects are equal.
+     */
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (other == null || !(other instanceof Signal)) {
+            return false;
+        }
+        Signal other1 = (Signal) other;
+        return name.equals(other1.name) && (number == other1.number);
+    }
+
+    /**
+     * Returns a hashcode for this Signal.
+     *
+     * @return a hash code value for this object.
+     */
+    public int hashCode() {
+        return number;
+    }
+
+    /**
+     * Returns a string representation of this signal. For example, "SIGINT"
+     * for an object constructed using <code>new Signal ("INT")</code>.
+     *
+     * @return a string representation of the signal
+     */
+    public String toString() {
+        return "SIG" + name;
+    }
 }

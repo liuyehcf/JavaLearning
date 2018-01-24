@@ -14,6 +14,23 @@ import java.util.List;
  */
 public class RowJavaNioApiDemo {
 
+    private static byte[] castToPrimitiveByteArray(List<Byte> bytes) {
+        byte[] byteArray = new byte[bytes.size()];
+
+        for (int i = 0; i < bytes.size(); i++) {
+            byteArray[i] = bytes.get(i);
+        }
+        return byteArray;
+    }
+
+    public static void main(String[] args) {
+        new MyHomeHttpClient().doRequest();
+
+        new MyLoginHttpClient("张三", "12345678").doRequest();
+
+        new MyComputeHttpClient("1.2", "2.4", "+").doRequest();
+    }
+
     private static abstract class RawHttpClientTemplate {
         final public void doRequest() {
             try {
@@ -118,23 +135,5 @@ public class RowJavaNioApiDemo {
 
             return httpRequestBuilder.build();
         }
-    }
-
-    private static byte[] castToPrimitiveByteArray(List<Byte> bytes) {
-        byte[] byteArray = new byte[bytes.size()];
-
-        for (int i = 0; i < bytes.size(); i++) {
-            byteArray[i] = bytes.get(i);
-        }
-        return byteArray;
-    }
-
-
-    public static void main(String[] args) {
-        new MyHomeHttpClient().doRequest();
-
-        new MyLoginHttpClient("张三", "12345678").doRequest();
-
-        new MyComputeHttpClient("1.2", "2.4", "+").doRequest();
     }
 }

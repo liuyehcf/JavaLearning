@@ -1,6 +1,6 @@
 package com.jenkov.nioserver;
 
-import org.junit.*;
+import org.junit.Test;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;

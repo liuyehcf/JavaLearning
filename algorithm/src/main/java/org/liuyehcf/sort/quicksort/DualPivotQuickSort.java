@@ -2,7 +2,7 @@ package org.liuyehcf.sort.quicksort;
 
 import java.util.LinkedList;
 
-import static org.liuyehcf.sort.SortUtils.*;
+import static org.liuyehcf.sort.SortUtils.exchange;
 
 /**
  * Created by HCF on 2017/7/25.

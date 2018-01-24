@@ -5,7 +5,9 @@ import org.liuyehcf.compile.grammar.regex.composition.Matcher;
 import org.liuyehcf.compile.grammar.regex.util.RegexAutoMachine;
 import org.liuyehcf.compile.grammar.regex.util.TestCaseBuilder;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 import static org.liuyehcf.compile.grammar.regex.TestRegex.*;
 

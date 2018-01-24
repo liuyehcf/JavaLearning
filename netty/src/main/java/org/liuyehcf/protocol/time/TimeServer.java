@@ -8,8 +8,6 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import org.liuyehcf.protocol.echo.EchoServer;
-import org.liuyehcf.protocol.echo.EchoServerHandler;
 
 /**
  * Created by HCF on 2017/12/2.
@@ -19,6 +17,16 @@ public class TimeServer {
 
     public TimeServer(int port) {
         this.port = port;
+    }
+
+    public static void main(String[] args) throws Exception {
+        int port;
+        if (args.length > 0) {
+            port = Integer.parseInt(args[0]);
+        } else {
+            port = 8080;
+        }
+        new TimeServer(port).run();
     }
 
     public void run() throws Exception {
@@ -48,15 +56,5 @@ public class TimeServer {
             workerGroup.shutdownGracefully();
             bossGroup.shutdownGracefully();
         }
-    }
-
-    public static void main(String[] args) throws Exception {
-        int port;
-        if (args.length > 0) {
-            port = Integer.parseInt(args[0]);
-        } else {
-            port = 8080;
-        }
-        new TimeServer(port).run();
     }
 }

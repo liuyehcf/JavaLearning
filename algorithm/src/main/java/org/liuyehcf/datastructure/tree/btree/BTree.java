@@ -12,14 +12,14 @@ public class BTree {
 
     private BTreeNode root;
 
-    private BTreeNode createNode() {
-        return new BTreeNode(t);
-    }
-
     public BTree(int t) {
         this.t = t;
         this.root = createNode();
         this.root.isLeaf = true;
+    }
+
+    private BTreeNode createNode() {
+        return new BTreeNode(t);
     }
 
     public void insert(int k) {

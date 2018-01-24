@@ -7,12 +7,16 @@ package org.liuyehcf.hihocoder.competition.microsoft20170408;
  */
 
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Scanner;
 
 
 class Status {
     int finishedJobNum;
     int workRobotNum;
+    int[] copyRobot;
 
     public Status(int finishedJobNum, int workRobot, int Q, int copyRobot) {
         this.finishedJobNum = finishedJobNum;
@@ -27,8 +31,6 @@ class Status {
         this.copyRobot = status.copyRobot.clone();
         this.copyRobot[this.copyRobot.length - 1] = copyRobotNum * 2;
     }
-
-    int[] copyRobot;
 
     public void update() {
         workRobotNum += copyRobot[0];
@@ -85,18 +87,18 @@ public class Item2 {
  * AC
  */
 class Item2_1 {
-    public static void main(String[] args){
-        Scanner scanner=new Scanner(System.in);
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
 
-        long N=scanner.nextLong();
-        int Q=scanner.nextInt();
+        long N = scanner.nextLong();
+        int Q = scanner.nextInt();
 
-        for(int time=1;;time++){
-            for(int copyNum=0;copyNum*Q<time;copyNum++){
-                int workTime=time-copyNum*Q;
-                long robotNum=1L<<copyNum;
-                long jobNum=robotNum*workTime;
-                if(jobNum>=N){
+        for (int time = 1; ; time++) {
+            for (int copyNum = 0; copyNum * Q < time; copyNum++) {
+                int workTime = time - copyNum * Q;
+                long robotNum = 1L << copyNum;
+                long jobNum = robotNum * workTime;
+                if (jobNum >= N) {
                     System.out.println(time);
                     return;
                 }

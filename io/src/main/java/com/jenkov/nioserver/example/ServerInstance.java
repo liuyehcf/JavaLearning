@@ -1,6 +1,8 @@
 package com.jenkov.nioserver.example;
 
-import com.jenkov.nioserver.*;
+import com.jenkov.nioserver.IMessageProcessor;
+import com.jenkov.nioserver.Message;
+import com.jenkov.nioserver.Server;
 import com.jenkov.nioserver.http.HttpMessageReaderFactory;
 
 import java.io.IOException;

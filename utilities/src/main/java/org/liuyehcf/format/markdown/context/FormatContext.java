@@ -11,6 +11,11 @@ import java.util.Set;
  */
 
 public class FormatContext {
+    private final String sourceDir;
+    private File file;
+    private Set<String> fileNames;
+    private LinkedList<LineElement> lineCache = new LinkedList<>();
+
     public FormatContext(File[] files, String sourceDir) {
         fileNames = new HashSet<String>();
         int i = 0;
@@ -22,20 +27,12 @@ public class FormatContext {
         this.sourceDir = sourceDir;
     }
 
-    private File file;
-
-    private final String sourceDir;
-
-    private Set<String> fileNames;
-
-    private LinkedList<LineElement> lineCache = new LinkedList<>();
+    public File getFile() {
+        return this.file;
+    }
 
     public void setFile(File file) {
         this.file = file;
-    }
-
-    public File getFile() {
-        return this.file;
     }
 
     public String getSourceDir() {

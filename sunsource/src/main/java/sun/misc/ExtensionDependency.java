@@ -53,6 +53,8 @@ import java.util.jar.Manifest;
  */
 public class ExtensionDependency {
 
+    // True to display all debug and trace messages
+    static final boolean DEBUG = false;
     /* Callbak interfaces to delegate installation of missing extensions */
     private static Vector providers;
 
@@ -105,9 +107,71 @@ public class ExtensionDependency {
         return false;
     }
 
+    /**
+     * <p>
+     *
+     * @return the java.ext.dirs property as a list of directory
+     * </p>
+     */
+    private static File[] getExtDirs() {
+        String s = (String) AccessController.doPrivileged(
+                new sun.security.action.GetPropertyAction("java.ext.dirs"));
+
+        File[] dirs;
+        if (s != null) {
+            StringTokenizer st =
+                    new StringTokenizer(s, File.pathSeparator);
+            int count = st.countTokens();
+            debug("getExtDirs count " + count);
+            dirs = new File[count];
+            for (int i = 0; i < count; i++) {
+                dirs[i] = new File(st.nextToken());
+                debug("getExtDirs dirs[" + i + "] " + dirs[i]);
+            }
+        } else {
+            dirs = new File[0];
+            debug("getExtDirs dirs " + dirs);
+        }
+        debug("getExtDirs dirs.length " + dirs.length);
+        return dirs;
+    }
+
     /*
-     * Check for all declared required extensions in the jar file 
-     * manifest.  
+     * <p>
+     * Scan the directories and return all files installed in those
+     * </p>
+     * @param dirs list of directories to scan
+     *
+     * @return the list of files installed in all the directories
+     */
+    private static File[] getExtFiles(File[] dirs) throws IOException {
+        Vector urls = new Vector();
+        for (int i = 0; i < dirs.length; i++) {
+            String[] files = dirs[i].list(new JarFilter());
+            if (files != null) {
+                debug("getExtFiles files.length " + files.length);
+                for (int j = 0; j < files.length; j++) {
+                    File f = new File(dirs[i], files[j]);
+                    urls.add(f);
+                    debug("getExtFiles f[" + j + "] " + f);
+                }
+            }
+        }
+        File[] ua = new File[urls.size()];
+        urls.copyInto(ua);
+        debug("getExtFiles ua.length " + ua.length);
+        return ua;
+    }
+
+    private static void debug(String s) {
+        if (DEBUG) {
+            System.err.println(s);
+        }
+    }
+
+    /*
+     * Check for all declared required extensions in the jar file
+     * manifest.
      */
     protected boolean checkExtensions(JarFile jar)
             throws ExtensionInstallationException {
@@ -159,10 +223,9 @@ public class ExtensionDependency {
         return result;
     }
 
-
     /*
      * <p>
-     * Check that a particular dependency on an extension is satisfied. 
+     * Check that a particular dependency on an extension is satisfied.
      * </p>
      * @param extensionName is the key used for the attributes in the manifest
      * @param attr is the attributes of the manifest file
@@ -183,7 +246,7 @@ public class ExtensionDependency {
 
     /*
      * <p>
-     * Check if a particular extension is part of the currently installed 
+     * Check if a particular extension is part of the currently installed
      * extensions.
      * </p>
      * @param extensionName is the key for the attributes in the manifest
@@ -240,11 +303,11 @@ public class ExtensionDependency {
 
     /*
      * <p>
-     * Check if the requested extension described by the attributes 
-     * in the manifest under the key extensionName is compatible with 
+     * Check if the requested extension described by the attributes
+     * in the manifest under the key extensionName is compatible with
      * the jar file.
      * </p>
-     * 
+     *
      * @param extensionName key in the attibute list
      * @param attr manifest file attributes
      * @param file installed extension jar file to compare the requested
@@ -400,62 +463,6 @@ public class ExtensionDependency {
                 });
     }
 
-    /**
-     * <p>
-     *
-     * @return the java.ext.dirs property as a list of directory
-     * </p>
-     */
-    private static File[] getExtDirs() {
-        String s = (String) AccessController.doPrivileged(
-                new sun.security.action.GetPropertyAction("java.ext.dirs"));
-
-        File[] dirs;
-        if (s != null) {
-            StringTokenizer st =
-                    new StringTokenizer(s, File.pathSeparator);
-            int count = st.countTokens();
-            debug("getExtDirs count " + count);
-            dirs = new File[count];
-            for (int i = 0; i < count; i++) {
-                dirs[i] = new File(st.nextToken());
-                debug("getExtDirs dirs[" + i + "] " + dirs[i]);
-            }
-        } else {
-            dirs = new File[0];
-            debug("getExtDirs dirs " + dirs);
-        }
-        debug("getExtDirs dirs.length " + dirs.length);
-        return dirs;
-    }
-
-    /* 
-     * <p>
-     * Scan the directories and return all files installed in those
-     * </p>
-     * @param dirs list of directories to scan
-     *
-     * @return the list of files installed in all the directories
-     */
-    private static File[] getExtFiles(File[] dirs) throws IOException {
-        Vector urls = new Vector();
-        for (int i = 0; i < dirs.length; i++) {
-            String[] files = dirs[i].list(new JarFilter());
-            if (files != null) {
-                debug("getExtFiles files.length " + files.length);
-                for (int j = 0; j < files.length; j++) {
-                    File f = new File(dirs[i], files[j]);
-                    urls.add(f);
-                    debug("getExtFiles f[" + j + "] " + f);
-                }
-            }
-        }
-        File[] ua = new File[urls.size()];
-        urls.copyInto(ua);
-        debug("getExtFiles ua.length " + ua.length);
-        return ua;
-    }
-
     /*
      * <p>
      * @return the list of installed extensions jar files
@@ -530,15 +537,6 @@ public class ExtensionDependency {
             // let's continue with the next installed extension
         }
         return Boolean.TRUE;
-    }
-
-    // True to display all debug and trace messages
-    static final boolean DEBUG = false;
-
-    private static void debug(String s) {
-        if (DEBUG) {
-            System.err.println(s);
-        }
     }
 
     private void debugException(Throwable e) {

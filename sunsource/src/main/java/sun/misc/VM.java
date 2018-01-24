@@ -13,6 +13,21 @@ import java.util.Properties;
 
 public class VM {
 
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    public static final int STATE_GREEN = 1;
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    public static final int STATE_YELLOW = 2;
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    public static final int STATE_RED = 3;
     /* The following methods used to be native methods that instruct
      * the VM to selectively suspend certain threads in low-memory
      * situations. They are inherently dangerous and not implementable
@@ -22,93 +37,49 @@ public class VM {
      */
     private static boolean suspended = false;
 
-    /**
-     * @deprecated
-     */
-    @Deprecated
-    public static boolean threadsSuspended() {
-        return suspended;
-    }
-
-    public static boolean allowThreadSuspension(ThreadGroup g, boolean b) {
-        return g.allowThreadSuspension(b);
-    }
-
-    /**
-     * @deprecated
-     */
-    @Deprecated
-    public static boolean suspendThreads() {
-        suspended = true;
-        return true;
-    }
-
     // Causes any suspended threadgroups to be resumed.
-
     /**
-     * @deprecated
+     * Write the current profiling contents to the file "java.prof".
+     * If the file already exists, it will be overwritten.
      */
-    @Deprecated
-    public static void unsuspendThreads() {
-        suspended = false;
-    }
+    // public native static void writeJavaProfilerReport();
+
+
+    private static volatile boolean booted = false;
 
     // Causes threadgroups no longer marked suspendable to be resumed.
-
-    /**
-     * @deprecated
-     */
-    @Deprecated
-    public static void unsuspendSomeThreads() {
-    }
+    // A user-settable upper limit on the maximum amount of allocatable direct
+    // buffer memory.  This value may be changed during VM initialization if
+    // "java" is launched with "-XX:MaxDirectMemorySize=<size>".
+    //
+    // The initial value of this field is arbitrary; during JRE initialization
+    // it will be reset to the value specified on the command line, if any,
+    // otherwise to Runtime.getRuntime.maxDirectMemory().
+    //
+    private static long directMemory = 64 * 1024 * 1024;
 
     /* Deprecated fields and methods -- Memory advice not supported in 1.2 */
+    // A user-settable boolean to determine whether ClassLoader.loadClass should
+    // accept array syntax.  This value may be changed during VM initialization
+    // via the system property "sun.lang.ClassLoader.allowArraySyntax".
+    //
+    // The default for 1.5 is "true", array syntax is allowed.  In 1.6, the
+    // default will be "false".  The presence of this system property to
+    // control array syntax allows applications the ability to preview this new
+    // behaviour.
+    //
+    private static boolean defaultAllowArraySyntax = false;
+    private static boolean allowArraySyntax = defaultAllowArraySyntax;
+    /* Current count of objects pending for finalization */
+    private static volatile int finalRefCount = 0;
+    /* Peak count of objects pending for finalization */
+    private static volatile int peakFinalRefCount = 0;
+    // a map of threadStatus values to the corresponding Thread.State
+    private static Map<Integer, Thread.State> threadStateMap = null;
+    private static Map<Integer, String> threadStateNames = null;
 
-    /**
-     * @deprecated
-     */
-    @Deprecated
-    public static final int STATE_GREEN = 1;
-
-    /**
-     * @deprecated
-     */
-    @Deprecated
-    public static final int STATE_YELLOW = 2;
-
-    /**
-     * @deprecated
-     */
-    @Deprecated
-    public static final int STATE_RED = 3;
-
-    /**
-     * @deprecated
-     */
-    @Deprecated
-    public static final int getState() {
-        return STATE_GREEN;
-    }
-
-    /**
-     * @deprecated
-     */
-    @Deprecated
-    public static void registerVMNotification(VMNotification n) {
-    }
-
-    /**
-     * @deprecated
-     */
-    @Deprecated
-    public static void asChange(int as_old, int as_new) {
-    }
-
-    /**
-     * @deprecated
-     */
-    @Deprecated
-    public static void asChange_otherthread(int as_old, int as_new) {
+    static {
+        initialize();
     }
 
     /*
@@ -147,13 +118,69 @@ public class VM {
     // public native static void resetJavaProfiler();
 
     /**
-     * Write the current profiling contents to the file "java.prof".
-     * If the file already exists, it will be overwritten.
+     * @deprecated
      */
-    // public native static void writeJavaProfilerReport();
+    @Deprecated
+    public static boolean threadsSuspended() {
+        return suspended;
+    }
 
+    public static boolean allowThreadSuspension(ThreadGroup g, boolean b) {
+        return g.allowThreadSuspension(b);
+    }
 
-    private static volatile boolean booted = false;
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    public static boolean suspendThreads() {
+        suspended = true;
+        return true;
+    }
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    public static void unsuspendThreads() {
+        suspended = false;
+    }
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    public static void unsuspendSomeThreads() {
+    }
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    public static final int getState() {
+        return STATE_GREEN;
+    }
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    public static void registerVMNotification(VMNotification n) {
+    }
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    public static void asChange(int as_old, int as_new) {
+    }
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    public static void asChange_otherthread(int as_old, int as_new) {
+    }
 
     // Invoked by by System.initializeSystemClass just before returning.
     // Subsystems that are invoked during initialization can check this
@@ -167,16 +194,6 @@ public class VM {
     public static boolean isBooted() {
         return booted;
     }
-
-    // A user-settable upper limit on the maximum amount of allocatable direct
-    // buffer memory.  This value may be changed during VM initialization if
-    // "java" is launched with "-XX:MaxDirectMemorySize=<size>".
-    //
-    // The initial value of this field is arbitrary; during JRE initialization
-    // it will be reset to the value specified on the command line, if any,
-    // otherwise to Runtime.getRuntime.maxDirectMemory().
-    //
-    private static long directMemory = 64 * 1024 * 1024;
 
     // If this method is invoked during VM initialization, it initializes the
     // maximum amount of allocatable direct buffer memory (in bytes) from the
@@ -208,29 +225,17 @@ public class VM {
         return directMemory;
     }
 
-    // A user-settable boolean to determine whether ClassLoader.loadClass should
-    // accept array syntax.  This value may be changed during VM initialization 
-    // via the system property "sun.lang.ClassLoader.allowArraySyntax". 
-    //
-    // The default for 1.5 is "true", array syntax is allowed.  In 1.6, the
-    // default will be "false".  The presence of this system property to
-    // control array syntax allows applications the ability to preview this new
-    // behaviour.
-    // 
-    private static boolean defaultAllowArraySyntax = false;
-    private static boolean allowArraySyntax = defaultAllowArraySyntax;
-
     // If this method is invoked during VM initialization, it initializes the
     // allowArraySyntax boolean based on the value of the system property
     // "sun.lang.ClassLoader.allowArraySyntax".  If the system property is not
     // provided, the default for 1.5 is "true".  In 1.6, the default will be
     // "false".  If the system property is provided, then the value of
-    // allowArraySyntax will be equal to "true" if Boolean.parseBoolean() 
+    // allowArraySyntax will be equal to "true" if Boolean.parseBoolean()
     // returns "true".   Otherwise, the field will be set to "false".
     //
     // If this method is invoked after the VM is booted, it returns the
     // allowArraySyntax boolean set during initialization.
-    //    
+    //
     public static boolean allowArraySyntax() {
         if (!booted) {
             String s
@@ -243,19 +248,13 @@ public class VM {
     }
 
     // Initialize any miscellenous operating system settings that need to be
-    // set for the class libraries. 
+    // set for the class libraries.
     //
     public static void initializeOSEnvironment() {
         if (!booted) {
             OSEnvironment.initialize();
         }
     }
-
-    /* Current count of objects pending for finalization */
-    private static volatile int finalRefCount = 0;
-
-    /* Peak count of objects pending for finalization */
-    private static volatile int peakFinalRefCount = 0;
 
     /*
      * Gets the number of objects pending for finalization.
@@ -277,19 +276,18 @@ public class VM {
 
     /*
      * Add <tt>n</tt> to the objects pending for finalization count.
-     * 
+     *
      * @param n an integer value to be added to the objects pending
      * for finalization count
      */
     public static void addFinalRefCount(int n) {
-        // The caller must hold lock to synchronize the update. 
+        // The caller must hold lock to synchronize the update.
 
         finalRefCount += n;
         if (finalRefCount > peakFinalRefCount) {
             peakFinalRefCount = finalRefCount;
         }
     }
-
 
     public static Thread.State toThreadState(int threadStatus) {
         // Initialize the threadStateMap
@@ -302,10 +300,6 @@ public class VM {
         }
         return s;
     }
-
-    // a map of threadStatus values to the corresponding Thread.State
-    private static Map<Integer, Thread.State> threadStateMap = null;
-    private static Map<Integer, String> threadStateNames = null;
 
     private synchronized static void initThreadStateMap() {
         if (threadStateMap != null) {
@@ -354,10 +348,6 @@ public class VM {
     //
     private native static void getThreadStateValues(int[][] vmThreadStateValues,
                                                     String[][] vmThreadStateNames);
-
-    static {
-        initialize();
-    }
 
     private native static void initialize();
 }

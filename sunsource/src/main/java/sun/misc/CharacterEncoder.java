@@ -44,12 +44,12 @@ import java.nio.ByteBuffer;
  * Several useful encoders have already been written and are
  * referenced in the See Also list below.
  *
- * @version    %I%, %G%
  * @author Chuck McManis
- * @see        CharacterDecoder;
- * @see        UCEncoder
- * @see        UUEncoder
- * @see        BASE64Encoder
+ * @version %I%, %G%
+ * @see CharacterDecoder;
+ * @see UCEncoder
+ * @see UUEncoder
+ * @see BASE64Encoder
  */
 public abstract class CharacterEncoder {
 
@@ -194,16 +194,16 @@ public abstract class CharacterEncoder {
      * new byte array will be created.
      */
     private byte[] getBytes(ByteBuffer bb) {
-    /*
-	 * This should never return a BufferOverflowException, as we're
-	 * careful to allocate just the right amount.
-	 */
+        /*
+         * This should never return a BufferOverflowException, as we're
+         * careful to allocate just the right amount.
+         */
         byte[] buf = null;
 
-	/*
-	 * If it has a usable backing byte buffer, use it.  Use only
-	 * if the array exactly represents the current ByteBuffer.
-	 */
+        /*
+         * If it has a usable backing byte buffer, use it.  Use only
+         * if the array exactly represents the current ByteBuffer.
+         */
         if (bb.hasArray()) {
             byte[] tmp = bb.array();
             if ((tmp.length == bb.capacity()) &&
@@ -214,16 +214,16 @@ public abstract class CharacterEncoder {
         }
 
         if (buf == null) {
-	    /*
-	     * This class doesn't have a concept of encode(buf, len, off),
-	     * so if we have a partial buffer, we must reallocate
-	     * space.
-	     */
+            /*
+             * This class doesn't have a concept of encode(buf, len, off),
+             * so if we have a partial buffer, we must reallocate
+             * space.
+             */
             buf = new byte[bb.remaining()];
 
-	    /*
-	     * position() automatically updated
-	     */
+            /*
+             * position() automatically updated
+             */
             bb.get(buf);
         }
 

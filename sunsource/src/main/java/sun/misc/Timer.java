@@ -68,17 +68,22 @@ package sun.misc;
 */
 
 public class Timer {
+    /*
+     * This variable holds a handle to the TimerThread class for
+     * the purpose of getting at the class monitor.  The reason
+     * why Class.forName("TimerThread") is not used is because it
+     * doesn't appear to work when loaded via a net class loader.
+     */
+    static TimerThread timerThread = null;
     /**
      * This is the owner of the timer.  Its tick method is
      * called when the timer ticks.
      */
     public Timeable owner;
-
     /*
-     * This is the interval of time in ms. 
+     * This is the interval of time in ms.
      */
     long interval;
-
     /*
      * This variable is used for two different purposes.
      * This is done in order to save space.
@@ -88,46 +93,34 @@ public class Timer {
      * should tick.
      */
     long sleepUntil;
-
     /*
      * This is the time remaining before the timer ticks.  It
      * is only valid if 'stopped' is true.  If the timer is
-     * continued, the next tick will happen remaingTime 
+     * continued, the next tick will happen remaingTime
      * milliseconds later.
      */
     long remainingTime;
-
-    /*     
+    /*
      * True iff the timer is in regex mode.
      */
     boolean regular;
 
-    /*     
-     * True iff the timer has been stopped. 
+    /* **************************************************************
+     * Timer queue-related variables
+     * ************************************************************** */
+    /*
+     * True iff the timer has been stopped.
      */
     boolean stopped;
 
     /* **************************************************************
-     * Timer queue-related variables 
+     * Timer methods
      * ************************************************************** */
-
-    /* 
+    /*
      * A link to another timer object.  This is used while the
      * timer object is enqueued in the timer queue.
      */
     Timer next;
-
-    /* **************************************************************
-     * Timer methods
-     * ************************************************************** */
-
-    /*
-     * This variable holds a handle to the TimerThread class for
-     * the purpose of getting at the class monitor.  The reason
-     * why Class.forName("TimerThread") is not used is because it
-     * doesn't appear to work when loaded via a net class loader.
-     */
-    static TimerThread timerThread = null;
 
     /**
      * Creates a timer object that is owned by 'owner' and
@@ -297,7 +290,7 @@ public class Timer {
         this.regular = regular;
     }
 
-    /* 
+    /*
      * This method is used only for testing purposes.
      */
     protected Thread getTimerThread() {
@@ -346,6 +339,10 @@ class TimerThread extends Thread {
      * timer thread to tell whether or not the wait completed.
      */
     static boolean notified = false;
+    /*
+     * The timer queue is a queue of timers waiting to tick.
+     */
+    static Timer timerQueue = null;
 
     protected TimerThread() {
         super("TimerThread");
@@ -353,56 +350,13 @@ class TimerThread extends Thread {
         start();
     }
 
-    public synchronized void run() {
-        while (true) {
-            long delay;
-
-            while (timerQueue == null) {
-                try {
-                    wait();
-                } catch (InterruptedException ex) {
-                    // Just drop through and check timerQueue.
-                }
-            }
-            notified = false;
-            delay = timerQueue.sleepUntil - System.currentTimeMillis();
-            if (delay > 0) {
-                try {
-                    wait(delay);
-                } catch (InterruptedException ex) {
-                    // Just drop through.
-                }
-            }
-            // remove from timer queue.
-            if (!notified) {
-                Timer timer = timerQueue;
-                timerQueue = timerQueue.next;
-                TimerTickThread thr = TimerTickThread.call(
-                        timer, timer.sleepUntil);
-                if (debug) {
-                    long delta = (System.currentTimeMillis() - timer.sleepUntil);
-                    System.out.println("tick(" + thr.getName() + ","
-                            + timer.interval + "," + delta + ")");
-                    if (delta > 250) {
-                        System.out.println("*** BIG DELAY ***");
-                    }
-                }
-            }
-        }
-    }
-
     /* ******************************************************* 
        Timer Queue
        ******************************************************* */
 
     /*
-     * The timer queue is a queue of timers waiting to tick.
-     */
-    static Timer timerQueue = null;
-
-    /*
      * Uses timer.sleepUntil to determine where in the queue
-     * to insert the timer object.  
+     * to insert the timer object.
      * A new ticker thread is created only if the timer
      * is inserted at the beginning of the queue.
      * The timer must not already be in the queue.
@@ -444,7 +398,7 @@ class TimerThread extends Thread {
 
     /*
      * If the timer is not in the queue, returns false;
-     * otherwise removes the timer from the timer queue and returns true. 
+     * otherwise removes the timer from the timer queue and returns true.
      * Assumes the caller has the TimerThread monitor.
      */
     static protected boolean dequeue(Timer timer) {
@@ -486,7 +440,7 @@ class TimerThread extends Thread {
         return true;
     }
 
-    /* 
+    /*
      * Inserts the timer back into the queue.  This method
      * is used by a callback thread after it has called the
      * timer owner's tick() method.  This method recomputes
@@ -507,6 +461,44 @@ class TimerThread extends Thread {
                     + ": requeue " + timer.interval + ": no-op");
         }
     }
+
+    public synchronized void run() {
+        while (true) {
+            long delay;
+
+            while (timerQueue == null) {
+                try {
+                    wait();
+                } catch (InterruptedException ex) {
+                    // Just drop through and check timerQueue.
+                }
+            }
+            notified = false;
+            delay = timerQueue.sleepUntil - System.currentTimeMillis();
+            if (delay > 0) {
+                try {
+                    wait(delay);
+                } catch (InterruptedException ex) {
+                    // Just drop through.
+                }
+            }
+            // remove from timer queue.
+            if (!notified) {
+                Timer timer = timerQueue;
+                timerQueue = timerQueue.next;
+                TimerTickThread thr = TimerTickThread.call(
+                        timer, timer.sleepUntil);
+                if (debug) {
+                    long delta = (System.currentTimeMillis() - timer.sleepUntil);
+                    System.out.println("tick(" + thr.getName() + ","
+                            + timer.interval + "," + delta + ")");
+                    if (delta > 250) {
+                        System.out.println("*** BIG DELAY ***");
+                    }
+                }
+            }
+        }
+    }
 }
 
 /* 
@@ -524,8 +516,8 @@ monitor.
 */
 
 class TimerTickThread extends Thread {
-    /* 
-     * Maximum size of the thread pool. 
+    /*
+     * Maximum size of the thread pool.
      */
     static final int MAX_POOL_SIZE = 3;
 
@@ -535,18 +527,18 @@ class TimerTickThread extends Thread {
     static int curPoolSize = 0;
 
     /*
-     * The pool of timer threads. 
+     * The pool of timer threads.
      */
     static TimerTickThread pool = null;
 
-    /* 
-     * Is used when linked into the thread pool. 
+    /*
+     * Is used when linked into the thread pool.
      */
     TimerTickThread next = null;
 
     /*
      * This is the handle to the timer whose owner's
-     * tick() method will be called. 
+     * tick() method will be called.
      */
     Timer timer;
 
@@ -558,7 +550,7 @@ class TimerTickThread extends Thread {
      */
     long lastSleepUntil;
 
-    /* 
+    /*
      * Creates a new callback thread to call the timer owner's
      * tick() method.  A thread is taken from the pool if one
      * is available, otherwise, a new thread is created.
@@ -585,12 +577,12 @@ class TimerTickThread extends Thread {
         return thread;
     }
 
-    /* 
+    /*
      * Returns false if the thread should simply exit;
-     * otherwise the thread is returned the pool, where 
-     * it waits to be notified.  (I did try to use the 
+     * otherwise the thread is returned the pool, where
+     * it waits to be notified.  (I did try to use the
      * class monitor but the time between the notify
-     * and breaking out of the wait seemed to take 
+     * and breaking out of the wait seemed to take
      * significantly longer; need to look into this later.)
      */
     private boolean returnToPool() {

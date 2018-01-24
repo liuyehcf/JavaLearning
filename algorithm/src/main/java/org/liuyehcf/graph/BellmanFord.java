@@ -11,20 +11,6 @@ import java.util.Scanner;
 public class BellmanFord {
     private static final int CANNOT_REACH = Integer.MAX_VALUE >> 2;
 
-    private static class Edge {
-        final int source;
-
-        final int dest;
-
-        int length;
-
-        public Edge(int source, int dest, int length) {
-            this.source = source;
-            this.dest = dest;
-            this.length = length;
-        }
-    }
-
     public static void main(String[] args) {
         // edgeNum并不代表真正有效边的数量，因为相同的源节点和目的节点之间可能有多条道路，我们只需要保留最小的即可
         int vertexNum, edgeNum, source, dest;
@@ -83,5 +69,19 @@ public class BellmanFord {
         }
 
         return dp[dest];
+    }
+
+    private static class Edge {
+        final int source;
+
+        final int dest;
+
+        int length;
+
+        public Edge(int source, int dest, int length) {
+            this.source = source;
+            this.dest = dest;
+            this.length = length;
+        }
     }
 }

@@ -50,16 +50,16 @@ public abstract class AbstractLineProcessor implements LineProcessor {
         return curLineElement.getContent();
     }
 
+    protected void setContentOfCurLineElement(String content) {
+        curLineElement.setContent(content);
+    }
+
     protected String getContentOfPreLineElement() {
         return preLineElement.getContent();
     }
 
     protected String getContentOfNextLineElement() {
         return nextLineElement.getContent();
-    }
-
-    protected void setContentOfCurLineElement(String content) {
-        curLineElement.setContent(content);
     }
 
     protected boolean curContentIsCode() {

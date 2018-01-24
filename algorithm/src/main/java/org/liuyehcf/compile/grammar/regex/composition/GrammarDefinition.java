@@ -11,10 +11,30 @@ import java.util.Map;
  * Created by Liuye on 2017/10/21.
  */
 public class GrammarDefinition {
+    private static Symbol NONE_NON_ALPHABET = Symbol.createNonAlphabetSymbol("NONE_NON_ALPHABET");
+    Map<Symbol, SymbolString> finalSymbolSymbolStringMap;
     private List<Symbol> nonAlphabetSymbols;
     private Map<Symbol, Production> nonAlphabetSymbolProductionMap;
-    Map<Symbol, SymbolString> finalSymbolSymbolStringMap;
     private SymbolString finalSymbolString;
+
+    public GrammarDefinition(Production... productions) {
+        nonAlphabetSymbols = new ArrayList<>();
+        nonAlphabetSymbolProductionMap = new HashMap<>();
+        for (Production production : productions) {
+            Symbol nonAlphabetSymbol = production.getNonAlphabetSymbol();
+            if (nonAlphabetSymbolProductionMap.containsKey(nonAlphabetSymbol)) throw new RuntimeException();
+            nonAlphabetSymbols.add(nonAlphabetSymbol);
+            nonAlphabetSymbolProductionMap.put(nonAlphabetSymbol, production);
+        }
+    }
+
+    public static GrammarDefinition createGrammarDefinitionOfNormalRegex(String regex) {
+        GrammarDefinition grammarDefinition = new GrammarDefinition(
+                new Production(NONE_NON_ALPHABET, new SymbolString(regex))
+        );
+
+        return grammarDefinition;
+    }
 
     public SymbolString getFinalSymbolString() {
         if (finalSymbolString == null) {
@@ -65,17 +85,6 @@ public class GrammarDefinition {
         }
     }
 
-    public GrammarDefinition(Production... productions) {
-        nonAlphabetSymbols = new ArrayList<>();
-        nonAlphabetSymbolProductionMap = new HashMap<>();
-        for (Production production : productions) {
-            Symbol nonAlphabetSymbol = production.getNonAlphabetSymbol();
-            if (nonAlphabetSymbolProductionMap.containsKey(nonAlphabetSymbol)) throw new RuntimeException();
-            nonAlphabetSymbols.add(nonAlphabetSymbol);
-            nonAlphabetSymbolProductionMap.put(nonAlphabetSymbol, production);
-        }
-    }
-
     @Override
     public String toString() {
         String s = "";
@@ -83,15 +92,5 @@ public class GrammarDefinition {
             s += nonAlphabetSymbolProductionMap.get(symbol).toString();
         }
         return s;
-    }
-
-    private static Symbol NONE_NON_ALPHABET = Symbol.createNonAlphabetSymbol("NONE_NON_ALPHABET");
-
-    public static GrammarDefinition createGrammarDefinitionOfNormalRegex(String regex) {
-        GrammarDefinition grammarDefinition = new GrammarDefinition(
-                new Production(NONE_NON_ALPHABET, new SymbolString(regex))
-        );
-
-        return grammarDefinition;
     }
 }

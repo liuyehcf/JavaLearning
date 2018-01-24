@@ -4,8 +4,8 @@ package org.liuyehcf.markdownformat.context;
  * Created by HCF on 2018/1/14.
  */
 public class DefaultLineElement implements LineElement {
-    private String content;
     private final boolean isCode;
+    private String content;
 
     public DefaultLineElement(String content, boolean isCode) {
         this.isCode = isCode;

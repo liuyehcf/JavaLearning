@@ -10,14 +10,14 @@ import java.security.PermissionCollection;
 import java.security.ProtectionDomain;
 
 public interface JavaSecurityProtectionDomainAccess {
+    /**
+     * Returns the ProtectionDomainCache.
+     */
+    ProtectionDomainCache getProtectionDomainCache();
+
     interface ProtectionDomainCache {
         void put(ProtectionDomain pd, PermissionCollection pc);
 
         PermissionCollection get(ProtectionDomain pd);
     }
-
-    /**
-     * Returns the ProtectionDomainCache.
-     */
-    ProtectionDomainCache getProtectionDomainCache();
 }

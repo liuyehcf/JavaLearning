@@ -109,41 +109,6 @@ public class PerformanceLogger {
         return perfLoggingOn;
     }
 
-
-    /**
-     * Internal class used to store time/message data together.
-     */
-    static class TimeData {
-        String message;
-        long time;
-
-        TimeData(String message, long time) {
-            this.message = message;
-            this.time = time;
-        }
-
-        String getMessage() {
-            return message;
-        }
-
-        long getTime() {
-            return time;
-        }
-    }
-
-    /**
-     * Sets the start time.  Ideally, this is the earliest time available
-     * during the startup of a Java applet or application.  This time is
-     * later used to analyze the difference between the initial startup
-     * time and other events in the system (such as an applet's init time).
-     */
-    public static void setStartTime(String message) {
-        if (loggingEnabled()) {
-            long nowTime = System.currentTimeMillis();
-            setStartTime(message, nowTime);
-        }
-    }
-
     /**
      * Sets the start time.
      * This version of the method is
@@ -177,6 +142,19 @@ public class PerformanceLogger {
             return ((TimeData) times.get(START_INDEX)).getTime();
         } else {
             return 0;
+        }
+    }
+
+    /**
+     * Sets the start time.  Ideally, this is the earliest time available
+     * during the startup of a Java applet or application.  This time is
+     * later used to analyze the difference between the initial startup
+     * time and other events in the system (such as an applet's init time).
+     */
+    public static void setStartTime(String message) {
+        if (loggingEnabled()) {
+            long nowTime = System.currentTimeMillis();
+            setStartTime(message, nowTime);
         }
     }
 
@@ -266,5 +244,26 @@ public class PerformanceLogger {
      */
     public static void outputLog() {
         outputLog(logWriter);
+    }
+
+    /**
+     * Internal class used to store time/message data together.
+     */
+    static class TimeData {
+        String message;
+        long time;
+
+        TimeData(String message, long time) {
+            this.message = message;
+            this.time = time;
+        }
+
+        String getMessage() {
+            return message;
+        }
+
+        long getTime() {
+            return time;
+        }
     }
 }

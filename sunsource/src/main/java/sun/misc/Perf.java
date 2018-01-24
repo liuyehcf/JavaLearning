@@ -1,6 +1,6 @@
 /*
  * %W% %E%
- * 
+ *
  * Copyright (c) 2006, Oracle and/or its affiliates. All rights reserved.
  * ORACLE PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
  */
@@ -34,52 +34,17 @@ import java.security.PrivilegedAction;
  */
 public final class Perf {
 
-    private static Perf instance;
-
     private static final int PERF_MODE_RO = 0;
     private static final int PERF_MODE_RW = 1;
+    private static Perf instance;
+
+    static {
+        registerNatives();
+        instance = new Perf();
+    }
 
     private Perf() {
     }    // prevent instantiation
-
-    /**
-     * The GetPerfAction class is a convenience class for acquiring access
-     * to the singleton Perf instance using the
-     * <code>AccessController.doPrivileged()</code> method.
-     * <p>
-     * An instance of this class can be used as the argument to
-     * <code>AccessController.doPrivileged(PrivilegedAction)</code>.
-     * <p> Here is a suggested idiom for use of this class:
-     * <p>
-     * <blockquote><pre>
-     * class MyTrustedClass {
-     *   private static final Perf perf =
-     *       (Perf)AccessController.doPrivileged(new Perf.GetPerfAction());
-     *   ...
-     * }
-     * </pre></blockquote>
-     * <p>
-     * In the presence of a security manager, the <code>MyTrustedClass</code>
-     * class in the above example will need to be granted the
-     * <em>"sun.misc.Perf.getPerf"</em> <code>RuntimePermission</code>
-     * permission in order to successfully acquire the singleton Perf instance.
-     * <p>
-     * Please note that the <em>"sun.misc.Perf.getPerf"</em> permission
-     * is not a JDK specified permission.
-     *
-     * @see java.security.AccessController#doPrivileged(PrivilegedAction)
-     * @see RuntimePermission
-     */
-    public static class GetPerfAction implements PrivilegedAction {
-        /**
-         * Run the <code>Perf.getPerf()</code> method in a privileged context.
-         *
-         * @see #getPerf
-         */
-        public Object run() {
-            return getPerf();
-        }
-    }
 
     /**
      * Return a reference to the singleton Perf instance.
@@ -122,6 +87,23 @@ public final class Perf {
 
         return instance;
     }
+
+    /**
+     * convert string to an array of UTF-8 bytes
+     */
+    private static byte[] getBytes(String s) {
+        byte[] bytes = null;
+
+        try {
+            bytes = s.getBytes("UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            // ignore, UTF-8 encoding is always known
+        }
+
+        return bytes;
+    }
+
+    private static native void registerNatives();
 
     /**
      * Attach to the instrumentation buffer for the specified Java virtual
@@ -454,22 +436,6 @@ public final class Perf {
                                              int units, byte[] value,
                                              int maxLength);
 
-
-    /**
-     * convert string to an array of UTF-8 bytes
-     */
-    private static byte[] getBytes(String s) {
-        byte[] bytes = null;
-
-        try {
-            bytes = s.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            // ignore, UTF-8 encoding is always known
-        }
-
-        return bytes;
-    }
-
     /**
      * Return the value of the High Resolution Counter.
      * <p>
@@ -498,10 +464,42 @@ public final class Perf {
      */
     public native long highResFrequency();
 
-    private static native void registerNatives();
-
-    static {
-        registerNatives();
-        instance = new Perf();
+    /**
+     * The GetPerfAction class is a convenience class for acquiring access
+     * to the singleton Perf instance using the
+     * <code>AccessController.doPrivileged()</code> method.
+     * <p>
+     * An instance of this class can be used as the argument to
+     * <code>AccessController.doPrivileged(PrivilegedAction)</code>.
+     * <p> Here is a suggested idiom for use of this class:
+     * <p>
+     * <blockquote><pre>
+     * class MyTrustedClass {
+     *   private static final Perf perf =
+     *       (Perf)AccessController.doPrivileged(new Perf.GetPerfAction());
+     *   ...
+     * }
+     * </pre></blockquote>
+     * <p>
+     * In the presence of a security manager, the <code>MyTrustedClass</code>
+     * class in the above example will need to be granted the
+     * <em>"sun.misc.Perf.getPerf"</em> <code>RuntimePermission</code>
+     * permission in order to successfully acquire the singleton Perf instance.
+     * <p>
+     * Please note that the <em>"sun.misc.Perf.getPerf"</em> permission
+     * is not a JDK specified permission.
+     *
+     * @see java.security.AccessController#doPrivileged(PrivilegedAction)
+     * @see RuntimePermission
+     */
+    public static class GetPerfAction implements PrivilegedAction {
+        /**
+         * Run the <code>Perf.getPerf()</code> method in a privileged context.
+         *
+         * @see #getPerf
+         */
+        public Object run() {
+            return getPerf();
+        }
     }
 }

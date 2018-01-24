@@ -6,25 +6,6 @@ import java.util.*;
  * Created by liuye on 2017/4/9 0009.
  */
 public class Item4 {
-    private static class TreeNode {
-        int F;//父亲节点
-        int IN;//刺杀该节点需要的信息量
-        int IP;//刺杀该节点能获取的信息量
-        int C;//刺杀该节点的消费(最终是要最小化这个,而信息量只是一个限制条件)
-
-        public TreeNode(int F, int IN, int IP, int C) {
-            this.F = F;
-            this.IN = IN;
-            this.IP = IP;
-            this.C = C;
-            children = new ArrayList<TreeNode>();
-            parent = null;
-        }
-
-        List<TreeNode> children;
-        TreeNode parent;
-    }
-
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         int N = scanner.nextInt();
@@ -70,11 +51,11 @@ public class Item4 {
         }
 
 
-        for(int i=1;i<=root.children.size();i++){
-            TreeNode node=root.children.get(i-1);
-            long cost=INCost(node, map);
-            for(int j=1;j<=root.IN;j++){
-                dp[i][j]=Math.min(dp[i-1][j],cost + node.C + dp[i-1][Math.max(0, j - node.IP)]);
+        for (int i = 1; i <= root.children.size(); i++) {
+            TreeNode node = root.children.get(i - 1);
+            long cost = INCost(node, map);
+            for (int j = 1; j <= root.IN; j++) {
+                dp[i][j] = Math.min(dp[i - 1][j], cost + node.C + dp[i - 1][Math.max(0, j - node.IP)]);
             }
         }
 
@@ -103,6 +84,23 @@ public class Item4 {
         }
         map.put(root, dp[root.IN]);
         return map.get(root);
+    }
+
+    private static class TreeNode {
+        int F;//父亲节点
+        int IN;//刺杀该节点需要的信息量
+        int IP;//刺杀该节点能获取的信息量
+        int C;//刺杀该节点的消费(最终是要最小化这个,而信息量只是一个限制条件)
+        List<TreeNode> children;
+        TreeNode parent;
+        public TreeNode(int F, int IN, int IP, int C) {
+            this.F = F;
+            this.IN = IN;
+            this.IP = IP;
+            this.C = C;
+            children = new ArrayList<TreeNode>();
+            parent = null;
+        }
     }
 
 }

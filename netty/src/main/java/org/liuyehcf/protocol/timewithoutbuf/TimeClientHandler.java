@@ -1,10 +1,7 @@
 package org.liuyehcf.protocol.timewithoutbuf;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-
-import java.util.Date;
 
 /**
  * Created by HCF on 2017/12/2.

@@ -9,47 +9,25 @@ import java.util.Set;
  * Created by Liuye on 2017/10/21.
  */
 public class Symbol {
+    public static final Symbol _Epsilon = createAlphabetSymbol("Epsilon");
+    private static List<Symbol> alphabetSymbols = null;
+    private static List<Symbol> alphabetSymbolsMatchesAny = null;
+    public static final Symbol _any = getAlphabetSymbolWithChar('.');
+    public static final Symbol _or = getAlphabetSymbolWithChar('|');
+    public static final Symbol _star = getAlphabetSymbolWithChar('*');
+    public static final Symbol _add = getAlphabetSymbolWithChar('+');
+    public static final Symbol _escaped = getAlphabetSymbolWithChar('\\');
+    public static final Symbol _leftMiddleParenthesis = getAlphabetSymbolWithChar('[');
+    public static final Symbol _rightMiddleParenthesis = getAlphabetSymbolWithChar(']');
+    public static final Symbol _middleParenthesisNot = getAlphabetSymbolWithChar('^');
+    public static final Symbol _leftSmallParenthesis = getAlphabetSymbolWithChar('(');
+    public static final Symbol _rightSmallParenthesis = getAlphabetSymbolWithChar(')');
     private final String symbol;
-
     private final boolean isOfAlphabet;
-
-    public String getSymbol() {
-        return symbol;
-    }
-
-    public char getChar() {
-        assert symbol.length() == 1;
-        return symbol.charAt(0);
-    }
-
-    public boolean isOfAlphabet() {
-        return isOfAlphabet;
-    }
 
     public Symbol(String symbol, boolean isOfAlphabet) {
         this.symbol = symbol;
         this.isOfAlphabet = isOfAlphabet;
-    }
-
-    protected String getTypeName() {
-        return isOfAlphabet ? "Alphabet" : "NonAlphabet";
-    }
-
-    @Override
-    public String toString() {
-        return this.symbol;
-    }
-
-    @Override
-    public int hashCode() {
-        return this.toString().hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return this.symbol.equals(((Symbol) obj).symbol)
-                && this.isOfAlphabet() == ((Symbol) obj).isOfAlphabet;
-
     }
 
     public static Symbol getAlphabetSymbolWithChar(char symbol) {
@@ -79,10 +57,6 @@ public class Symbol {
         return new Symbol(symbol, false);
     }
 
-    private static List<Symbol> alphabetSymbols = null;
-
-    private static List<Symbol> alphabetSymbolsMatchesAny = null;
-
     public static List<Symbol> getAlphabetSymbols() {
         return alphabetSymbols;
     }
@@ -91,19 +65,6 @@ public class Symbol {
         return alphabetSymbolsMatchesAny;
     }
 
-    public static final Symbol _Epsilon = createAlphabetSymbol("Epsilon");
-
-    public static final Symbol _any = getAlphabetSymbolWithChar('.');
-    public static final Symbol _or = getAlphabetSymbolWithChar('|');
-    public static final Symbol _star = getAlphabetSymbolWithChar('*');
-    public static final Symbol _add = getAlphabetSymbolWithChar('+');
-    public static final Symbol _escaped = getAlphabetSymbolWithChar('\\');
-    public static final Symbol _leftMiddleParenthesis = getAlphabetSymbolWithChar('[');
-    public static final Symbol _rightMiddleParenthesis = getAlphabetSymbolWithChar(']');
-    public static final Symbol _middleParenthesisNot = getAlphabetSymbolWithChar('^');
-    public static final Symbol _leftSmallParenthesis = getAlphabetSymbolWithChar('(');
-    public static final Symbol _rightSmallParenthesis = getAlphabetSymbolWithChar(')');
-
     public static Set<Symbol> getOppositeSymbols(Set<Symbol> excludedSymbols) {
         Set<Symbol> oppositeSymbols = new HashSet<>();
         for (Symbol symbol : getAlphabetSymbols()) {
@@ -111,6 +72,40 @@ public class Symbol {
         }
         oppositeSymbols.removeAll(excludedSymbols);
         return oppositeSymbols;
+    }
+
+    public String getSymbol() {
+        return symbol;
+    }
+
+    public char getChar() {
+        assert symbol.length() == 1;
+        return symbol.charAt(0);
+    }
+
+    public boolean isOfAlphabet() {
+        return isOfAlphabet;
+    }
+
+    protected String getTypeName() {
+        return isOfAlphabet ? "Alphabet" : "NonAlphabet";
+    }
+
+    @Override
+    public String toString() {
+        return this.symbol;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.toString().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return this.symbol.equals(((Symbol) obj).symbol)
+                && this.isOfAlphabet() == ((Symbol) obj).isOfAlphabet;
+
     }
 }
 
