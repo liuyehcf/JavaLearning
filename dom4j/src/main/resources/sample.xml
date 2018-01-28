@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--a simple demo -->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+  <bean id="sample" class="org.liuyehcf.dom4j.Person">
+    <!--This is comment-->
+    <property name="nickName" value="liuye"/>
+    <property name="age" value="25"/>
+    <property name="country" value="China"/>
+  </bean>
+</beans>
