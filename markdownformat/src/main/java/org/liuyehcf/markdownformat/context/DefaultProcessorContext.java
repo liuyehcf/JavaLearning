@@ -34,6 +34,7 @@ public class DefaultProcessorContext implements ProcessorContext {
         addProcessor(new IndexProcessor());
         addProcessor(new InnerLinkCheckProcessor());
         addProcessor(new RedundantEmptyProcessor());
+        addProcessor(new RemoveControlCharacterProcessor());
         addProcessor(new ResourceLinkProcessor());
         addProcessor(new SubItemProcessor());
 
