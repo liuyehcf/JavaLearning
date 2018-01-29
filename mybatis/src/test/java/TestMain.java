@@ -1,5 +1,5 @@
 import org.junit.Test;
-import org.liuyehcf.entity.CrmUser;
+import org.liuyehcf.dataobject.CrmUserDO;
 import org.liuyehcf.service.CrmUserService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -15,7 +15,7 @@ public class TestMain {
 
         CrmUserService crmUserService = applicationContext.getBean("crmUserServiceImpl", CrmUserService.class);
 
-        CrmUser crmUser = new CrmUser();
+        CrmUserDO crmUser = new CrmUserDO();
         crmUser.setFirstName("L");
         crmUser.setLastName("H");
 
@@ -31,7 +31,7 @@ public class TestMain {
 
         CrmUserService crmUserService = applicationContext.getBean("crmUserServiceImpl", CrmUserService.class);
 
-        CrmUser crmUser = crmUserService.selectCrmUserById(1L);
+        CrmUserDO crmUser = crmUserService.selectCrmUserById(1L);
 
         System.out.println(crmUser);
     }
@@ -42,7 +42,7 @@ public class TestMain {
 
         CrmUserService crmUserService = applicationContext.getBean("crmUserServiceImpl", CrmUserService.class);
 
-        CrmUser crmUser = crmUserService.selectCrmUserById(1L);
+        CrmUserDO crmUser = crmUserService.selectCrmUserById(1L);
 
         crmUser.setFirstName("HHH");
         //crmUser.setSex(null);

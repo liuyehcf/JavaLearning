@@ -1,7 +1,7 @@
 package org.liuyehcf.service;
 
-import org.liuyehcf.entity.LoginRequest;
-import org.liuyehcf.entity.LoginResponse;
+import org.liuyehcf.dataobject.LoginRequest;
+import org.liuyehcf.dataobject.LoginResponse;
 import org.springframework.stereotype.Service;
 
 /**

@@ -2,7 +2,7 @@ package org.liuyehcf.dao;
 
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.JdbcType;
-import org.liuyehcf.entity.CrmUser;
+import org.liuyehcf.dataobject.CrmUserDO;
 
 /**
  * Created by HCF on 2017/3/31.
@@ -20,14 +20,14 @@ public interface CrmUserDAO {
             @Result(column = "age", property = "age", jdbcType = JdbcType.SMALLINT),
             @Result(column = "sex", property = "sex", jdbcType = JdbcType.TINYINT),
     })
-    CrmUser selectCrmUserById(@Param("id") Long id);
+    CrmUserDO selectCrmUserById(@Param("id") Long id);
 
     @Insert({
             "INSERT INTO crm_user(first_name, last_name, age, sex) " +
                     "VALUES(#{crmUser.firstName, jdbcType=VARCHAR}, #{crmUser.lastName, jdbcType=VARCHAR}, #{crmUser.age, jdbcType=SMALLINT}, #{crmUser.sex, jdbcType=TINYINT})"
 
     })
-    int insertCrmUser(@Param("crmUser") CrmUser crmUser);
+    int insertCrmUser(@Param("crmUser") CrmUserDO crmUser);
 
 
     @Update({
@@ -41,5 +41,5 @@ public interface CrmUserDAO {
                     "WHERE id = #{crmUser.id, jdbcType=BIGINT} "
             , "</script>"
     })
-    int updateCrmUser(@Param("crmUser") CrmUser crmUser);
+    int updateCrmUser(@Param("crmUser") CrmUserDO crmUser);
 }

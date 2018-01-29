@@ -1,9 +1,9 @@
-package org.liuyehcf.entity;
+package org.liuyehcf.dataobject;
 
 /**
  * Created by HCF on 2017/3/31.
  */
-public class CrmUser {
+public class CrmUserDO {
     private Long id;
     private String firstName;
     private String lastName;

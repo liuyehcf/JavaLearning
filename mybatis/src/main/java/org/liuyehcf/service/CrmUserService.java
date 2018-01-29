@@ -1,17 +1,17 @@
 package org.liuyehcf.service;
 
-import org.liuyehcf.entity.CrmUser;
+import org.liuyehcf.dataobject.CrmUserDO;
 
 /**
  * Created by HCF on 2017/3/31.
  */
 public interface CrmUserService {
 
-    CrmUser selectCrmUserById(Long id);
+    CrmUserDO selectCrmUserById(Long id);
 
-    int insertCrmUser(CrmUser crmUser);
+    int insertCrmUser(CrmUserDO crmUser);
 
-    int updateCrmUser(CrmUser crmUser);
+    int updateCrmUser(CrmUserDO crmUser);
 
     /**
      * 利用XML配置声明式事务
@@ -19,7 +19,7 @@ public interface CrmUserService {
      * @param crmUser
      * @return
      */
-    int updateCrmUserWithXmlTransaction(CrmUser crmUser);
+    int updateCrmUserWithXmlTransaction(CrmUserDO crmUser);
 
     /**
      * 利用注解配置声明式事务
@@ -27,11 +27,11 @@ public interface CrmUserService {
      * @param crmUser
      * @return
      */
-    int updateCrmUserWithAnnotationTransaction(CrmUser crmUser);
+    int updateCrmUserWithAnnotationTransaction(CrmUserDO crmUser);
 
     /**
      * 嵌套事务测试
      */
-    void nestTransactionWithAnnotationTransaction(CrmUser crmUser);
+    void nestTransactionWithAnnotationTransaction(CrmUserDO crmUser);
 }
 

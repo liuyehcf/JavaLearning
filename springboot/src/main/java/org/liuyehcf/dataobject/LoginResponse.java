@@ -1,4 +1,4 @@
-package org.liuyehcf.entity;
+package org.liuyehcf.dataobject;
 
 /**
  * Created by Liuye on 2017/12/15.

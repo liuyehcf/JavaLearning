@@ -1,5 +1,5 @@
 import org.junit.Test;
-import org.liuyehcf.entity.CrmUser;
+import org.liuyehcf.dataobject.CrmUserDO;
 import org.liuyehcf.service.CrmUserService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -17,7 +17,7 @@ public class TestAnnotationTransaction {
 
         CrmUserService crmUserService = applicationContext.getBean("crmUserServiceImpl", CrmUserService.class);
 
-        CrmUser crmUser = crmUserService.selectCrmUserById(1L);
+        CrmUserDO crmUser = crmUserService.selectCrmUserById(1L);
 
         SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");//设置日期格式
         crmUser.setFirstName(df.format(new Date()));
@@ -32,7 +32,7 @@ public class TestAnnotationTransaction {
 
         CrmUserService crmUserService = applicationContext.getBean("crmUserServiceImpl", CrmUserService.class);
 
-        CrmUser crmUser = crmUserService.selectCrmUserById(1L);
+        CrmUserDO crmUser = crmUserService.selectCrmUserById(1L);
 
         SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");//设置日期格式
         crmUser.setFirstName(df.format(new Date()));
