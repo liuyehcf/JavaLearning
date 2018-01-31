@@ -1,17 +1,15 @@
 package org.liuyehcf.springmvc;
 
-
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
-@Controller
 @RequestMapping("/")
+@Controller
 public class SampleController {
 
-    @RequestMapping("/home")
+    @RequestMapping(value = "/{user}", method = RequestMethod.GET)
     @ResponseBody
-    public String hello(String name) {
-        return "hello, " + name;
+    public String printGetMethodRequestParams(@PathVariable(value = "user") String user, @RequestParam(value = "age") Integer age) {
+        return "user: " + user + ", age: " + age;
     }
 }
