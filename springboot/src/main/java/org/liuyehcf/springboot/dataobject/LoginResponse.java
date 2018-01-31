@@ -1,4 +1,4 @@
-package org.liuyehcf.dataobject;
+package org.liuyehcf.springboot.dataobject;
 
 /**
  * Created by Liuye on 2017/12/15.

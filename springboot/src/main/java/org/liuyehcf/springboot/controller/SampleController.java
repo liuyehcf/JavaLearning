@@ -1,8 +1,8 @@
-package org.liuyehcf.controller;
+package org.liuyehcf.springboot.controller;
 
-import org.liuyehcf.dataobject.LoginRequest;
-import org.liuyehcf.dataobject.LoginResponse;
-import org.liuyehcf.service.SampleService;
+import org.liuyehcf.springboot.dataobject.LoginRequest;
+import org.liuyehcf.springboot.dataobject.LoginResponse;
+import org.liuyehcf.springboot.service.SampleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
