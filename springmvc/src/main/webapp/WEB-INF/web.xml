@@ -30,8 +30,9 @@
 
     <context-param>
         <param-name>contextConfigLocation</param-name>
-        <param-value>WEB-INF/applicationContext.xml</param-value>
+        <param-value>/WEB-INF/applicationContext.xml</param-value>
     </context-param>
+
 
     <!-- Spring业务层容器，配合context-param使用 -->
     <listener>
