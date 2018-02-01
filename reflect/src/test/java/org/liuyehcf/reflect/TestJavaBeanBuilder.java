@@ -11,7 +11,7 @@ public class TestJavaBeanBuilder {
     public void testGeneric1() {
         System.out.println(JSON.toJSONString(JavaBeanBuilderUtils.createJavaBean(
                 new TypeReference<UserDTO<GenericDTO<UserDTO<AddressDTO>, AddressDTO>>>() {
-                }.getType()
+                }
         )));
     }
 
@@ -19,7 +19,7 @@ public class TestJavaBeanBuilder {
     public void testGeneric2() {
         System.out.println(JSON.toJSONString(JavaBeanBuilderUtils.createJavaBean(
                 new TypeReference<GenericDTO<GenericDTO<UserDTO<AddressDTO>, AddressDTO>, GenericDTO<UserDTO<GenericDTO<UserDTO<AddressDTO>, AddressDTO>>, AddressDTO>>>() {
-                }.getType()
+                }
         )));
     }
 }
