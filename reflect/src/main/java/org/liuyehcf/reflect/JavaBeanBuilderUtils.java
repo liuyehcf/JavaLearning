@@ -118,7 +118,7 @@ public class JavaBeanBuilderUtils {
      */
     private Object createJavaBeanWithClass(Class clazz) {
 
-        Object data = createInstance(clazz);
+        Object obj = createInstance(clazz);
 
         for (Method setMethod : getSetMethods(clazz)) {
 
@@ -126,10 +126,10 @@ public class JavaBeanBuilderUtils {
             Type paramType = setMethod.getGenericParameterTypes()[0];
 
             // 填充默认值
-            setDefaultValue(data, setMethod, paramType);
+            setDefaultValue(obj, setMethod, paramType);
         }
 
-        return data;
+        return obj;
     }
 
     /**
@@ -142,7 +142,7 @@ public class JavaBeanBuilderUtils {
 
         Class clazz = (Class) type.getRawType();
 
-        Object data = createInstance(clazz);
+        Object obj = createInstance(clazz);
 
         for (Method setMethod : getSetMethods(clazz)) {
             // 拿到set方法的参数类型
@@ -152,14 +152,14 @@ public class JavaBeanBuilderUtils {
             if (paramType instanceof TypeVariable) {
                 // 如果参数类型是泛型形参，根据映射关系找到泛型形参对应的泛型实参
                 Type actualType = genericTypes.get(((TypeVariable) paramType).getName());
-                setDefaultValue(data, setMethod, actualType);
+                setDefaultValue(obj, setMethod, actualType);
             } else {
                 // 参数类型是确切的类型，可能是Class，也可能是ParameterizedType
-                setDefaultValue(data, setMethod, paramType);
+                setDefaultValue(obj, setMethod, paramType);
             }
         }
 
-        return data;
+        return obj;
     }
 
     /**
@@ -201,18 +201,18 @@ public class JavaBeanBuilderUtils {
     /**
      * 为属性设置默认值，根据参数类型进行分发
      *
-     * @param data
+     * @param obj
      * @param method
      * @param paramType
      */
-    private void setDefaultValue(Object data, Method method, Type paramType) {
+    private void setDefaultValue(Object obj, Method method, Type paramType) {
         try {
             if (paramType instanceof Class) {
                 // 普通参数
-                setDefaultValueOfNormal(data, method, (Class) paramType);
+                setDefaultValueOfNormal(obj, method, (Class) paramType);
             } else if (paramType instanceof ParameterizedType) {
                 // 泛型实参
-                setDefaultValueOfGeneric(data, method, (ParameterizedType) paramType);
+                setDefaultValueOfGeneric(obj, method, (ParameterizedType) paramType);
             } else {
                 throw new UnsupportedOperationException();
             }
@@ -235,43 +235,43 @@ public class JavaBeanBuilderUtils {
     /**
      * set方法参数是普通的类型
      *
-     * @param data
+     * @param obj
      * @param method
      * @param paramClass
      * @throws IllegalAccessException
      * @throws InvocationTargetException
      */
-    private void setDefaultValueOfNormal(Object data, Method method, Class paramClass) throws IllegalAccessException, InvocationTargetException {
+    private void setDefaultValueOfNormal(Object obj, Method method, Class paramClass) throws IllegalAccessException, InvocationTargetException {
         if (DEFAULT_VALUE_OF_BASIC_CLASS.containsKey(paramClass)) {
             // 填充基本类型
-            method.invoke(data, DEFAULT_VALUE_OF_BASIC_CLASS.get(paramClass));
+            method.invoke(obj, DEFAULT_VALUE_OF_BASIC_CLASS.get(paramClass));
         } else if (paramClass.equals(String.class)) {
             // 填充String类型
-            method.invoke(data, "default" + getFieldName(method));
+            method.invoke(obj, "default" + getFieldName(method));
         } else {
             // 填充其他类型
-            method.invoke(data, createJavaBean(paramClass));
+            method.invoke(obj, createJavaBean(paramClass));
         }
     }
 
     /**
      * set方法的参数是泛型
      *
-     * @param data
+     * @param obj
      * @param method
      * @param paramType
      * @throws IllegalAccessException
      * @throws InvocationTargetException
      */
-    private void setDefaultValueOfGeneric(Object data, Method method, ParameterizedType paramType) throws IllegalAccessException, InvocationTargetException {
+    private void setDefaultValueOfGeneric(Object obj, Method method, ParameterizedType paramType) throws IllegalAccessException, InvocationTargetException {
         Class clazz = (Class) paramType.getRawType();
 
         if (instanceOfContainer(clazz)) {
             // 如果是容器的话，特殊处理一下
-            setDefaultValueForContainer(data, method, paramType);
+            setDefaultValueForContainer(obj, method, paramType);
         } else {
             // 其他类型
-            method.invoke(data, createJavaBean(paramType));
+            method.invoke(obj, createJavaBean(paramType));
         }
     }
 
@@ -288,13 +288,13 @@ public class JavaBeanBuilderUtils {
     /**
      * 为几种不同的容器设置默认值，由于容器没有set方法，走默认逻辑就会得到一个空的容器。因此为容器填充一个值
      *
-     * @param data
+     * @param obj
      * @param method
      * @param paramType
      * @throws IllegalAccessException
      * @throws InvocationTargetException
      */
-    private void setDefaultValueForContainer(Object data, Method method, ParameterizedType paramType) throws IllegalAccessException, InvocationTargetException {
+    private void setDefaultValueForContainer(Object obj, Method method, ParameterizedType paramType) throws IllegalAccessException, InvocationTargetException {
         Class clazz = (Class) paramType.getRawType();
 
         if (clazz.equals(List.class)) {
@@ -302,81 +302,81 @@ public class JavaBeanBuilderUtils {
 
             Type genericParam = paramType.getActualTypeArguments()[0];
 
-            Object obj;
+            Object value;
 
             for (int i = 0; i < CONTAINER_DEFAULT_SIZE; i++) {
                 if (genericParam instanceof TypeVariable) {
-                    obj = createJavaBean(genericTypes.get(((TypeVariable) genericParam).getName()));
+                    value = createJavaBean(genericTypes.get(((TypeVariable) genericParam).getName()));
                 } else {
-                    obj = createJavaBean(genericParam);
+                    value = createJavaBean(genericParam);
                 }
 
-                list.add(obj);
+                list.add(value);
             }
 
-            method.invoke(data, list);
+            method.invoke(obj, list);
         } else if (clazz.equals(Set.class)) {
             Set set = new HashSet();
 
             Type genericParam = paramType.getActualTypeArguments()[0];
 
-            Object obj;
+            Object value;
 
             for (int i = 0; i < CONTAINER_DEFAULT_SIZE; i++) {
                 if (genericParam instanceof TypeVariable) {
-                    obj = createJavaBean(genericTypes.get(((TypeVariable) genericParam).getName()));
+                    value = createJavaBean(genericTypes.get(((TypeVariable) genericParam).getName()));
                 } else {
-                    obj = createJavaBean(genericParam);
+                    value = createJavaBean(genericParam);
                 }
 
-                set.add(obj);
+                set.add(value);
             }
 
-            method.invoke(data, set);
+            method.invoke(obj, set);
         } else if (clazz.equals(Queue.class)) {
             Queue queue = new LinkedList();
 
             Type genericParam = paramType.getActualTypeArguments()[0];
 
-            Object obj;
+            Object value;
 
             for (int i = 0; i < CONTAINER_DEFAULT_SIZE; i++) {
                 if (genericParam instanceof TypeVariable) {
-                    obj = createJavaBean(genericTypes.get(((TypeVariable) genericParam).getName()));
+                    value = createJavaBean(genericTypes.get(((TypeVariable) genericParam).getName()));
                 } else {
-                    obj = createJavaBean(genericParam);
+                    value = createJavaBean(genericParam);
                 }
 
-                queue.add(obj);
+                queue.add(value);
             }
 
-            method.invoke(data, queue);
+            method.invoke(obj, queue);
         } else if (clazz.equals(Map.class)) {
             Map map = new HashMap();
 
             Type genericParam1 = paramType.getActualTypeArguments()[0];
             Type genericParam2 = paramType.getActualTypeArguments()[1];
 
-            Object obj1;
-            Object obj2;
+            Object key;
+            Object value;
 
             for (int i = 0; i < CONTAINER_DEFAULT_SIZE; i++) {
                 if (genericParam1 instanceof TypeVariable) {
-                    obj1 = createJavaBean(genericTypes.get(((TypeVariable) genericParam1).getName()));
+                    key = createJavaBean(genericTypes.get(((TypeVariable) genericParam1).getName()));
                 } else {
-                    obj1 = createJavaBean(genericParam1);
+                    key = createJavaBean(genericParam1);
                 }
 
                 if (genericParam2 instanceof TypeVariable) {
-                    obj2 = createJavaBean(genericTypes.get(((TypeVariable) genericParam2).getName()));
+                    value = createJavaBean(genericTypes.get(((TypeVariable) genericParam2).getName()));
                 } else {
-                    obj2 = createJavaBean(genericParam2);
+                    value = createJavaBean(genericParam2);
                 }
 
-                map.put(obj1, obj2);
+                map.put(key, value);
             }
 
-            method.invoke(data, map);
+            method.invoke(obj, map);
         } else {
             throw new UnsupportedOperationException();
         }
