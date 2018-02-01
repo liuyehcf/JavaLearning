@@ -4,7 +4,7 @@ import java.lang.reflect.*;
 import java.util.Arrays;
 import java.util.Date;
 
-public class GenericDTO<Data, Value> {
+public class GenericParamDemo<Data, Value> {
     private Data data;
 
     private Value value;
@@ -30,7 +30,7 @@ public class GenericDTO<Data, Value> {
     }
 
     public static void main(String[] args) throws Exception {
-        ParameterizedType type = (ParameterizedType) new TypeReference<GenericDTO<String, Date>>() {
+        ParameterizedType type = (ParameterizedType) new TypeReference<GenericParamDemo<String, Date>>() {
         }.getType();
 
         System.out.println("rawType: " + type.getRawType());
@@ -40,7 +40,7 @@ public class GenericDTO<Data, Value> {
             System.out.println("actualType" + i + ": " + type.getActualTypeArguments()[i]);
         }
 
-        TypeVariable[] typeParameters = GenericDTO.class.getTypeParameters();
+        TypeVariable[] typeParameters = GenericParamDemo.class.getTypeParameters();
         System.out.println("typeParameters: " + Arrays.toString(typeParameters));
 
         for (int i = 0; i < typeParameters.length; i++) {
@@ -50,9 +50,9 @@ public class GenericDTO<Data, Value> {
 
         }
 
-        Method method1 = GenericDTO.class.getMethod("setValue", Object.class);
-        Method method2 = GenericDTO.class.getMethod("setData", Object.class);
-        Method method3 = GenericDTO.class.getMethod("func", Object.class, Object.class, String.class);
+        Method method1 = GenericParamDemo.class.getMethod("setValue", Object.class);
+        Method method2 = GenericParamDemo.class.getMethod("setData", Object.class);
+        Method method3 = GenericParamDemo.class.getMethod("func", Object.class, Object.class, String.class);
 
 
         printMethod(method1);
