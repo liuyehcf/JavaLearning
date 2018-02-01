@@ -34,12 +34,26 @@ public class JavaBeanBuilderUtils {
     private final Type type;
 
     /**
-     * 初始化任意Bean
+     * 唯一对外接口
+     *
+     * @param typeReference
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T createJavaBean(TypeReference<T> typeReference) {
+        if (typeReference == null) {
+            throw new NullPointerException();
+        }
+        return (T) createJavaBean(typeReference.getType());
+    }
+
+    /**
+     * 初始化JavaBean
      *
      * @param type
      * @return
      */
-    public static Object createJavaBean(Type type) {
+    private static Object createJavaBean(Type type) {
         if (type == null) {
             throw new NullPointerException();
         }
