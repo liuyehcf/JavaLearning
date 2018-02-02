@@ -433,6 +433,4 @@ public class JavaBeanBuilderUtils {
         CONTAINER_CLASS_SET.add(Set.class);
         CONTAINER_CLASS_SET.add(Queue.class);
     }
-
-
 }
