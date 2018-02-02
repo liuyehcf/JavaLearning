@@ -79,7 +79,9 @@ public class BuilderProcessor extends AbstractProcessor {
 
         List<JCTree> jcTreeList = List.nil();
 
-        jcTreeList = List.<JCTree>nil().appendList(cloneSetMethodJCMethodDecl(jcClassDecl, methodDecls));
+
+        jcTreeList = jcTreeList.append(getProxyField(jcClassDecl));
+        jcTreeList = jcTreeList.appendList(cloneSetMethodJCMethodDecl(jcClassDecl, methodDecls));
 
         return treeMaker.ClassDef(
                 treeMaker.Modifiers(Flags.PUBLIC + Flags.STATIC + Flags.FINAL), // 访问标志
@@ -88,6 +90,15 @@ public class BuilderProcessor extends AbstractProcessor {
                 null, // 继承
                 List.nil(), // 接口列表
                 jcTreeList); // 定义
+    }
+
+    private JCTree getProxyField(JCTree.JCClassDecl jcClassDecl) {
+        return treeMaker.VarDef(
+                treeMaker.Modifiers(Flags.PRIVATE), // 访问标志
+                names.fromString("obj"), // 名字
+                treeMaker.Ident(names.fromString(jcClassDecl.getSimpleName().toString())),
+                null
+        );
     }
 
     private List<JCTree> cloneSetMethodJCMethodDecl(JCTree.JCClassDecl jcClassDecl, List<JCTree.JCMethodDecl> methodDecls) {
