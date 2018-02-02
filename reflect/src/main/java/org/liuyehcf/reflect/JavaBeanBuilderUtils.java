@@ -382,6 +382,23 @@ public class JavaBeanBuilderUtils {
         }
     }
 
+    public static abstract class TypeReference<T> {
+        private final Type type;
+
+        protected TypeReference() {
+            Type superClass = getClass().getGenericSuperclass();
+
+            Type type = ((ParameterizedType) superClass).getActualTypeArguments()[0];
+
+            this.type = type;
+        }
+
+        public final Type getType() {
+            return type;
+        }
+    }
+
+
     static {
         DEFAULT_VALUE_OF_BASIC_CLASS.put(Byte.class, BYTE_DEFAULT_VALUE);
         DEFAULT_VALUE_OF_BASIC_CLASS.put(byte.class, BYTE_DEFAULT_VALUE);
