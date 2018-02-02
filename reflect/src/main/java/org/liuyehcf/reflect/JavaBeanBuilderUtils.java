@@ -12,12 +12,13 @@ public class JavaBeanBuilderUtils {
     private static final Float FLOAT_DEFAULT_VALUE = 0.0f;
     private static final Double DOUBLE_DEFAULT_VALUE = 0.0;
     private static final Boolean BOOLEAN_DEFAULT_VALUE = false;
+    private static final String STRING_DEFAULT_PREFIX = "default";
 
     private static final Map<Class, Object> DEFAULT_VALUE_OF_BASIC_CLASS = new HashMap<>();
 
-    private static final String SET = "set";
-    private static final Integer SET_PARAM_COUNT = 1;
-    private static final Class VOID_CLASS = void.class;
+    private static final String SET_METHOD_PREFIX = "set";
+    private static final Integer SET_METHOD_PARAM_COUNT = 1;
+    private static final Class SET_METHOD_RETURN_TYPE = void.class;
 
     private static final Set<Class> CONTAINER_CLASS_SET = new HashSet<>();
     private static final Integer CONTAINER_DEFAULT_SIZE = 3;
@@ -189,9 +190,9 @@ public class JavaBeanBuilderUtils {
         Method[] methods = clazz.getMethods();
 
         for (Method method : methods) {
-            if (method.getName().startsWith(SET)
-                    && SET_PARAM_COUNT.equals(method.getParameterCount())
-                    && VOID_CLASS.equals(method.getReturnType())) {
+            if (method.getName().startsWith(SET_METHOD_PREFIX)
+                    && SET_METHOD_PARAM_COUNT.equals(method.getParameterCount())
+                    && SET_METHOD_RETURN_TYPE.equals(method.getReturnType())) {
                 setMethods.add(method);
             }
         }
@@ -247,7 +248,7 @@ public class JavaBeanBuilderUtils {
             method.invoke(obj, DEFAULT_VALUE_OF_BASIC_CLASS.get(paramClass));
         } else if (paramClass.equals(String.class)) {
             // 填充String类型
-            method.invoke(obj, "default" + getFieldName(method));
+            method.invoke(obj, STRING_DEFAULT_PREFIX + getFieldName(method));
         } else {
             // 填充其他类型
             method.invoke(obj, createJavaBean(paramClass));
