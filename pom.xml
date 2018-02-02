@@ -37,6 +37,7 @@
         <module>logback</module>
         <module>swagger</module>
         <module>dom4j</module>
+        <module>lombok</module>
     </modules>
 
     <properties>
