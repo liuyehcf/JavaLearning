@@ -67,4 +67,8 @@ public class UserDTO {
     public void setEducation(String education) {
         this.education = education;
     }
+
+    public static void main(String[] args) throws Exception {
+        Class.forName("UserDTO.UserDTOBuilder");
+    }
 }

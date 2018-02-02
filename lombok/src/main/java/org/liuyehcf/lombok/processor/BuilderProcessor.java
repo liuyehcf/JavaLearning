@@ -6,7 +6,10 @@ import com.sun.tools.javac.processing.JavacProcessingEnvironment;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.TreeMaker;
 import com.sun.tools.javac.tree.TreeTranslator;
-import com.sun.tools.javac.util.*;
+import com.sun.tools.javac.util.Context;
+import com.sun.tools.javac.util.List;
+import com.sun.tools.javac.util.ListBuffer;
+import com.sun.tools.javac.util.Names;
 import org.liuyehcf.lombok.annotation.Builder;
 
 import javax.annotation.processing.*;
@@ -31,7 +34,7 @@ public class BuilderProcessor extends AbstractProcessor {
 
         if (set.isEmpty()) return false;
 
-        messager.printMessage(Diagnostic.Kind.WARNING, set.toString());
+//        messager.printMessage(Diagnostic.Kind.WARNING, set.toString());
 
         set.forEach(element -> {
             // 获取当前元素的JCTree
@@ -73,7 +76,10 @@ public class BuilderProcessor extends AbstractProcessor {
     }
 
     private JCTree.JCClassDecl createStaticInnerBuilderJCClassDecl(JCTree.JCClassDecl jcClassDecl, List<JCTree.JCMethodDecl> methodDecls) {
-        List<JCTree> jcTreeList = List.<JCTree>nil().appendList(cloneSetMethodJCMethodDecl(jcClassDecl, methodDecls));
+
+        List<JCTree> jcTreeList = List.nil();
+
+        jcTreeList = List.<JCTree>nil().appendList(cloneSetMethodJCMethodDecl(jcClassDecl, methodDecls));
 
         return treeMaker.ClassDef(
                 treeMaker.Modifiers(Flags.PUBLIC + Flags.STATIC + Flags.FINAL), // 访问标志
@@ -91,43 +97,27 @@ public class BuilderProcessor extends AbstractProcessor {
         for (JCTree.JCMethodDecl jcMethodDecl : methodDecls) {
 
             ListBuffer<JCTree.JCStatement> statements = new ListBuffer<>();
-            //statements.appendList(jcMethodDecl.getBody().getStatements());
+            //statements.appendList(jcMethodDecl.getBody().getStatements()); //todo
             statements.append(
                     treeMaker.Return(treeMaker.Ident(names.fromString("this"))));
 
             JCTree.JCBlock jcBlock = treeMaker.Block(0, statements.toList());
 
-            //messager.printMessage(Diagnostic.Kind.WARNING, "\n" + jcBlock.toString());
+            List<JCTree.JCVariableDecl> params = List.<JCTree.JCVariableDecl>nil().prependList(jcMethodDecl.getParameters());
 
             clonedSetMethods = clonedSetMethods.prepend(treeMaker.MethodDef(
                     jcMethodDecl.getModifiers(), // 访问标志
                     jcMethodDecl.getName(), // 名字
                     treeMaker.Ident(names.fromString(jcClassDecl.getSimpleName().toString() + "Builder")), //返回类型
-                    List.nil(), // 泛型形参列表
-                    List.nil(), // 参数列表  //todo
-                    List.nil(), // 异常列表
+                    jcMethodDecl.getTypeParameters(), // 泛型形参列表
+                    List.convert(JCTree.JCVariableDecl.class, jcMethodDecl.getTypeParameters()), // 参数列表，非常奇怪的地方，不用List.convert就报错
+                    jcMethodDecl.getThrows(), // 异常列表
                     jcBlock, // 方法体
                     null // 默认值
             ));
         }
 
         return clonedSetMethods;
-    }
-
-    private JCTree.JCNewClass createNewClassDecl(JCTree.JCClassDecl jcClassDecl) {
-        return treeMaker.NewClass(null, List.nil(), null, List.nil(), jcClassDecl);
-    }
-
-    private JCTree.JCMethodDecl makeGetterMethodDecl(JCTree.JCVariableDecl jcVariableDecl) {
-        ListBuffer<JCTree.JCStatement> statements = new ListBuffer<>();
-        statements.append(treeMaker.Return(treeMaker.Select(treeMaker.Ident(names.fromString("this")), jcVariableDecl.getName())));
-        JCTree.JCBlock body = treeMaker.Block(0, statements.toList());
-        return treeMaker.MethodDef(treeMaker.Modifiers(Flags.PUBLIC), getNewMethodName(jcVariableDecl.getName()), jcVariableDecl.vartype, List.nil(), List.nil(), List.nil(), body, null);
-    }
-
-    private Name getNewMethodName(Name name) {
-        String s = name.toString();
-        return names.fromString("get" + s.substring(0, 1).toUpperCase() + s.substring(1, name.length()));
     }
 
     @Override
