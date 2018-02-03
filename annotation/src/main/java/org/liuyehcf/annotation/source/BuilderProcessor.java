@@ -166,7 +166,7 @@ public class BuilderProcessor extends AbstractProcessor {
     }
 
     /**
-     * 创建初始化语句
+     * 创建一个语法树节点，其类型为JCExpression。即" new XXX(); "的语句
      *
      * @param jcClassDecl
      * @return
