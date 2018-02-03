@@ -69,6 +69,6 @@ public class UserDTO {
     }
 
     public static void main(String[] args) throws Exception {
-        Class.forName("UserDTO.UserDTOBuilder");
+        Class.forName("org.liuyehcf.lombok.UserDTO$UserDTOBuilder");
     }
 }

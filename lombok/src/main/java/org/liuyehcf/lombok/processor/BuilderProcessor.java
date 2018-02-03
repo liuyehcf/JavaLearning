@@ -79,9 +79,9 @@ public class BuilderProcessor extends AbstractProcessor {
 
         List<JCTree> jcTreeList = List.nil();
 
-
-        jcTreeList = jcTreeList.append(getProxyField(jcClassDecl));
-        jcTreeList = jcTreeList.appendList(cloneSetMethodJCMethodDecl(jcClassDecl, methodDecls));
+        JCTree.JCVariableDecl jcVariableDecl = getProxyField(jcClassDecl);
+        jcTreeList = jcTreeList.append(jcVariableDecl);
+        jcTreeList = jcTreeList.appendList(cloneSetMethodJCMethodDecl(jcClassDecl, methodDecls, jcVariableDecl));
 
         return treeMaker.ClassDef(
                 treeMaker.Modifiers(Flags.PUBLIC + Flags.STATIC + Flags.FINAL), // 访问标志
@@ -92,7 +92,7 @@ public class BuilderProcessor extends AbstractProcessor {
                 jcTreeList); // 定义
     }
 
-    private JCTree getProxyField(JCTree.JCClassDecl jcClassDecl) {
+    private JCTree.JCVariableDecl getProxyField(JCTree.JCClassDecl jcClassDecl) {
         return treeMaker.VarDef(
                 treeMaker.Modifiers(Flags.PRIVATE), // 访问标志
                 names.fromString("obj"), // 名字
@@ -101,30 +101,50 @@ public class BuilderProcessor extends AbstractProcessor {
         );
     }
 
-    private List<JCTree> cloneSetMethodJCMethodDecl(JCTree.JCClassDecl jcClassDecl, List<JCTree.JCMethodDecl> methodDecls) {
+    private List<JCTree> cloneSetMethodJCMethodDecl(JCTree.JCClassDecl jcClassDecl, List<JCTree.JCMethodDecl> methodDecls, JCTree.JCVariableDecl jcVariableDecl) {
         List<JCTree> clonedSetMethods = List.nil();
 
 
         for (JCTree.JCMethodDecl jcMethodDecl : methodDecls) {
 
+            JCTree.JCVariableDecl param = jcMethodDecl.getParameters().get(0);
+
             ListBuffer<JCTree.JCStatement> statements = new ListBuffer<>();
-            //statements.appendList(jcMethodDecl.getBody().getStatements()); //todo
+
+
+//            statements.append(
+//                    treeMaker.Assignment(., treeMaker.Ident(names.fromString(paramName)))
+//            );
+
+            statements.append(
+                    treeMaker.Exec(
+                            treeMaker.Assign(
+                                    treeMaker.Select(treeMaker.Ident(names.fromString("obj")), param.getName()),
+                                    treeMaker.Ident(param.getName())
+                            )
+                    )
+            );
+
+
             statements.append(
                     treeMaker.Return(treeMaker.Ident(names.fromString("this"))));
 
             JCTree.JCBlock jcBlock = treeMaker.Block(0, statements.toList());
 
-            List<JCTree.JCVariableDecl> params = List.<JCTree.JCVariableDecl>nil().prependList(jcMethodDecl.getParameters());
+            JCTree.JCVariableDecl temp=jcMethodDecl.getParameters().get(0);
 
-            clonedSetMethods = clonedSetMethods.prepend(treeMaker.MethodDef(
-                    jcMethodDecl.getModifiers(), // 访问标志
-                    jcMethodDecl.getName(), // 名字
-                    treeMaker.Ident(names.fromString(jcClassDecl.getSimpleName().toString() + "Builder")), //返回类型
-                    jcMethodDecl.getTypeParameters(), // 泛型形参列表
-                    List.convert(JCTree.JCVariableDecl.class, jcMethodDecl.getTypeParameters()), // 参数列表，非常奇怪的地方，不用List.convert就报错
-                    jcMethodDecl.getThrows(), // 异常列表
-                    jcBlock, // 方法体
-                    null // 默认值
+            JCTree.JCVariableDecl ddd=treeMaker.VarDef(temp.sym,temp.getNameExpression());
+
+            clonedSetMethods = clonedSetMethods.prepend(
+                    treeMaker.MethodDef(
+                            jcMethodDecl.getModifiers(), // 访问标志
+                            jcMethodDecl.getName(), // 名字
+                            treeMaker.Ident(names.fromString(jcClassDecl.getSimpleName().toString() + "Builder")), //返回类型
+                            jcMethodDecl.getTypeParameters(), // 泛型形参列表
+                            List.of(ddd), // 参数列表
+                            jcMethodDecl.getThrows(), // 异常列表
+                            jcBlock, // 方法体
+                            null // 默认值
             ));
         }
 
