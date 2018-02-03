@@ -1,4 +1,4 @@
-package org.liuyehcf.lombok.processor;
+package org.liuyehcf.annotation.source;
 
 import com.sun.tools.javac.api.JavacTrees;
 import com.sun.tools.javac.code.Flags;
@@ -7,7 +7,6 @@ import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.TreeMaker;
 import com.sun.tools.javac.tree.TreeTranslator;
 import com.sun.tools.javac.util.*;
-import org.liuyehcf.lombok.annotation.Builder;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
@@ -15,7 +14,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import java.util.Set;
 
-@SupportedAnnotationTypes("org.liuyehcf.lombok.annotation.Builder")
+@SupportedAnnotationTypes("org.liuyehcf.annotation.source.Builder")
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class BuilderProcessor extends AbstractProcessor {
 
@@ -24,6 +23,8 @@ public class BuilderProcessor extends AbstractProcessor {
     private static final String IDENTIFIER_DATA = "data";
 
     private static final String IDENTIFIER_SET = "set";
+
+    private static final String IDENTIFIER_BUILD = "build";
 
     /**
      * 用于在编译器打印消息的组件
@@ -75,8 +76,6 @@ public class BuilderProcessor extends AbstractProcessor {
                                     getSetJCMethodDecls(jcClassDecl)
                             )
                     );
-
-//                    messager.printMessage(Diagnostic.Kind.WARNING, jcClassDecl.toString());
                 }
             });
         });
@@ -140,6 +139,7 @@ public class BuilderProcessor extends AbstractProcessor {
         JCTree.JCVariableDecl jcVariableDecl = createDataField(jcClassDecl);
         jcTrees = jcTrees.append(jcVariableDecl);
         jcTrees = jcTrees.appendList(createSetJCMethodDecls(jcClassDecl, jcMethodDecls, jcVariableDecl));
+        jcTrees = jcTrees.append(createBuildJCMethodDecl(jcClassDecl));
 
         return treeMaker.ClassDef(
                 treeMaker.Modifiers(Flags.PUBLIC + Flags.STATIC + Flags.FINAL), // 访问标志
@@ -161,7 +161,23 @@ public class BuilderProcessor extends AbstractProcessor {
                 treeMaker.Modifiers(Flags.PRIVATE), // 访问标志
                 getNameFromString(IDENTIFIER_DATA), // 名字
                 treeMaker.Ident(getNameFromString(jcClassDecl.getSimpleName().toString())), // 类型
-                null // 初始化表达式
+                createInitializeJCExpression(jcClassDecl) // 初始化表达式
+        );
+    }
+
+    /**
+     * 创建初始化语句
+     *
+     * @param jcClassDecl
+     * @return
+     */
+    private JCTree.JCExpression createInitializeJCExpression(JCTree.JCClassDecl jcClassDecl) {
+        return treeMaker.NewClass(
+                null, // 尚不清楚含义
+                List.nil(), // 构造器方法参数
+                treeMaker.Ident(jcClassDecl.getSimpleName()), // 创建的类名
+                List.nil(), // 构造器方法列表
+                null // 尚不清楚含义
         );
     }
 
@@ -174,13 +190,13 @@ public class BuilderProcessor extends AbstractProcessor {
      * @return
      */
     private List<JCTree> createSetJCMethodDecls(JCTree.JCClassDecl jcClassDecl, List<JCTree.JCMethodDecl> methodDecls, JCTree.JCVariableDecl jcVariableDecl) {
-        List<JCTree> clonedSetMethods = List.nil();
+        List<JCTree> setJCMethodDecls = List.nil();
 
         for (JCTree.JCMethodDecl jcMethodDecl : methodDecls) {
-            clonedSetMethods = clonedSetMethods.append(createSetJCMethodDecl(jcClassDecl, jcMethodDecl));
+            setJCMethodDecls = setJCMethodDecls.append(createSetJCMethodDecl(jcClassDecl, jcMethodDecl));
         }
 
-        return clonedSetMethods;
+        return setJCMethodDecls;
     }
 
     /**
@@ -227,10 +243,41 @@ public class BuilderProcessor extends AbstractProcessor {
         return treeMaker.MethodDef(
                 jcMethodDecl.getModifiers(), // 访问标志
                 jcMethodDecl.getName(), // 名字
-                treeMaker.Ident(names.fromString(jcClassDecl.getSimpleName().toString() + "Builder")), //返回类型
+                treeMaker.Ident(getNameFromString(jcClassDecl.getSimpleName().toString() + "Builder")), //返回类型
                 jcMethodDecl.getTypeParameters(), // 泛型形参列表
                 List.of(copyJCVariableDecl(jcVariableDecl)), // 参数列表，这里必须创建一个新的JCVariableDecl，否则注解处理时就会抛异常，原因目前还不清楚
                 jcMethodDecl.getThrows(), // 异常列表
+                jcBlock, // 方法体
+                null // 默认值
+        );
+    }
+
+    private JCTree.JCMethodDecl createBuildJCMethodDecl(JCTree.JCClassDecl jcClassDecl) {
+        ListBuffer<JCTree.JCStatement> jcStatements = new ListBuffer<>();
+
+        // 添加返回语句 " return data; "
+        jcStatements.append(
+                treeMaker.Return(
+                        treeMaker.Ident(
+                                getNameFromString(IDENTIFIER_DATA)
+                        )
+                )
+        );
+
+        // 转换成代码块
+        JCTree.JCBlock jcBlock = treeMaker.Block(
+                0 // 访问标志
+                , jcStatements.toList() // 所有的语句
+        );
+
+
+        return treeMaker.MethodDef(
+                treeMaker.Modifiers(Flags.PUBLIC), // 访问标志
+                getNameFromString(IDENTIFIER_BUILD), // 名字
+                treeMaker.Ident(jcClassDecl.getSimpleName()), //返回类型
+                List.nil(), // 泛型形参列表
+                List.nil(), // 参数列表，这里必须创建一个新的JCVariableDecl，否则注解处理时就会抛异常，原因目前还不清楚
+                List.nil(), // 异常列表
                 jcBlock, // 方法体
                 null // 默认值
         );

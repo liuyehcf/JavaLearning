@@ -1,16 +1,14 @@
-package org.liuyehcf.lombok;
-
-import org.liuyehcf.lombok.annotation.Builder;
+package org.liuyehcf.annotation.source;
 
 @Builder
 public class UserDTO {
     private String firstName;
+
     private String lastName;
+
     private Integer age;
+
     private String address;
-    private String country;
-    private String language;
-    private String education;
 
     public String getFirstName() {
         return firstName;
@@ -44,31 +42,23 @@ public class UserDTO {
         this.address = address;
     }
 
-    public String getCountry() {
-        return country;
+    @Override
+    public String toString() {
+        return "firstName: " + firstName + "\n" +
+                "lastName: " + lastName + "\n" +
+                "age: " + age + "\n" +
+                "address: " + address;
     }
 
-    public void setCountry(String country) {
-        this.country = country;
-    }
+    public static void main(String[] args) {
+        UserDTO.UserDTOBuilder builder = new UserDTO.UserDTOBuilder();
 
-    public String getLanguage() {
-        return language;
-    }
+        UserDTO userDTO = builder.setFirstName("贺")
+                .setLastName("辰枫")
+                .setAge(25)
+                .setAddress("杭州")
+                .build();
 
-    public void setLanguage(String language) {
-        this.language = language;
-    }
-
-    public String getEducation() {
-        return education;
-    }
-
-    public void setEducation(String education) {
-        this.education = education;
-    }
-
-    public static void main(String[] args) throws Exception {
-        Class.forName("org.liuyehcf.lombok.UserDTO$UserDTOBuilder");
+        System.out.println(userDTO);
     }
 }
