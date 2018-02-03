@@ -32,10 +32,6 @@ public class BuilderProcessor extends AbstractProcessor {
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         Set<? extends Element> set = roundEnv.getElementsAnnotatedWith(Builder.class);
 
-        if (set.isEmpty()) return false;
-
-//        messager.printMessage(Diagnostic.Kind.WARNING, set.toString());
-
         set.forEach(element -> {
             // 获取当前元素的JCTree
             JCTree jcTree = trees.getTree(element);
