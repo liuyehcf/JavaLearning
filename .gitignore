@@ -35,6 +35,7 @@
 # IntelliJ
 **/out/*
 **/target/*
+**/classes/*
 
 !**/target/startClient.*
 !**/target/startServer.*
