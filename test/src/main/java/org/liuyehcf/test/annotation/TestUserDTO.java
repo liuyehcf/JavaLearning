@@ -1,7 +1,9 @@
-package org.liuyehcf.annotation.source;
+package org.liuyehcf.test.annotation;
+
+import org.liuyehcf.annotation.source.Builder;
 
 @Builder
-public class UserDTO {
+public class TestUserDTO {
     private String firstName;
 
     private String lastName;
@@ -51,15 +53,14 @@ public class UserDTO {
     }
 
     public static void main(String[] args) {
-//        UserDTO.UserDTOBuilder builder = new UserDTO.UserDTOBuilder();
-//
-//        UserDTO userDTO = builder.setFirstName("贺")
-//                .setLastName("辰枫")
-//                .setAge(25)
-//                .setAddress("杭州")
-//                .build();
-//
-//        System.out.println(userDTO);
+        TestUserDTO.TestUserDTOBuilder builder = new TestUserDTO.TestUserDTOBuilder();
 
+        TestUserDTO userDTO = builder.setFirstName("辰枫")
+                .setLastName("贺")
+                .setAge(25)
+                .setAddress("杭州")
+                .build();
+
+        System.out.println(userDTO);
     }
 }
