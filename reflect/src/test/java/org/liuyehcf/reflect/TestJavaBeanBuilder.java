@@ -9,16 +9,16 @@ import org.liuyehcf.reflect.dto.UserDTO;
 public class TestJavaBeanBuilder {
     @Test
     public void testGeneric1() {
-        System.out.println(JSON.toJSONString(JavaBeanBuilderUtils.createJavaBean(
-                new JavaBeanBuilderUtils.TypeReference<UserDTO<GenericDTO<UserDTO<AddressDTO>, AddressDTO>>>() {
+        System.out.println(JSON.toJSONString(JavaBeanInitializerUtils.createJavaBean(
+                new JavaBeanInitializerUtils.TypeReference<UserDTO<GenericDTO<UserDTO<AddressDTO>, AddressDTO>>>() {
                 }
         )));
     }
 
     @Test
     public void testGeneric2() {
-        System.out.println(JSON.toJSONString(JavaBeanBuilderUtils.createJavaBean(
-                new JavaBeanBuilderUtils.TypeReference<GenericDTO<GenericDTO<UserDTO<AddressDTO>, AddressDTO>, GenericDTO<UserDTO<GenericDTO<UserDTO<AddressDTO>, AddressDTO>>, AddressDTO>>>() {
+        System.out.println(JSON.toJSONString(JavaBeanInitializerUtils.createJavaBean(
+                new JavaBeanInitializerUtils.TypeReference<GenericDTO<GenericDTO<UserDTO<AddressDTO>, AddressDTO>, GenericDTO<UserDTO<GenericDTO<UserDTO<AddressDTO>, AddressDTO>>, AddressDTO>>>() {
                 }
         )));
     }

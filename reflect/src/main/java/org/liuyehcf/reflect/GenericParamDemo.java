@@ -30,7 +30,7 @@ public class GenericParamDemo<Data, Value> {
     }
 
     public static void main(String[] args) throws Exception {
-        ParameterizedType type = (ParameterizedType) new JavaBeanBuilderUtils.TypeReference<GenericParamDemo<String, Date>>() {
+        ParameterizedType type = (ParameterizedType) new JavaBeanInitializerUtils.TypeReference<GenericParamDemo<String, Date>>() {
         }.getType();
 
         System.out.println("rawType: " + type.getRawType());

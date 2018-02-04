@@ -3,7 +3,7 @@ package org.liuyehcf.reflect;
 import java.lang.reflect.*;
 import java.util.*;
 
-public class JavaBeanBuilderUtils {
+public class JavaBeanInitializerUtils {
     private static final Byte BYTE_DEFAULT_VALUE = 0;
     private static final Character CHAR_DEFAULT_VALUE = 0;
     private static final Short SHORT_DEFAULT_VALUE = 0;
@@ -58,11 +58,11 @@ public class JavaBeanBuilderUtils {
         if (type == null) {
             throw new NullPointerException();
         }
-        return new JavaBeanBuilderUtils(type)
+        return new JavaBeanInitializerUtils(type)
                 .doCreateJavaBean();
     }
 
-    private JavaBeanBuilderUtils(Type type) {
+    private JavaBeanInitializerUtils(Type type) {
         this.type = type;
         genericTypes = new HashMap<>();
         init();
