@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.liuyehcf.mybatis.CrmUserDAO">
+    <sql id="columns">
+        id            AS id,
+        first_name    AS firstName,
+        last_name     AS lastName,
+        age           AS age,
+        sex           AS sex
+    </sql>
+
+    <select id="selectById" resultType="crmUserDO">
+        SELECT
+        <include refid="columns"/>
+        FROM crm_user
+        WHERE id = #{anotherName}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO crm_user(
+        first_name,
+        last_name,
+        age,
+        sex
+        )
+        VALUES(
+        #{firstName},
+        #{lastName},
+        #{age},
+        #{sex}
+        )
+    </insert>
+
+    <update id="update" parameterType="crmUserDO">
+        UPDATE crm_user
+        <set>
+            <if test="firstName != null and firstName != ''">
+                first_name = #{firstName},
+            </if>
+
+            <if test="lastName != null and lastName != ''">
+                last_name = #{lastName},
+            </if>
+            <if test="age != null">
+                age = #{age},
+            </if>
+            <if test="sex != null">
+                sex= #{sex},
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <select id="selectByIdWithParam" resultType="crmUserDO">
+        SELECT
+        <include refid="columns"/>
+        FROM crm_user
+        WHERE id = #{specificName}
+    </select>
+
+    <insert id="insertWithParam" useGeneratedKeys="true" keyProperty="specificName.id">
+        INSERT INTO crm_user(
+        first_name,
+        last_name,
+        age,
+        sex
+        )
+        VALUES(
+        #{specificName.firstName},
+        #{specificName.lastName},
+        #{specificName.age},
+        #{specificName.sex}
+        )
+    </insert>
+
+    <update id="updateWithParam" parameterType="crmUserDO">
+        UPDATE crm_user
+        <set>
+            <if test="specificName.firstName != null and specificName.firstName != ''">
+                first_name = #{specificName.firstName},
+            </if>
+
+            <if test="specificName.lastName != null and specificName.lastName != ''">
+                last_name = #{specificName.lastName},
+            </if>
+            <if test="specificName.age != null">
+                age = #{specificName.age},
+            </if>
+            <if test="specificName.sex != null">
+                sex= #{specificName.sex},
+            </if>
+        </set>
+        WHERE id = #{specificName.id}
+    </update>
+
+
+    <select id="selectByFirstName" resultType="crmUserDO">
+        SELECT
+        <include refid="columns"/>
+        FROM crm_user
+        <where>
+            <if test="_parameter != null and _parameter !=''">
+                AND first_name = #{anotherName}
+            </if>
+        </where>
+    </select>
+
+</mapper>

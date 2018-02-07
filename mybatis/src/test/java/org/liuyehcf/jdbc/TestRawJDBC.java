@@ -1,3 +1,5 @@
+package org.liuyehcf.jdbc;
+
 import org.junit.Test;
 
 import java.sql.*;

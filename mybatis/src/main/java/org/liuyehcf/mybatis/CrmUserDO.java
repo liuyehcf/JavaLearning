@@ -1,4 +1,4 @@
-package org.liuyehcf.dataobject;
+package org.liuyehcf.mybatis;
 
 /**
  * Created by HCF on 2017/3/31.
@@ -52,6 +52,12 @@ public class CrmUserDO {
 
     @Override
     public String toString() {
-        return "id: " + id + ", " + firstName + lastName;
+        return '{' +
+                "id:'" + id + '\'' +
+                ", firstName: '" + firstName + '\'' +
+                ", lastName: '" + lastName + '\'' +
+                ", age: '" + age + '\'' +
+                ", sex: '" + sex + '\''
+                + '}';
     }
 }
