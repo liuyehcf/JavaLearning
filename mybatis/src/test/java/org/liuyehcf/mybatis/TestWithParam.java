@@ -44,4 +44,19 @@ public class TestWithParam {
             }
         }.execute();
     }
+
+
+    @Test
+    public void select() {
+        new TestTemplate() {
+            @Override
+            protected void doExecute(SqlSession sqlSession) throws Exception {
+                CrmUserDAO mapper = sqlSession.getMapper(CrmUserDAO.class);
+
+                CrmUserDO crmUserDO = mapper.selectByIdWithParam(1L);
+
+                System.out.println(crmUserDO);
+            }
+        }.execute();
+    }
 }
