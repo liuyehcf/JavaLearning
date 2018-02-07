@@ -16,6 +16,7 @@ class NfaBuildIterator {
     private NfaClosure curNfaClosure;
     private List<NfaClosure> groupNfaClosures;
     private GroupUtil groupUtil;
+
     private NfaBuildIterator(List<Symbol> symbols) {
         this.symbols = symbols;
         index = 0;

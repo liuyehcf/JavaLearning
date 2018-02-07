@@ -23,16 +23,53 @@ public class JavaBeanInitializerUtils {
     private static final Set<Class> CONTAINER_CLASS_SET = new HashSet<>();
     private static final Integer CONTAINER_DEFAULT_SIZE = 3;
 
+    static {
+        DEFAULT_VALUE_OF_BASIC_CLASS.put(Byte.class, BYTE_DEFAULT_VALUE);
+        DEFAULT_VALUE_OF_BASIC_CLASS.put(byte.class, BYTE_DEFAULT_VALUE);
 
-    /**
-     * 从泛型参数名映射到实际的类型
-     */
-    private Map<String, Type> genericTypes;
+        DEFAULT_VALUE_OF_BASIC_CLASS.put(Character.class, CHAR_DEFAULT_VALUE);
+        DEFAULT_VALUE_OF_BASIC_CLASS.put(char.class, CHAR_DEFAULT_VALUE);
+
+        DEFAULT_VALUE_OF_BASIC_CLASS.put(Short.class, SHORT_DEFAULT_VALUE);
+        DEFAULT_VALUE_OF_BASIC_CLASS.put(short.class, SHORT_DEFAULT_VALUE);
+
+        DEFAULT_VALUE_OF_BASIC_CLASS.put(Integer.class, INTEGER_DEFAULT_VALUE);
+        DEFAULT_VALUE_OF_BASIC_CLASS.put(int.class, INTEGER_DEFAULT_VALUE);
+
+        DEFAULT_VALUE_OF_BASIC_CLASS.put(Long.class, LONG_DEFAULT_VALUE);
+        DEFAULT_VALUE_OF_BASIC_CLASS.put(long.class, LONG_DEFAULT_VALUE);
+
+        DEFAULT_VALUE_OF_BASIC_CLASS.put(Float.class, FLOAT_DEFAULT_VALUE);
+        DEFAULT_VALUE_OF_BASIC_CLASS.put(float.class, FLOAT_DEFAULT_VALUE);
+
+        DEFAULT_VALUE_OF_BASIC_CLASS.put(Double.class, DOUBLE_DEFAULT_VALUE);
+        DEFAULT_VALUE_OF_BASIC_CLASS.put(double.class, DOUBLE_DEFAULT_VALUE);
+
+        DEFAULT_VALUE_OF_BASIC_CLASS.put(Boolean.class, BOOLEAN_DEFAULT_VALUE);
+        DEFAULT_VALUE_OF_BASIC_CLASS.put(boolean.class, BOOLEAN_DEFAULT_VALUE);
+    }
+
+    static {
+        CONTAINER_CLASS_SET.add(List.class);
+        CONTAINER_CLASS_SET.add(Map.class);
+        CONTAINER_CLASS_SET.add(Set.class);
+        CONTAINER_CLASS_SET.add(Queue.class);
+    }
 
     /**
      * 要初始化的类型
      */
     private final Type type;
+    /**
+     * 从泛型参数名映射到实际的类型
+     */
+    private Map<String, Type> genericTypes;
+
+    private JavaBeanInitializerUtils(Type type) {
+        this.type = type;
+        genericTypes = new HashMap<>();
+        init();
+    }
 
     /**
      * 唯一对外接口
@@ -60,12 +97,6 @@ public class JavaBeanInitializerUtils {
         }
         return new JavaBeanInitializerUtils(type)
                 .doCreateJavaBean();
-    }
-
-    private JavaBeanInitializerUtils(Type type) {
-        this.type = type;
-        genericTypes = new HashMap<>();
-        init();
     }
 
     /**
@@ -232,7 +263,6 @@ public class JavaBeanInitializerUtils {
         return method.getName().substring(3);
     }
 
-
     /**
      * set方法参数是普通的类型
      *
@@ -397,40 +427,5 @@ public class JavaBeanInitializerUtils {
         public final Type getType() {
             return type;
         }
-    }
-
-
-    static {
-        DEFAULT_VALUE_OF_BASIC_CLASS.put(Byte.class, BYTE_DEFAULT_VALUE);
-        DEFAULT_VALUE_OF_BASIC_CLASS.put(byte.class, BYTE_DEFAULT_VALUE);
-
-        DEFAULT_VALUE_OF_BASIC_CLASS.put(Character.class, CHAR_DEFAULT_VALUE);
-        DEFAULT_VALUE_OF_BASIC_CLASS.put(char.class, CHAR_DEFAULT_VALUE);
-
-        DEFAULT_VALUE_OF_BASIC_CLASS.put(Short.class, SHORT_DEFAULT_VALUE);
-        DEFAULT_VALUE_OF_BASIC_CLASS.put(short.class, SHORT_DEFAULT_VALUE);
-
-        DEFAULT_VALUE_OF_BASIC_CLASS.put(Integer.class, INTEGER_DEFAULT_VALUE);
-        DEFAULT_VALUE_OF_BASIC_CLASS.put(int.class, INTEGER_DEFAULT_VALUE);
-
-        DEFAULT_VALUE_OF_BASIC_CLASS.put(Long.class, LONG_DEFAULT_VALUE);
-        DEFAULT_VALUE_OF_BASIC_CLASS.put(long.class, LONG_DEFAULT_VALUE);
-
-        DEFAULT_VALUE_OF_BASIC_CLASS.put(Float.class, FLOAT_DEFAULT_VALUE);
-        DEFAULT_VALUE_OF_BASIC_CLASS.put(float.class, FLOAT_DEFAULT_VALUE);
-
-        DEFAULT_VALUE_OF_BASIC_CLASS.put(Double.class, DOUBLE_DEFAULT_VALUE);
-        DEFAULT_VALUE_OF_BASIC_CLASS.put(double.class, DOUBLE_DEFAULT_VALUE);
-
-        DEFAULT_VALUE_OF_BASIC_CLASS.put(Boolean.class, BOOLEAN_DEFAULT_VALUE);
-        DEFAULT_VALUE_OF_BASIC_CLASS.put(boolean.class, BOOLEAN_DEFAULT_VALUE);
-    }
-
-
-    static {
-        CONTAINER_CLASS_SET.add(List.class);
-        CONTAINER_CLASS_SET.add(Map.class);
-        CONTAINER_CLASS_SET.add(Set.class);
-        CONTAINER_CLASS_SET.add(Queue.class);
     }
 }

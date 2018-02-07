@@ -103,6 +103,7 @@ public class FpUtils {
     // Constants used in scalb
     static double twoToTheDoubleScaleUp = powerOfTwoD(512);
     static double twoToTheDoubleScaleDown = powerOfTwoD(-512);
+
     /**
      * Don't let anyone instantiate this class.
      */

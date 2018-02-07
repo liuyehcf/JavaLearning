@@ -12,6 +12,18 @@ public class TestUserDTO {
 
     private String address;
 
+    public static void main(String[] args) {
+        TestUserDTO.TestUserDTOBuilder builder = new TestUserDTO.TestUserDTOBuilder();
+
+        TestUserDTO userDTO = builder.setFirstName("辰枫")
+                .setLastName("贺")
+                .setAge(25)
+                .setAddress("杭州")
+                .build();
+
+        System.out.println(userDTO);
+    }
+
     public String getFirstName() {
         return firstName;
     }
@@ -50,17 +62,5 @@ public class TestUserDTO {
                 "lastName: " + lastName + "\n" +
                 "age: " + age + "\n" +
                 "address: " + address;
-    }
-
-    public static void main(String[] args) {
-        TestUserDTO.TestUserDTOBuilder builder = new TestUserDTO.TestUserDTOBuilder();
-
-        TestUserDTO userDTO = builder.setFirstName("辰枫")
-                .setLastName("贺")
-                .setAge(25)
-                .setAddress("杭州")
-                .build();
-
-        System.out.println(userDTO);
     }
 }

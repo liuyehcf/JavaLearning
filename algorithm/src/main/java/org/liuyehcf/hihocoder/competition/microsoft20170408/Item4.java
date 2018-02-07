@@ -93,6 +93,7 @@ public class Item4 {
         int C;//刺杀该节点的消费(最终是要最小化这个,而信息量只是一个限制条件)
         List<TreeNode> children;
         TreeNode parent;
+
         public TreeNode(int F, int IN, int IP, int C) {
             this.F = F;
             this.IN = IN;

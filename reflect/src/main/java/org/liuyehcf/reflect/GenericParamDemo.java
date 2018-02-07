@@ -9,26 +9,6 @@ public class GenericParamDemo<Data, Value> {
 
     private Value value;
 
-    public Data getData() {
-        return data;
-    }
-
-    public void setData(Data data) {
-        this.data = data;
-    }
-
-    public Value getValue() {
-        return value;
-    }
-
-    public void setValue(Value value) {
-        this.value = value;
-    }
-
-    public <Data, Value> void func(Data data, Value value, String s) {
-
-    }
-
     public static void main(String[] args) throws Exception {
         ParameterizedType type = (ParameterizedType) new JavaBeanInitializerUtils.TypeReference<GenericParamDemo<String, Date>>() {
         }.getType();
@@ -79,5 +59,25 @@ public class GenericParamDemo<Data, Value> {
         System.out.println("parameters: " + Arrays.toString(parameters));
 
         System.out.println("-----------------------------\n\n\n");
+    }
+
+    public Data getData() {
+        return data;
+    }
+
+    public void setData(Data data) {
+        this.data = data;
+    }
+
+    public Value getValue() {
+        return value;
+    }
+
+    public void setValue(Value value) {
+        this.value = value;
+    }
+
+    public <Data, Value> void func(Data data, Value value, String s) {
+
     }
 }
