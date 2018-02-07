@@ -9,6 +9,18 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public abstract class TestTemplate {
+
+    static final String DEFAULT_FIRST_NAME = "default_first_name";
+    static final String DEFAULT_LAST_NAME = "default_last_name";
+    static final Integer DEFAULT_AGE = 100;
+    static final Boolean DEFAULT_SEX = true;
+
+    static final String MODIFIED_FIRST_NAME = "modified_first_name";
+    static final String MODIFIED_LAST_NAME = "modified_last_name";
+    static final Boolean MODIFIED_SEX = false;
+
+    static final Long ID = 1L;
+
     public void execute() {
         String resource = "mybatis-config.xml";
         InputStream inputStream;

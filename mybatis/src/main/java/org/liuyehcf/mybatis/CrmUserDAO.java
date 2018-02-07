@@ -15,6 +15,9 @@ public interface CrmUserDAO {
 
     int update(CrmUserDO anyName);
 
+    List<CrmUserDO> selectByFirstName(String anyName);
+
+    List<CrmUserDO> selectByFirstNameAndLastName(String anyName1, String anyName2);
 
     CrmUserDO selectByIdWithParam(@Param("specificName") Long anyName);
 
@@ -22,6 +25,8 @@ public interface CrmUserDAO {
 
     int updateWithParam(@Param("specificName") CrmUserDO anyName);
 
+    List<CrmUserDO> selectByFirstNameWithParam(@Param("specificName") String anyName);
 
-    List<CrmUserDO> selectByFirstName(String anyName);
+    List<CrmUserDO> selectByFirstNameAndLastNameWithParam(@Param("specificName1") String anyName1, @Param("specificName2") String anyName2);
+
 }

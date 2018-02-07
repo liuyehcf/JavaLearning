@@ -6,6 +6,22 @@ import org.junit.Test;
 import java.util.List;
 
 public class TestWithoutParam {
+
+    @Test
+    public void select() {
+        new TestTemplate() {
+            @Override
+            protected void doExecute(SqlSession sqlSession) throws Exception {
+                CrmUserDAO mapper = sqlSession.getMapper(CrmUserDAO.class);
+
+                CrmUserDO crmUserDO = mapper.selectById(ID);
+
+                System.out.println(crmUserDO);
+            }
+        }.execute();
+    }
+
+
     @Test
     public void insert() {
         new TestTemplate() {
@@ -14,10 +30,10 @@ public class TestWithoutParam {
                 CrmUserDAO mapper = sqlSession.getMapper(CrmUserDAO.class);
 
                 CrmUserDO crmUserDO = new CrmUserDO();
-                crmUserDO.setFirstName("六");
-                crmUserDO.setLastName("小");
-                crmUserDO.setAge(25);
-                crmUserDO.setSex(true);
+                crmUserDO.setFirstName(DEFAULT_FIRST_NAME);
+                crmUserDO.setLastName(DEFAULT_LAST_NAME);
+                crmUserDO.setAge(DEFAULT_AGE);
+                crmUserDO.setSex(DEFAULT_SEX);
 
                 System.out.println("before insert: " + crmUserDO);
                 mapper.insert(crmUserDO);
@@ -34,15 +50,15 @@ public class TestWithoutParam {
                 CrmUserDAO mapper = sqlSession.getMapper(CrmUserDAO.class);
 
                 CrmUserDO crmUserDO = new CrmUserDO();
-                Long id = 1L;
-                crmUserDO.setId(id);
-                crmUserDO.setLastName("七");
-                crmUserDO.setFirstName("大");
-                crmUserDO.setSex(false);
+
+                crmUserDO.setId(ID);
+                crmUserDO.setLastName(MODIFIED_LAST_NAME);
+                crmUserDO.setFirstName(MODIFIED_FIRST_NAME);
+                crmUserDO.setSex(MODIFIED_SEX);
 
                 mapper.update(crmUserDO);
 
-                System.out.println(mapper.selectById(id));
+                System.out.println(mapper.selectById(ID));
             }
         }.execute();
     }
@@ -54,25 +70,32 @@ public class TestWithoutParam {
             protected void doExecute(SqlSession sqlSession) throws Exception {
                 CrmUserDAO mapper = sqlSession.getMapper(CrmUserDAO.class);
 
-                List<CrmUserDO> crmUserDOS = mapper.selectByFirstName("六");
+                List<CrmUserDO> crmUserDOS = mapper.selectByFirstName(MODIFIED_FIRST_NAME);
 
-                System.out.println(crmUserDOS);
+                System.out.println(crmUserDOS.size());
             }
         }.execute();
     }
 
+
     @Test
-    public void select() {
+    public void selectByFirstNameAndLastName() {
         new TestTemplate() {
             @Override
             protected void doExecute(SqlSession sqlSession) throws Exception {
                 CrmUserDAO mapper = sqlSession.getMapper(CrmUserDAO.class);
 
-                CrmUserDO crmUserDO = mapper.selectById(1L);
+                List<CrmUserDO> crmUserDOS;
 
-                System.out.println(crmUserDO);
+                crmUserDOS = mapper.selectByFirstNameAndLastName(MODIFIED_FIRST_NAME, null);
+                System.out.println(crmUserDOS.size());
+
+                crmUserDOS = mapper.selectByFirstNameAndLastName(null, MODIFIED_LAST_NAME);
+                System.out.println(crmUserDOS.size());
+
+                crmUserDOS = mapper.selectByFirstNameAndLastName(MODIFIED_FIRST_NAME, MODIFIED_LAST_NAME);
+                System.out.println(crmUserDOS.size());
             }
         }.execute();
     }
-
 }

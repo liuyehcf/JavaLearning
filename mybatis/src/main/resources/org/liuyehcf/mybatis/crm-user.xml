@@ -51,6 +51,31 @@
         WHERE id = #{id}
     </update>
 
+    <select id="selectByFirstName" resultType="crmUserDO">
+        SELECT
+        <include refid="columns"/>
+        FROM crm_user
+        <where>
+            <if test="_parameter != null and _parameter !=''">
+                AND first_name = #{anotherName}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectByFirstNameAndLastName" resultType="crmUserDO">
+        SELECT
+        <include refid="columns"/>
+        FROM crm_user
+        <where>
+            <if test="param1 != null and param1 !=''">
+                AND first_name = #{0}
+            </if>
+            <if test="param2 != null and param2 !=''">
+                AND last_name = #{1}
+            </if>
+        </where>
+    </select>
+
     <select id="selectByIdWithParam" resultType="crmUserDO">
         SELECT
         <include refid="columns"/>
@@ -68,39 +93,52 @@
         VALUES(
         #{specificName.firstName},
         #{specificName.lastName},
-        #{specificName.age},
-        #{specificName.sex}
+        #{param1.age},
+        #{param1.sex}
         )
     </insert>
 
     <update id="updateWithParam" parameterType="crmUserDO">
         UPDATE crm_user
         <set>
-            <if test="specificName.firstName != null and specificName.firstName != ''">
+            <if test="specificName.firstName != null and param1.firstName != ''">
                 first_name = #{specificName.firstName},
             </if>
 
-            <if test="specificName.lastName != null and specificName.lastName != ''">
+            <if test="param1.lastName != null and specificName.lastName != ''">
                 last_name = #{specificName.lastName},
             </if>
             <if test="specificName.age != null">
                 age = #{specificName.age},
             </if>
-            <if test="specificName.sex != null">
+            <if test="param1.sex != null">
                 sex= #{specificName.sex},
             </if>
         </set>
         WHERE id = #{specificName.id}
     </update>
 
-
-    <select id="selectByFirstName" resultType="crmUserDO">
+    <select id="selectByFirstNameWithParam" resultType="crmUserDO">
         SELECT
         <include refid="columns"/>
         FROM crm_user
         <where>
-            <if test="_parameter != null and _parameter !=''">
-                AND first_name = #{anotherName}
+            <if test="param1 != null and specificName !=''">
+                AND first_name = #{specificName}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectByFirstNameAndLastNameWithParam" resultType="crmUserDO">
+        SELECT
+        <include refid="columns"/>
+        FROM crm_user
+        <where>
+            <if test="param1 != null and param1 !=''">
+                AND first_name = #{specificName1}
+            </if>
+            <if test="specificName2 != null and specificName2 !=''">
+                AND last_name = #{param2}
             </if>
         </where>
     </select>

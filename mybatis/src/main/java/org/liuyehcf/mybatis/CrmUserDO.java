@@ -58,6 +58,7 @@ public class CrmUserDO {
                 ", lastName: '" + lastName + '\'' +
                 ", age: '" + age + '\'' +
                 ", sex: '" + sex + '\''
-                + '}';
+                + "" +
+                '}';
     }
 }
