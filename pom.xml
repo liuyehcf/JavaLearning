@@ -17,9 +17,9 @@
         <module>io</module>
         <module>office</module>
         <module>utilities</module>
-        <module>sunsource</module>
+        <module>sun-source</module>
         <module>mock</module>
-        <module>springboot</module>
+        <module>spring-boot</module>
         <module>netty</module>
         <module>aliyun</module>
         <module>slf4j</module>
@@ -27,17 +27,19 @@
         <module>fastjson</module>
         <module>http</module>
         <module>proxy</module>
-        <module>springaop</module>
+        <module>spring-aop</module>
         <module>classloader</module>
         <module>security</module>
         <module>jni</module>
-        <module>springioc</module>
-        <module>springmvc</module>
-        <module>markdownformat</module>
+        <module>spring-ioc</module>
+        <module>spring-mvc</module>
+        <module>markdown-format</module>
         <module>logback</module>
         <module>swagger</module>
         <module>dom4j</module>
         <module>reflect</module>
+        <module>jdbc</module>
+        <module>mybatis-spring</module>
 
     </modules>
 
