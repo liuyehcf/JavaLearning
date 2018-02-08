@@ -16,7 +16,6 @@
         <module>framework</module>
         <module>io</module>
         <module>office</module>
-        <module>utilities</module>
         <module>sun-source</module>
         <module>mock</module>
         <module>spring-boot</module>
