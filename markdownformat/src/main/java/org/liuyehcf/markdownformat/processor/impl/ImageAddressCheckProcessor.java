@@ -6,16 +6,14 @@ import org.liuyehcf.markdownformat.processor.PreFileProcessor;
 
 import java.io.File;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import static org.liuyehcf.markdownformat.log.CommonLogger.logger;
+import static org.liuyehcf.markdownformat.constant.RegexConstant.IMAGE_PATTERN;
+import static org.liuyehcf.markdownformat.log.CommonLogger.DEFAULT_LOGGER;
 
 /**
  * Created by HCF on 2018/1/14.
  */
 public class ImageAddressCheckProcessor implements PreFileProcessor {
-    private static final String IMAGE_REGEX = "!\\[.*?\\]\\((.*)\\)";
-    private static final Pattern IMAGE_PATTERN = Pattern.compile(IMAGE_REGEX);
 
     @Override
     public void process(FileContext fileContext) {
@@ -32,7 +30,7 @@ public class ImageAddressCheckProcessor implements PreFileProcessor {
                 File image = new File(absoluteImagePath);
 
                 if (!(image.exists() && image.isFile())) {
-                    logger.error("file [{}] contains wrong image source [{}]", fileContext.getCurrentFile(), relativeImagePath);
+                    DEFAULT_LOGGER.error("file [{}] contains wrong image source [{}]", fileContext.getCurrentFile(), relativeImagePath);
                 }
             }
             iterator.moveForward();

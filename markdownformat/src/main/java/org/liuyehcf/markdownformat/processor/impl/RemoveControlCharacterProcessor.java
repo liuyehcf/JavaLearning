@@ -5,15 +5,10 @@ import org.liuyehcf.markdownformat.context.LineElement;
 import org.liuyehcf.markdownformat.context.LineIterator;
 import org.liuyehcf.markdownformat.processor.PreFileProcessor;
 
-import java.util.regex.Pattern;
-
-import static org.liuyehcf.markdownformat.log.CommonLogger.logger;
+import static org.liuyehcf.markdownformat.constant.RegexConstant.CONTROL_CHARACTER_PATTERN;
+import static org.liuyehcf.markdownformat.log.CommonLogger.DEFAULT_LOGGER;
 
 public class RemoveControlCharacterProcessor implements PreFileProcessor {
-
-    private static final String CONTROL_CHARACTER_REGEX = "\u0008";
-
-    private static final Pattern PATTERN = Pattern.compile(CONTROL_CHARACTER_REGEX);
 
     @Override
     public void process(FileContext fileContext) {
@@ -24,10 +19,10 @@ public class RemoveControlCharacterProcessor implements PreFileProcessor {
 
             String content = lineElement.getContent();
 
-            if (isContains(content)) {
-                content = content.replaceAll(CONTROL_CHARACTER_REGEX, "");
+            if (containsControlChar(content)) {
+                content = content.replaceAll(CONTROL_CHARACTER_PATTERN.pattern(), "");
 
-                logger.info("file '{}' contains invisible character \\u0008", fileContext.getCurrentFile());
+                DEFAULT_LOGGER.info("file '{}' contains invisible character \\u0008", fileContext.getCurrentFile());
 
                 lineElement.setContent(content);
             }
@@ -36,7 +31,7 @@ public class RemoveControlCharacterProcessor implements PreFileProcessor {
         }
     }
 
-    private boolean isContains(String s) {
-        return PATTERN.matcher(s).find();
+    private boolean containsControlChar(String s) {
+        return CONTROL_CHARACTER_PATTERN.matcher(s).find();
     }
 }

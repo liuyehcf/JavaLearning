@@ -6,18 +6,14 @@ import org.liuyehcf.markdownformat.context.LineIterator;
 import org.liuyehcf.markdownformat.processor.PreFileProcessor;
 
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import static org.liuyehcf.markdownformat.log.CommonLogger.logger;
+import static org.liuyehcf.markdownformat.constant.RegexConstant.INNER_LINK_PATTERN;
+import static org.liuyehcf.markdownformat.log.CommonLogger.DEFAULT_LOGGER;
 
 /**
  * Created by HCF on 2018/1/14.
  */
 public class InnerLinkCheckProcessor implements PreFileProcessor {
-    static final String INNER_LINK_REGEX = "\\{% post_link (.*?) %\\}";
-
-    static final Pattern INNER_LINK_PATTERN = Pattern.compile(INNER_LINK_REGEX);
-
 
     @Override
     public void process(FileContext fileContext) {
@@ -35,7 +31,7 @@ public class InnerLinkCheckProcessor implements PreFileProcessor {
 
                 while (m.find()) {
                     if (!fileContext.containsFile(m.group(1))) {
-                        logger.error("file '{}', Inner link '{}'  error", fileContext.getCurrentFile(), m.group(0));
+                        DEFAULT_LOGGER.error("file '{}', Inner link '{}'  error", fileContext.getCurrentFile(), m.group(0));
                     }
                 }
             }

@@ -10,7 +10,7 @@ import java.util.*;
 
 import static org.liuyehcf.markdownformat.context.ProcessorEnum.POST_PROCESSOR_INDEX;
 import static org.liuyehcf.markdownformat.context.ProcessorEnum.PRE_PROCESSOR_INDEX;
-import static org.liuyehcf.markdownformat.log.CommonLogger.logger;
+import static org.liuyehcf.markdownformat.log.CommonLogger.DEFAULT_LOGGER;
 
 /**
  * Created by HCF on 2018/1/14.
@@ -37,7 +37,7 @@ public class DefaultProcessorContext implements ProcessorContext {
         addProcessor(new RemoveControlCharacterProcessor());
         addProcessor(new ResourceLinkProcessor());
         addProcessor(new SubItemProcessor());
-
+        addProcessor(new TableProcessor());
 
         processors = Collections.unmodifiableMap(processors);
     }
@@ -128,6 +128,6 @@ public class DefaultProcessorContext implements ProcessorContext {
 
         bufferedWriter.close();
 
-        logger.info("rewrite file '{}'", fileContext.getCurrentFile());
+        DEFAULT_LOGGER.info("rewrite file '{}'", fileContext.getCurrentFile());
     }
 }

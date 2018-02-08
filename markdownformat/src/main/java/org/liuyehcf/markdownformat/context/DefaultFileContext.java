@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.liuyehcf.markdownformat.log.CommonLogger.logger;
+import static org.liuyehcf.markdownformat.log.CommonLogger.DEFAULT_LOGGER;
 
 /**
  * Created by HCF on 2018/1/13.
@@ -63,7 +63,7 @@ public class DefaultFileContext implements FileContext {
             try {
                 readCurrentFile();
             } catch (IOException e) {
-                logger.error(e.getMessage());
+                DEFAULT_LOGGER.error(e.getMessage());
                 throw new RuntimeException(e);
             }
         }
@@ -112,7 +112,7 @@ public class DefaultFileContext implements FileContext {
                 }
 
                 if (line == null) {
-                    logger.error("``` No pairs appear");
+                    DEFAULT_LOGGER.error("``` No pairs appear");
                     throw new RuntimeException();
                 }
 

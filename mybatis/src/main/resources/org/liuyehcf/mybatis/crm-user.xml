@@ -2,11 +2,11 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.liuyehcf.mybatis.CrmUserDAO">
     <sql id="columns">
-        id            AS id,
-        first_name    AS firstName,
-        last_name     AS lastName,
-        age           AS age,
-        sex           AS sex
+        id AS id,
+        first_name AS firstName,
+        last_name AS lastName,
+        age AS age,
+        sex AS sex
     </sql>
 
     <select id="selectById" resultType="crmUserDO">
