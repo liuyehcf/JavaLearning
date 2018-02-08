@@ -67,10 +67,10 @@
         <include refid="columns"/>
         FROM crm_user
         <where>
-            <if test="param1 != null and param1 !=''">
+            <if test="param1 != null and arg0 !=''">
                 AND first_name = #{arg0}
             </if>
-            <if test="param2 != null and param2 !=''">
+            <if test="arg1 != null and param2 !=''">
                 AND last_name = #{param2}
             </if>
         </where>
@@ -109,10 +109,10 @@
                 last_name = #{specificName.lastName},
             </if>
             <if test="specificName.age != null">
-                age = #{specificName.age},
+                age = #{param1.age},
             </if>
             <if test="param1.sex != null">
-                sex= #{specificName.sex},
+                sex= #{param1.sex},
             </if>
         </set>
         WHERE id = #{specificName.id}
