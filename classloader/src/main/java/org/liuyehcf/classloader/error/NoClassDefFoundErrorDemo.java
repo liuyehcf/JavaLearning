@@ -1,9 +1,9 @@
-package org.liuyehcf.error;
+package org.liuyehcf.classloader.error;
 
 public class NoClassDefFoundErrorDemo {
     public static void main(String[] args) {
         try {
-            Class.forName("org.liuyehcf.error.InitializeThrowError");
+            Class.forName("org.liuyehcf.classloader.error.InitializeThrowError");
         } catch (Throwable e) {
             // 这里捕获到的是java.lang.ExceptionInInitializerError
             e.printStackTrace();
