@@ -1,7 +1,7 @@
 package org.liuyehcf.markdown.format.hexo;
 
 import org.liuyehcf.markdown.format.hexo.dto.BootParamDTO;
-import org.liuyehcf.markdown.format.hexo.log.CommonLogger;
+import org.liuyehcf.markdown.format.hexo.log.DefaultLogger;
 import org.liuyehcf.markdown.format.hexo.context.DefaultFileContext;
 import org.liuyehcf.markdown.format.hexo.context.DefaultProcessorContext;
 
@@ -36,13 +36,13 @@ public class MarkdownFormatter {
 
     private static BootParamDTO prepareParamDTO(String[] args) {
         if (args.length != 1 && args.length != 3) {
-            CommonLogger.DEFAULT_LOGGER.error(WRONG_PARAMS + ",args= {}", args);
+            DefaultLogger.DEFAULT_LOGGER.error(WRONG_PARAMS + ",args= {}", args);
             throw new RuntimeException(WRONG_PARAMS);
         }
 
         File rootDirectory = new File(args[0]);
         if (!(rootDirectory.exists() && rootDirectory.isDirectory())) {
-            CommonLogger.DEFAULT_LOGGER.error(WRONG_PARAMS + ",args= {}", args);
+            DefaultLogger.DEFAULT_LOGGER.error(WRONG_PARAMS + ",args= {}", args);
             throw new RuntimeException(WRONG_PARAMS);
         }
 
@@ -60,7 +60,7 @@ public class MarkdownFormatter {
 
         if (!(fileDirectory.exists() && fileDirectory.isDirectory())
                 || !(imageDirectory.exists() && imageDirectory.isDirectory())) {
-            CommonLogger.DEFAULT_LOGGER.error(WRONG_PARAMS + ",args= {}", args);
+            DefaultLogger.DEFAULT_LOGGER.error(WRONG_PARAMS + ",args= {}", args);
             throw new RuntimeException(WRONG_PARAMS);
         }
 

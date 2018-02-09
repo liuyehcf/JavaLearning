@@ -9,7 +9,7 @@ import org.liuyehcf.markdown.format.hexo.processor.PreFileProcessor;
 import java.util.regex.Matcher;
 
 import static org.liuyehcf.markdown.format.hexo.constant.RegexConstant.INNER_LINK_PATTERN;
-import static org.liuyehcf.markdown.format.hexo.log.CommonLogger.DEFAULT_LOGGER;
+import static org.liuyehcf.markdown.format.hexo.log.DefaultLogger.DEFAULT_LOGGER;
 
 /**
  * Created by HCF on 2018/1/14.

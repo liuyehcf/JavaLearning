@@ -1,13 +1,16 @@
 package org.liuyehcf.markdown.format.hexo.context;
 
 import org.liuyehcf.markdown.format.hexo.dto.BootParamDTO;
-import org.liuyehcf.markdown.format.hexo.log.CommonLogger;
+import org.liuyehcf.markdown.format.hexo.log.DefaultLogger;
 import org.liuyehcf.markdown.format.hexo.util.StringUtils;
 
 import java.io.*;
 import java.util.*;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import static org.liuyehcf.markdown.format.hexo.constant.RegexConstant.PROPERTY_PATTERN;
+import static org.liuyehcf.markdown.format.hexo.constant.RegexConstant.SUB_PROPERTY_PATTERN;
+import static org.liuyehcf.markdown.format.hexo.constant.StringConstant.*;
 
 /**
  * Created by HCF on 2018/1/13.
@@ -28,11 +31,6 @@ public class DefaultFileContext implements FileContext {
 
     private LinkedList<LineElement> lineElements;
 
-    private static final String PROPERTY_REGEX = "^\\s*(.*?)\\s*:\\s*(.*?)\\s*$";
-    private static final String SUB_PROPERTY_REGEX = "^\\s*-\\s+(.*)$";
-    private static final Pattern PROPERTY_PATTERN = Pattern.compile(PROPERTY_REGEX);
-    private static final Pattern SUB_PROPERTY_PATTERN = Pattern.compile(SUB_PROPERTY_REGEX);
-
     public DefaultFileContext(BootParamDTO paramDTO) {
         rootDirectory = paramDTO.getRootDirectory();
         fileDirectory = paramDTO.getFileDirectory();
@@ -45,7 +43,7 @@ public class DefaultFileContext implements FileContext {
         File[] fileArray = fileDirectory.listFiles(new FileFilter() {
             @Override
             public boolean accept(File pathname) {
-                return pathname.getName().endsWith(".md");
+                return pathname.getName().endsWith(MARKDOWN_SUFFIX);
             }
         });
 
@@ -63,7 +61,7 @@ public class DefaultFileContext implements FileContext {
         try {
             readCurrentFile();
         } catch (IOException e) {
-            CommonLogger.DEFAULT_LOGGER.error(e.getMessage());
+            DefaultLogger.DEFAULT_LOGGER.error(e.getMessage());
             throw new RuntimeException(e);
         }
     }
@@ -119,15 +117,15 @@ public class DefaultFileContext implements FileContext {
         // 首先读取文件属性
         line = reader.readLine();
         lineElements.add(new DefaultLineElement(line, false));
-        if (!line.equals("---")) {
-            CommonLogger.DEFAULT_LOGGER.error("hexo file format error, \" --- \" not exists!");
+        if (!line.equals(HEXO_PROPERTY_BOUNDARY)) {
+            DefaultLogger.DEFAULT_LOGGER.error("file [{}] contains wrong hexo header", getFile());
             throw new RuntimeException();
         }
 
         StringBuilder sb = null;
         String preKey = null;
         while ((line = reader.readLine()) != null
-                && !line.equals("---")) {
+                && !line.equals(HEXO_PROPERTY_BOUNDARY)) {
             if (!StringUtils.isBlankLine(line)) {
                 Matcher propertyMatcher = PROPERTY_PATTERN.matcher(line);
 
@@ -137,7 +135,7 @@ public class DefaultFileContext implements FileContext {
                     // 处理一下之前的子属性
                     if (sb != null) {
                         if (preKey == null || sb.length() == 0) {
-                            CommonLogger.DEFAULT_LOGGER.error("hexo file format error, file property format error");
+                            DefaultLogger.DEFAULT_LOGGER.error("file [{}] contains wrong hexo header", getFile());
                             throw new RuntimeException();
                         }
                         properties.put(preKey, sb.substring(0, sb.length() - 1));
@@ -163,11 +161,11 @@ public class DefaultFileContext implements FileContext {
                 else {
                     Matcher subPropertyMatcher = SUB_PROPERTY_PATTERN.matcher(line);
                     if (!subPropertyMatcher.matches()) {
-                        CommonLogger.DEFAULT_LOGGER.error("hexo file format error, file property format error");
+                        DefaultLogger.DEFAULT_LOGGER.error("file [{}] contains wrong hexo header", getFile());
                         throw new RuntimeException();
                     } else {
                         if (sb == null) {
-                            CommonLogger.DEFAULT_LOGGER.error("hexo file format error, file property format error");
+                            DefaultLogger.DEFAULT_LOGGER.error("file [{}] contains wrong hexo header", getFile());
                             throw new RuntimeException();
                         }
                         sb.append(subPropertyMatcher.group(1) + ",");
@@ -179,29 +177,29 @@ public class DefaultFileContext implements FileContext {
         // 处理一下之前的子属性
         if (sb != null) {
             if (preKey == null || sb.length() == 0) {
-                CommonLogger.DEFAULT_LOGGER.error("hexo file format error, file property format error");
+                DefaultLogger.DEFAULT_LOGGER.error("file [{}] contains wrong hexo header", getFile());
                 throw new RuntimeException();
             }
             properties.put(preKey, sb.substring(0, sb.length() - 1));
         }
-        if (!line.equals("---")) {
-            CommonLogger.DEFAULT_LOGGER.error("hexo file format error, \" --- \" not exists!");
+        if (!line.equals(HEXO_PROPERTY_BOUNDARY)) {
+            DefaultLogger.DEFAULT_LOGGER.error("file [{}] contains wrong hexo header", getFile());
             throw new RuntimeException();
         }
         lineElements.add(new DefaultLineElement(line, false));
 
 
         while ((line = reader.readLine()) != null) {
-            if (line.contains("```")) {
+            if (line.contains(CODE_BOUNDARY)) {
                 //cache "```" itself
                 lineElements.add(new DefaultLineElement(line, true));
 
-                while ((line = reader.readLine()) != null && !line.contains("```")) {
+                while ((line = reader.readLine()) != null && !line.contains(CODE_BOUNDARY)) {
                     lineElements.add(new DefaultLineElement(line, true));
                 }
 
                 if (line == null) {
-                    CommonLogger.DEFAULT_LOGGER.error("``` No pairs appear");
+                    DefaultLogger.DEFAULT_LOGGER.error("file [{}] contains wrong code format", getFile());
                     throw new RuntimeException();
                 }
 
@@ -217,8 +215,8 @@ public class DefaultFileContext implements FileContext {
 
     @Override
     public boolean containsFile(String name) {
-        if (!name.endsWith(".md")) {
-            name = name + ".md";
+        if (!name.endsWith(MARKDOWN_SUFFIX)) {
+            name = name + MARKDOWN_SUFFIX;
         }
 
         for (File file : files) {

@@ -1,6 +1,6 @@
 package org.liuyehcf.markdown.format.hexo.context;
 
-import org.liuyehcf.markdown.format.hexo.log.CommonLogger;
+import org.liuyehcf.markdown.format.hexo.log.DefaultLogger;
 import org.liuyehcf.markdown.format.hexo.processor.FileProcessor;
 import org.liuyehcf.markdown.format.hexo.processor.PostFileProcessor;
 import org.liuyehcf.markdown.format.hexo.processor.PreFileProcessor;
@@ -33,6 +33,7 @@ public class DefaultProcessorContext implements ProcessorContext {
         addProcessor(new ImageAddressCheckProcessor());
         addProcessor(new IndexProcessor());
         addProcessor(new InnerLinkCheckProcessor());
+        addProcessor(new LatexFormulaWrapperProcessor());
         addProcessor(new RedundantEmptyProcessor());
         addProcessor(new RemoveControlCharacterProcessor());
         addProcessor(new ResourceLinkProcessor());
@@ -128,6 +129,6 @@ public class DefaultProcessorContext implements ProcessorContext {
 
         bufferedWriter.close();
 
-        CommonLogger.DEFAULT_LOGGER.info("rewrite file '{}'", fileContext.getFile());
+        DefaultLogger.DEFAULT_LOGGER.info("rewrite file '{}'", fileContext.getFile());
     }
 }
