@@ -28,17 +28,12 @@ public class RegexConstant {
     private static final String SUB_PROPERTY_REGEX = "^\\s*-\\s+(.*)$";
     public static final Pattern SUB_PROPERTY_PATTERN = Pattern.compile(SUB_PROPERTY_REGEX);
 
-    private static final String FORMULA_WRAPPER_START_REGEX = "((\\{% raw %\\})?\\s*?";
-    private static final String FORMULA_WRAPPER_END_REGEX = "\\s*?(\\{% endraw %\\})?";
+    private static final String FORMULA_WRAPPER_START_REGEX = "(\\{% raw %\\})?";
+    private static final String FORMULA_WRAPPER_END_REGEX = "(\\{% endraw %\\})?";
 
-    private static final String INNER_FORMULA_REGEX = FORMULA_WRAPPER_START_REGEX + "|" + "([^\\\\]|^))(\\$.*?[^\\\\]\\$)" + FORMULA_WRAPPER_END_REGEX;
+    private static final String INNER_FORMULA_REGEX = FORMULA_WRAPPER_START_REGEX + "(([\\\\\\$])?\\$(\\$)?.*?[^\\\\]\\$(\\$)?)" + FORMULA_WRAPPER_END_REGEX;
     public static final Pattern INNER_FORMULA_PATTERN = Pattern.compile(INNER_FORMULA_REGEX);
 
-    private static final String INTER_FORMULA_REGEX = FORMULA_WRAPPER_START_REGEX + "|" + "([^\\\\]|^))(\\$\\$)" + FORMULA_WRAPPER_END_REGEX;
+    private static final String INTER_FORMULA_REGEX = FORMULA_WRAPPER_START_REGEX + "(([\\\\\\$])?\\$\\$(\\$)?)" + FORMULA_WRAPPER_END_REGEX;
     public static final Pattern INTER_FORMULA_PATTERN = Pattern.compile(INTER_FORMULA_REGEX);
-
-    public static void main(String[] args) {
-        Matcher m = INNER_FORMULA_PATTERN.matcher("$sdfsdf$");
-        System.out.println(m.find());
-    }
 }

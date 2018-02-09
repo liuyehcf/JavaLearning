@@ -6,6 +6,9 @@ import org.liuyehcf.markdown.format.hexo.context.LineIterator;
 public abstract class AbstractFileProcessor implements FileProcessor {
     @Override
     public final void process(FileContext fileContext) {
+        // 钩子方法
+        reset();
+
         // 获取文件行迭代器
         LineIterator iterator = fileContext.getLineIterator();
 
@@ -17,9 +20,6 @@ public abstract class AbstractFileProcessor implements FileProcessor {
             // 前进一行
             iterator.moveForward();
         }
-
-        // 钩子方法
-        reset();
     }
 
     // 行处理逻辑
