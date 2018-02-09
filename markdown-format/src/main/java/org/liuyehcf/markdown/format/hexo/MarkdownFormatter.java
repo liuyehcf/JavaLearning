@@ -23,6 +23,9 @@ public class MarkdownFormatter {
         DefaultProcessorContext processorContext = new DefaultProcessorContext();
 
         while (fileContext.hasNextFile()) {
+            // 初始化文件上下文
+            fileContext.initFileContext();
+
             // 处理当前文件
             processorContext.process(fileContext);
 

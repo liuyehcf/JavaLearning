@@ -8,11 +8,24 @@ import java.io.File;
 public interface FileContext {
 
     /**
+     * 初始化当前文件上下文
+     */
+    void initFileContext();
+
+    /**
+     * 获取当前文件的属性值
+     *
+     * @param key
+     * @return
+     */
+    String getProperty(String key);
+
+    /**
      * 获取当前File
      *
      * @return
      */
-    File getCurrentFile();
+    File getFile();
 
     /**
      * 获取当前的LineContext
@@ -20,7 +33,7 @@ public interface FileContext {
      *
      * @return
      */
-    LineIterator getLineIteratorOfCurrentFile();
+    LineIterator getLineIterator();
 
     /**
      * 获取根目录的File对象

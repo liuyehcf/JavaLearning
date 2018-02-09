@@ -5,7 +5,6 @@ import org.liuyehcf.markdown.format.hexo.processor.FileProcessor;
 import org.liuyehcf.markdown.format.hexo.processor.PostFileProcessor;
 import org.liuyehcf.markdown.format.hexo.processor.PreFileProcessor;
 import org.liuyehcf.markdown.format.hexo.processor.impl.*;
-import org.liuyehcf.markdownformat.processor.impl.*;
 
 import java.io.*;
 import java.util.*;
@@ -88,7 +87,7 @@ public class DefaultProcessorContext implements ProcessorContext {
     private boolean isModify(FileContext fileContext) throws IOException {
         List<String> originContents = new ArrayList<>();
 
-        BufferedReader reader = new BufferedReader(new FileReader(fileContext.getCurrentFile()));
+        BufferedReader reader = new BufferedReader(new FileReader(fileContext.getFile()));
 
         String line;
 
@@ -99,7 +98,7 @@ public class DefaultProcessorContext implements ProcessorContext {
         reader.close();
 
         Iterator<String> originIterator = originContents.iterator();
-        LineIterator curIterator = fileContext.getLineIteratorOfCurrentFile();
+        LineIterator curIterator = fileContext.getLineIterator();
 
         while (originIterator.hasNext()
                 && curIterator.isNotFinish()) {
@@ -118,9 +117,9 @@ public class DefaultProcessorContext implements ProcessorContext {
     }
 
     private void reWrite(FileContext fileContext) throws IOException {
-        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileContext.getCurrentFile()));
+        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileContext.getFile()));
 
-        LineIterator lineIterator = fileContext.getLineIteratorOfCurrentFile();
+        LineIterator lineIterator = fileContext.getLineIterator();
 
         while (lineIterator.isNotFinish()) {
             bufferedWriter.write(lineIterator.getCurrentLineElement().getContent() + "\n");
@@ -129,6 +128,6 @@ public class DefaultProcessorContext implements ProcessorContext {
 
         bufferedWriter.close();
 
-        CommonLogger.DEFAULT_LOGGER.info("rewrite file '{}'", fileContext.getCurrentFile());
+        CommonLogger.DEFAULT_LOGGER.info("rewrite file '{}'", fileContext.getFile());
     }
 }

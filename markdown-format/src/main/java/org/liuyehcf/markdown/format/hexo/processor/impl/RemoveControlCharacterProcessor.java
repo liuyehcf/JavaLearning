@@ -1,33 +1,28 @@
 package org.liuyehcf.markdown.format.hexo.processor.impl;
 
-import org.liuyehcf.markdown.format.hexo.log.CommonLogger;
-import org.liuyehcf.markdown.format.hexo.processor.PreFileProcessor;
 import org.liuyehcf.markdown.format.hexo.context.FileContext;
 import org.liuyehcf.markdown.format.hexo.context.LineElement;
 import org.liuyehcf.markdown.format.hexo.context.LineIterator;
+import org.liuyehcf.markdown.format.hexo.log.CommonLogger;
+import org.liuyehcf.markdown.format.hexo.processor.AbstractFileProcessor;
+import org.liuyehcf.markdown.format.hexo.processor.PreFileProcessor;
 
 import static org.liuyehcf.markdown.format.hexo.constant.RegexConstant.CONTROL_CHARACTER_PATTERN;
 
-public class RemoveControlCharacterProcessor implements PreFileProcessor {
+public class RemoveControlCharacterProcessor extends AbstractFileProcessor implements PreFileProcessor {
 
     @Override
-    public void process(FileContext fileContext) {
-        LineIterator iterator = fileContext.getLineIteratorOfCurrentFile();
+    protected void doProcess(FileContext fileContext, LineIterator iterator) {
+        LineElement lineElement = iterator.getCurrentLineElement();
 
-        while (iterator.isNotFinish()) {
-            LineElement lineElement = iterator.getCurrentLineElement();
+        String content = lineElement.getContent();
 
-            String content = lineElement.getContent();
+        if (containsControlChar(content)) {
+            content = content.replaceAll(CONTROL_CHARACTER_PATTERN.pattern(), "");
 
-            if (containsControlChar(content)) {
-                content = content.replaceAll(CONTROL_CHARACTER_PATTERN.pattern(), "");
+            CommonLogger.DEFAULT_LOGGER.info("file '{}' contains invisible character \\u0008", fileContext.getFile());
 
-                CommonLogger.DEFAULT_LOGGER.info("file '{}' contains invisible character \\u0008", fileContext.getCurrentFile());
-
-                lineElement.setContent(content);
-            }
-
-            iterator.moveForward();
+            lineElement.setContent(content);
         }
     }
 

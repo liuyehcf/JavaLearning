@@ -1,8 +1,9 @@
 package org.liuyehcf.markdown.format.hexo.processor.impl;
 
-import org.liuyehcf.markdown.format.hexo.processor.PreFileProcessor;
 import org.liuyehcf.markdown.format.hexo.context.FileContext;
 import org.liuyehcf.markdown.format.hexo.context.LineIterator;
+import org.liuyehcf.markdown.format.hexo.processor.AbstractFileProcessor;
+import org.liuyehcf.markdown.format.hexo.processor.PreFileProcessor;
 
 import java.io.File;
 import java.util.regex.Matcher;
@@ -13,27 +14,22 @@ import static org.liuyehcf.markdown.format.hexo.log.CommonLogger.DEFAULT_LOGGER;
 /**
  * Created by HCF on 2018/1/14.
  */
-public class ImageAddressCheckProcessor implements PreFileProcessor {
+public class ImageAddressCheckProcessor extends AbstractFileProcessor implements PreFileProcessor {
 
     @Override
-    public void process(FileContext fileContext) {
-        LineIterator iterator = fileContext.getLineIteratorOfCurrentFile();
+    protected void doProcess(FileContext fileContext, LineIterator iterator) {
+        String content = iterator.getCurrentLineElement().getContent();
 
-        while (iterator.isNotFinish()) {
-            String content = iterator.getCurrentLineElement().getContent();
+        String relativeImagePath;
 
-            String relativeImagePath;
+        if ((relativeImagePath = getImagePath(content)) != null) {
+            String absoluteImagePath = fileContext.getRootDirectory().getAbsolutePath() + relativeImagePath;
 
-            if ((relativeImagePath = getImagePath(content)) != null) {
-                String absoluteImagePath = fileContext.getRootDirectory().getAbsolutePath() + relativeImagePath;
+            File image = new File(absoluteImagePath);
 
-                File image = new File(absoluteImagePath);
-
-                if (!(image.exists() && image.isFile())) {
-                    DEFAULT_LOGGER.error("file [{}] contains wrong image source [{}]", fileContext.getCurrentFile(), relativeImagePath);
-                }
+            if (!(image.exists() && image.isFile())) {
+                DEFAULT_LOGGER.error("file [{}] contains wrong image source [{}]", fileContext.getFile(), relativeImagePath);
             }
-            iterator.moveForward();
         }
     }
 

@@ -15,8 +15,4 @@ public class RegexConstant {
     public static final Pattern SUB_ITEM_PATTERN = Pattern.compile(SUB_ITEM_REGEX);
     private static final String TABLE_REGEX = " *\\|.*?\\| *";
     public static final Pattern TABLE_PATTERN = Pattern.compile(TABLE_REGEX);
-
-    public static void main(String[] args) {
-        System.out.println(TABLE_PATTERN.matcher("| asdf | asdf |").matches());
-    }
 }
