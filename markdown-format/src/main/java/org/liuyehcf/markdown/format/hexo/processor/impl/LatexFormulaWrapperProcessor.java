@@ -26,7 +26,7 @@ public class LatexFormulaWrapperProcessor extends AbstractFileProcessor implemen
             String content = lineElement.getContent();
 
             if (isIllegal(content)) {
-                DEFAULT_LOGGER.error("file [{}] contains wrong formula grammar `$`", fileContext.getFile());
+                DEFAULT_LOGGER.error("file [{}] contains wrong formula grammar: `$`. line content: {}", fileContext.getFile(), lineElement.getContent());
                 throw new RuntimeException();
             }
 
@@ -55,6 +55,11 @@ public class LatexFormulaWrapperProcessor extends AbstractFileProcessor implemen
                     innerMatcher.appendReplacement(
                             stringBuffer,
                             extra + FORMULA_WRAPPER_START + "\\$" + "$4" + "\\$" + FORMULA_WRAPPER_END);
+                } else {
+                    if (content.contains("\\$")) {
+                        DEFAULT_LOGGER.error("file [{}] contains wrong formula grammar: \\$ unwrapped. line content: {}", fileContext.getFile(), lineElement.getContent());
+                        throw new RuntimeException();
+                    }
                 }
             }
             innerMatcher.appendTail(stringBuffer);
