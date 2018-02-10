@@ -60,6 +60,11 @@ public class LatexFormulaWrapperProcessor extends AbstractFileProcessor implemen
                         DEFAULT_LOGGER.error("file [{}] contains wrong formula grammar: \\$ unwrapped. line content: {}", fileContext.getFile(), lineElement.getContent());
                         throw new RuntimeException();
                     }
+                    Matcher check = INTER_FORMULA_PATTERN.matcher(content);
+                    if (!(check.find() && check.find() && !check.find())) {
+                        DEFAULT_LOGGER.error("file [{}] contains wrong formula grammar: unsupported grammar. line content: {}", fileContext.getFile(), lineElement.getContent());
+                        throw new RuntimeException();
+                    }
                 }
             }
             innerMatcher.appendTail(stringBuffer);
