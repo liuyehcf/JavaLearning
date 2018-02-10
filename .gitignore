@@ -53,3 +53,8 @@ crashlytics-build.properties
 
 # log
 *.log
+
+
+# special pom file
+
+**/dependency-reduced-pom.xml
