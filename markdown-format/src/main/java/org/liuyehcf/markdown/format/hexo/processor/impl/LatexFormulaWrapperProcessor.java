@@ -8,8 +8,7 @@ import org.liuyehcf.markdown.format.hexo.processor.PreFileProcessor;
 
 import java.util.regex.Matcher;
 
-import static org.liuyehcf.markdown.format.hexo.constant.RegexConstant.INNER_FORMULA_PATTERN;
-import static org.liuyehcf.markdown.format.hexo.constant.RegexConstant.INTER_FORMULA_PATTERN;
+import static org.liuyehcf.markdown.format.hexo.constant.RegexConstant.*;
 import static org.liuyehcf.markdown.format.hexo.constant.StringConstant.*;
 import static org.liuyehcf.markdown.format.hexo.log.DefaultLogger.DEFAULT_LOGGER;
 
@@ -25,6 +24,11 @@ public class LatexFormulaWrapperProcessor extends AbstractFileProcessor implemen
         if (isMathFile(fileContext)
                 && !lineElement.isCode()) {
             String content = lineElement.getContent();
+
+            if (isIllegal(content)) {
+                DEFAULT_LOGGER.error("file [{}] contains wrong formula grammar `$`", fileContext.getFile());
+                throw new RuntimeException();
+            }
 
             StringBuffer stringBuffer = new StringBuffer();
             Matcher innerMatcher = INNER_FORMULA_PATTERN.matcher(content);
@@ -132,5 +136,10 @@ public class LatexFormulaWrapperProcessor extends AbstractFileProcessor implemen
             }
         }
         return false;
+    }
+
+    private boolean isIllegal(String content) {
+        Matcher m = ILLEGAL_FORMULA_PATTERN.matcher(content);
+        return m.find();
     }
 }

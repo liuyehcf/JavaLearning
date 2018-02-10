@@ -32,5 +32,7 @@ public class RegexConstant {
 
     private static final String INTER_FORMULA_REGEX = "((\\{% raw %\\})?+)(\\$\\$++)((\\{% endraw %\\})?+)";
     public static final Pattern INTER_FORMULA_PATTERN = Pattern.compile(INTER_FORMULA_REGEX);
-    
+
+    private static final String ILLEGAL_FORMULA_REGEX = "`.*\\$.*`";
+    public static final Pattern ILLEGAL_FORMULA_PATTERN = Pattern.compile(ILLEGAL_FORMULA_REGEX);
 }
