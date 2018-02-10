@@ -6,14 +6,13 @@ import org.liuyehcf.markdown.format.hexo.context.LineIterator;
 import org.liuyehcf.markdown.format.hexo.processor.AbstractFileProcessor;
 import org.liuyehcf.markdown.format.hexo.processor.PreFileProcessor;
 
-import java.util.regex.Matcher;
-
-import static org.liuyehcf.markdown.format.hexo.constant.RegexConstant.*;
 import static org.liuyehcf.markdown.format.hexo.constant.StringConstant.*;
 import static org.liuyehcf.markdown.format.hexo.log.DefaultLogger.DEFAULT_LOGGER;
 
 public class LatexFormulaWrapperProcessor extends AbstractFileProcessor implements PreFileProcessor {
+    private boolean isInnerFormulaStart;
     private boolean isInterFormulaStart;
+    private int innerFormulaCount;
     private int interFormulaCount;
 
     @Override
@@ -25,95 +24,9 @@ public class LatexFormulaWrapperProcessor extends AbstractFileProcessor implemen
                 && !lineElement.isCode()) {
             String content = lineElement.getContent();
 
-            if (isIllegal(content)) {
-                DEFAULT_LOGGER.error("file [{}] contains wrong formula grammar: `$`. line content: {}", fileContext.getFile(), lineElement.getContent());
-                throw new RuntimeException();
-            }
+            content = processInnerFormula(fileContext, iterator, content);
 
-            StringBuffer stringBuffer = new StringBuffer();
-            Matcher innerMatcher = INNER_FORMULA_PATTERN.matcher(content);
-            while (innerMatcher.find()) {
-                int startOfGroup3 = innerMatcher.start(3);
-
-                // 普通$...$
-                boolean case1 = "$".equals(innerMatcher.group(3))
-                        && (startOfGroup3 == 0 || content.charAt(startOfGroup3 - 1) != '\\')
-                        && "$".equals(innerMatcher.group(5));
-
-                // \$$...$
-                boolean case2 = "$$".equals(innerMatcher.group(3))
-                        && (startOfGroup3 > 0 && content.charAt(startOfGroup3 - 1) == '\\')
-                        && "$".equals(innerMatcher.group(5));
-
-                String extra = "";
-                // 补上原本不该捕获的，已经被转义的"$"
-                if (case2) {
-                    extra = "\\$";
-                }
-
-                if (case1 || case2) {
-                    innerMatcher.appendReplacement(
-                            stringBuffer,
-                            extra + FORMULA_WRAPPER_START + "\\$" + "$4" + "\\$" + FORMULA_WRAPPER_END);
-                } else {
-                    if (content.contains("\\$")) {
-                        DEFAULT_LOGGER.error("file [{}] contains wrong formula grammar: \\$ unwrapped. line content: {}", fileContext.getFile(), lineElement.getContent());
-                        throw new RuntimeException();
-                    }
-                    Matcher check = INTER_FORMULA_PATTERN.matcher(content);
-                    if (!(check.find() && check.find() && !check.find())) {
-                        DEFAULT_LOGGER.error("file [{}] contains wrong formula grammar: unsupported grammar. line content: {}", fileContext.getFile(), lineElement.getContent());
-                        throw new RuntimeException();
-                    }
-                }
-            }
-            innerMatcher.appendTail(stringBuffer);
-            content = stringBuffer.toString();
-
-
-            stringBuffer = new StringBuffer();
-            Matcher interMatcher = INTER_FORMULA_PATTERN.matcher(content);
-            while (interMatcher.find()) {
-                int startOfGroup3 = interMatcher.start(3);
-
-                // 普通$$
-                boolean case1 = "$$".equals(interMatcher.group(3))
-                        && (startOfGroup3 == 0 || content.charAt(startOfGroup3 - 1) != '\\');
-
-                // \$$$
-                boolean case2 = "$$$".equals(interMatcher.group(3))
-                        && (startOfGroup3 > 0 && content.charAt(startOfGroup3 - 1) == '\\');
-
-                String extra = "";
-                // 补上原本不该捕获的，已经被转义的"$"
-                if (case2) {
-                    extra = "\\$";
-                }
-
-                if (case1 || case2) {
-                    if (isInterFormulaStart) {
-                        if (FORMULA_WRAPPER_END.equals(interMatcher.group(4))) {
-                            DEFAULT_LOGGER.error("file [{}] contains wrong formula wrapper", fileContext.getFile());
-                            throw new RuntimeException();
-                        }
-                        interMatcher.appendReplacement(
-                                stringBuffer,
-                                extra + FORMULA_WRAPPER_START + "\\$\\$");
-                    } else {
-                        if (FORMULA_WRAPPER_START.equals(interMatcher.group(1))) {
-                            DEFAULT_LOGGER.error("file [{}] contains wrong formula wrapper", fileContext.getFile());
-                            throw new RuntimeException();
-                        }
-                        interMatcher.appendReplacement(
-                                stringBuffer,
-                                extra + "\\$\\$" + FORMULA_WRAPPER_END);
-                    }
-                    isInterFormulaStart = !isInterFormulaStart;
-                    interFormulaCount++;
-                }
-            }
-            interMatcher.appendTail(stringBuffer);
-            content = stringBuffer.toString();
+            content = processInterFormula(fileContext, iterator, content);
 
             lineElement.setContent(content);
         }
@@ -121,13 +34,16 @@ public class LatexFormulaWrapperProcessor extends AbstractFileProcessor implemen
 
     @Override
     protected void beforeProcess(FileContext fileContext) {
+        isInnerFormulaStart = true;
         isInterFormulaStart = true;
+        innerFormulaCount = 0;
         interFormulaCount = 0;
     }
 
     @Override
     protected void afterProcess(FileContext fileContext) {
-        if ((interFormulaCount & 1) != 0) {
+        if ((innerFormulaCount & 1) != 0
+                || (interFormulaCount & 1) != 0) {
             DEFAULT_LOGGER.error("file [{}] contains unmatched inter formula wrappers!", fileContext.getFile());
         }
     }
@@ -148,8 +64,168 @@ public class LatexFormulaWrapperProcessor extends AbstractFileProcessor implemen
         return false;
     }
 
-    private boolean isIllegal(String content) {
-        Matcher m = ILLEGAL_FORMULA_PATTERN.matcher(content);
-        return m.find();
+    private String processInnerFormula(FileContext fileContext, LineIterator iterator, String content) {
+        int cursor = 0;
+
+        StringBuilder sb = new StringBuilder();
+
+        while (cursor < content.length()) {
+
+            // escape inner line code
+            if (content.charAt(cursor) == '`') {
+                // '`' is not allowed in formula
+                if (!isInnerFormulaStart) {
+                    DEFAULT_LOGGER.error("file [{}] contains wrong formula grammar: '`' is not allowed in formula. line content: {}", fileContext.getFile(), content);
+                    throw new RuntimeException();
+                }
+
+                sb.append(content.charAt(cursor++));
+
+                while (content.charAt(cursor) != '`') {
+                    sb.append(content.charAt(cursor++));
+                }
+
+                sb.append(content.charAt(cursor++));
+            } else if (isInnerFormulaBoundary(content, cursor)) {
+                if (isInnerFormulaStart) {
+                    if (hasFormulaStart(content, cursor)) {
+                        sb.append("$");
+                    } else {
+                        sb.append(FORMULA_WRAPPER_START)
+                                .append("$");
+                    }
+                } else {
+                    if (hasFormulaEnd(content, cursor)) {
+                        sb.append("$");
+                    } else {
+                        sb.append("$")
+                                .append(FORMULA_WRAPPER_END);
+                    }
+                }
+                isInnerFormulaStart = !isInnerFormulaStart;
+                innerFormulaCount++;
+                cursor++;
+            } else {
+                sb.append(content.charAt(cursor++));
+            }
+        }
+
+        return sb.toString();
+    }
+
+    /**
+     * 当前符号是否是一个行内公式的边界符号
+     *
+     * @param content
+     * @param cursor
+     * @return
+     */
+    private boolean isInnerFormulaBoundary(String content, int cursor) {
+        if (content.charAt(cursor) == '$'
+                && (cursor == content.length() - 1 || content.charAt(cursor + 1) != '$')) {
+            if (cursor == 0) {
+                return true;
+            } else if (cursor == 1) {
+                return content.charAt(cursor - 1) != '\\' && content.charAt(cursor - 1) != '$';
+            } else {
+                return content.charAt(cursor - 1) != '\\' && !(content.charAt(cursor - 1) == '$' && content.charAt(cursor - 2) != '\\');
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 是否已经包含了{% raw %}
+     *
+     * @param content
+     * @param cursor
+     * @return
+     */
+    private boolean hasFormulaStart(String content, int cursor) {
+        int len = FORMULA_WRAPPER_START.length();
+        return cursor >= len
+                && FORMULA_WRAPPER_START.equals(content.substring(cursor - len, cursor));
+    }
+
+    /**
+     * 是否已经包含了{% endraw %}
+     *
+     * @param content
+     * @param cursor
+     * @return
+     */
+    private boolean hasFormulaEnd(String content, int cursor) {
+        int len = FORMULA_WRAPPER_END.length();
+        return cursor + len < content.length()
+                && FORMULA_WRAPPER_END.equals(content.substring(cursor + 1, cursor + len + 1));
+    }
+
+    private boolean isCrossLine(String content) {
+        return content.length() > 1
+                && content.charAt(content.length() - 1) == '\\'
+                && content.charAt(content.length() - 2) == '\\';
+    }
+
+    private String processInterFormula(FileContext fileContext, LineIterator iterator, String content) {
+        int cursor = 0;
+
+        StringBuilder sb = new StringBuilder();
+
+        while (cursor < content.length()) {
+            // escape inner line code
+            if (content.charAt(cursor) == '`') {
+                // '`' is not allowed in formula
+                if (!isInterFormulaStart) {
+                    DEFAULT_LOGGER.error("file [{}] contains wrong formula grammar: '`' is not allowed in formula. line content: {}", fileContext.getFile(), content);
+                    throw new RuntimeException();
+                }
+
+                sb.append(content.charAt(cursor++));
+
+                while (content.charAt(cursor) != '`') {
+                    sb.append(content.charAt(cursor++));
+                }
+
+                sb.append(content.charAt(cursor++));
+            } else if (isInterFormulaBoundary(content, cursor)) {
+                if (isInterFormulaStart) {
+                    if (hasFormulaStart(content, cursor)) {
+                        sb.append("$$");
+                    } else {
+                        sb.append(FORMULA_WRAPPER_START)
+                                .append("$$");
+                    }
+                } else {
+                    if (hasFormulaEnd(content, cursor + 1)) {
+                        sb.append("$$");
+                    } else {
+                        sb.append("$$").append(FORMULA_WRAPPER_END);
+                    }
+                }
+                cursor += 2;
+                isInterFormulaStart = !isInterFormulaStart;
+                interFormulaCount++;
+            } else {
+                sb.append(content.charAt(cursor++));
+            }
+        }
+
+        return sb.toString();
+    }
+
+    private boolean isInterFormulaBoundary(String content, int cursor) {
+        if (cursor < content.length() - 1
+                && content.charAt(cursor) == '$'
+                && content.charAt(cursor + 1) == '$'
+                && (cursor == content.length() - 2 || content.charAt(cursor + 2) != '$')) {
+            if (cursor == 0) {
+                return true;
+            } else if (cursor == 1) {
+                return content.charAt(cursor - 1) != '\\' && content.charAt(cursor - 1) != '$';
+            } else {
+                return content.charAt(cursor - 1) != '\\' && !(content.charAt(cursor - 1) == '$' && content.charAt(cursor - 2) != '\\');
+            }
+        }
+        return false;
     }
 }
