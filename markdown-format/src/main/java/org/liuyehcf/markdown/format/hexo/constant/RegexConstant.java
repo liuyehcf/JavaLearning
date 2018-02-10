@@ -27,10 +27,10 @@ public class RegexConstant {
     private static final String SUB_PROPERTY_REGEX = "^\\s*-\\s+(.*)$";
     public static final Pattern SUB_PROPERTY_PATTERN = Pattern.compile(SUB_PROPERTY_REGEX);
 
-    private static final String INNER_FORMULA_REGEX = "((\\{% raw %\\})?+|[^\\\\]|^)(\\$++)(.*?[^\\\\])(\\$++)(\\{% endraw %\\})?+";
+    private static final String INNER_FORMULA_REGEX = "((\\{% raw %\\})?+)(\\$++)(.*?[^\\\\])(\\$++)((\\{% endraw %\\})?+)";
     public static final Pattern INNER_FORMULA_PATTERN = Pattern.compile(INNER_FORMULA_REGEX);
 
-    private static final String INTER_FORMULA_REGEX = "((\\{% raw %\\})?+|[^\\\\]|^)(\\$\\$++)(\\{% endraw %\\})?+";
+    private static final String INTER_FORMULA_REGEX = "((\\{% raw %\\})?+)(\\$\\$++)((\\{% endraw %\\})?+)";
     public static final Pattern INTER_FORMULA_PATTERN = Pattern.compile(INTER_FORMULA_REGEX);
     
 }

@@ -29,17 +29,28 @@ public class LatexFormulaWrapperProcessor extends AbstractFileProcessor implemen
             StringBuffer stringBuffer = new StringBuffer();
             Matcher innerMatcher = INNER_FORMULA_PATTERN.matcher(content);
             while (innerMatcher.find()) {
-                if ("$".equals(innerMatcher.group(3))
-                        && "$".equals(innerMatcher.group(5))) {
-                    if (FORMULA_WRAPPER_START.equals(innerMatcher.group(1))) {
-                        innerMatcher.appendReplacement(
-                                stringBuffer,
-                                FORMULA_WRAPPER_START + "\\$" + "$4" + "\\$" + FORMULA_WRAPPER_END);
-                    } else {
-                        innerMatcher.appendReplacement(
-                                stringBuffer,
-                                "$1" + FORMULA_WRAPPER_START + "\\$" + "$4" + "\\$" + FORMULA_WRAPPER_END);
-                    }
+                int startOfGroup3 = innerMatcher.start(3);
+
+                // 普通$...$
+                boolean case1 = "$".equals(innerMatcher.group(3))
+                        && (startOfGroup3 == 0 || content.charAt(startOfGroup3 - 1) != '\\')
+                        && "$".equals(innerMatcher.group(5));
+
+                // \$$...$
+                boolean case2 = "$$".equals(innerMatcher.group(3))
+                        && (startOfGroup3 > 0 && content.charAt(startOfGroup3 - 1) == '\\')
+                        && "$".equals(innerMatcher.group(5));
+
+                String extra = "";
+                // 补上原本不该捕获的，已经被转义的"$"
+                if (case2) {
+                    extra = "\\$";
+                }
+
+                if (case1 || case2) {
+                    innerMatcher.appendReplacement(
+                            stringBuffer,
+                            extra + FORMULA_WRAPPER_START + "\\$" + "$4" + "\\$" + FORMULA_WRAPPER_END);
                 }
             }
             innerMatcher.appendTail(stringBuffer);
@@ -49,18 +60,31 @@ public class LatexFormulaWrapperProcessor extends AbstractFileProcessor implemen
             stringBuffer = new StringBuffer();
             Matcher interMatcher = INTER_FORMULA_PATTERN.matcher(content);
             while (interMatcher.find()) {
-                if ("$$".equals(interMatcher.group(3))) {
-                    if (isInterFormulaStart) {
-                        if (FORMULA_WRAPPER_START.equals(interMatcher.group(1))) {
-                            interMatcher.appendReplacement(
-                                    stringBuffer,
-                                    FORMULA_WRAPPER_START + "\\$\\$");
-                        } else {
-                            interMatcher.appendReplacement(
-                                    stringBuffer,
-                                    "$1" + FORMULA_WRAPPER_START + "\\$\\$");
-                        }
+                int startOfGroup3 = interMatcher.start(3);
 
+                // 普通$$
+                boolean case1 = "$$".equals(interMatcher.group(3))
+                        && (startOfGroup3 == 0 || content.charAt(startOfGroup3 - 1) != '\\');
+
+                // \$$$
+                boolean case2 = "$$$".equals(interMatcher.group(3))
+                        && (startOfGroup3 > 0 && content.charAt(startOfGroup3 - 1) == '\\');
+
+                String extra = "";
+                // 补上原本不该捕获的，已经被转义的"$"
+                if (case2) {
+                    extra = "\\$";
+                }
+
+                if (case1 || case2) {
+                    if (isInterFormulaStart) {
+                        if (FORMULA_WRAPPER_END.equals(interMatcher.group(4))) {
+                            DEFAULT_LOGGER.error("file [{}] contains wrong formula wrapper", fileContext.getFile());
+                            throw new RuntimeException();
+                        }
+                        interMatcher.appendReplacement(
+                                stringBuffer,
+                                extra + FORMULA_WRAPPER_START + "\\$\\$");
                     } else {
                         if (FORMULA_WRAPPER_START.equals(interMatcher.group(1))) {
                             DEFAULT_LOGGER.error("file [{}] contains wrong formula wrapper", fileContext.getFile());
@@ -68,7 +92,7 @@ public class LatexFormulaWrapperProcessor extends AbstractFileProcessor implemen
                         }
                         interMatcher.appendReplacement(
                                 stringBuffer,
-                                "$1" + "\\$\\$" + FORMULA_WRAPPER_END);
+                                extra + "\\$\\$" + FORMULA_WRAPPER_END);
                     }
                     isInterFormulaStart = !isInterFormulaStart;
                     interFormulaCount++;
