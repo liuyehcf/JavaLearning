@@ -10,6 +10,7 @@ import java.io.File;
 import static org.liuyehcf.markdown.format.hexo.constant.ErrorConstant.WRONG_PARAMS;
 import static org.liuyehcf.markdown.format.hexo.constant.ParamConstant.DEFAULT_FILE_DIRECTORY_SIMPLE_NAME;
 import static org.liuyehcf.markdown.format.hexo.constant.ParamConstant.DEFAULT_IMAGE_DIRECTORY_SIMPLE_NAME;
+import static org.liuyehcf.markdown.format.hexo.log.DefaultLogger.DEFAULT_LOGGER;
 
 /**
  * Created by HCF on 2018/1/13.
@@ -36,13 +37,13 @@ public class MarkdownFormatter {
 
     private static BootParamDTO prepareParamDTO(String[] args) {
         if (args.length != 1 && args.length != 3) {
-            DefaultLogger.DEFAULT_LOGGER.error(WRONG_PARAMS + ",args= {}", args);
+            DEFAULT_LOGGER.error(WRONG_PARAMS + ",args= {}", args);
             throw new RuntimeException(WRONG_PARAMS);
         }
 
         File rootDirectory = new File(args[0]);
         if (!(rootDirectory.exists() && rootDirectory.isDirectory())) {
-            DefaultLogger.DEFAULT_LOGGER.error(WRONG_PARAMS + ",args= {}", args);
+            DEFAULT_LOGGER.error(WRONG_PARAMS + ",args= {}", args);
             throw new RuntimeException(WRONG_PARAMS);
         }
 
@@ -60,7 +61,7 @@ public class MarkdownFormatter {
 
         if (!(fileDirectory.exists() && fileDirectory.isDirectory())
                 || !(imageDirectory.exists() && imageDirectory.isDirectory())) {
-            DefaultLogger.DEFAULT_LOGGER.error(WRONG_PARAMS + ",args= {}", args);
+            DEFAULT_LOGGER.error(WRONG_PARAMS + ",args= {}", args);
             throw new RuntimeException(WRONG_PARAMS);
         }
 

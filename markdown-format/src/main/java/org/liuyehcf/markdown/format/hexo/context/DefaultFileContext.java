@@ -1,7 +1,6 @@
 package org.liuyehcf.markdown.format.hexo.context;
 
 import org.liuyehcf.markdown.format.hexo.dto.BootParamDTO;
-import org.liuyehcf.markdown.format.hexo.log.DefaultLogger;
 import org.liuyehcf.markdown.format.hexo.util.StringUtils;
 
 import java.io.*;
@@ -11,6 +10,7 @@ import java.util.regex.Matcher;
 import static org.liuyehcf.markdown.format.hexo.constant.RegexConstant.PROPERTY_PATTERN;
 import static org.liuyehcf.markdown.format.hexo.constant.RegexConstant.SUB_PROPERTY_PATTERN;
 import static org.liuyehcf.markdown.format.hexo.constant.StringConstant.*;
+import static org.liuyehcf.markdown.format.hexo.log.DefaultLogger.DEFAULT_LOGGER;
 
 /**
  * Created by HCF on 2018/1/13.
@@ -61,7 +61,7 @@ public class DefaultFileContext implements FileContext {
         try {
             readCurrentFile();
         } catch (IOException e) {
-            DefaultLogger.DEFAULT_LOGGER.error(e.getMessage());
+            DEFAULT_LOGGER.error(e.getMessage());
             throw new RuntimeException(e);
         }
     }
@@ -118,7 +118,7 @@ public class DefaultFileContext implements FileContext {
         line = reader.readLine();
         lineElements.add(new DefaultLineElement(line, false));
         if (!line.equals(HEXO_PROPERTY_BOUNDARY)) {
-            DefaultLogger.DEFAULT_LOGGER.error("file [{}] contains wrong hexo header", getFile());
+            DEFAULT_LOGGER.error("file [{}] contains wrong hexo header", getFile());
             throw new RuntimeException();
         }
 
@@ -135,7 +135,7 @@ public class DefaultFileContext implements FileContext {
                     // 处理一下之前的子属性
                     if (sb != null) {
                         if (preKey == null || sb.length() == 0) {
-                            DefaultLogger.DEFAULT_LOGGER.error("file [{}] contains wrong hexo header", getFile());
+                            DEFAULT_LOGGER.error("file [{}] contains wrong hexo header", getFile());
                             throw new RuntimeException();
                         }
                         properties.put(preKey, sb.substring(0, sb.length() - 1));
@@ -161,11 +161,11 @@ public class DefaultFileContext implements FileContext {
                 else {
                     Matcher subPropertyMatcher = SUB_PROPERTY_PATTERN.matcher(line);
                     if (!subPropertyMatcher.matches()) {
-                        DefaultLogger.DEFAULT_LOGGER.error("file [{}] contains wrong hexo header", getFile());
+                        DEFAULT_LOGGER.error("file [{}] contains wrong hexo header", getFile());
                         throw new RuntimeException();
                     } else {
                         if (sb == null) {
-                            DefaultLogger.DEFAULT_LOGGER.error("file [{}] contains wrong hexo header", getFile());
+                            DEFAULT_LOGGER.error("file [{}] contains wrong hexo header", getFile());
                             throw new RuntimeException();
                         }
                         sb.append(subPropertyMatcher.group(1) + ",");
@@ -177,13 +177,13 @@ public class DefaultFileContext implements FileContext {
         // 处理一下之前的子属性
         if (sb != null) {
             if (preKey == null || sb.length() == 0) {
-                DefaultLogger.DEFAULT_LOGGER.error("file [{}] contains wrong hexo header", getFile());
+                DEFAULT_LOGGER.error("file [{}] contains wrong hexo header", getFile());
                 throw new RuntimeException();
             }
             properties.put(preKey, sb.substring(0, sb.length() - 1));
         }
         if (!line.equals(HEXO_PROPERTY_BOUNDARY)) {
-            DefaultLogger.DEFAULT_LOGGER.error("file [{}] contains wrong hexo header", getFile());
+            DEFAULT_LOGGER.error("file [{}] contains wrong hexo header", getFile());
             throw new RuntimeException();
         }
         lineElements.add(new DefaultLineElement(line, false));
@@ -199,7 +199,7 @@ public class DefaultFileContext implements FileContext {
                 }
 
                 if (line == null) {
-                    DefaultLogger.DEFAULT_LOGGER.error("file [{}] contains wrong code format", getFile());
+                    DEFAULT_LOGGER.error("file [{}] contains wrong code format", getFile());
                     throw new RuntimeException();
                 }
 

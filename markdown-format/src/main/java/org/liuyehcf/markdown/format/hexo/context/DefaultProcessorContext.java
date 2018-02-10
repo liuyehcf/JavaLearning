@@ -11,6 +11,7 @@ import java.util.*;
 
 import static org.liuyehcf.markdown.format.hexo.context.ProcessorEnum.POST_PROCESSOR_INDEX;
 import static org.liuyehcf.markdown.format.hexo.context.ProcessorEnum.PRE_PROCESSOR_INDEX;
+import static org.liuyehcf.markdown.format.hexo.log.DefaultLogger.DEFAULT_LOGGER;
 
 /**
  * Created by HCF on 2018/1/14.
@@ -129,6 +130,6 @@ public class DefaultProcessorContext implements ProcessorContext {
 
         bufferedWriter.close();
 
-        DefaultLogger.DEFAULT_LOGGER.info("rewrite file '{}'", fileContext.getFile());
+        DEFAULT_LOGGER.info("rewrite file '{}'", fileContext.getFile());
     }
 }

@@ -8,6 +8,7 @@ import org.liuyehcf.markdown.format.hexo.processor.AbstractFileProcessor;
 import org.liuyehcf.markdown.format.hexo.processor.PreFileProcessor;
 
 import static org.liuyehcf.markdown.format.hexo.constant.RegexConstant.CONTROL_CHARACTER_PATTERN;
+import static org.liuyehcf.markdown.format.hexo.log.DefaultLogger.DEFAULT_LOGGER;
 
 public class RemoveControlCharacterProcessor extends AbstractFileProcessor implements PreFileProcessor {
 
@@ -20,7 +21,7 @@ public class RemoveControlCharacterProcessor extends AbstractFileProcessor imple
         if (containsControlChar(content)) {
             content = content.replaceAll(CONTROL_CHARACTER_PATTERN.pattern(), "");
 
-            DefaultLogger.DEFAULT_LOGGER.info("file '{}' contains invisible character \\u0008", fileContext.getFile());
+            DEFAULT_LOGGER.info("file '{}' contains invisible character \\u0008", fileContext.getFile());
 
             lineElement.setContent(content);
         }

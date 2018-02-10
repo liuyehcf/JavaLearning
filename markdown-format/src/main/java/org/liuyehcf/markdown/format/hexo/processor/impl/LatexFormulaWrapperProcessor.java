@@ -62,6 +62,7 @@ public class LatexFormulaWrapperProcessor extends AbstractFileProcessor implemen
 
                     } else {
                         if (FORMULA_WRAPPER_START.equals(interMatcher.group(1))) {
+                            DEFAULT_LOGGER.error("file [{}] contains wrong formula wrapper", fileContext.getFile());
                             throw new RuntimeException();
                         }
                         interMatcher.appendReplacement(
