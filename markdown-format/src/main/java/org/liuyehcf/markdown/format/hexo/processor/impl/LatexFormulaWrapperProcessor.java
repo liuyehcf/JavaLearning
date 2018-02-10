@@ -26,39 +26,52 @@ public class LatexFormulaWrapperProcessor extends AbstractFileProcessor implemen
             String content = lineElement.getContent();
 
             StringBuffer stringBuffer = new StringBuffer();
-
             Matcher innerMatcher = INNER_FORMULA_PATTERN.matcher(content);
-            while (innerMatcher.find()
-                    && innerMatcher.group(3) == null
-                    && innerMatcher.group(4) == null
-                    && innerMatcher.group(5) == null) {
-                innerMatcher.appendReplacement(
-                        stringBuffer,
-                        FORMULA_WRAPPER_START + "$2" + FORMULA_WRAPPER_END
-                );
+            while (innerMatcher.find()) {
+                if ("$".equals(innerMatcher.group(3))
+                        && "$".equals(innerMatcher.group(5))) {
+                    if (FORMULA_WRAPPER_START.equals(innerMatcher.group(1))) {
+                        innerMatcher.appendReplacement(
+                                stringBuffer,
+                                FORMULA_WRAPPER_START + "\\$" + "$4" + "\\$" + FORMULA_WRAPPER_END);
+                    } else {
+                        innerMatcher.appendReplacement(
+                                stringBuffer,
+                                "$1" + FORMULA_WRAPPER_START + "\\$" + "$4" + "\\$" + FORMULA_WRAPPER_END);
+                    }
+                }
             }
             innerMatcher.appendTail(stringBuffer);
-
             content = stringBuffer.toString();
 
-            stringBuffer = new StringBuffer();
 
+            stringBuffer = new StringBuffer();
             Matcher interMatcher = INTER_FORMULA_PATTERN.matcher(content);
-            while (interMatcher.find()
-                    && interMatcher.group(3) == null
-                    && interMatcher.group(4) == null
-                    && interMatcher.group(5) == null) {
-                interMatcher.appendReplacement(
-                        stringBuffer,
-                        isInterFormulaStart ?
-                                (FORMULA_WRAPPER_START + "$2")
-                                :
-                                ("$2" + FORMULA_WRAPPER_END)
-                );
-                isInterFormulaStart = !isInterFormulaStart;
+            while (interMatcher.find()) {
+                if ("$$".equals(interMatcher.group(3))) {
+                    if (isInterFormulaStart) {
+                        if (FORMULA_WRAPPER_START.equals(interMatcher.group(1))) {
+                            interMatcher.appendReplacement(
+                                    stringBuffer,
+                                    FORMULA_WRAPPER_START + "\\$\\$");
+                        } else {
+                            interMatcher.appendReplacement(
+                                    stringBuffer,
+                                    "$1" + FORMULA_WRAPPER_START + "\\$\\$");
+                        }
+
+                    } else {
+                        if (FORMULA_WRAPPER_START.equals(interMatcher.group(1))) {
+                            throw new RuntimeException();
+                        }
+                        interMatcher.appendReplacement(
+                                stringBuffer,
+                                "$1" + "\\$\\$" + FORMULA_WRAPPER_END);
+                    }
+                    isInterFormulaStart = !isInterFormulaStart;
+                }
             }
             interMatcher.appendTail(stringBuffer);
-
             content = stringBuffer.toString();
 
             lineElement.setContent(content);
@@ -84,28 +97,5 @@ public class LatexFormulaWrapperProcessor extends AbstractFileProcessor implemen
             }
         }
         return false;
-    }
-
-    public static void main(String[] args) {
-        boolean isInterFormulaStart = true;
-        String content = "$$sdfasdfasdf$$";
-        StringBuffer stringBuffer = new StringBuffer();
-
-        Matcher interMatcher = INTER_FORMULA_PATTERN.matcher(content);
-        while (interMatcher.find()
-                && interMatcher.group(3) == null) {
-            interMatcher.appendReplacement(
-                    stringBuffer,
-                    isInterFormulaStart ?
-                            (FORMULA_WRAPPER_START + "$2")
-                            :
-                            ("$2" + FORMULA_WRAPPER_END)
-            );
-            isInterFormulaStart = !isInterFormulaStart;
-        }
-        interMatcher.appendTail(stringBuffer);
-
-        content = stringBuffer.toString();
-        System.out.println(content);
     }
 }

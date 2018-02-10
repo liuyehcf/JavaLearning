@@ -14,4 +14,8 @@ public class StringUtils {
         Matcher m = EMPTY_PATTERN.matcher(s);
         return m.matches();
     }
+
+    public static boolean isBlank(String s) {
+        return s == null || s.isEmpty();
+    }
 }
