@@ -6,8 +6,8 @@ import org.liuyehcf.markdown.format.hexo.context.LineIterator;
 public abstract class AbstractFileProcessor implements FileProcessor {
     @Override
     public final void process(FileContext fileContext) {
-        // 钩子方法
-        reset();
+        // 前置处理
+        beforeProcess(fileContext);
 
         // 获取文件行迭代器
         LineIterator iterator = fileContext.getLineIterator();
@@ -20,13 +20,36 @@ public abstract class AbstractFileProcessor implements FileProcessor {
             // 前进一行
             iterator.moveForward();
         }
+
+        // 后置处理
+        afterProcess(fileContext);
     }
 
-    // 行处理逻辑
+    /**
+     * 行处理逻辑
+     *
+     * @param fileContext
+     * @param iterator
+     */
     protected abstract void doProcess(FileContext fileContext, LineIterator iterator);
 
-    // 有些处理器需要重置自身状态，提供一个钩子方法
-    protected void reset() {
-        // do nothing
+    /**
+     * 提供一个前置钩子方法
+     * 选择性覆盖
+     *
+     * @param fileContext
+     */
+    protected void beforeProcess(FileContext fileContext) {
+
+    }
+
+    /**
+     * 提供一个后置钩子方法
+     * 选择性覆盖
+     *
+     * @param fileContext
+     */
+    protected void afterProcess(FileContext fileContext) {
+
     }
 }

@@ -135,7 +135,8 @@ public class IndexProcessor extends AbstractFileProcessor implements PreFileProc
         }
     }
 
-    protected void reset() {
+    @Override
+    protected void beforeProcess(FileContext fileContext) {
         Arrays.fill(indexes, 0);
     }
 

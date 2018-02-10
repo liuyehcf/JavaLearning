@@ -15,6 +15,7 @@ import static org.liuyehcf.markdown.format.hexo.log.DefaultLogger.DEFAULT_LOGGER
 
 public class LatexFormulaWrapperProcessor extends AbstractFileProcessor implements PreFileProcessor {
     private boolean isInterFormulaStart;
+    private int interFormulaCount;
 
     @Override
     protected void doProcess(FileContext fileContext, LineIterator iterator) {
@@ -70,6 +71,7 @@ public class LatexFormulaWrapperProcessor extends AbstractFileProcessor implemen
                                 "$1" + "\\$\\$" + FORMULA_WRAPPER_END);
                     }
                     isInterFormulaStart = !isInterFormulaStart;
+                    interFormulaCount++;
                 }
             }
             interMatcher.appendTail(stringBuffer);
@@ -80,8 +82,16 @@ public class LatexFormulaWrapperProcessor extends AbstractFileProcessor implemen
     }
 
     @Override
-    protected void reset() {
+    protected void beforeProcess(FileContext fileContext) {
         isInterFormulaStart = true;
+        interFormulaCount = 0;
+    }
+
+    @Override
+    protected void afterProcess(FileContext fileContext) {
+        if ((interFormulaCount & 1) != 0) {
+            DEFAULT_LOGGER.error("file [{}] contains unmatched inter formula wrappers!", fileContext.getFile());
+        }
     }
 
     private boolean isMathFile(FileContext fileContext) {
