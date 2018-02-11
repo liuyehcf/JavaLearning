@@ -30,6 +30,7 @@ public class InnerLinkCheckProcessor extends AbstractFileProcessor implements Pr
             while (m.find()) {
                 if (!fileContext.containsFile(m.group(1))) {
                     DEFAULT_LOGGER.error("file '{}', Inner link '{}'  error", fileContext.getFile(), m.group(0));
+                    throw new RuntimeException();
                 }
             }
         }

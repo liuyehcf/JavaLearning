@@ -29,6 +29,7 @@ public class ImageAddressCheckProcessor extends AbstractFileProcessor implements
 
             if (!(image.exists() && image.isFile())) {
                 DEFAULT_LOGGER.error("file [{}] contains wrong image source [{}]", fileContext.getFile(), relativeImagePath);
+                throw new RuntimeException();
             }
         }
     }

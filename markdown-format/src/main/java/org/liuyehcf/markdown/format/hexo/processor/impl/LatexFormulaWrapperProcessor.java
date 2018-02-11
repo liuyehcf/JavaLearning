@@ -44,6 +44,7 @@ public class LatexFormulaWrapperProcessor extends AbstractFileProcessor implemen
         if ((InnerFormulaWrapper.formulaCount & 1) != 0
                 || (InterFormulaWrapper.formulaCount & 1) != 0) {
             DEFAULT_LOGGER.error("file [{}] contains wrong formula grammar: Inner or inter formula wrapper is not matched!!", fileContext.getFile());
+            throw new RuntimeException();
         }
     }
 
