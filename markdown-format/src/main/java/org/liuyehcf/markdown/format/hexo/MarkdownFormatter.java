@@ -1,9 +1,10 @@
 package org.liuyehcf.markdown.format.hexo;
 
-import org.liuyehcf.markdown.format.hexo.dto.BootParamDTO;
-import org.liuyehcf.markdown.format.hexo.log.DefaultLogger;
 import org.liuyehcf.markdown.format.hexo.context.DefaultFileContext;
 import org.liuyehcf.markdown.format.hexo.context.DefaultProcessorContext;
+import org.liuyehcf.markdown.format.hexo.context.FileContext;
+import org.liuyehcf.markdown.format.hexo.context.ProcessorContext;
+import org.liuyehcf.markdown.format.hexo.dto.BootParamDTO;
 
 import java.io.File;
 
@@ -20,8 +21,8 @@ public class MarkdownFormatter {
     public static void main(String[] args) {
         BootParamDTO bootParamDTO = prepareParamDTO(args);
 
-        DefaultFileContext fileContext = new DefaultFileContext(bootParamDTO);
-        DefaultProcessorContext processorContext = new DefaultProcessorContext();
+        FileContext fileContext = new DefaultFileContext(bootParamDTO);
+        ProcessorContext processorContext = new DefaultProcessorContext();
 
         while (fileContext.hasNextFile()) {
             // 初始化文件上下文

@@ -3,7 +3,6 @@ package org.liuyehcf.markdown.format.hexo.processor.impl;
 import org.liuyehcf.markdown.format.hexo.context.FileContext;
 import org.liuyehcf.markdown.format.hexo.context.LineElement;
 import org.liuyehcf.markdown.format.hexo.context.LineIterator;
-import org.liuyehcf.markdown.format.hexo.log.DefaultLogger;
 import org.liuyehcf.markdown.format.hexo.processor.AbstractFileProcessor;
 import org.liuyehcf.markdown.format.hexo.processor.PreFileProcessor;
 

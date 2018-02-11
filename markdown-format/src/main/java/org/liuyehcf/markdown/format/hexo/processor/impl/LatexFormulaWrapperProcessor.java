@@ -65,9 +65,9 @@ public class LatexFormulaWrapperProcessor extends AbstractFileProcessor implemen
     }
 
     private static abstract class AbstractFormulaWrapper {
-        int cursor;
         final File file;
         final String content;
+        int cursor;
         StringBuilder sb;
 
         AbstractFormulaWrapper(File file, String content) {
@@ -92,6 +92,7 @@ public class LatexFormulaWrapperProcessor extends AbstractFileProcessor implemen
 
         /**
          * 是否已经包含了{% endraw %}
+         *
          * @param cursor cursor
          * @return boolean
          */

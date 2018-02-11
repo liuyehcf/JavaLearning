@@ -1,6 +1,5 @@
 package org.liuyehcf.markdown.format.hexo.context;
 
-import org.liuyehcf.markdown.format.hexo.log.DefaultLogger;
 import org.liuyehcf.markdown.format.hexo.processor.FileProcessor;
 import org.liuyehcf.markdown.format.hexo.processor.PostFileProcessor;
 import org.liuyehcf.markdown.format.hexo.processor.PreFileProcessor;
