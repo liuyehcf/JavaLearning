@@ -64,12 +64,12 @@ public class LatexFormulaWrapperProcessor extends AbstractFileProcessor implemen
     }
 
     private static abstract class AbstractFormulaWrapper {
-        protected int cursor;
-        protected final File file;
-        protected final String content;
-        protected StringBuilder sb;
+        int cursor;
+        final File file;
+        final String content;
+        StringBuilder sb;
 
-        public AbstractFormulaWrapper(File file, String content) {
+        AbstractFormulaWrapper(File file, String content) {
             cursor = 0;
             this.file = file;
             this.content = content;
@@ -81,9 +81,9 @@ public class LatexFormulaWrapperProcessor extends AbstractFileProcessor implemen
         /**
          * 是否已经包含了{% raw %}
          *
-         * @return
+         * @return boolean
          */
-        protected final boolean hasFormulaStart() {
+        final boolean hasFormulaStart() {
             int len = FORMULA_WRAPPER_START.length();
             return cursor >= len
                     && FORMULA_WRAPPER_START.equals(content.substring(cursor - len, cursor));
@@ -91,10 +91,10 @@ public class LatexFormulaWrapperProcessor extends AbstractFileProcessor implemen
 
         /**
          * 是否已经包含了{% endraw %}
-         *
-         * @return
+         * @param cursor cursor
+         * @return boolean
          */
-        protected final boolean hasFormulaEnd(int cursor) {
+        final boolean hasFormulaEnd(int cursor) {
             int len = FORMULA_WRAPPER_END.length();
             return cursor + len < content.length()
                     && FORMULA_WRAPPER_END.equals(content.substring(cursor + 1, cursor + len + 1));
@@ -105,9 +105,9 @@ public class LatexFormulaWrapperProcessor extends AbstractFileProcessor implemen
          * 前面不可以是转义字符"\"
          * 前面不可以是正常的$
          *
-         * @return
+         * @return boolean
          */
-        protected final boolean isPrefixBoundary() {
+        final boolean isPrefixBoundary() {
             if (cursor == 0) {
                 return true;
             } else if (cursor == 1) {
@@ -123,7 +123,7 @@ public class LatexFormulaWrapperProcessor extends AbstractFileProcessor implemen
         private static int formulaCount;
         private static boolean isCrossing;
 
-        public InnerFormulaWrapper(File file, String content) {
+        InnerFormulaWrapper(File file, String content) {
             super(file, content);
         }
 
@@ -177,8 +177,9 @@ public class LatexFormulaWrapperProcessor extends AbstractFileProcessor implemen
                 throw new RuntimeException();
             }
 
-            if (originCrossing == isCrossing
-                    && (formulaCount - originFormulaCount & 1) != 0) {
+            // 如果是非跨行行内公式，必须满足'$'成对出现的条件
+            if (!(isCrossing || originCrossing)
+                    && ((formulaCount - originFormulaCount) & 1) != 0) {
                 DEFAULT_LOGGER.error("file [{}] contains wrong formula grammar: Inner formula is not match in one line. line content: {}", file, content);
                 throw new RuntimeException();
             }
@@ -187,11 +188,9 @@ public class LatexFormulaWrapperProcessor extends AbstractFileProcessor implemen
         }
 
         private boolean isBoundary() {
-            if (content.charAt(cursor) == '$'
-                    && (cursor == content.length() - 1 || content.charAt(cursor + 1) != '$')) {
-                return isPrefixBoundary();
-            }
-            return false;
+            return content.charAt(cursor) == '$'
+                    && (cursor == content.length() - 1 || content.charAt(cursor + 1) != '$')
+                    && isPrefixBoundary();
         }
 
         private boolean hasFormulaEnd() {
@@ -209,7 +208,7 @@ public class LatexFormulaWrapperProcessor extends AbstractFileProcessor implemen
         private static boolean isMatchLeft;
         private static int formulaCount;
 
-        public InterFormulaWrapper(File file, String content) {
+        InterFormulaWrapper(File file, String content) {
             super(file, content);
         }
 
@@ -259,13 +258,11 @@ public class LatexFormulaWrapperProcessor extends AbstractFileProcessor implemen
         }
 
         private boolean isBoundary() {
-            if (cursor < content.length() - 1
+            return cursor < content.length() - 1
                     && content.charAt(cursor) == '$'
                     && content.charAt(cursor + 1) == '$'
-                    && (cursor == content.length() - 2 || content.charAt(cursor + 2) != '$')) {
-                return isPrefixBoundary();
-            }
-            return false;
+                    && (cursor == content.length() - 2 || content.charAt(cursor + 2) != '$')
+                    && isPrefixBoundary();
         }
     }
 }
