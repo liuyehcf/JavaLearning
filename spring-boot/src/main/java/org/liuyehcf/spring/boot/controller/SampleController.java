@@ -1,9 +1,7 @@
 package org.liuyehcf.spring.boot.controller;
 
-import org.liuyehcf.spring.boot.dataobject.LoginRequest;
-import org.liuyehcf.spring.boot.dataobject.LoginResponse;
-import org.liuyehcf.spring.boot.service.SampleService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.liuyehcf.spring.boot.dto.LoginRequestDTO;
+import org.liuyehcf.spring.boot.dto.LoginResponseDTO;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,25 +12,41 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/")
 public class SampleController {
 
-    @Autowired
-    private SampleService sampleService;
-
     @RequestMapping(value = "/home", method = RequestMethod.GET)
     @ResponseBody
     public String home() {
-        return sampleService.home();
+        return "Hello world!";
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     @ResponseBody
-    public LoginResponse login(@RequestBody LoginRequest request) {
-        return sampleService.login(request);
+    public LoginResponseDTO login(@RequestBody LoginRequestDTO request) {
+        LoginResponseDTO loginResponse = new LoginResponseDTO();
+        loginResponse.setState("OK");
+        loginResponse.setMessage("欢迎登陆" + request.getName());
+        return loginResponse;
     }
 
     @RequestMapping(value = "/compute", method = RequestMethod.GET)
     @ResponseBody
-    public String compute(@RequestParam String value1, @RequestParam String value2, @RequestHeader String operator) {
-        return sampleService.compute(value1, value2, operator);
+    public String compute(@RequestParam String value1,
+                          @RequestParam String value2,
+                          @RequestHeader String operator) {
+        switch (operator) {
+            case "+":
+                return Float.toString(
+                        Float.parseFloat(value1)
+                                + Float.parseFloat(value2));
+            case "-":
+                return Float.toString(
+                        Float.parseFloat(value1)
+                                - Float.parseFloat(value2));
+            case "*":
+                return Float.toString(
+                        Float.parseFloat(value1)
+                                * Float.parseFloat(value2));
+            default:
+                return "wrong operation";
+        }
     }
-
 }

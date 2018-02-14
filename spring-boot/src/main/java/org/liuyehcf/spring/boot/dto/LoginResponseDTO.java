@@ -1,9 +1,9 @@
-package org.liuyehcf.spring.boot.dataobject;
+package org.liuyehcf.spring.boot.dto;
 
 /**
  * Created by Liuye on 2017/12/15.
  */
-public class LoginResponse {
+public class LoginResponseDTO {
     private String state;
 
     private String message;

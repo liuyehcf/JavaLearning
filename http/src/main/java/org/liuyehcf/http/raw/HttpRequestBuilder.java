@@ -9,19 +9,31 @@ import java.util.Map;
 public class HttpRequestBuilder {
 
     private static final String SPACE = " ";
-
     private static final String ENTER = "\r";
-
     private static final String LINE_FEED = "\n";
-
     private static final String CONTENT_LENGTH = "content-length";
-
     private static final String COLON = ":";
-    private final Map<String, String> headers = new HashMap<>();
-    private String method = "GET";
-    private String url = null;
-    private String version = "HTTP/1.1";
-    private String body = null;
+
+    private Map<String, String> headers;
+    private String method;
+    private String url;
+    private String version;
+    private String body;
+
+    public static HttpRequestBuilder builder() {
+        return new HttpRequestBuilder();
+    }
+
+    /**
+     * 构造方法，填充默认值
+     */
+    private HttpRequestBuilder() {
+        headers = new HashMap<>();
+        method = "GET";
+        url = null;
+        version = "HTTP/1.1";
+        body = null;
+    }
 
     public HttpRequestBuilder method(String method) {
         this.method = method;
@@ -54,7 +66,7 @@ public class HttpRequestBuilder {
 
         return method + SPACE + url + SPACE + version + ENTER + LINE_FEED
                 + headers()
-                + emptyLine()
+                + LINE_FEED
                 + (body == null ? "" : body);
     }
 
@@ -94,9 +106,5 @@ public class HttpRequestBuilder {
                     .append(LINE_FEED);
         }
         return sb.toString();
-    }
-
-    private String emptyLine() {
-        return LINE_FEED;
     }
 }

@@ -98,13 +98,12 @@ public class NettyHttpRequestDemo {
     }
 
     private static String buildRequest() {
-        HttpRequestBuilder httpRequestBuilder = new HttpRequestBuilder();
-        httpRequestBuilder
+        return HttpRequestBuilder.builder()
                 .method("GET")
                 .url("http://127.0.0.1:8080/home")
                 .addHeader("Host", "8080")
-                .addHeader("Connection", "close");
-        return httpRequestBuilder.build();
+                .addHeader("Connection", "close")
+                .build();
     }
 
     public static void main(String[] args) {
