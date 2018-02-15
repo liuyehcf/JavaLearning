@@ -38,6 +38,65 @@ public class BStarTree {
         data = root;
     }
 
+    public static void main(String[] args) {
+        long start = System.currentTimeMillis();
+
+        Random random = new Random(0);
+
+        int TIMES = 2;
+
+        while (--TIMES > 0) {
+            System.out.println("剩余测试次数: " + TIMES);
+            BStarTree bStarTree = new BStarTree(1);
+
+            int N = 10000;
+
+            Set<Integer> set = new HashSet<Integer>();
+            for (int i = 0; i < N; i++) {
+                //set.add(random.nextInt());
+                set.add(i);
+            }
+
+            List<Integer> list = new ArrayList<Integer>(set);
+            Collections.shuffle(list, random);
+            //插入N个数据
+            int cnt = 0;
+            for (int i : list) {
+                System.out.println("(" + cnt++ + ") insert :" + i);
+                bStarTree.insert(i);
+                bStarTree.levelOrderTraverse();
+            }
+
+            int M = list.size() / 2;
+
+//            //删除M个数据
+//            Collections.shuffle(list, random);
+//
+//            for (int i = 0; i < M; i++) {
+//                set.remove(list.get(i));
+//                bStarTree.delete(list.get(i));
+//            }
+//
+//            //再插入M个数据
+//            for (int i = 0; i < M; i++) {
+//                int k = random.nextInt();
+//                if (set.add(k)) {
+//                    bStarTree.insert(k);
+//                }
+//            }
+//            list.clear();
+//            list.addAll(set);
+//            Collections.shuffle(list, random);
+//
+//            //再删除所有元素
+//            for (int i : list) {
+//                bStarTree.delete(i);
+//            }
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("Run time: " + (end - start) / 1000 + "s");
+    }
+
     public void insert(int k) {
         if (root.n == MAX_KEY_NUM) {
             BStarTreeNode newRoot = new BStarTreeNode(t);
@@ -269,7 +328,6 @@ public class BStarTree {
         x.n++;
     }
 
-
     private void shiftToLeft(BStarTreeNode x, int i) {
         BStarTreeNode p = x.children[i];
         BStarTreeNode y = x.children[i + 1];
@@ -381,64 +439,5 @@ public class BStarTree {
             }
             System.out.println();
         }
-    }
-
-    public static void main(String[] args) {
-        long start = System.currentTimeMillis();
-
-        Random random = new Random(0);
-
-        int TIMES = 2;
-
-        while (--TIMES > 0) {
-            System.out.println("剩余测试次数: " + TIMES);
-            BStarTree bStarTree = new BStarTree(1);
-
-            int N = 10000;
-
-            Set<Integer> set = new HashSet<Integer>();
-            for (int i = 0; i < N; i++) {
-                //set.add(random.nextInt());
-                set.add(i);
-            }
-
-            List<Integer> list = new ArrayList<Integer>(set);
-            Collections.shuffle(list, random);
-            //插入N个数据
-            int cnt = 0;
-            for (int i : list) {
-                System.out.println("(" + cnt++ + ") insert :" + i);
-                bStarTree.insert(i);
-                bStarTree.levelOrderTraverse();
-            }
-
-            int M = list.size() / 2;
-
-//            //删除M个数据
-//            Collections.shuffle(list, random);
-//
-//            for (int i = 0; i < M; i++) {
-//                set.remove(list.get(i));
-//                bStarTree.delete(list.get(i));
-//            }
-//
-//            //再插入M个数据
-//            for (int i = 0; i < M; i++) {
-//                int k = random.nextInt();
-//                if (set.add(k)) {
-//                    bStarTree.insert(k);
-//                }
-//            }
-//            list.clear();
-//            list.addAll(set);
-//            Collections.shuffle(list, random);
-//
-//            //再删除所有元素
-//            for (int i : list) {
-//                bStarTree.delete(i);
-//            }
-        }
-        long end = System.currentTimeMillis();
-        System.out.println("Run time: " + (end - start) / 1000 + "s");
     }
 }

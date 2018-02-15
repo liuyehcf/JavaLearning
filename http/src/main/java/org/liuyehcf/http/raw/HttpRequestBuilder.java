@@ -20,10 +20,6 @@ public class HttpRequestBuilder {
     private String version;
     private String body;
 
-    public static HttpRequestBuilder builder() {
-        return new HttpRequestBuilder();
-    }
-
     /**
      * 构造方法，填充默认值
      */
@@ -33,6 +29,10 @@ public class HttpRequestBuilder {
         url = null;
         version = "HTTP/1.1";
         body = null;
+    }
+
+    public static HttpRequestBuilder builder() {
+        return new HttpRequestBuilder();
     }
 
     public HttpRequestBuilder method(String method) {

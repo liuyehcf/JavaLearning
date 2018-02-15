@@ -8,24 +8,68 @@ import java.util.*;
 
 
 public class AVLTree1 {
-    private enum RotateOrientation {
-        INVALID,
-        LEFT,
-        RIGHT
-    }
-
     private AVLTreeNode root;
-
     private AVLTreeNode nil;
     private Map<AVLTreeNode, Integer> highMap;
-
-
     public AVLTree1() {
         nil = new AVLTreeNode(0);
         nil.left = nil;
         nil.right = nil;
         nil.parent = nil;
         root = nil;
+    }
+
+    public static void main(String[] args) {
+        long start = System.currentTimeMillis();
+
+        Random random = new Random();
+
+        int TIMES = 10;
+
+        while (--TIMES > 0) {
+            System.out.println("剩余测试次数: " + TIMES);
+            AVLTree1 avlTree2 = new AVLTree1();
+
+            int N = 1000;
+            int M = N / 2;
+
+            Set<Integer> set = new HashSet<Integer>();
+            for (int i = 0; i < N; i++) {
+                set.add(random.nextInt());
+            }
+
+            List<Integer> list = new ArrayList<Integer>(set);
+            Collections.shuffle(list, random);
+            //插入N个数据
+            for (int i : list) {
+                avlTree2.insert(i);
+            }
+
+            //删除M个数据
+            Collections.shuffle(list, random);
+
+            for (int i = 0; i < M; i++) {
+                set.remove(list.get(i));
+                avlTree2.delete(list.get(i));
+            }
+
+            //再插入M个数据
+            for (int i = 0; i < M; i++) {
+                int k = random.nextInt();
+                set.add(k);
+                avlTree2.insert(k);
+            }
+            list.clear();
+            list.addAll(set);
+            Collections.shuffle(list, random);
+
+            //再删除所有元素
+            for (int i : list) {
+                avlTree2.delete(i);
+            }
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("Run time: " + (end - start) / 1000 + "s");
     }
 
     public void insert(int val) {
@@ -297,56 +341,9 @@ public class AVLTree1 {
         }
     }
 
-    public static void main(String[] args) {
-        long start = System.currentTimeMillis();
-
-        Random random = new Random();
-
-        int TIMES = 10;
-
-        while (--TIMES > 0) {
-            System.out.println("剩余测试次数: " + TIMES);
-            AVLTree1 avlTree2 = new AVLTree1();
-
-            int N = 1000;
-            int M = N / 2;
-
-            Set<Integer> set = new HashSet<Integer>();
-            for (int i = 0; i < N; i++) {
-                set.add(random.nextInt());
-            }
-
-            List<Integer> list = new ArrayList<Integer>(set);
-            Collections.shuffle(list, random);
-            //插入N个数据
-            for (int i : list) {
-                avlTree2.insert(i);
-            }
-
-            //删除M个数据
-            Collections.shuffle(list, random);
-
-            for (int i = 0; i < M; i++) {
-                set.remove(list.get(i));
-                avlTree2.delete(list.get(i));
-            }
-
-            //再插入M个数据
-            for (int i = 0; i < M; i++) {
-                int k = random.nextInt();
-                set.add(k);
-                avlTree2.insert(k);
-            }
-            list.clear();
-            list.addAll(set);
-            Collections.shuffle(list, random);
-
-            //再删除所有元素
-            for (int i : list) {
-                avlTree2.delete(i);
-            }
-        }
-        long end = System.currentTimeMillis();
-        System.out.println("Run time: " + (end - start) / 1000 + "s");
+    private enum RotateOrientation {
+        INVALID,
+        LEFT,
+        RIGHT
     }
 }

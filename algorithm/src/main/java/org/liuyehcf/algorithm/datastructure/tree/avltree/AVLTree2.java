@@ -22,6 +22,57 @@ public class AVLTree2 {
         root = nil;
     }
 
+    public static void main(String[] args) {
+        long start = System.currentTimeMillis();
+
+        Random random = new Random();
+
+        int TIMES = 10;
+
+        while (--TIMES > 0) {
+            System.out.println("剩余测试次数: " + TIMES);
+            AVLTree2 avlTree = new AVLTree2();
+
+            int N = 10000;
+            int M = N / 2;
+
+            List<Integer> list = new ArrayList<Integer>();
+            for (int i = 0; i < N; i++) {
+                list.add(random.nextInt());
+            }
+
+            Collections.shuffle(list, random);
+            //插入N个数据
+            for (int i : list) {
+                avlTree.insert(i);
+            }
+
+            //删除M个数据
+            Collections.shuffle(list, random);
+
+            for (int i = 0; i < M; i++) {
+                int k = list.get(list.size() - 1);
+                list.remove(list.size() - 1);
+                avlTree.delete(k);
+            }
+
+            //再插入M个数据
+            for (int i = 0; i < M; i++) {
+                int k = random.nextInt();
+                list.add(k);
+                avlTree.insert(k);
+            }
+            Collections.shuffle(list, random);
+
+            //再删除所有元素
+            for (int i : list) {
+                avlTree.delete(i);
+            }
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("Run time: " + (end - start) / 1000 + "s");
+    }
+
     public void insert(int val) {
         AVLTreeNode x = root;
         AVLTreeNode y = nil;
@@ -191,7 +242,6 @@ public class AVLTree2 {
         return nil;
     }
 
-
     public void delete(int val) {
         AVLTreeNode z = search(root, val);
         if (z == nil) {
@@ -243,14 +293,12 @@ public class AVLTree2 {
         }
     }
 
-
     private AVLTreeNode min(AVLTreeNode x) {
         while (x.left != nil) {
             x = x.left;
         }
         return x;
     }
-
 
     public void inOrderTraverse() {
         inOrderTraverse(root);
@@ -278,56 +326,5 @@ public class AVLTree2 {
             System.out.print(root.val + ", ");
             inOrderTraverse(root.right);
         }
-    }
-
-    public static void main(String[] args) {
-        long start = System.currentTimeMillis();
-
-        Random random = new Random();
-
-        int TIMES = 10;
-
-        while (--TIMES > 0) {
-            System.out.println("剩余测试次数: " + TIMES);
-            AVLTree2 avlTree = new AVLTree2();
-
-            int N = 10000;
-            int M = N / 2;
-
-            List<Integer> list = new ArrayList<Integer>();
-            for (int i = 0; i < N; i++) {
-                list.add(random.nextInt());
-            }
-
-            Collections.shuffle(list, random);
-            //插入N个数据
-            for (int i : list) {
-                avlTree.insert(i);
-            }
-
-            //删除M个数据
-            Collections.shuffle(list, random);
-
-            for (int i = 0; i < M; i++) {
-                int k = list.get(list.size() - 1);
-                list.remove(list.size() - 1);
-                avlTree.delete(k);
-            }
-
-            //再插入M个数据
-            for (int i = 0; i < M; i++) {
-                int k = random.nextInt();
-                list.add(k);
-                avlTree.insert(k);
-            }
-            Collections.shuffle(list, random);
-
-            //再删除所有元素
-            for (int i : list) {
-                avlTree.delete(i);
-            }
-        }
-        long end = System.currentTimeMillis();
-        System.out.println("Run time: " + (end - start) / 1000 + "s");
     }
 }

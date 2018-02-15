@@ -21,6 +21,61 @@ public class BPlusTree {
         data = root;
     }
 
+    public static void main(String[] args) {
+        long start = System.currentTimeMillis();
+
+        Random random = new Random();
+
+        int TIMES = 500;
+
+        while (--TIMES > 0) {
+            System.out.println("剩余测试次数: " + TIMES);
+            BPlusTree bPlusTree = new BPlusTree(random.nextInt(20) + 2);
+
+            int N = 10000;
+
+            Set<Integer> set = new HashSet<Integer>();
+            for (int i = 0; i < N; i++) {
+                set.add(random.nextInt());
+            }
+
+            List<Integer> list = new ArrayList<Integer>(set);
+            Collections.shuffle(list, random);
+            //插入N个数据
+            for (int i : list) {
+                bPlusTree.insert(i);
+            }
+
+            int M = list.size() / 2;
+
+            //删除M个数据
+            Collections.shuffle(list, random);
+
+            for (int i = 0; i < M; i++) {
+                set.remove(list.get(i));
+                bPlusTree.delete(list.get(i));
+            }
+
+            //再插入M个数据
+            for (int i = 0; i < M; i++) {
+                int k = random.nextInt();
+                if (set.add(k)) {
+                    bPlusTree.insert(k);
+                }
+            }
+            list.clear();
+            list.addAll(set);
+            Collections.shuffle(list, random);
+
+            //再删除所有元素
+            for (int i : list) {
+                bPlusTree.delete(i);
+            }
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("Run time: " + (end - start) / 1000 + "s");
+    }
+
     public void insert(int k) {
         if (root.n == 2 * t) {
             BPlusTreeNode newRoot = new BPlusTreeNode(t);
@@ -323,60 +378,5 @@ public class BPlusTree {
             x = x.next;
         }
         return list;
-    }
-
-    public static void main(String[] args) {
-        long start = System.currentTimeMillis();
-
-        Random random = new Random();
-
-        int TIMES = 500;
-
-        while (--TIMES > 0) {
-            System.out.println("剩余测试次数: " + TIMES);
-            BPlusTree bPlusTree = new BPlusTree(random.nextInt(20) + 2);
-
-            int N = 10000;
-
-            Set<Integer> set = new HashSet<Integer>();
-            for (int i = 0; i < N; i++) {
-                set.add(random.nextInt());
-            }
-
-            List<Integer> list = new ArrayList<Integer>(set);
-            Collections.shuffle(list, random);
-            //插入N个数据
-            for (int i : list) {
-                bPlusTree.insert(i);
-            }
-
-            int M = list.size() / 2;
-
-            //删除M个数据
-            Collections.shuffle(list, random);
-
-            for (int i = 0; i < M; i++) {
-                set.remove(list.get(i));
-                bPlusTree.delete(list.get(i));
-            }
-
-            //再插入M个数据
-            for (int i = 0; i < M; i++) {
-                int k = random.nextInt();
-                if (set.add(k)) {
-                    bPlusTree.insert(k);
-                }
-            }
-            list.clear();
-            list.addAll(set);
-            Collections.shuffle(list, random);
-
-            //再删除所有元素
-            for (int i : list) {
-                bPlusTree.delete(i);
-            }
-        }
-        long end = System.currentTimeMillis();
-        System.out.println("Run time: " + (end - start) / 1000 + "s");
     }
 }

@@ -25,6 +25,63 @@ public class RBTree {
         root = nil;
     }
 
+    public static void main(String[] args) {
+        long start = System.currentTimeMillis();
+
+        Random random = new Random();
+
+        int TIMES = 10;
+
+        while (--TIMES > 0) {
+            System.out.println("剩余测试次数: " + TIMES);
+            RBTree rbTree = new RBTree();
+
+            int N = 10000;
+            int M = N / 2;
+
+            Set<Integer> set = new HashSet<Integer>();
+            for (int i = 0; i < N; i++) {
+                set.add(random.nextInt());
+            }
+
+            List<Integer> list = new ArrayList<Integer>(set);
+            Collections.shuffle(list, random);
+            //插入N个数据
+            for (int i : list) {
+                rbTree.insert(i);
+            }
+
+//            rbTree.preOrderTraverse();
+//            rbTree.inOrderTraverse();
+//            rbTree.postOrderTraverse();
+
+            //删除M个数据
+            Collections.shuffle(list, random);
+
+            for (int i = 0; i < M; i++) {
+                set.remove(list.get(i));
+                rbTree.delete(list.get(i));
+            }
+
+            //再插入M个数据
+            for (int i = 0; i < M; i++) {
+                int k = random.nextInt();
+                set.add(k);
+                rbTree.insert(k);
+            }
+            list.clear();
+            list.addAll(set);
+            Collections.shuffle(list, random);
+
+            //再删除所有元素
+            for (int i : list) {
+                rbTree.delete(i);
+            }
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("Run time: " + (end - start) / 1000 + "s");
+    }
+
     public void insert(int val) {
         RBTreeNode x = root;
         RBTreeNode y = nil;
@@ -381,7 +438,6 @@ public class RBTree {
         }
     }
 
-
     public void inOrderTraverse() {
         StringBuilder sbRecursive = new StringBuilder();
         StringBuilder sbStack = new StringBuilder();
@@ -577,62 +633,5 @@ public class RBTree {
                 cur = cur.parent;
             }
         }
-    }
-
-    public static void main(String[] args) {
-        long start = System.currentTimeMillis();
-
-        Random random = new Random();
-
-        int TIMES = 10;
-
-        while (--TIMES > 0) {
-            System.out.println("剩余测试次数: " + TIMES);
-            RBTree rbTree = new RBTree();
-
-            int N = 10000;
-            int M = N / 2;
-
-            Set<Integer> set = new HashSet<Integer>();
-            for (int i = 0; i < N; i++) {
-                set.add(random.nextInt());
-            }
-
-            List<Integer> list = new ArrayList<Integer>(set);
-            Collections.shuffle(list, random);
-            //插入N个数据
-            for (int i : list) {
-                rbTree.insert(i);
-            }
-
-//            rbTree.preOrderTraverse();
-//            rbTree.inOrderTraverse();
-//            rbTree.postOrderTraverse();
-
-            //删除M个数据
-            Collections.shuffle(list, random);
-
-            for (int i = 0; i < M; i++) {
-                set.remove(list.get(i));
-                rbTree.delete(list.get(i));
-            }
-
-            //再插入M个数据
-            for (int i = 0; i < M; i++) {
-                int k = random.nextInt();
-                set.add(k);
-                rbTree.insert(k);
-            }
-            list.clear();
-            list.addAll(set);
-            Collections.shuffle(list, random);
-
-            //再删除所有元素
-            for (int i : list) {
-                rbTree.delete(i);
-            }
-        }
-        long end = System.currentTimeMillis();
-        System.out.println("Run time: " + (end - start) / 1000 + "s");
     }
 }
