@@ -382,10 +382,7 @@ public class BStarTree {
             System.out.println();
         }
     }
-}
 
-
-class TestBStarTree {
     public static void main(String[] args) {
         long start = System.currentTimeMillis();
 

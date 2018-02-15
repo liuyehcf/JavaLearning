@@ -332,10 +332,7 @@ public class BTree {
             }
         }
     }
-}
 
-
-class TestBtree {
     public static void main(String[] args) {
         long start = System.currentTimeMillis();
 

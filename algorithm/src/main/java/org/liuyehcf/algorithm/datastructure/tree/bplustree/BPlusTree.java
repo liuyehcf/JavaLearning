@@ -324,10 +324,7 @@ public class BPlusTree {
         }
         return list;
     }
-}
 
-
-class TestBPlusTree {
     public static void main(String[] args) {
         long start = System.currentTimeMillis();
 

@@ -3,13 +3,9 @@ package org.liuyehcf.algorithm.datastructure.tree.avltree;
 import java.util.*;
 
 /**
- * Created by Liuye on 2017/4/27.
+ * Created by liuye on 2017/4/24 0024.
  */
-enum RotateOrientation {
-    INVALID,
-    LEFT,
-    RIGHT
-}
+
 
 public class AVLTree2 {
     private AVLTreeNode root;
@@ -48,57 +44,42 @@ public class AVLTree2 {
         }
         z.left = nil;
         z.right = nil;
-        fixUp(z);
+        balanceFix(z);
         if (!check())
             throw new RuntimeException();
     }
 
-    private void fixUp(AVLTreeNode y) {
-        if (y == nil) {
-            y = y.parent;
-        }
-        while (y != nil) {
-            updateHigh(y);
-            if (y.left.h == y.right.h + 2)
-                y = holdRotate(y, RotateOrientation.RIGHT);
-            else if (y.right.h == y.left.h + 2)
-                y = holdRotate(y, RotateOrientation.LEFT);
-            y = y.parent;
-        }
-    }
+    private void balanceFix(AVLTreeNode z) {
+        //当前节点的初始高度
+        int originHigh = z.h;
 
-    private AVLTreeNode holdRotate(AVLTreeNode x, RotateOrientation orientation) {
-        LinkedList<AVLTreeNode> stack1 = new LinkedList<AVLTreeNode>();
-        LinkedList<RotateOrientation> stack2 = new LinkedList<RotateOrientation>();
-        stack1.push(x);
-        stack2.push(orientation);
-        AVLTreeNode cur = nil;
-        AVLTreeNode rotateRoot = nil;
-        RotateOrientation curOrientation = RotateOrientation.INVALID;
-        while (!stack1.isEmpty()) {
-            cur = stack1.peek();
-            curOrientation = stack2.peek();
-            if (curOrientation == RotateOrientation.LEFT) {
-                if (cur.right.right.h >= cur.right.left.h) {
-                    stack1.pop();
-                    stack2.pop();
-                    rotateRoot = leftRotate(cur);
-                } else {
-                    stack1.push(cur.right);
-                    stack2.push(RotateOrientation.RIGHT);
-                }
-            } else if (curOrientation == RotateOrientation.RIGHT) {
-                if (cur.left.left.h >= cur.left.right.h) {
-                    stack1.pop();
-                    stack2.pop();
-                    rotateRoot = rightRotate(cur);
-                } else {
-                    stack1.push(cur.left);
-                    stack2.push(RotateOrientation.LEFT);
-                }
+        updateHigh(z);
+
+        //经过调整后的子树根节点(调整之前子树根节点为z)
+        AVLTreeNode r = z;
+
+        if (z.left.h == z.right.h + 2) {
+            //todo 这里的等号非常重要(插入过程时不可能取等号，删除过程可能取等号)
+            if (z.left.left.h >= z.left.right.h) {
+                r = rightRotate(z);
+            } else if (z.left.left.h < z.left.right.h) {
+                leftRotate(z.left);
+                r = rightRotate(z);
+            }
+
+        } else if (z.right.h == z.left.h + 2) {
+            //todo 这里的等号非常重要(插入过程时不可能取等号，删除过程可能取等号)
+            if (z.right.right.h >= z.right.left.h) {
+                r = leftRotate(z);
+            } else if (z.right.right.h < z.right.left.h) {
+                rightRotate(z.right);
+                r = leftRotate(z);
             }
         }
-        return rotateRoot;
+
+        //递归其父节点
+        if (r.h != originHigh && r != root)
+            balanceFix(r.parent);
     }
 
     private void updateHigh(AVLTreeNode z) {
@@ -216,36 +197,40 @@ public class AVLTree2 {
         if (z == nil) {
             throw new RuntimeException();
         }
+        //y代表真正被删除的节点
         AVLTreeNode y = z;
-        AVLTreeNode x = nil;
+        //x为被删除节点的父节点，如果平衡被破坏，从该节点开始
+        AVLTreeNode p = y.parent;
         if (z.left == nil) {
-            x = y.right;
             transplant(z, z.right);
         } else if (z.right == nil) {
-            x = y.left;
             transplant(z, z.left);
         } else {
             y = min(z.right);
-            x = y.right;
-            if (y.parent == z) {
-                x.parent = y;
+            //todo 这里的分类讨论非常重要,否则将会定位到错误的父节点
+            if (y == z.right) {
+                p = y;
             } else {
-                transplant(y, y.right);
-                y.right = z.right;
-                y.right.parent = y;
+                p = y.parent;
             }
-            transplant(z, y);
+            transplant(y, y.right);
+
+            //todo 下面六句可以用z.val=y.val来代替,效果一样
+            y.right = z.right;
+            y.right.parent = y;
 
             y.left = z.left;
             y.left.parent = y;
 
+            transplant(z, y);
+            y.h = z.h;//todo 这里高度必须维护
             //todo 这里不需要更新p的高度,因为p的子树的高度此时并不知道是否正确,因此更新也没有意义,这也是deleteFixBalance必须遍历到root的原因
         }
-        fixUp(x);
+        if (p != nil)
+            balanceFix(p);
         if (!check())
             throw new RuntimeException();
     }
-
 
     private void transplant(AVLTreeNode u, AVLTreeNode v) {
         v.parent = u.parent;
@@ -294,10 +279,7 @@ public class AVLTree2 {
             inOrderTraverse(root.right);
         }
     }
-}
 
-
-class TestAVLTree2 {
     public static void main(String[] args) {
         long start = System.currentTimeMillis();
 
@@ -307,44 +289,42 @@ class TestAVLTree2 {
 
         while (--TIMES > 0) {
             System.out.println("剩余测试次数: " + TIMES);
-            AVLTree2 avlTree2 = new AVLTree2();
+            AVLTree2 avlTree = new AVLTree2();
 
-            int N = 1000;
+            int N = 10000;
             int M = N / 2;
 
-            Set<Integer> set = new HashSet<Integer>();
+            List<Integer> list = new ArrayList<Integer>();
             for (int i = 0; i < N; i++) {
-                set.add(random.nextInt());
+                list.add(random.nextInt());
             }
 
-            List<Integer> list = new ArrayList<Integer>(set);
             Collections.shuffle(list, random);
             //插入N个数据
             for (int i : list) {
-                avlTree2.insert(i);
+                avlTree.insert(i);
             }
 
             //删除M个数据
             Collections.shuffle(list, random);
 
             for (int i = 0; i < M; i++) {
-                set.remove(list.get(i));
-                avlTree2.delete(list.get(i));
+                int k = list.get(list.size() - 1);
+                list.remove(list.size() - 1);
+                avlTree.delete(k);
             }
 
             //再插入M个数据
             for (int i = 0; i < M; i++) {
                 int k = random.nextInt();
-                set.add(k);
-                avlTree2.insert(k);
+                list.add(k);
+                avlTree.insert(k);
             }
-            list.clear();
-            list.addAll(set);
             Collections.shuffle(list, random);
 
             //再删除所有元素
             for (int i : list) {
-                avlTree2.delete(i);
+                avlTree.delete(i);
             }
         }
         long end = System.currentTimeMillis();

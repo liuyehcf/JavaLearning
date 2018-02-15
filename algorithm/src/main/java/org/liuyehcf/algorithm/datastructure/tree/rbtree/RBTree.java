@@ -579,10 +579,6 @@ public class RBTree {
         }
     }
 
-}
-
-
-class TestRBTree {
     public static void main(String[] args) {
         long start = System.currentTimeMillis();
 
