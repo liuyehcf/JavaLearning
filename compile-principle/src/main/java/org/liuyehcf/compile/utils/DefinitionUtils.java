@@ -19,6 +19,11 @@ public class DefinitionUtils {
         return new Symbol(false, value);
     }
 
+    public static Symbol createClonedAndFlippedSymbol(Symbol symbol) {
+        assertTrue("".equals(symbol.getSubValue()));
+        return new Symbol(symbol.getTerminator(), symbol.getValue(), "'");
+    }
+
     public static SymbolSequence createSymbolSequence(Symbol... symbols) {
         return new SymbolSequence(symbols);
     }

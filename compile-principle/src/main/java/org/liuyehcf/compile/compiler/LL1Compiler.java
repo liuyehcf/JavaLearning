@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.liuyehcf.compile.utils.AssertUtils.assertFalse;
+import static org.liuyehcf.compile.utils.CollectionUtils.of;
+import static org.liuyehcf.compile.utils.CollectionUtils.subListExceptFirstElement;
 import static org.liuyehcf.compile.utils.DefinitionUtils.*;
 
 public class LL1Compiler implements Compiler {
@@ -20,7 +22,6 @@ public class LL1Compiler implements Compiler {
 
     public LL1Compiler(Grammar grammar) {
         this.grammar = convert(grammar);
-        System.out.println(this.grammar);
     }
 
     /**
@@ -36,6 +37,11 @@ public class LL1Compiler implements Compiler {
     @Override
     public boolean isSentence(String sequence) {
         return false;
+    }
+
+    @Override
+    public Grammar getGrammar() {
+        return this.grammar;
     }
 
     /**
@@ -67,16 +73,27 @@ public class LL1Compiler implements Compiler {
         }
 
         private Grammar convert() {
+            check();
+
             init();
 
             for (int i = 0; i < sortedSymbols.size(); i++) {
                 for (int j = 0; j < i; j++) {
+                    // 如果非终结符I的产生式里第一个非终结符是J，那么用J的产生式替换掉非终结符J
                     substitutionNonTerminator(i, j);
                 }
-                eliminateDirectLeftRecursion();
+                // 消除非终结符I的直接左递归
+                eliminateDirectLeftRecursion(i);
             }
 
             return createNewGrammar();
+        }
+
+        /**
+         * 检查待转换的文法是否符合LL1文法的要求
+         */
+        private void check() {
+
         }
 
         private void init() {
@@ -136,12 +153,13 @@ public class LL1Compiler implements Compiler {
                     // 遍历终结符J的每个子产生式
                     for (SymbolSequence symbolSequenceJ : productionJ.getRight()) {
 
-                        List<Symbol> combinedSymbols = symbolSequenceJ.getSymbols();
-
-                        combinedSymbols.addAll(symbolsI.subList(1, symbolsI.size()));
-
                         symbolSequences.add(
-                                createSymbolSequence(combinedSymbols)
+                                createSymbolSequence(
+                                        of(
+                                                symbolSequenceJ.getSymbols(),
+                                                subListExceptFirstElement(symbolsI)
+                                        )
+                                )
                         );
                     }
 
@@ -157,8 +175,84 @@ public class LL1Compiler implements Compiler {
             }
         }
 
-        private void eliminateDirectLeftRecursion() {
+        /**
+         * p1: A→Aα1|Aα2|...|Aαn|β1|β2|...|βm
+         * p2: A→β1A′|β2A′|...|βmA′
+         * p3: A′→α1A′|α2A′|...|αnA′|ε
+         *
+         * @param i
+         */
+        private void eliminateDirectLeftRecursion(int i) {
+            Symbol _A = sortedSymbols.get(i);
 
+            Production p1 = productionMap.get(_A);
+
+            List<SymbolSequence> _Betas = new ArrayList<>();
+            List<SymbolSequence> _Alphas = new ArrayList<>();
+
+            for (SymbolSequence symbolSequence : p1.getRight()) {
+                List<Symbol> symbols = symbolSequence.getSymbols();
+                if (!symbols.isEmpty()
+                        && symbols.get(0).equals(_A)) {
+                    _Alphas.add(symbolSequence);
+                } else {
+                    _Betas.add(symbolSequence);
+                }
+            }
+
+            if (_Alphas.isEmpty()) {
+                return;
+            }
+
+            List<SymbolSequence> changedAlphas = new ArrayList<>();
+
+            for (SymbolSequence symbolSequence : _Alphas) {
+
+                changedAlphas.add(
+                        // αiA′
+                        createSymbolSequence(
+                                of(
+                                        // αi
+                                        subListExceptFirstElement(symbolSequence.getSymbols()),
+                                        // A′
+                                        createClonedAndFlippedSymbol(_A)
+                                )
+                        )
+                );
+            }
+
+            // ε
+            changedAlphas.add(
+                    createSymbolSequence(Symbol._Epsilon)
+            );
+
+            Production p3 = createProduction(
+                    createClonedAndFlippedSymbol(_A),
+                    changedAlphas
+            );
+
+            List<SymbolSequence> changedBetas = new ArrayList<>();
+
+            for (SymbolSequence betaSymbolSequence : _Betas) {
+
+                for (SymbolSequence alphaSymbolSequence : changedAlphas) {
+                    changedBetas.add(
+                            createSymbolSequence(
+                                    of(
+                                            betaSymbolSequence.getSymbols(),
+                                            alphaSymbolSequence.getSymbols()
+                                    )
+                            )
+                    );
+                }
+            }
+
+            Production p2 = createProduction(
+                    _A,
+                    changedBetas
+            );
+
+            productionMap.put(_A, p2);
         }
 
         private Grammar createNewGrammar() {
