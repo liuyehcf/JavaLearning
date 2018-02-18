@@ -31,7 +31,7 @@ public class Symbol {
         }
     }
 
-    public Boolean getTerminator() {
+    public Boolean isTerminator() {
         return isTerminator;
     }
 

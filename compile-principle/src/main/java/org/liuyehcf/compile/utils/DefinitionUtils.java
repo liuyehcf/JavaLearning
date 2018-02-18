@@ -21,7 +21,7 @@ public class DefinitionUtils {
 
     public static Symbol createClonedAndFlippedSymbol(Symbol symbol) {
         assertTrue("".equals(symbol.getSubValue()));
-        return new Symbol(symbol.getTerminator(), symbol.getValue(), "'");
+        return new Symbol(symbol.isTerminator(), symbol.getValue(), "'");
     }
 
     public static SymbolSequence createSymbolSequence(Symbol... symbols) {

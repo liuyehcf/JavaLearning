@@ -5,13 +5,11 @@ import org.liuyehcf.compile.definition.Production;
 import org.liuyehcf.compile.definition.Symbol;
 import org.liuyehcf.compile.definition.SymbolSequence;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.liuyehcf.compile.utils.AssertUtils.assertFalse;
+import static org.liuyehcf.compile.utils.AssertUtils.assertTrue;
 import static org.liuyehcf.compile.utils.CollectionUtils.of;
 import static org.liuyehcf.compile.utils.CollectionUtils.subListExceptFirstElement;
 import static org.liuyehcf.compile.utils.DefinitionUtils.*;
@@ -96,13 +94,17 @@ public class LL1Compiler implements Compiler {
 
         }
 
+        /**
+         * 初始化一些变量
+         */
         private void init() {
             if (productionMap == null) {
                 productionMap = new HashMap<>();
                 for (Production production : grammar.getProductions()) {
                     Symbol nonTerminator = production.getLeft();
-                    assertFalse(nonTerminator.getTerminator());
+                    assertFalse(nonTerminator.isTerminator());
 
+                    // 合并相同非终结符的产生式
                     if (productionMap.containsKey(nonTerminator)) {
                         productionMap.put(nonTerminator, parallelProduction(
                                 productionMap.get(nonTerminator),
@@ -119,8 +121,64 @@ public class LL1Compiler implements Compiler {
         }
 
         private void createOrderedSymbols() {
-            // todo 这里需要按照有向图遍历进行排序
-            this.sortedSymbols = new ArrayList<>(productionMap.keySet());
+            // 有向边，从key指向value
+            Map<Symbol, List<Symbol>> edges = new HashMap<>();
+
+            // 顶点的度，度为0的顶点才能访问
+            Map<Symbol, Integer> degrees = new HashMap<>();
+
+            // 初始化edges以及degrees
+            for (Symbol symbol : productionMap.keySet()) {
+                edges.put(symbol, new ArrayList<>());
+                degrees.put(symbol, 0);
+            }
+
+            for (Map.Entry<Symbol, Production> entry : productionMap.entrySet()) {
+                Symbol toSymbol = entry.getKey();
+
+                for (SymbolSequence symbolSequence : entry.getValue().getRight()) {
+                    List<Symbol> symbols = symbolSequence.getSymbols();
+                    if (!symbols.isEmpty()
+                            && !symbols.get(0).isTerminator()
+                            && !symbols.get(0).equals(toSymbol)) {
+                        Symbol fromSymbol = symbols.get(0);
+
+                        edges.get(fromSymbol).add(toSymbol);
+
+                        degrees.put(toSymbol, degrees.get(toSymbol) + 1);
+                    }
+                }
+            }
+
+            Queue<Symbol> queue = new LinkedList<>();
+
+            List<Symbol> visitedSymbol = new ArrayList<>();
+
+            for (Map.Entry<Symbol, Integer> entry : degrees.entrySet()) {
+                if (entry.getValue() == 0) {
+                    queue.add(entry.getKey());
+                }
+            }
+
+            while (!queue.isEmpty()) {
+                Symbol curSymbol = queue.poll();
+                visitedSymbol.add(curSymbol);
+
+                // 有向邻接节点
+                List<Symbol> adjList = edges.get(curSymbol);
+
+                for (Symbol adjSymbol : adjList) {
+                    degrees.put(adjSymbol, degrees.get(adjSymbol) - 1);
+                    // 度为0，可以访问
+                    if (degrees.get(adjSymbol) == 0) {
+                        queue.offer(adjSymbol);
+                    }
+                }
+            }
+
+            assertTrue(visitedSymbol.size() == productionMap.size());
+
+            this.sortedSymbols = visitedSymbol;
         }
 
         /**
@@ -187,7 +245,10 @@ public class LL1Compiler implements Compiler {
 
             Production p1 = productionMap.get(_A);
 
+            // β1|β2|...|βm
             List<SymbolSequence> _Betas = new ArrayList<>();
+
+            // Aα1|Aα2|...|Aαn
             List<SymbolSequence> _Alphas = new ArrayList<>();
 
             for (SymbolSequence symbolSequence : p1.getRight()) {
@@ -204,16 +265,16 @@ public class LL1Compiler implements Compiler {
                 return;
             }
 
-            List<SymbolSequence> changedAlphas = new ArrayList<>();
+            List<SymbolSequence> p3SymbolSequence = new ArrayList<>();
 
-            for (SymbolSequence symbolSequence : _Alphas) {
+            for (SymbolSequence alphaSymbolSequence : _Alphas) {
 
-                changedAlphas.add(
+                p3SymbolSequence.add(
                         // αiA′
                         createSymbolSequence(
                                 of(
                                         // αi
-                                        subListExceptFirstElement(symbolSequence.getSymbols()),
+                                        subListExceptFirstElement(alphaSymbolSequence.getSymbols()),
                                         // A′
                                         createClonedAndFlippedSymbol(_A)
                                 )
@@ -222,21 +283,22 @@ public class LL1Compiler implements Compiler {
             }
 
             // ε
-            changedAlphas.add(
+            p3SymbolSequence.add(
                     createSymbolSequence(Symbol._Epsilon)
             );
 
             Production p3 = createProduction(
                     createClonedAndFlippedSymbol(_A),
-                    changedAlphas
+                    p3SymbolSequence
             );
 
-            List<SymbolSequence> changedBetas = new ArrayList<>();
+            List<SymbolSequence> p2SymbolSequence = new ArrayList<>();
 
             for (SymbolSequence betaSymbolSequence : _Betas) {
 
-                for (SymbolSequence alphaSymbolSequence : changedAlphas) {
-                    changedBetas.add(
+                // 构造β1A′|β2A′|...|βmA′，其中A′也需要一层遍历
+                for (SymbolSequence alphaSymbolSequence : p3SymbolSequence) {
+                    p2SymbolSequence.add(
                             createSymbolSequence(
                                     of(
                                             betaSymbolSequence.getSymbols(),
@@ -249,7 +311,7 @@ public class LL1Compiler implements Compiler {
 
             Production p2 = createProduction(
                     _A,
-                    changedBetas
+                    p2SymbolSequence
             );
 
             productionMap.put(_A, p2);
