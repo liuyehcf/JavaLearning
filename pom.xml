@@ -39,6 +39,8 @@
         <module>reflect</module>
         <module>jdbc</module>
         <module>mybatis-spring</module>
+        <module>lambda-expression</module>
+        <module>compile-principle</module>
 
     </modules>
 
