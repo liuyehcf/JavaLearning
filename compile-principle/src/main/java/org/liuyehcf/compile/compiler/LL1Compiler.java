@@ -82,6 +82,9 @@ public class LL1Compiler implements Compiler {
                 }
                 // 消除非终结符I的直接左递归
                 eliminateDirectLeftRecursion(i);
+
+                // 提取左公因子
+                // extractLeftCommonFactor(i);
             }
 
             return createNewGrammar();
@@ -138,8 +141,10 @@ public class LL1Compiler implements Compiler {
 
                 for (SymbolSequence symbolSequence : entry.getValue().getRight()) {
                     List<Symbol> symbols = symbolSequence.getSymbols();
-                    if (!symbols.isEmpty()
-                            && !symbols.get(0).isTerminator()
+
+                    assertTrue(!symbols.isEmpty());
+
+                    if (!symbols.get(0).isTerminator()
                             && !symbols.get(0).equals(toSymbol)) {
                         Symbol fromSymbol = symbols.get(0);
 
@@ -203,9 +208,10 @@ public class LL1Compiler implements Compiler {
             for (SymbolSequence symbolSequenceI : productionI.getRight()) {
                 List<Symbol> symbolsI = symbolSequenceI.getSymbols();
 
+                assertTrue(!symbolsI.isEmpty());
+
                 // 如果子产生式第一个符号是symbolJ，那么进行替换
-                if (!symbolsI.isEmpty()
-                        && symbolsI.get(0).equals(symbolJ)) {
+                if (symbolsI.get(0).equals(symbolJ)) {
                     isSubstituted = true;
 
                     // 遍历终结符J的每个子产生式
@@ -234,9 +240,10 @@ public class LL1Compiler implements Compiler {
         }
 
         /**
-         * p1: A→Aα1|Aα2|...|Aαn|β1|β2|...|βm
-         * p2: A→β1A′|β2A′|...|βmA′
-         * p3: A′→α1A′|α2A′|...|αnA′|ε
+         * 消除直接左递归，将产生式p1改造成p2
+         * p1: A  → Aα1|Aα2|...|Aαn|β1|β2|...|βm
+         * p2: A  → β1A′|β2A′|...|βmA′
+         * p3: A′ → α1A′|α2A′|...|αnA′|ε
          *
          * @param i
          */
@@ -253,8 +260,10 @@ public class LL1Compiler implements Compiler {
 
             for (SymbolSequence symbolSequence : p1.getRight()) {
                 List<Symbol> symbols = symbolSequence.getSymbols();
-                if (!symbols.isEmpty()
-                        && symbols.get(0).equals(_A)) {
+
+                assertTrue(!symbols.isEmpty());
+
+                if (symbols.get(0).equals(_A)) {
                     _Alphas.add(symbolSequence);
                 } else {
                     _Betas.add(symbolSequence);
@@ -276,7 +285,7 @@ public class LL1Compiler implements Compiler {
                                         // αi
                                         subListExceptFirstElement(alphaSymbolSequence.getSymbols()),
                                         // A′
-                                        createClonedAndFlippedSymbol(_A)
+                                        _A.getMutatedSymbol()
                                 )
                         )
                 );
@@ -288,7 +297,7 @@ public class LL1Compiler implements Compiler {
             );
 
             Production p3 = createProduction(
-                    createClonedAndFlippedSymbol(_A),
+                    _A.getMutatedSymbol(),
                     p3SymbolSequence
             );
 
@@ -315,6 +324,64 @@ public class LL1Compiler implements Compiler {
             );
 
             productionMap.put(_A, p2);
+        }
+
+        /**
+         * 提取左公因子，直到任意两个子产生式没有公共前缀
+         * p1: A  → aβ1|aβ2|...|aβn|γ1|γ2|...|γm
+         * p2: A  → aA′|γ1|γ2|...|γm
+         * p3: A′ → β1|β2|...|βn
+         *
+         * @param i
+         */
+        private void extractLeftCommonFactor(int i) {
+            Symbol _A = sortedSymbols.get(i);
+
+            Production p1 = productionMap.get(_A);
+
+            Map<Symbol, Integer> commonPrefixes = new HashMap<>();
+
+            // 初始化commonPrefixes
+            for (SymbolSequence symbolSequence : p1.getRight()) {
+                List<Symbol> symbols = symbolSequence.getSymbols();
+
+                assertTrue(!symbols.isEmpty() && symbols.get(0).isTerminator());
+
+                Symbol firstSymbol = symbols.get(0);
+
+                if (!commonPrefixes.containsKey(firstSymbol)) {
+                    commonPrefixes.put(firstSymbol, 0);
+                }
+
+                commonPrefixes.put(firstSymbol, commonPrefixes.get(firstSymbol) + 1);
+            }
+
+            filterPrefixWithSingleCount(commonPrefixes);
+
+            // 循环提取左公因子
+            while (!commonPrefixes.isEmpty()) {
+
+
+                filterPrefixWithSingleCount(commonPrefixes);
+            }
+
+        }
+
+        /**
+         * 除去计数值为1的公共前缀
+         *
+         * @param commonPrefixes
+         */
+        private void filterPrefixWithSingleCount(Map<Symbol, Integer> commonPrefixes) {
+            List<Symbol> removeKeys = new ArrayList<>();
+            for (Map.Entry<Symbol, Integer> entry : commonPrefixes.entrySet()) {
+                if (entry.getValue() == 1) {
+                    removeKeys.add(entry.getKey());
+                }
+            }
+            for (Symbol key : removeKeys) {
+                commonPrefixes.remove(key);
+            }
         }
 
         private Grammar createNewGrammar() {

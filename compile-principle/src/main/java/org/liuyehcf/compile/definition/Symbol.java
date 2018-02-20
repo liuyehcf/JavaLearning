@@ -2,33 +2,39 @@ package org.liuyehcf.compile.definition;
 
 /**
  * 文法符号，包括终结符和非终结符
+ * 特殊符号用"__"作为前后缀，且全部字母大写，同时禁止普通Symbol带有"__"前后缀
  */
 public class Symbol {
-    private static final String EMPTY_SUB_VALUE = "";
+    public static final Symbol _Epsilon = new Symbol(true, "__EPSILON__", 0);
 
-    public static final Symbol _Epsilon = new Symbol(true, "", "Epsilon");
-
+    // 是否为终结符
     private final Boolean isTerminator;
+
+    // 符号的字符串
     private final String value;
 
-    // 该字段，仅用于内部处理，比如想要构造一个A'，把'写到subValue中
-    private final String subValue;
+    // 异变次数，例如A异变一次就是A'
+    private final Integer mutationTimes;
 
     public Symbol(Boolean isTerminator, String value) {
-        this(isTerminator, value, EMPTY_SUB_VALUE);
-    }
-
-    public Symbol(Boolean isTerminator, String value, String subValue) {
-        check(isTerminator, value, subValue);
-        this.isTerminator = isTerminator;
-        this.value = value;
-        this.subValue = subValue;
-    }
-
-    private void check(Boolean isTerminator, String value, String subValue) {
-        if (isTerminator == null || value == null || subValue == null) {
+        if (isTerminator == null || value == null) {
             throw new NullPointerException();
         }
+        if (value.startsWith("__") || value.endsWith("__")) {
+            throw new IllegalArgumentException();
+        }
+        this.isTerminator = isTerminator;
+        this.value = value;
+        this.mutationTimes = 0;
+    }
+
+    private Symbol(Boolean isTerminator, String value, Integer mutationTimes) {
+        if (isTerminator == null || value == null || mutationTimes == null) {
+            throw new NullPointerException();
+        }
+        this.isTerminator = isTerminator;
+        this.value = value;
+        this.mutationTimes = mutationTimes;
     }
 
     public Boolean isTerminator() {
@@ -39,8 +45,20 @@ public class Symbol {
         return value;
     }
 
-    public String getSubValue() {
-        return subValue;
+    public Boolean isMutated() {
+        return mutationTimes != 0;
+    }
+
+    private String getMutationString() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < mutationTimes; i++) {
+            sb.append("′");
+        }
+        return sb.toString();
+    }
+
+    public Symbol getMutatedSymbol() {
+        return new Symbol(this.isTerminator, this.value, this.mutationTimes + 1);
     }
 
     @Override
@@ -48,7 +66,7 @@ public class Symbol {
         if (obj instanceof Symbol) {
             Symbol symbol = (Symbol) obj;
             return symbol.value.equals(this.value)
-                    && symbol.subValue.equals(this.subValue)
+                    && symbol.mutationTimes.equals(this.mutationTimes)
                     && symbol.isTerminator.equals(this.isTerminator);
         }
         return false;
@@ -56,15 +74,14 @@ public class Symbol {
 
     @Override
     public int hashCode() {
-        return this.isTerminator.hashCode() + this.value.hashCode() + this.subValue.hashCode();
+        return this.isTerminator.hashCode() + this.value.hashCode() + this.mutationTimes.hashCode();
     }
 
     @Override
     public String toString() {
         return "{" +
                 "\"isTerminator\":" + "\"" + isTerminator + "\"" +
-                ", \"value\":" + "\"" + value + "\"" +
-                ", \"subValue\":" + "\"" + subValue + "\"" +
+                ", \"value\":" + "\"" + value + getMutationString() + "\"" +
                 '}';
     }
 }
