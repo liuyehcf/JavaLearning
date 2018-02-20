@@ -84,7 +84,7 @@ public class LL1Compiler implements Compiler {
                 eliminateDirectLeftRecursion(i);
 
                 // 提取左公因子
-                // extractLeftCommonFactor(i);
+                extractLeftCommonFactor(i);
             }
 
             return createNewGrammar();
@@ -345,7 +345,6 @@ public class LL1Compiler implements Compiler {
          */
         private void extractLeftCommonFactor(int i) {
             Symbol _A = sortedSymbols.get(i);
-
             Production p1 = productionMap.get(_A);
 
             Map<Symbol, Integer> commonPrefixes = new HashMap<>();
@@ -368,10 +367,58 @@ public class LL1Compiler implements Compiler {
             filterPrefixWithSingleCount(commonPrefixes);
 
             // 循环提取左公因子
-            while (!commonPrefixes.isEmpty()) {
+            if (!commonPrefixes.isEmpty()) {
 
+                Map<Symbol, Production> extraProductions = p1.getExtraProductions();
 
-                filterPrefixWithSingleCount(commonPrefixes);
+                Symbol _AFlip = _A;
+
+                do {
+                    _AFlip = _AFlip.getMutatedSymbol();
+                } while (extraProductions.containsKey(_AFlip));
+
+                Symbol prefixSymbol = commonPrefixes.keySet().iterator().next();
+
+                List<SymbolSequence> _Betas = new ArrayList<>();
+                List<SymbolSequence> _Gammas = new ArrayList<>();
+
+                for (SymbolSequence symbolSequence : p1.getRight()) {
+                    if (symbolSequence.getSymbols().get(0).equals(prefixSymbol)) {
+                        if (symbolSequence.getSymbols().size() > 1) {
+                            _Betas.add(
+                                    createSymbolSequence(
+                                            subListExceptFirstElement(symbolSequence.getSymbols())
+                                    )
+                            );
+                        }
+                    } else {
+                        _Gammas.add(symbolSequence);
+                    }
+                }
+
+                Production p3 = createProduction(
+                        _AFlip,
+                        _Betas
+                );
+
+                assertFalse(extraProductions.containsKey(_AFlip));
+                extraProductions.put(_AFlip, p3);
+
+                Production p2 = createProduction(
+                        extraProductions,
+                        _A,
+                        of(
+                                createSymbolSequence(
+                                        prefixSymbol,
+                                        _AFlip
+                                ),
+                                _Gammas
+                        )
+                );
+
+                productionMap.put(_A, p2);
+
+                extractLeftCommonFactor(i);
             }
 
         }

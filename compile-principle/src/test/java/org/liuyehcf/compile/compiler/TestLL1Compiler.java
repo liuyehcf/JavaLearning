@@ -1,6 +1,5 @@
 package org.liuyehcf.compile.compiler;
 
-import com.alibaba.fastjson.JSON;
 import org.junit.Test;
 import org.liuyehcf.compile.definition.Grammar;
 
@@ -42,7 +41,7 @@ public class TestLL1Compiler {
                 )
         );
 
-        System.out.println(JSON.toJSON(new LL1Compiler(grammar).getGrammar()));
+        System.out.println(new LL1Compiler(grammar).getGrammar());
     }
 
     @Test
@@ -86,7 +85,7 @@ public class TestLL1Compiler {
                 )
         );
 
-        System.out.println(JSON.toJSON(new LL1Compiler(grammar).getGrammar()));
+        System.out.println(new LL1Compiler(grammar).getGrammar());
     }
 
     @Test
@@ -130,6 +129,42 @@ public class TestLL1Compiler {
                 )
         );
 
-        System.out.println(JSON.toJSON(new LL1Compiler(grammar).getGrammar()));
+        System.out.println(new LL1Compiler(grammar).getGrammar());
+    }
+
+    @Test
+    public void testCommonPrefixExtract1() {
+        Grammar grammar = createGrammar(
+                createProduction(
+                        createNonTerminator("E"),
+                        createSymbolSequence(
+                                createTerminator("a"),
+                                createTerminator("b")
+                        )
+                ),
+                createProduction(
+                        createNonTerminator("E"),
+                        createSymbolSequence(
+                                createTerminator("a"),
+                                createTerminator("c")
+                        )
+                ),
+                createProduction(
+                        createNonTerminator("E"),
+                        createSymbolSequence(
+                                createTerminator("b"),
+                                createTerminator("d")
+                        )
+                ),
+                createProduction(
+                        createNonTerminator("E"),
+                        createSymbolSequence(
+                                createTerminator("b"),
+                                createTerminator("c")
+                        )
+                )
+        );
+
+        System.out.println(new LL1Compiler(grammar).getGrammar());
     }
 }

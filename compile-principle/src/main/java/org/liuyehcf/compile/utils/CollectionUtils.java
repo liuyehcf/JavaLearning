@@ -13,6 +13,10 @@ public class CollectionUtils {
         return new ArrayList<>((Arrays.asList(elements)));
     }
 
+    public static <T> List<T> of(T element, List<T> list) {
+        return of(list, element);
+    }
+
     public static <T> List<T> of(List<T> list, T... elements) {
         List<T> newList = new ArrayList<>(list);
         newList.addAll(Arrays.asList(elements));

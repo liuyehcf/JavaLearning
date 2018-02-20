@@ -8,16 +8,16 @@ public class Symbol {
     public static final Symbol _Epsilon = new Symbol(true, "__EPSILON__", 0);
 
     // 是否为终结符
-    private final Boolean isTerminator;
+    private final boolean isTerminator;
 
     // 符号的字符串
     private final String value;
 
     // 异变次数，例如A异变一次就是A'
-    private final Integer mutationTimes;
+    private final int mutationTimes;
 
-    public Symbol(Boolean isTerminator, String value) {
-        if (isTerminator == null || value == null) {
+    public Symbol(boolean isTerminator, String value) {
+        if (value == null) {
             throw new NullPointerException();
         }
         if (value.startsWith("__") || value.endsWith("__")) {
@@ -28,8 +28,8 @@ public class Symbol {
         this.mutationTimes = 0;
     }
 
-    private Symbol(Boolean isTerminator, String value, Integer mutationTimes) {
-        if (isTerminator == null || value == null || mutationTimes == null) {
+    private Symbol(boolean isTerminator, String value, int mutationTimes) {
+        if (value == null) {
             throw new NullPointerException();
         }
         this.isTerminator = isTerminator;
@@ -37,15 +37,15 @@ public class Symbol {
         this.mutationTimes = mutationTimes;
     }
 
-    public Boolean isTerminator() {
+    public boolean isTerminator() {
         return isTerminator;
     }
 
-    public String getValue() {
-        return value;
+    public String getMutatedValue() {
+        return value + getMutationString();
     }
 
-    public Boolean isMutated() {
+    public boolean isMutated() {
         return mutationTimes != 0;
     }
 
@@ -57,6 +57,11 @@ public class Symbol {
         return sb.toString();
     }
 
+    /**
+     * 产生一个异变符号
+     *
+     * @return
+     */
     public Symbol getMutatedSymbol() {
         return new Symbol(this.isTerminator, this.value, this.mutationTimes + 1);
     }
@@ -66,22 +71,24 @@ public class Symbol {
         if (obj instanceof Symbol) {
             Symbol symbol = (Symbol) obj;
             return symbol.value.equals(this.value)
-                    && symbol.mutationTimes.equals(this.mutationTimes)
-                    && symbol.isTerminator.equals(this.isTerminator);
+                    && symbol.mutationTimes == this.mutationTimes
+                    && symbol.isTerminator == this.isTerminator;
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return this.isTerminator.hashCode() + this.value.hashCode() + this.mutationTimes.hashCode();
+        return Boolean.valueOf(this.isTerminator).hashCode() +
+                this.value.hashCode() +
+                Integer.valueOf(this.mutationTimes).hashCode();
     }
 
     @Override
     public String toString() {
         return "{" +
                 "\"isTerminator\":" + "\"" + isTerminator + "\"" +
-                ", \"value\":" + "\"" + value + getMutationString() + "\"" +
+                ", \"value\":" + "\"" + getMutatedValue() + "\"" +
                 '}';
     }
 }

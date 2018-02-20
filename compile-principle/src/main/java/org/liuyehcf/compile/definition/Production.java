@@ -41,7 +41,30 @@ public class Production {
         return "{" +
                 "\"left\":" + left +
                 ", \"right\":" + right +
-                ", \"extraProductions\":" + extraProductions +
+                ", \"extraProductions\":" + toExtraProductionsString() +
                 '}';
+    }
+
+    private String toExtraProductionsString() {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append('{');
+
+        for (Map.Entry<Symbol, Production> entry : extraProductions.entrySet()) {
+            sb.append("\"")
+                    .append(entry.getKey().getMutatedValue())
+                    .append("\"")
+                    .append(":")
+                    .append(entry.getValue().toString())
+                    .append(",");
+        }
+
+        if (sb.length() > 1) {
+            sb.setLength(sb.length() - 1);
+        }
+
+        sb.append('}');
+
+        return sb.toString();
     }
 }
