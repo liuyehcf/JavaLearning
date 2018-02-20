@@ -3,6 +3,8 @@ package org.liuyehcf.compile.definition;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.liuyehcf.compile.utils.AssertUtils.assertFalse;
+
 /**
  * 文法符号串
  */
@@ -22,10 +24,24 @@ public class SymbolSequence {
         return symbols;
     }
 
-    @Override
-    public String toString() {
-        return "{" +
+    public String toJSONString() {
+        return '{' +
                 "\"symbols\":" + symbols +
                 '}';
+    }
+
+    public String toReadableJSONString() {
+        StringBuilder sb = new StringBuilder();
+
+        for (Symbol symbol : symbols) {
+            sb.append(symbol.toReadableJSONString());
+        }
+
+        return sb.toString();
+    }
+
+    @Override
+    public String toString() {
+        return toReadableJSONString();
     }
 }

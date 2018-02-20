@@ -113,11 +113,19 @@ public class Symbol {
                 Integer.valueOf(this.primeCount).hashCode();
     }
 
-    @Override
-    public String toString() {
-        return "{" +
+    public String toJSONString() {
+        return '{' +
                 "\"isTerminator\":" + "\"" + isTerminator + "\"" +
                 ", \"value\":" + "\"" + getPrimedValue() + "\"" +
                 '}';
+    }
+
+    public String toReadableJSONString() {
+        return getPrimedValue();
+    }
+
+    @Override
+    public String toString() {
+        return toReadableJSONString();
     }
 }

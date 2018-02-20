@@ -346,6 +346,7 @@ public class LL1Compiler implements Compiler {
         private void extractLeftCommonFactor(Symbol _A) {
             Production p1 = productionMap.get(_A);
 
+            // 所有平凡前缀计数
             Map<Symbol, Integer> commonPrefixes = new HashMap<>();
 
             // 初始化commonPrefixes
@@ -355,6 +356,11 @@ public class LL1Compiler implements Compiler {
                 assertTrue(!symbols.isEmpty() && symbols.get(0).isTerminator());
 
                 Symbol firstSymbol = symbols.get(0);
+
+                // 跳过非平凡前缀
+                if (firstSymbol.equals(Symbol.EPSILON)) {
+                    continue;
+                }
 
                 if (!commonPrefixes.containsKey(firstSymbol)) {
                     commonPrefixes.put(firstSymbol, 0);
@@ -382,6 +388,12 @@ public class LL1Compiler implements Compiler {
                             _Betas.add(
                                     createSymbolSequence(
                                             subListExceptFirstElement(symbolSequenceOfP1.getSymbols())
+                                    )
+                            );
+                        } else {
+                            _Betas.add(
+                                    createSymbolSequence(
+                                            Symbol.EPSILON
                                     )
                             );
                         }

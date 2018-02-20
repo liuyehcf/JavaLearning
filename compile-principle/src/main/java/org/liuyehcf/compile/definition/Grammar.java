@@ -3,6 +3,8 @@ package org.liuyehcf.compile.definition;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.liuyehcf.compile.utils.AssertUtils.assertFalse;
+
 /**
  * 文法定义
  */
@@ -23,10 +25,35 @@ public class Grammar {
         return productions;
     }
 
-    @Override
-    public String toString() {
-        return "{" +
+    public String toJSONString() {
+        return '{' +
                 "\"productions\":" + productions +
                 '}';
+    }
+
+    public String toReadableJSONString() {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append('{')
+                .append("\"productions\":")
+                .append('[');
+
+        for (Production production : productions) {
+            sb.append(production.toReadableJSONString())
+                    .append(",");
+        }
+
+        assertFalse(productions.isEmpty());
+        sb.setLength(sb.length() - 1);
+
+        sb.append(']')
+                .append('}');
+
+        return sb.toString();
+    }
+
+    @Override
+    public String toString() {
+        return toReadableJSONString();
     }
 }

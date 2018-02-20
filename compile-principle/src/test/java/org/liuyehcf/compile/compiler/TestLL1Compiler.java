@@ -45,8 +45,8 @@ public class TestLL1Compiler {
         Grammar convertedGrammar = new LL1Compiler(grammar).getGrammar();
 
         assertEquals(
-                convertedGrammar.toString(),
-                "{\"productions\":[{\"left\":{\"isTerminator\":\"false\", \"value\":\"E\"}, \"right\":[{\"symbols\":[{\"isTerminator\":\"true\", \"value\":\"(\"}, {\"isTerminator\":\"false\", \"value\":\"E\"}, {\"isTerminator\":\"true\", \"value\":\")\"}, {\"isTerminator\":\"false\", \"value\":\"E′\"}]}, {\"symbols\":[{\"isTerminator\":\"true\", \"value\":\"id\"}, {\"isTerminator\":\"false\", \"value\":\"E′\"}]}]}, {\"left\":{\"isTerminator\":\"false\", \"value\":\"E′\"}, \"right\":[{\"symbols\":[{\"isTerminator\":\"true\", \"value\":\"+\"}, {\"isTerminator\":\"false\", \"value\":\"E\"}, {\"isTerminator\":\"false\", \"value\":\"E′\"}]}, {\"symbols\":[{\"isTerminator\":\"true\", \"value\":\"*\"}, {\"isTerminator\":\"false\", \"value\":\"E\"}, {\"isTerminator\":\"false\", \"value\":\"E′\"}]}, {\"symbols\":[{\"isTerminator\":\"true\", \"value\":\"__EPSILON__\"}]}]}]}"
+                "{\"productions\":[\"E → (E)E′|idE′\",\"E′ → +EE′|*EE′|__EPSILON__\"]}",
+                convertedGrammar.toReadableJSONString()
         );
     }
 
@@ -94,8 +94,8 @@ public class TestLL1Compiler {
         Grammar convertedGrammar = new LL1Compiler(grammar).getGrammar();
 
         assertEquals(
-                convertedGrammar.toString(),
-                "{\"productions\":[{\"left\":{\"isTerminator\":\"false\", \"value\":\"D\"}, \"right\":[{\"symbols\":[{\"isTerminator\":\"true\", \"value\":\"(\"}, {\"isTerminator\":\"false\", \"value\":\"E\"}, {\"isTerminator\":\"true\", \"value\":\")\"}, {\"isTerminator\":\"false\", \"value\":\"E′\"}]}, {\"symbols\":[{\"isTerminator\":\"true\", \"value\":\"id\"}, {\"isTerminator\":\"false\", \"value\":\"E′\"}]}]}, {\"left\":{\"isTerminator\":\"false\", \"value\":\"E\"}, \"right\":[{\"symbols\":[{\"isTerminator\":\"true\", \"value\":\"(\"}, {\"isTerminator\":\"false\", \"value\":\"E\"}, {\"isTerminator\":\"true\", \"value\":\")\"}, {\"isTerminator\":\"false\", \"value\":\"E′\"}]}, {\"symbols\":[{\"isTerminator\":\"true\", \"value\":\"id\"}, {\"isTerminator\":\"false\", \"value\":\"E′\"}]}]}, {\"left\":{\"isTerminator\":\"false\", \"value\":\"E′\"}, \"right\":[{\"symbols\":[{\"isTerminator\":\"true\", \"value\":\"+\"}, {\"isTerminator\":\"false\", \"value\":\"E\"}, {\"isTerminator\":\"false\", \"value\":\"E′\"}]}, {\"symbols\":[{\"isTerminator\":\"true\", \"value\":\"*\"}, {\"isTerminator\":\"false\", \"value\":\"E\"}, {\"isTerminator\":\"false\", \"value\":\"E′\"}]}, {\"symbols\":[{\"isTerminator\":\"true\", \"value\":\"__EPSILON__\"}]}]}]}"
+                "{\"productions\":[\"D → (E)E′|idE′\",\"E → (E)E′|idE′\",\"E′ → +EE′|*EE′|__EPSILON__\"]}",
+                convertedGrammar.toReadableJSONString()
         );
     }
 
@@ -133,7 +133,12 @@ public class TestLL1Compiler {
                 )
         );
 
-        System.out.println(new LL1Compiler(grammar).getGrammar());
+        Grammar convertedGrammar = new LL1Compiler(grammar).getGrammar();
+
+        assertEquals(
+                "{\"productions\":[\"A → bA′′|aA′\",\"A′ → bA′′′\",\"A′′ → d|c\",\"A′′′ → __EPSILON__|c\"]}",
+                convertedGrammar.toReadableJSONString()
+        );
     }
 
     @Test
@@ -180,6 +185,94 @@ public class TestLL1Compiler {
                 )
         );
 
-        System.out.println(new LL1Compiler(grammar).getGrammar());
+        Grammar convertedGrammar = new LL1Compiler(grammar).getGrammar();
+
+        assertEquals(
+                "{\"productions\":[\"A → aA′|γ1|γ2|γm\",\"A′ → β1|β2|βn\"]}",
+                convertedGrammar.toReadableJSONString()
+        );
+    }
+
+    @Test
+    public void testCommonPrefixExtract3() {
+        Grammar grammar = createGrammar(
+                createProduction(
+                        createNonTerminator("A"),
+                        createSymbolSequence(
+                                createTerminator("a")
+                        )
+                ),
+                createProduction(
+                        createNonTerminator("A"),
+                        createSymbolSequence(
+                                createTerminator("a"),
+                                createTerminator("b")
+                        )
+                ),
+                createProduction(
+                        createNonTerminator("A"),
+                        createSymbolSequence(
+                                createTerminator("a"),
+                                createTerminator("b"),
+                                createTerminator("c")
+                        )
+                ),
+                createProduction(
+                        createNonTerminator("A"),
+                        createSymbolSequence(
+                                createTerminator("a"),
+                                createTerminator("b"),
+                                createTerminator("c"),
+                                createTerminator("d")
+                        )
+                ),
+                createProduction(
+                        createNonTerminator("A"),
+                        createSymbolSequence(
+                                createTerminator("b")
+                        )
+                ),
+                createProduction(
+                        createNonTerminator("A"),
+                        createSymbolSequence(
+                                createTerminator("b"),
+                                createTerminator("c")
+                        )
+                ),
+                createProduction(
+                        createNonTerminator("A"),
+                        createSymbolSequence(
+                                createTerminator("b"),
+                                createTerminator("c"),
+                                createTerminator("d")
+                        )
+                ),
+                createProduction(
+                        createNonTerminator("A"),
+                        createSymbolSequence(
+                                createTerminator("c")
+                        )
+                ),
+                createProduction(
+                        createNonTerminator("A"),
+                        createSymbolSequence(
+                                createTerminator("c"),
+                                createTerminator("d")
+                        )
+                ),
+                createProduction(
+                        createNonTerminator("A"),
+                        createSymbolSequence(
+                                createTerminator("d")
+                        )
+                )
+        );
+
+        Grammar convertedGrammar = new LL1Compiler(grammar).getGrammar();
+
+        assertEquals(
+                "{\"productions\":[\"A → cA′′′|bA′′|aA′|d\",\"A′ → bA′′′′′|__EPSILON__\",\"A′′ → cA′′′′|__EPSILON__\",\"A′′′ → __EPSILON__|d\",\"A′′′′ → __EPSILON__|d\",\"A′′′′′ → cA′′′′′′|__EPSILON__\",\"A′′′′′′ → __EPSILON__|d\"]}",
+                convertedGrammar.toReadableJSONString()
+        );
     }
 }

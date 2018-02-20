@@ -14,7 +14,10 @@ public class ListUtils {
     }
 
     public static <T> List<T> of(T element, List<T> list) {
-        return of(list, element);
+        List<T> newList = new ArrayList<>();
+        newList.add(element);
+        newList.addAll(list);
+        return newList;
     }
 
     public static <T> List<T> of(List<T> list, T element) {
