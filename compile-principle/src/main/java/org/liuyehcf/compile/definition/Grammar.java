@@ -7,6 +7,8 @@ import java.util.List;
  * 文法定义
  */
 public class Grammar {
+
+    // 文法包含的所有产生式
     final private List<Production> productions;
 
     public Grammar(Production... productions) {

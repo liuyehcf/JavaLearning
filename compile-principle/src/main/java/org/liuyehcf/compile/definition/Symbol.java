@@ -5,7 +5,8 @@ package org.liuyehcf.compile.definition;
  * 特殊符号用"__"作为前后缀，且全部字母大写，同时禁止普通Symbol带有"__"前后缀
  */
 public class Symbol {
-    public static final Symbol _Epsilon = new Symbol(true, "__EPSILON__", 0);
+    
+    public static final Symbol EPSILON = new Symbol(true, "__EPSILON__", 0);
 
     // 是否为终结符
     private final boolean isTerminator;
@@ -16,6 +17,12 @@ public class Symbol {
     // 异变次数，例如A异变一次就是A'
     private final int mutationTimes;
 
+    /**
+     * 对外暴露的构造方法
+     *
+     * @param isTerminator
+     * @param value
+     */
     public Symbol(boolean isTerminator, String value) {
         if (value == null) {
             throw new NullPointerException();
@@ -28,6 +35,13 @@ public class Symbol {
         this.mutationTimes = 0;
     }
 
+    /**
+     * 内部用的构造方法，仅用于创建一些特殊Symbol，以及异变符号
+     *
+     * @param isTerminator
+     * @param value
+     * @param mutationTimes
+     */
     private Symbol(boolean isTerminator, String value, int mutationTimes) {
         if (value == null) {
             throw new NullPointerException();
@@ -41,14 +55,29 @@ public class Symbol {
         return isTerminator;
     }
 
+    /**
+     * 带上异变后缀的符号字符串
+     *
+     * @return
+     */
     public String getMutatedValue() {
         return value + getMutationString();
     }
 
+    /**
+     * 是否是异变符号
+     *
+     * @return
+     */
     public boolean isMutated() {
         return mutationTimes != 0;
     }
 
+    /**
+     * 根据异变次数生成后缀符号，例如1次异变就是"′"
+     *
+     * @return
+     */
     private String getMutationString() {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < mutationTimes; i++) {

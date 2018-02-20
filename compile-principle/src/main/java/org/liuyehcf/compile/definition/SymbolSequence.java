@@ -3,7 +3,11 @@ package org.liuyehcf.compile.definition;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * 文法符号串
+ */
 public class SymbolSequence {
+    // 符号串
     private final List<Symbol> symbols;
 
     public SymbolSequence(Symbol... symbols) {

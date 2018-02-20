@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class CollectionUtils {
+public class ListUtils {
     public static <T> List<T> subListExceptFirstElement(List<T> list) {
         return list.subList(1, list.size());
     }
@@ -17,6 +17,12 @@ public class CollectionUtils {
         return of(list, element);
     }
 
+    public static <T> List<T> of(List<T> list, T element) {
+        List<T> newList = new ArrayList<>(list);
+        newList.add(element);
+        return newList;
+    }
+
     public static <T> List<T> of(List<T> list, T... elements) {
         List<T> newList = new ArrayList<>(list);
         newList.addAll(Arrays.asList(elements));
@@ -25,11 +31,9 @@ public class CollectionUtils {
 
     public static <T> List<T> of(List<T>... lists) {
         List<T> newList = new ArrayList<>();
-
         for (List<T> list : lists) {
             newList.addAll(list);
         }
-
         return newList;
     }
 }

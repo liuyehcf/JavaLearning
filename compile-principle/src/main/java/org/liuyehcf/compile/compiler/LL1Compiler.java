@@ -10,8 +10,8 @@ import java.util.stream.Collectors;
 
 import static org.liuyehcf.compile.utils.AssertUtils.assertFalse;
 import static org.liuyehcf.compile.utils.AssertUtils.assertTrue;
-import static org.liuyehcf.compile.utils.CollectionUtils.of;
-import static org.liuyehcf.compile.utils.CollectionUtils.subListExceptFirstElement;
+import static org.liuyehcf.compile.utils.ListUtils.of;
+import static org.liuyehcf.compile.utils.ListUtils.subListExceptFirstElement;
 import static org.liuyehcf.compile.utils.DefinitionUtils.*;
 
 public class LL1Compiler implements Compiler {
@@ -303,7 +303,7 @@ public class LL1Compiler implements Compiler {
 
             // ε
             p3SymbolSequence.add(
-                    createSymbolSequence(Symbol._Epsilon)
+                    createSymbolSequence(Symbol.EPSILON)
             );
 
             Production p3 = createProduction(
