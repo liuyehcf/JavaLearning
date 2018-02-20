@@ -18,8 +18,14 @@ public class LL1Compiler implements Compiler {
 
     private final Grammar grammar;
 
+    private final Map<Symbol, List<Symbol>> firsts;
+
+    private final Map<Symbol, List<Symbol>> follows;
+
     public LL1Compiler(Grammar grammar) {
         this.grammar = convert(grammar);
+        firsts = new HashMap<>();
+        follows = new HashMap<>();
     }
 
     /**
@@ -371,8 +377,8 @@ public class LL1Compiler implements Compiler {
 
                 Map<Symbol, Production> extraProductions = p1.getExtraProductions();
 
+                // 产生一个异变的A，同时需要保证是没被使用过的，因为该函数会被递归调用
                 Symbol _AFlip = _A;
-
                 do {
                     _AFlip = _AFlip.getMutatedSymbol();
                 } while (extraProductions.containsKey(_AFlip));
@@ -397,8 +403,8 @@ public class LL1Compiler implements Compiler {
                 }
 
                 Production p3 = createProduction(
-                        _AFlip,
-                        _Betas
+                        _AFlip, // A′
+                        _Betas // β1|β2|...|βn
                 );
 
                 assertFalse(extraProductions.containsKey(_AFlip));
@@ -406,18 +412,21 @@ public class LL1Compiler implements Compiler {
 
                 Production p2 = createProduction(
                         extraProductions,
-                        _A,
+                        _A, // A
                         of(
+                                // aA′
                                 createSymbolSequence(
                                         prefixSymbol,
                                         _AFlip
                                 ),
+                                // γ1|γ2|...|γm
                                 _Gammas
                         )
                 );
 
                 productionMap.put(_A, p2);
 
+                // 递归调用
                 extractLeftCommonFactor(i);
             }
 

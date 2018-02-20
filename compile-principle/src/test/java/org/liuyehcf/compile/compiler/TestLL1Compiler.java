@@ -167,4 +167,51 @@ public class TestLL1Compiler {
 
         System.out.println(new LL1Compiler(grammar).getGrammar());
     }
+
+    @Test
+    public void testCommonPrefixExtract2() {
+        Grammar grammar = createGrammar(
+                createProduction(
+                        createNonTerminator("A"),
+                        createSymbolSequence(
+                                createTerminator("a"),
+                                createTerminator("β1")
+                        )
+                ),
+                createProduction(
+                        createNonTerminator("A"),
+                        createSymbolSequence(
+                                createTerminator("a"),
+                                createTerminator("β2")
+                        )
+                ),
+                createProduction(
+                        createNonTerminator("A"),
+                        createSymbolSequence(
+                                createTerminator("a"),
+                                createTerminator("βn")
+                        )
+                ),
+                createProduction(
+                        createNonTerminator("A"),
+                        createSymbolSequence(
+                                createTerminator("γ1")
+                        )
+                ),
+                createProduction(
+                        createNonTerminator("A"),
+                        createSymbolSequence(
+                                createTerminator("γ2")
+                        )
+                ),
+                createProduction(
+                        createNonTerminator("A"),
+                        createSymbolSequence(
+                                createTerminator("γm")
+                        )
+                )
+        );
+
+        System.out.println(new LL1Compiler(grammar).getGrammar());
+    }
 }
