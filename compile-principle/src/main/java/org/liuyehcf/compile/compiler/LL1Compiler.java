@@ -16,26 +16,28 @@ import static org.liuyehcf.compile.utils.ListUtils.subListExceptFirstElement;
 
 public class LL1Compiler implements Compiler {
 
-    private final Grammar grammar;
+    private final Grammar originGrammar;
 
-    private final Map<Symbol, List<Symbol>> firsts;
+    private Grammar grammar;
 
-    private final Map<Symbol, List<Symbol>> follows;
+    private Map<Symbol, List<Symbol>> firsts;
 
-    public LL1Compiler(Grammar grammar) {
-        this.grammar = convert(grammar);
+    private Map<Symbol, List<Symbol>> follows;
+
+    public LL1Compiler(Grammar originGrammar) {
+        this.originGrammar = originGrammar;
         firsts = new HashMap<>();
         follows = new HashMap<>();
     }
 
     /**
-     * 转换给定文法，包括消除直接/间接左递归；提取公因子
-     *
-     * @param grammar
-     * @return
+     * 初始化方法
      */
-    private Grammar convert(Grammar grammar) {
-        return GrammarConverter.convert(grammar);
+    public void init() {
+        //转换给定文法，包括消除直接/间接左递归；提取公因子
+        this.grammar = GrammarConverter.convert(originGrammar);
+
+
     }
 
     @Override
@@ -45,6 +47,9 @@ public class LL1Compiler implements Compiler {
 
     @Override
     public Grammar getGrammar() {
+        if (this.grammar == null) {
+            init();
+        }
         return this.grammar;
     }
 
@@ -155,6 +160,8 @@ public class LL1Compiler implements Compiler {
                     if (!symbols.get(0).isTerminator()
                             && !symbols.get(0).equals(toSymbol)) {
                         Symbol fromSymbol = symbols.get(0);
+
+                        assertTrue(edges.containsKey(fromSymbol));
 
                         edges.get(fromSymbol).add(toSymbol);
 

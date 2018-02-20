@@ -42,7 +42,8 @@ public class TestLL1Compiler {
                 )
         );
 
-        Grammar convertedGrammar = new LL1Compiler(grammar).getGrammar();
+        Compiler compiler = new LL1Compiler(grammar);
+        Grammar convertedGrammar = compiler.getGrammar();
 
         assertEquals(
                 "{\"productions\":[\"E → (E)E′|idE′\",\"E′ → +EE′|*EE′|__EPSILON__\"]}",
@@ -91,10 +92,70 @@ public class TestLL1Compiler {
                 )
         );
 
-        Grammar convertedGrammar = new LL1Compiler(grammar).getGrammar();
+        Compiler compiler = new LL1Compiler(grammar);
+        Grammar convertedGrammar = compiler.getGrammar();
 
         assertEquals(
                 "{\"productions\":[\"D → (E)E′|idE′\",\"E → (E)E′|idE′\",\"E′ → +EE′|*EE′|__EPSILON__\"]}",
+                convertedGrammar.toReadableJSONString()
+        );
+    }
+
+
+    @Test
+    public void testGrammarConvert3() {
+        Grammar grammar = createGrammar(
+                createProduction(
+                        createNonTerminator("D"),
+                        createSymbolSequence(
+                                createNonTerminator("E"),
+                                createTerminator("e")
+                        )
+                ),
+                createProduction(
+                        createNonTerminator("D"),
+                        createSymbolSequence(
+                                createTerminator("e"),
+                                createNonTerminator("E")
+                        )
+                ),
+                createProduction(
+                        createNonTerminator("E"),
+                        createSymbolSequence(
+                                createNonTerminator("E"),
+                                createTerminator("+"),
+                                createNonTerminator("E")
+                        )
+                ),
+                createProduction(
+                        createNonTerminator("E"),
+                        createSymbolSequence(
+                                createNonTerminator("E"),
+                                createTerminator("*"),
+                                createNonTerminator("E")
+                        )
+                ),
+                createProduction(
+                        createNonTerminator("E"),
+                        createSymbolSequence(
+                                createTerminator("("),
+                                createNonTerminator("E"),
+                                createTerminator(")")
+                        )
+                ),
+                createProduction(
+                        createNonTerminator("E"),
+                        createSymbolSequence(
+                                createTerminator("id")
+                        )
+                )
+        );
+
+        Compiler compiler = new LL1Compiler(grammar);
+        Grammar convertedGrammar = compiler.getGrammar();
+
+        assertEquals(
+                "{\"productions\":[\"D → (E)E′e|idE′e|eE\",\"E → (E)E′|idE′\",\"E′ → +EE′|*EE′|__EPSILON__\"]}",
                 convertedGrammar.toReadableJSONString()
         );
     }
@@ -133,7 +194,8 @@ public class TestLL1Compiler {
                 )
         );
 
-        Grammar convertedGrammar = new LL1Compiler(grammar).getGrammar();
+        Compiler compiler = new LL1Compiler(grammar);
+        Grammar convertedGrammar = compiler.getGrammar();
 
         assertEquals(
                 "{\"productions\":[\"A → bA′′|aA′\",\"A′ → bA′′′\",\"A′′ → d|c\",\"A′′′ → __EPSILON__|c\"]}",
@@ -185,7 +247,8 @@ public class TestLL1Compiler {
                 )
         );
 
-        Grammar convertedGrammar = new LL1Compiler(grammar).getGrammar();
+        Compiler compiler = new LL1Compiler(grammar);
+        Grammar convertedGrammar = compiler.getGrammar();
 
         assertEquals(
                 "{\"productions\":[\"A → aA′|γ1|γ2|γm\",\"A′ → β1|β2|βn\"]}",
@@ -268,7 +331,8 @@ public class TestLL1Compiler {
                 )
         );
 
-        Grammar convertedGrammar = new LL1Compiler(grammar).getGrammar();
+        Compiler compiler = new LL1Compiler(grammar);
+        Grammar convertedGrammar = compiler.getGrammar();
 
         assertEquals(
                 "{\"productions\":[\"A → cA′′′|bA′′|aA′|d\",\"A′ → bA′′′′′|__EPSILON__\",\"A′′ → cA′′′′|__EPSILON__\",\"A′′′ → __EPSILON__|d\",\"A′′′′ → __EPSILON__|d\",\"A′′′′′ → cA′′′′′′|__EPSILON__\",\"A′′′′′′ → __EPSILON__|d\"]}",
