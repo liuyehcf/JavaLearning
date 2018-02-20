@@ -1,5 +1,6 @@
 package org.liuyehcf.compile.definition;
 
+import com.alibaba.fastjson.JSON;
 import org.junit.Test;
 
 import static org.liuyehcf.compile.utils.DefinitionUtils.*;
@@ -40,6 +41,6 @@ public class TestGrammar {
                 )
         );
 
-        System.out.println(grammar);
+        System.out.println(JSON.toJSON(grammar));
     }
 }

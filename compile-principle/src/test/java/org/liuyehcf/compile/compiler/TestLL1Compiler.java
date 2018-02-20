@@ -1,5 +1,6 @@
 package org.liuyehcf.compile.compiler;
 
+import com.alibaba.fastjson.JSON;
 import org.junit.Test;
 import org.liuyehcf.compile.definition.Grammar;
 
@@ -41,7 +42,7 @@ public class TestLL1Compiler {
                 )
         );
 
-        System.out.println(new LL1Compiler(grammar).getGrammar());
+        System.out.println(JSON.toJSON(new LL1Compiler(grammar).getGrammar()));
     }
 
     @Test
@@ -85,7 +86,7 @@ public class TestLL1Compiler {
                 )
         );
 
-        System.out.println(new LL1Compiler(grammar).getGrammar());
+        System.out.println(JSON.toJSON(new LL1Compiler(grammar).getGrammar()));
     }
 
     @Test
@@ -129,6 +130,6 @@ public class TestLL1Compiler {
                 )
         );
 
-        System.out.println(new LL1Compiler(grammar).getGrammar());
+        System.out.println(JSON.toJSON(new LL1Compiler(grammar).getGrammar()));
     }
 }

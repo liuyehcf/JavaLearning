@@ -234,7 +234,9 @@ public class LL1Compiler implements Compiler {
 
             if (isSubstituted) {
                 productionMap.put(symbolI,
-                        createProduction(symbolI,
+                        createProduction(
+                                productionJ.getExtraProductions(),
+                                symbolI,
                                 symbolSequences));
             }
         }
@@ -276,6 +278,8 @@ public class LL1Compiler implements Compiler {
 
             List<SymbolSequence> p3SymbolSequence = new ArrayList<>();
 
+            Symbol _AFlip = _A.getMutatedSymbol();
+
             for (SymbolSequence alphaSymbolSequence : _Alphas) {
 
                 p3SymbolSequence.add(
@@ -285,7 +289,7 @@ public class LL1Compiler implements Compiler {
                                         // αi
                                         subListExceptFirstElement(alphaSymbolSequence.getSymbols()),
                                         // A′
-                                        _A.getMutatedSymbol()
+                                        _AFlip
                                 )
                         )
                 );
@@ -297,7 +301,7 @@ public class LL1Compiler implements Compiler {
             );
 
             Production p3 = createProduction(
-                    _A.getMutatedSymbol(),
+                    _AFlip,
                     p3SymbolSequence
             );
 
@@ -305,20 +309,25 @@ public class LL1Compiler implements Compiler {
 
             for (SymbolSequence betaSymbolSequence : _Betas) {
 
-                // 构造β1A′|β2A′|...|βmA′，其中A′也需要一层遍历
-                for (SymbolSequence alphaSymbolSequence : p3SymbolSequence) {
-                    p2SymbolSequence.add(
-                            createSymbolSequence(
-                                    of(
-                                            betaSymbolSequence.getSymbols(),
-                                            alphaSymbolSequence.getSymbols()
-                                    )
-                            )
-                    );
-                }
+                // 构造βmA′
+                p2SymbolSequence.add(
+                        createSymbolSequence(
+                                of(
+                                        // βm
+                                        betaSymbolSequence.getSymbols(),
+                                        // A′
+                                        _AFlip
+                                )
+                        )
+                );
             }
 
+            Map<Symbol, Production> extraProductionsOfP3 = new HashMap<>();
+            extraProductionsOfP3.put(_AFlip, p3);
+
+
             Production p2 = createProduction(
+                    extraProductionsOfP3,
                     _A,
                     p2SymbolSequence
             );
