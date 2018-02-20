@@ -10,9 +10,9 @@ import java.util.stream.Collectors;
 
 import static org.liuyehcf.compile.utils.AssertUtils.assertFalse;
 import static org.liuyehcf.compile.utils.AssertUtils.assertTrue;
+import static org.liuyehcf.compile.utils.DefinitionUtils.*;
 import static org.liuyehcf.compile.utils.ListUtils.of;
 import static org.liuyehcf.compile.utils.ListUtils.subListExceptFirstElement;
-import static org.liuyehcf.compile.utils.DefinitionUtils.*;
 
 public class LL1Compiler implements Compiler {
 
@@ -82,15 +82,17 @@ public class LL1Compiler implements Compiler {
             init();
 
             for (int i = 0; i < sortedSymbols.size(); i++) {
+                Symbol _AI = sortedSymbols.get(i);
                 for (int j = 0; j < i; j++) {
+                    Symbol _AJ = sortedSymbols.get(j);
                     // 如果非终结符I的产生式里第一个非终结符是J，那么用J的产生式替换掉非终结符J
-                    substitutionNonTerminator(i, j);
+                    substitutionNonTerminator(_AI, _AJ);
                 }
                 // 消除非终结符I的直接左递归
-                eliminateDirectLeftRecursion(i);
+                eliminateDirectLeftRecursion(_AI);
 
                 // 提取左公因子
-                extractLeftCommonFactor(i);
+                extractLeftCommonFactor(_AI);
             }
 
             return createNewGrammar();
@@ -195,35 +197,33 @@ public class LL1Compiler implements Compiler {
         /**
          * 将已消除直接/间接左递归的非终结符j的产生式代入产生式i中
          *
-         * @param i
-         * @param j
+         * @param _AI
+         * @param _AJ
          */
-        private void substitutionNonTerminator(int i, int j) {
-            Symbol symbolI = sortedSymbols.get(i);
-            Symbol symbolJ = sortedSymbols.get(j);
+        private void substitutionNonTerminator(Symbol _AI, Symbol _AJ) {
 
-            Production productionI = productionMap.get(symbolI);
-            Production productionJ = productionMap.get(symbolJ);
+            Production pI = productionMap.get(_AI);
+            Production pJ = productionMap.get(_AJ);
 
             // 标记是否发生替换
             boolean isSubstituted = false;
 
-            List<SymbolSequence> symbolSequences = new ArrayList<>();
+            List<SymbolSequence> modifiedSymbolSequencesI = new ArrayList<>();
 
             // 遍历产生式I的每一个子产生式
-            for (SymbolSequence symbolSequenceI : productionI.getRight()) {
-                List<Symbol> symbolsI = symbolSequenceI.getSymbols();
+            for (SymbolSequence originSymbolSequenceI : pI.getRight()) {
+                List<Symbol> symbolsI = originSymbolSequenceI.getSymbols();
 
                 assertTrue(!symbolsI.isEmpty());
 
                 // 如果子产生式第一个符号是symbolJ，那么进行替换
-                if (symbolsI.get(0).equals(symbolJ)) {
+                if (symbolsI.get(0).equals(_AJ)) {
                     isSubstituted = true;
 
                     // 遍历终结符J的每个子产生式
-                    for (SymbolSequence symbolSequenceJ : productionJ.getRight()) {
+                    for (SymbolSequence symbolSequenceJ : pJ.getRight()) {
 
-                        symbolSequences.add(
+                        modifiedSymbolSequencesI.add(
                                 createSymbolSequence(
                                         of(
                                                 symbolSequenceJ.getSymbols(),
@@ -234,16 +234,15 @@ public class LL1Compiler implements Compiler {
                     }
 
                 } else {
-                    symbolSequences.add(symbolSequenceI);
+                    modifiedSymbolSequencesI.add(originSymbolSequenceI);
                 }
             }
 
             if (isSubstituted) {
-                productionMap.put(symbolI,
+                productionMap.put(_AI,
                         createProduction(
-                                productionJ.getExtraProductions(),
-                                symbolI,
-                                symbolSequences));
+                                _AI,
+                                modifiedSymbolSequencesI));
             }
         }
 
@@ -253,11 +252,9 @@ public class LL1Compiler implements Compiler {
          * p2: A  → β1A′|β2A′|...|βmA′
          * p3: A′ → α1A′|α2A′|...|αnA′|ε
          *
-         * @param i
+         * @param _A
          */
-        private void eliminateDirectLeftRecursion(int i) {
-            Symbol _A = sortedSymbols.get(i);
-
+        private void eliminateDirectLeftRecursion(Symbol _A) {
             Production p1 = productionMap.get(_A);
 
             // β1|β2|...|βm
@@ -266,15 +263,15 @@ public class LL1Compiler implements Compiler {
             // Aα1|Aα2|...|Aαn
             List<SymbolSequence> _Alphas = new ArrayList<>();
 
-            for (SymbolSequence symbolSequence : p1.getRight()) {
-                List<Symbol> symbols = symbolSequence.getSymbols();
+            for (SymbolSequence symbolSequenceOfP1 : p1.getRight()) {
+                List<Symbol> symbols = symbolSequenceOfP1.getSymbols();
 
                 assertTrue(!symbols.isEmpty());
 
                 if (symbols.get(0).equals(_A)) {
-                    _Alphas.add(symbolSequence);
+                    _Alphas.add(symbolSequenceOfP1);
                 } else {
-                    _Betas.add(symbolSequence);
+                    _Betas.add(symbolSequenceOfP1);
                 }
             }
 
@@ -282,60 +279,57 @@ public class LL1Compiler implements Compiler {
                 return;
             }
 
-            List<SymbolSequence> p3SymbolSequence = new ArrayList<>();
+            List<SymbolSequence> symbolSequenceOfP3 = new ArrayList<>();
 
-            Symbol _AFlip = _A.getMutatedSymbol();
+            Symbol _APrimed = createPrimedSymbolFor(_A);
 
             for (SymbolSequence alphaSymbolSequence : _Alphas) {
 
-                p3SymbolSequence.add(
+                symbolSequenceOfP3.add(
                         // αiA′
                         createSymbolSequence(
                                 of(
                                         // αi
                                         subListExceptFirstElement(alphaSymbolSequence.getSymbols()),
                                         // A′
-                                        _AFlip
+                                        _APrimed
                                 )
                         )
                 );
             }
 
             // ε
-            p3SymbolSequence.add(
+            symbolSequenceOfP3.add(
                     createSymbolSequence(Symbol.EPSILON)
             );
 
             Production p3 = createProduction(
-                    _AFlip,
-                    p3SymbolSequence
+                    _APrimed,
+                    symbolSequenceOfP3
             );
 
-            List<SymbolSequence> p2SymbolSequence = new ArrayList<>();
+            List<SymbolSequence> symbolSequenceOfP2 = new ArrayList<>();
 
             for (SymbolSequence betaSymbolSequence : _Betas) {
 
                 // 构造βmA′
-                p2SymbolSequence.add(
+                symbolSequenceOfP2.add(
                         createSymbolSequence(
                                 of(
                                         // βm
                                         betaSymbolSequence.getSymbols(),
                                         // A′
-                                        _AFlip
+                                        _APrimed
                                 )
                         )
                 );
             }
 
-            Map<Symbol, Production> extraProductionsOfP3 = new HashMap<>();
-            extraProductionsOfP3.put(_AFlip, p3);
-
+            productionMap.put(_APrimed, p3);
 
             Production p2 = createProduction(
-                    extraProductionsOfP3,
                     _A,
-                    p2SymbolSequence
+                    symbolSequenceOfP2
             );
 
             productionMap.put(_A, p2);
@@ -347,17 +341,16 @@ public class LL1Compiler implements Compiler {
          * p2: A  → aA′|γ1|γ2|...|γm
          * p3: A′ → β1|β2|...|βn
          *
-         * @param i
+         * @param _A
          */
-        private void extractLeftCommonFactor(int i) {
-            Symbol _A = sortedSymbols.get(i);
+        private void extractLeftCommonFactor(Symbol _A) {
             Production p1 = productionMap.get(_A);
 
             Map<Symbol, Integer> commonPrefixes = new HashMap<>();
 
             // 初始化commonPrefixes
-            for (SymbolSequence symbolSequence : p1.getRight()) {
-                List<Symbol> symbols = symbolSequence.getSymbols();
+            for (SymbolSequence symbolSequenceOfP1 : p1.getRight()) {
+                List<Symbol> symbols = symbolSequenceOfP1.getSymbols();
 
                 assertTrue(!symbols.isEmpty() && symbols.get(0).isTerminator());
 
@@ -375,49 +368,43 @@ public class LL1Compiler implements Compiler {
             // 循环提取左公因子
             if (!commonPrefixes.isEmpty()) {
 
-                Map<Symbol, Production> extraProductions = p1.getExtraProductions();
-
-                // 产生一个异变的A，同时需要保证是没被使用过的，因为该函数会被递归调用
-                Symbol _AFlip = _A;
-                do {
-                    _AFlip = _AFlip.getMutatedSymbol();
-                } while (extraProductions.containsKey(_AFlip));
+                // 产生一个异变符号（例如，A′），同时需要保证是没被使用过的
+                Symbol _APrimed = createPrimedSymbolFor(_A);
 
                 Symbol prefixSymbol = commonPrefixes.keySet().iterator().next();
 
                 List<SymbolSequence> _Betas = new ArrayList<>();
                 List<SymbolSequence> _Gammas = new ArrayList<>();
 
-                for (SymbolSequence symbolSequence : p1.getRight()) {
-                    if (symbolSequence.getSymbols().get(0).equals(prefixSymbol)) {
-                        if (symbolSequence.getSymbols().size() > 1) {
+                for (SymbolSequence symbolSequenceOfP1 : p1.getRight()) {
+                    if (symbolSequenceOfP1.getSymbols().get(0).equals(prefixSymbol)) {
+                        if (symbolSequenceOfP1.getSymbols().size() > 1) {
                             _Betas.add(
                                     createSymbolSequence(
-                                            subListExceptFirstElement(symbolSequence.getSymbols())
+                                            subListExceptFirstElement(symbolSequenceOfP1.getSymbols())
                                     )
                             );
                         }
                     } else {
-                        _Gammas.add(symbolSequence);
+                        _Gammas.add(symbolSequenceOfP1);
                     }
                 }
 
                 Production p3 = createProduction(
-                        _AFlip, // A′
+                        _APrimed, // A′
                         _Betas // β1|β2|...|βn
                 );
 
-                assertFalse(extraProductions.containsKey(_AFlip));
-                extraProductions.put(_AFlip, p3);
+                assertFalse(productionMap.containsKey(_APrimed));
+                productionMap.put(_APrimed, p3);
 
                 Production p2 = createProduction(
-                        extraProductions,
                         _A, // A
                         of(
                                 // aA′
                                 createSymbolSequence(
                                         prefixSymbol,
-                                        _AFlip
+                                        _APrimed
                                 ),
                                 // γ1|γ2|...|γm
                                 _Gammas
@@ -427,7 +414,8 @@ public class LL1Compiler implements Compiler {
                 productionMap.put(_A, p2);
 
                 // 递归调用
-                extractLeftCommonFactor(i);
+                extractLeftCommonFactor(_A);
+                extractLeftCommonFactor(_APrimed);
             }
 
         }
@@ -447,6 +435,16 @@ public class LL1Compiler implements Compiler {
             for (Symbol key : removeKeys) {
                 commonPrefixes.remove(key);
             }
+        }
+
+        private Symbol createPrimedSymbolFor(Symbol symbol) {
+            Symbol primedSymbol = symbol;
+
+            do {
+                primedSymbol = primedSymbol.getPrimedSymbol();
+            } while (productionMap.containsKey(primedSymbol));
+
+            return primedSymbol;
         }
 
         private Grammar createNewGrammar() {

@@ -5,7 +5,7 @@ package org.liuyehcf.compile.definition;
  * 特殊符号用"__"作为前后缀，且全部字母大写，同时禁止普通Symbol带有"__"前后缀
  */
 public class Symbol {
-    
+
     public static final Symbol EPSILON = new Symbol(true, "__EPSILON__", 0);
 
     // 是否为终结符
@@ -14,8 +14,8 @@ public class Symbol {
     // 符号的字符串
     private final String value;
 
-    // 异变次数，例如A异变一次就是A'
-    private final int mutationTimes;
+    // 一撇"′"的数量（value本身包含的"′"不算）
+    private final int primeCount;
 
     /**
      * 对外暴露的构造方法
@@ -32,7 +32,7 @@ public class Symbol {
         }
         this.isTerminator = isTerminator;
         this.value = value;
-        this.mutationTimes = 0;
+        this.primeCount = 0;
     }
 
     /**
@@ -40,15 +40,15 @@ public class Symbol {
      *
      * @param isTerminator
      * @param value
-     * @param mutationTimes
+     * @param primeCount
      */
-    private Symbol(boolean isTerminator, String value, int mutationTimes) {
+    private Symbol(boolean isTerminator, String value, int primeCount) {
         if (value == null) {
             throw new NullPointerException();
         }
         this.isTerminator = isTerminator;
         this.value = value;
-        this.mutationTimes = mutationTimes;
+        this.primeCount = primeCount;
     }
 
     public boolean isTerminator() {
@@ -60,17 +60,17 @@ public class Symbol {
      *
      * @return
      */
-    public String getMutatedValue() {
-        return value + getMutationString();
+    public String getPrimedValue() {
+        return value + toPrimeString();
     }
 
     /**
-     * 是否是异变符号
+     * 是否为异变符号
      *
      * @return
      */
-    public boolean isMutated() {
-        return mutationTimes != 0;
+    public boolean isPrimedSymbol() {
+        return primeCount != 0;
     }
 
     /**
@@ -78,9 +78,9 @@ public class Symbol {
      *
      * @return
      */
-    private String getMutationString() {
+    private String toPrimeString() {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < mutationTimes; i++) {
+        for (int i = 0; i < primeCount; i++) {
             sb.append("′");
         }
         return sb.toString();
@@ -91,8 +91,8 @@ public class Symbol {
      *
      * @return
      */
-    public Symbol getMutatedSymbol() {
-        return new Symbol(this.isTerminator, this.value, this.mutationTimes + 1);
+    public Symbol getPrimedSymbol() {
+        return new Symbol(this.isTerminator, this.value, this.primeCount + 1);
     }
 
     @Override
@@ -100,7 +100,7 @@ public class Symbol {
         if (obj instanceof Symbol) {
             Symbol symbol = (Symbol) obj;
             return symbol.value.equals(this.value)
-                    && symbol.mutationTimes == this.mutationTimes
+                    && symbol.primeCount == this.primeCount
                     && symbol.isTerminator == this.isTerminator;
         }
         return false;
@@ -110,14 +110,14 @@ public class Symbol {
     public int hashCode() {
         return Boolean.valueOf(this.isTerminator).hashCode() +
                 this.value.hashCode() +
-                Integer.valueOf(this.mutationTimes).hashCode();
+                Integer.valueOf(this.primeCount).hashCode();
     }
 
     @Override
     public String toString() {
         return "{" +
                 "\"isTerminator\":" + "\"" + isTerminator + "\"" +
-                ", \"value\":" + "\"" + getMutatedValue() + "\"" +
+                ", \"value\":" + "\"" + getPrimedValue() + "\"" +
                 '}';
     }
 }

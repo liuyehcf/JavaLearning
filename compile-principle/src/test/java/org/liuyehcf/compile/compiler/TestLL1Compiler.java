@@ -3,6 +3,7 @@ package org.liuyehcf.compile.compiler;
 import org.junit.Test;
 import org.liuyehcf.compile.definition.Grammar;
 
+import static org.junit.Assert.assertEquals;
 import static org.liuyehcf.compile.utils.DefinitionUtils.*;
 
 public class TestLL1Compiler {
@@ -41,55 +42,16 @@ public class TestLL1Compiler {
                 )
         );
 
-        System.out.println(new LL1Compiler(grammar).getGrammar());
+        Grammar convertedGrammar = new LL1Compiler(grammar).getGrammar();
+
+        assertEquals(
+                convertedGrammar.toString(),
+                "{\"productions\":[{\"left\":{\"isTerminator\":\"false\", \"value\":\"E\"}, \"right\":[{\"symbols\":[{\"isTerminator\":\"true\", \"value\":\"(\"}, {\"isTerminator\":\"false\", \"value\":\"E\"}, {\"isTerminator\":\"true\", \"value\":\")\"}, {\"isTerminator\":\"false\", \"value\":\"E′\"}]}, {\"symbols\":[{\"isTerminator\":\"true\", \"value\":\"id\"}, {\"isTerminator\":\"false\", \"value\":\"E′\"}]}]}, {\"left\":{\"isTerminator\":\"false\", \"value\":\"E′\"}, \"right\":[{\"symbols\":[{\"isTerminator\":\"true\", \"value\":\"+\"}, {\"isTerminator\":\"false\", \"value\":\"E\"}, {\"isTerminator\":\"false\", \"value\":\"E′\"}]}, {\"symbols\":[{\"isTerminator\":\"true\", \"value\":\"*\"}, {\"isTerminator\":\"false\", \"value\":\"E\"}, {\"isTerminator\":\"false\", \"value\":\"E′\"}]}, {\"symbols\":[{\"isTerminator\":\"true\", \"value\":\"__EPSILON__\"}]}]}]}"
+        );
     }
 
     @Test
     public void testGrammarConvert2() {
-        Grammar grammar = createGrammar(
-                createProduction(
-                        createNonTerminator("E"),
-                        createSymbolSequence(
-                                createNonTerminator("E"),
-                                createTerminator("+"),
-                                createNonTerminator("E")
-                        )
-                ),
-                createProduction(
-                        createNonTerminator("E"),
-                        createSymbolSequence(
-                                createNonTerminator("E"),
-                                createTerminator("*"),
-                                createNonTerminator("E")
-                        )
-                ),
-                createProduction(
-                        createNonTerminator("E"),
-                        createSymbolSequence(
-                                createTerminator("("),
-                                createNonTerminator("E"),
-                                createTerminator(")")
-                        )
-                ),
-                createProduction(
-                        createNonTerminator("E"),
-                        createSymbolSequence(
-                                createTerminator("id")
-                        )
-                ),
-                createProduction(
-                        createNonTerminator("F"),
-                        createSymbolSequence(
-                                createNonTerminator("E")
-                        )
-                )
-        );
-
-        System.out.println(new LL1Compiler(grammar).getGrammar());
-    }
-
-    @Test
-    public void testGrammarConvert3() {
         Grammar grammar = createGrammar(
                 createProduction(
                         createNonTerminator("D"),
@@ -129,35 +91,41 @@ public class TestLL1Compiler {
                 )
         );
 
-        System.out.println(new LL1Compiler(grammar).getGrammar());
+        Grammar convertedGrammar = new LL1Compiler(grammar).getGrammar();
+
+        assertEquals(
+                convertedGrammar.toString(),
+                "{\"productions\":[{\"left\":{\"isTerminator\":\"false\", \"value\":\"D\"}, \"right\":[{\"symbols\":[{\"isTerminator\":\"true\", \"value\":\"(\"}, {\"isTerminator\":\"false\", \"value\":\"E\"}, {\"isTerminator\":\"true\", \"value\":\")\"}, {\"isTerminator\":\"false\", \"value\":\"E′\"}]}, {\"symbols\":[{\"isTerminator\":\"true\", \"value\":\"id\"}, {\"isTerminator\":\"false\", \"value\":\"E′\"}]}]}, {\"left\":{\"isTerminator\":\"false\", \"value\":\"E\"}, \"right\":[{\"symbols\":[{\"isTerminator\":\"true\", \"value\":\"(\"}, {\"isTerminator\":\"false\", \"value\":\"E\"}, {\"isTerminator\":\"true\", \"value\":\")\"}, {\"isTerminator\":\"false\", \"value\":\"E′\"}]}, {\"symbols\":[{\"isTerminator\":\"true\", \"value\":\"id\"}, {\"isTerminator\":\"false\", \"value\":\"E′\"}]}]}, {\"left\":{\"isTerminator\":\"false\", \"value\":\"E′\"}, \"right\":[{\"symbols\":[{\"isTerminator\":\"true\", \"value\":\"+\"}, {\"isTerminator\":\"false\", \"value\":\"E\"}, {\"isTerminator\":\"false\", \"value\":\"E′\"}]}, {\"symbols\":[{\"isTerminator\":\"true\", \"value\":\"*\"}, {\"isTerminator\":\"false\", \"value\":\"E\"}, {\"isTerminator\":\"false\", \"value\":\"E′\"}]}, {\"symbols\":[{\"isTerminator\":\"true\", \"value\":\"__EPSILON__\"}]}]}]}"
+        );
     }
 
     @Test
     public void testCommonPrefixExtract1() {
         Grammar grammar = createGrammar(
                 createProduction(
-                        createNonTerminator("E"),
+                        createNonTerminator("A"),
                         createSymbolSequence(
                                 createTerminator("a"),
                                 createTerminator("b")
                         )
                 ),
                 createProduction(
-                        createNonTerminator("E"),
+                        createNonTerminator("A"),
                         createSymbolSequence(
                                 createTerminator("a"),
+                                createTerminator("b"),
                                 createTerminator("c")
                         )
                 ),
                 createProduction(
-                        createNonTerminator("E"),
+                        createNonTerminator("A"),
                         createSymbolSequence(
                                 createTerminator("b"),
                                 createTerminator("d")
                         )
                 ),
                 createProduction(
-                        createNonTerminator("E"),
+                        createNonTerminator("A"),
                         createSymbolSequence(
                                 createTerminator("b"),
                                 createTerminator("c")

@@ -5,7 +5,9 @@ import org.liuyehcf.compile.definition.Production;
 import org.liuyehcf.compile.definition.Symbol;
 import org.liuyehcf.compile.definition.SymbolSequence;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.liuyehcf.compile.utils.AssertUtils.assertTrue;
 
@@ -27,15 +29,11 @@ public class DefinitionUtils {
     }
 
     public static Production createProduction(Symbol left, SymbolSequence... right) {
-        return createProduction(new HashMap<>(), left, Arrays.asList(right));
-    }
-
-    public static Production createProduction(Map<Symbol, Production> extraProductions, Symbol left, List<SymbolSequence> right) {
-        return new Production(extraProductions, left, right);
+        return createProduction(left, Arrays.asList(right));
     }
 
     public static Production createProduction(Symbol left, List<SymbolSequence> right) {
-        return createProduction(new HashMap<>(), left, right);
+        return new Production(left, right);
     }
 
     public static Grammar createGrammar(Production... productions) {
