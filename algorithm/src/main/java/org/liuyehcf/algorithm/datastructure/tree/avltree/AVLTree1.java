@@ -11,6 +11,7 @@ public class AVLTree1 {
     private AVLTreeNode root;
     private AVLTreeNode nil;
     private Map<AVLTreeNode, Integer> highMap;
+
     public AVLTree1() {
         nil = new AVLTreeNode(0);
         nil.left = nil;

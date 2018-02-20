@@ -1,5 +1,6 @@
 package org.liuyehcf.compile.definition;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.liuyehcf.compile.utils.AssertUtils.assertFalse;
@@ -18,9 +19,17 @@ public class Production {
     // 并列关系的多个产生式右部
     private final List<SymbolSequence> right;
 
-    public Production(Symbol left, List<SymbolSequence> right) {
+    private Production(Symbol left, List<SymbolSequence> right) {
         this.left = left;
         this.right = right;
+    }
+
+    public static Production createProduction(Symbol left, SymbolSequence... right) {
+        return createProduction(left, Arrays.asList(right));
+    }
+
+    public static Production createProduction(Symbol left, List<SymbolSequence> right) {
+        return new Production(left, right);
     }
 
     public Symbol getLeft() {

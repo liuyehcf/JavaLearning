@@ -10,8 +10,11 @@ import org.liuyehcf.compile.utils.SetUtils;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.liuyehcf.compile.definition.Grammar.createGrammar;
+import static org.liuyehcf.compile.definition.Grammar.parallelProduction;
+import static org.liuyehcf.compile.definition.Production.createProduction;
+import static org.liuyehcf.compile.definition.SymbolSequence.createSymbolSequence;
 import static org.liuyehcf.compile.utils.AssertUtils.*;
-import static org.liuyehcf.compile.utils.DefinitionUtils.*;
 
 public class LL1Compiler implements Compiler {
 
@@ -24,8 +27,10 @@ public class LL1Compiler implements Compiler {
     // 文法符号集合
     private Set<Symbol> symbols;
 
+    // 非终结符集合
     private Set<Symbol> nonTerminatorSymbols;
 
+    // 终结符集合
     private Set<Symbol> terminatorSymbols;
 
     // 非终结符->产生式的映射
@@ -247,13 +252,13 @@ public class LL1Compiler implements Compiler {
          */
         private List<Symbol> sortedSymbols;
 
+        private GrammarConverter(Grammar grammar) {
+            this.grammar = grammar;
+        }
+
         private static Grammar convert(Grammar grammar) {
             return new GrammarConverter(grammar)
                     .convert();
-        }
-
-        private GrammarConverter(Grammar grammar) {
-            this.grammar = grammar;
         }
 
         private Grammar convert() {

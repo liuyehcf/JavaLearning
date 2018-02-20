@@ -8,6 +8,7 @@ public class Symbol {
 
     public static final Symbol START = new Symbol(false, "__START__", 0);
     public static final Symbol EPSILON = new Symbol(true, "__EPSILON__", 0);
+    public static final Symbol DOLLAR = new Symbol(true, "__DOLLAR__", 0);
 
     // 是否为终结符
     private final boolean isTerminator;
@@ -19,12 +20,12 @@ public class Symbol {
     private final int primeCount;
 
     /**
-     * 对外暴露的构造方法
+     * 仅用于创建普通Symbol
      *
      * @param isTerminator
      * @param value
      */
-    public Symbol(boolean isTerminator, String value) {
+    private Symbol(boolean isTerminator, String value) {
         if (value == null) {
             throw new NullPointerException();
         }
@@ -37,7 +38,7 @@ public class Symbol {
     }
 
     /**
-     * 内部用的构造方法，仅用于创建一些特殊Symbol，以及异变符号
+     * 仅用于创建一些特殊Symbol，以及异变符号
      *
      * @param isTerminator
      * @param value
@@ -50,6 +51,14 @@ public class Symbol {
         this.isTerminator = isTerminator;
         this.value = value;
         this.primeCount = primeCount;
+    }
+
+    public static Symbol createTerminator(String value) {
+        return new Symbol(true, value);
+    }
+
+    public static Symbol createNonTerminator(String value) {
+        return new Symbol(false, value);
     }
 
     public boolean isTerminator() {

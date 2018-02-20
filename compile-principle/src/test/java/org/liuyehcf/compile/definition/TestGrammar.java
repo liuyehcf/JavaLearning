@@ -2,7 +2,11 @@ package org.liuyehcf.compile.definition;
 
 import org.junit.Test;
 
-import static org.liuyehcf.compile.utils.DefinitionUtils.*;
+import static org.liuyehcf.compile.definition.Grammar.createGrammar;
+import static org.liuyehcf.compile.definition.Production.createProduction;
+import static org.liuyehcf.compile.definition.Symbol.createNonTerminator;
+import static org.liuyehcf.compile.definition.Symbol.createTerminator;
+import static org.liuyehcf.compile.definition.SymbolSequence.createSymbolSequence;
 
 public class TestGrammar {
     @Test

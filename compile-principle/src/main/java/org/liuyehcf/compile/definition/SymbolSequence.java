@@ -3,21 +3,23 @@ package org.liuyehcf.compile.definition;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.liuyehcf.compile.utils.AssertUtils.assertFalse;
-
 /**
  * 文法符号串
  */
 public class SymbolSequence {
-    // 符号串
+    // 文法符号串
     private final List<Symbol> symbols;
 
-    public SymbolSequence(Symbol... symbols) {
-        this.symbols = Arrays.asList(symbols);
+    private SymbolSequence(List<Symbol> symbols) {
+        this.symbols = symbols;
     }
 
-    public SymbolSequence(List<Symbol> symbols) {
-        this.symbols = symbols;
+    public static SymbolSequence createSymbolSequence(Symbol... symbols) {
+        return new SymbolSequence(Arrays.asList(symbols));
+    }
+
+    public static SymbolSequence createSymbolSequence(List<Symbol> symbols) {
+        return new SymbolSequence(symbols);
     }
 
     public List<Symbol> getSymbols() {
