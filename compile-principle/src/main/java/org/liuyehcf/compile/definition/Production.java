@@ -41,7 +41,7 @@ public class Production {
     public String toReadableJSONString() {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("\"");
+        sb.append('\"');
         sb.append(left.toReadableJSONString())
                 .append(" → ");
 
@@ -53,7 +53,7 @@ public class Production {
         assertFalse(right.isEmpty());
         sb.setLength(sb.length() - 1);
 
-        sb.append("\"");
+        sb.append('\"');
 
         return sb.toString();
     }

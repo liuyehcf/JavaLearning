@@ -6,6 +6,7 @@ package org.liuyehcf.compile.definition;
  */
 public class Symbol {
 
+    public static final Symbol START = new Symbol(false, "__START__", 0);
     public static final Symbol EPSILON = new Symbol(true, "__EPSILON__", 0);
 
     // 是否为终结符
@@ -115,8 +116,8 @@ public class Symbol {
 
     public String toJSONString() {
         return '{' +
-                "\"isTerminator\":" + "\"" + isTerminator + "\"" +
-                ", \"value\":" + "\"" + getPrimedValue() + "\"" +
+                "\"isTerminator\":" + '\"' + isTerminator + '\"' +
+                ", \"value\":" + '\"' + getPrimedValue() + '\"' +
                 '}';
     }
 

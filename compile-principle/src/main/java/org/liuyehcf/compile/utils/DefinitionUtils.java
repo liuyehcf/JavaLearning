@@ -11,7 +11,7 @@ import java.util.List;
 
 import static org.liuyehcf.compile.utils.AssertUtils.assertTrue;
 
-public class DefinitionUtils {
+public abstract class DefinitionUtils {
     public static Symbol createTerminator(String value) {
         return new Symbol(true, value);
     }

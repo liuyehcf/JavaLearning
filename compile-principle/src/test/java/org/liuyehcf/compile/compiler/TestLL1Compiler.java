@@ -2,6 +2,7 @@ package org.liuyehcf.compile.compiler;
 
 import org.junit.Test;
 import org.liuyehcf.compile.definition.Grammar;
+import org.liuyehcf.compile.definition.Symbol;
 
 import static org.junit.Assert.assertEquals;
 import static org.liuyehcf.compile.utils.DefinitionUtils.*;
@@ -337,6 +338,80 @@ public class TestLL1Compiler {
         assertEquals(
                 "{\"productions\":[\"A → cA′′′|bA′′|aA′|d\",\"A′ → bA′′′′′|__EPSILON__\",\"A′′ → cA′′′′|__EPSILON__\",\"A′′′ → __EPSILON__|d\",\"A′′′′ → __EPSILON__|d\",\"A′′′′′ → cA′′′′′′|__EPSILON__\",\"A′′′′′′ → __EPSILON__|d\"]}",
                 convertedGrammar.toReadableJSONString()
+        );
+    }
+
+    @Test
+    public void testFirst1() {
+        Grammar grammar = createGrammar(
+                createProduction(
+                        createNonTerminator("E"),
+                        createSymbolSequence(
+                                createNonTerminator("T"),
+                                createNonTerminator("E^")
+                        )
+                ),
+                createProduction(
+                        createNonTerminator("E^"),
+                        createSymbolSequence(
+                                createTerminator("+"),
+                                createNonTerminator("T"),
+                                createNonTerminator("E^")
+                        )
+                ),
+                createProduction(
+                        createNonTerminator("E^"),
+                        createSymbolSequence(
+                                Symbol.EPSILON
+                        )
+                ),
+                createProduction(
+                        createNonTerminator("T"),
+                        createSymbolSequence(
+                                createNonTerminator("F"),
+                                createNonTerminator("T^")
+                        )
+                ),
+                createProduction(
+                        createNonTerminator("T^"),
+                        createSymbolSequence(
+                                createTerminator("*"),
+                                createNonTerminator("F"),
+                                createNonTerminator("T^")
+                        )
+                ),
+                createProduction(
+                        createNonTerminator("T^"),
+                        createSymbolSequence(
+                                Symbol.EPSILON
+                        )
+                ),
+                createProduction(
+                        createNonTerminator("F"),
+                        createSymbolSequence(
+                                createTerminator("("),
+                                createNonTerminator("E"),
+                                createTerminator(")")
+                        )
+                ),
+                createProduction(
+                        createNonTerminator("F"),
+                        createSymbolSequence(
+                                createTerminator("id")
+                        )
+                )
+        );
+
+        LL1Compiler compiler = new LL1Compiler(grammar);
+        Grammar convertedGrammar = compiler.getGrammar();
+
+        assertEquals(
+                "{\"productions\":[\"T → (E)T^|idT^\",\"E → (E)T^E^|idT^E^\",\"F → (E)|id\",\"E^ → +TE^|__EPSILON__\",\"T^ → *FT^|__EPSILON__\"]}",
+                convertedGrammar.toReadableJSONString()
+        );
+        assertEquals(
+                "{\"terminator\":{\"__EPSILON__\":\"__EPSILON__\",\"(\":\"(\",\")\":\")\",\"*\":\"*\",\"id\":\"id\",\"+\":\"+\"},\"nonTerminator\":{\"T\":\"(,id\",\"E\":\"(,id\",\"F\":\"(,id\",\"E^\":\"__EPSILON__,+\",\"T^\":\"__EPSILON__,*\"}}",
+                compiler.getFirstReadableJSONString()
         );
     }
 }

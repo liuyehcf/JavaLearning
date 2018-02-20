@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ListUtils {
+public abstract class ListUtils {
     public static <T> List<T> subListExceptFirstElement(List<T> list) {
         return list.subList(1, list.size());
     }
