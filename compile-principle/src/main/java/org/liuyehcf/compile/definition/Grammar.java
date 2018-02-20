@@ -1,7 +1,8 @@
 package org.liuyehcf.compile.definition;
 
+import org.liuyehcf.compile.utils.ListUtils;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.liuyehcf.compile.utils.AssertUtils.assertFalse;
@@ -17,13 +18,41 @@ public class Grammar {
 
     private Grammar(List<Production> productions) {
         this.productions = productions;
+
+        init();
     }
 
-    public static Grammar createGrammar(Production... productions) {
-        return new Grammar(Arrays.asList(productions));
+    private void init() {
+        boolean containsStartSymbol = false;
+
+        // 首先，检查是否含有文法开始符号的产生式
+        for (Production production : productions) {
+            if (production.getLeft().equals(Symbol.START)) {
+                containsStartSymbol = true;
+                break;
+            }
+        }
+
+        if (!containsStartSymbol) {
+            Symbol symbol = productions.get(0).getLeft();
+
+            // 添加文法开始符号的产生式
+            productions.add(
+                    Production.create(
+                            Symbol.START,
+                            SymbolSequence.create(
+                                    symbol
+                            )
+                    )
+            );
+        }
     }
 
-    public static Grammar createGrammar(List<Production> productions) {
+    public static Grammar create(Production... productions) {
+        return new Grammar(ListUtils.of(productions));
+    }
+
+    public static Grammar create(List<Production> productions) {
         return new Grammar(productions);
     }
 
@@ -33,7 +62,7 @@ public class Grammar {
         List<SymbolSequence> right = new ArrayList<>(p1.getRight());
         right.addAll(p2.getRight());
 
-        return Production.createProduction(
+        return Production.create(
                 p1.getLeft(),
                 right);
     }

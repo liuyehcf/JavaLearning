@@ -10,10 +10,7 @@ import org.liuyehcf.compile.utils.SetUtils;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.liuyehcf.compile.definition.Grammar.createGrammar;
 import static org.liuyehcf.compile.definition.Grammar.parallelProduction;
-import static org.liuyehcf.compile.definition.Production.createProduction;
-import static org.liuyehcf.compile.definition.SymbolSequence.createSymbolSequence;
 import static org.liuyehcf.compile.utils.AssertUtils.*;
 
 public class LL1Compiler implements Compiler {
@@ -103,39 +100,40 @@ public class LL1Compiler implements Compiler {
         while (!canBreak) {
             Map<Symbol, Set<Symbol>> newFirsts = new HashMap<>(this.firsts);
 
-            for (Symbol symbolX : symbols) {
-                if (!symbolX.isTerminator()) {
-                    Production productionOfX = productionMap.get(symbolX);
+            for (Symbol _X : symbols) {
+                if (!_X.isTerminator()) {
+                    Production pX = productionMap.get(_X);
 
-                    assertNotNull(productionOfX);
+                    assertNotNull(pX);
 
                     // 如果X是一个非终结符，且X→Y1...Yk∈P(k≥1)
                     // 那么如果对于某个i，a在FIRST(Yi)中且ε在所有的FIRST(Y1),...,FIRST(Yi−1)中(即Y1...Yi−1⇒∗ε)，就把a加入到FIRST(X)中
                     // 如果对于所有的j=1,2,...,k，ε在FIRST(Yj)中，那么将ε加入到FIRST(X)
 
                     // 这里需要遍历每个子产生式
-                    for (SymbolSequence symbolSequence : productionOfX.getRight()) {
+                    for (SymbolSequence symbolSequence : pX.getRight()) {
                         boolean canReachEpsilon = true;
 
                         for (int i = 0; i < symbolSequence.getSymbols().size(); i++) {
-                            Symbol symbolY = symbolSequence.getSymbols().get(i);
-                            if (!newFirsts.containsKey(symbolY)) {
+                            Symbol _YI = symbolSequence.getSymbols().get(i);
+                            if (!newFirsts.containsKey(_YI)) {
                                 // 说明该符号的first集尚未计算，因此跳过当前子表达式
                                 canReachEpsilon = false;
                                 break;
                             } else {
-                                // 首先，将symbolY的first集(除了ε)添加到symbolX的first集中
-                                if (!newFirsts.containsKey(symbolX)) {
-                                    newFirsts.put(symbolX, new HashSet<>());
+                                // 首先，将_Y的first集(除了ε)添加到_X的first集中
+                                if (!newFirsts.containsKey(_X)) {
+                                    newFirsts.put(_X, new HashSet<>());
                                 }
-                                newFirsts.get(symbolX).addAll(
+                                newFirsts.get(_X).addAll(
                                         SetUtils.extract(
-                                                newFirsts.get(symbolY),
-                                                Symbol.EPSILON)
+                                                newFirsts.get(_YI),
+                                                Symbol.EPSILON
+                                        )
                                 );
 
-                                // 若symbolY的first集不包含ε，那么到子表达式循环结束
-                                if (!newFirsts.get(symbolY).contains(Symbol.EPSILON)) {
+                                // 若_Y的first集不包含ε，那么到子表达式循环结束
+                                if (!newFirsts.get(_YI).contains(Symbol.EPSILON)) {
                                     canReachEpsilon = false;
                                     break;
                                 }
@@ -143,7 +141,7 @@ public class LL1Compiler implements Compiler {
                         }
 
                         if (canReachEpsilon) {
-                            newFirsts.get(symbolX).add(Symbol.EPSILON);
+                            newFirsts.get(_X).add(Symbol.EPSILON);
                         }
                     }
                 }
@@ -160,7 +158,70 @@ public class LL1Compiler implements Compiler {
 
 
     private void calculateFollow() {
+        // 将$放入FOLLOW(S)中，其中S是开始符号，$是输入右端的结束标记
+        follows.put(Symbol.START, SetUtils.of(Symbol.DOLLAR));
 
+        boolean canBreak = false;
+        while (!canBreak) {
+            Map<Symbol, Set<Symbol>> newFollows = new HashMap<>(this.follows);
+
+            for (Symbol _A : symbols) {
+                if (!_A.isTerminator()) {
+                    Production pA = productionMap.get(_A);
+
+                    assertNotNull(pA);
+
+                    for (SymbolSequence symbolSequence : pA.getRight()) {
+                        for (int i = 0; i < symbolSequence.getSymbols().size(); i++) {
+                            Symbol _B = symbolSequence.getSymbols().get(i);
+                            Symbol _BetaFirst = null;
+
+                            if (i < symbolSequence.getSymbols().size() - 1) {
+                                _BetaFirst = symbolSequence.getSymbols().get(i + 1);
+                            }
+
+                            // 如果存在一个产生式A→αBβ，那么FIRST(β)中除ε之外的所有符号都在FOLLOW(B)中
+                            if (_BetaFirst != null) {
+                                if (!newFollows.containsKey(_B)) {
+                                    newFollows.put(_B, new HashSet<>());
+                                }
+
+                                assertNotNull(this.firsts.get(_BetaFirst));
+
+                                newFollows.get(_B).addAll(
+                                        SetUtils.extract(
+                                                this.firsts.get(_BetaFirst),
+                                                Symbol.EPSILON)
+                                );
+                            }
+
+                            // 如果存在一个产生式A→αB，或存在产生式A→αBβ且FIRST(β)包含ε，那么FOLLOW(A)中的所有符号都在FOLLOW(B)中
+                            if (_BetaFirst == null
+                                    || this.firsts.get(_BetaFirst).contains(Symbol.EPSILON)) {
+
+                                if (newFollows.containsKey(_A)) {
+
+                                    if (!newFollows.containsKey(_B)) {
+                                        newFollows.put(_B, new HashSet<>());
+                                    }
+
+                                    newFollows.get(_B).addAll(
+                                            newFollows.get(_A)
+                                    );
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (newFollows.equals(this.follows)) {
+                canBreak = true;
+            } else {
+                this.follows = newFollows;
+                canBreak = false;
+            }
+        }
     }
 
     @Override
@@ -176,6 +237,11 @@ public class LL1Compiler implements Compiler {
         return this.grammar;
     }
 
+    /**
+     * 打印JSON格式的FIRST集
+     *
+     * @return
+     */
     public String getFirstReadableJSONString() {
         StringBuilder sb = new StringBuilder();
 
@@ -214,6 +280,68 @@ public class LL1Compiler implements Compiler {
             assertFalse(firsts.get(nonTerminator).isEmpty());
 
             for (Symbol firstSymbol : firsts.get(nonTerminator)) {
+                sb.append(firstSymbol).append(',');
+            }
+
+            sb.setLength(sb.length() - 1);
+
+            sb.append('\"');
+            sb.append(',');
+        }
+
+        assertFalse(nonTerminatorSymbols.isEmpty());
+        sb.setLength(sb.length() - 1);
+
+
+        sb.append('}');
+        sb.append('}');
+
+        return sb.toString();
+    }
+
+    /**
+     * 打印JSON格式的FOLLOW集
+     *
+     * @return
+     */
+    public String getFollowReadableJSONString() {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append('{');
+        sb.append("\"terminator\":");
+        sb.append('{');
+
+        for (Symbol terminator : terminatorSymbols) {
+            sb.append('\"').append(terminator.toReadableJSONString()).append("\":");
+            sb.append('\"');
+
+            assertFalse(follows.get(terminator).isEmpty());
+
+            for (Symbol firstSymbol : follows.get(terminator)) {
+                sb.append(firstSymbol).append(',');
+            }
+
+            sb.setLength(sb.length() - 1);
+
+            sb.append('\"');
+            sb.append(',');
+        }
+
+        assertFalse(terminatorSymbols.isEmpty());
+        sb.setLength(sb.length() - 1);
+
+        sb.append('}');
+        sb.append(',');
+        sb.append("\"nonTerminator\":");
+        sb.append('{');
+
+        for (Symbol nonTerminator : nonTerminatorSymbols) {
+            sb.append('\"').append(nonTerminator.toReadableJSONString()).append("\":");
+            sb.append('\"');
+
+            assertFalse(follows.get(nonTerminator).isEmpty());
+
+            for (Symbol firstSymbol : follows.get(nonTerminator)) {
                 sb.append(firstSymbol).append(',');
             }
 
@@ -414,7 +542,7 @@ public class LL1Compiler implements Compiler {
                     for (SymbolSequence symbolSequenceJ : pJ.getRight()) {
 
                         modifiedSymbolSequencesI.add(
-                                createSymbolSequence(
+                                SymbolSequence.create(
                                         ListUtils.of(
                                                 symbolSequenceJ.getSymbols(),
                                                 ListUtils.subListExceptFirstElement(symbolsI)
@@ -430,7 +558,7 @@ public class LL1Compiler implements Compiler {
 
             if (isSubstituted) {
                 productionMap.put(_AI,
-                        createProduction(
+                        Production.create(
                                 _AI,
                                 modifiedSymbolSequencesI));
             }
@@ -477,7 +605,7 @@ public class LL1Compiler implements Compiler {
 
                 symbolSequenceOfP3.add(
                         // αiA′
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 ListUtils.of(
                                         // αi
                                         ListUtils.subListExceptFirstElement(alphaSymbolSequence.getSymbols()),
@@ -490,10 +618,10 @@ public class LL1Compiler implements Compiler {
 
             // ε
             symbolSequenceOfP3.add(
-                    createSymbolSequence(Symbol.EPSILON)
+                    SymbolSequence.create(Symbol.EPSILON)
             );
 
-            Production p3 = createProduction(
+            Production p3 = Production.create(
                     _APrimed,
                     symbolSequenceOfP3
             );
@@ -504,7 +632,7 @@ public class LL1Compiler implements Compiler {
 
                 // 构造βmA′
                 symbolSequenceOfP2.add(
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 ListUtils.of(
                                         // βm
                                         betaSymbolSequence.getSymbols(),
@@ -517,7 +645,7 @@ public class LL1Compiler implements Compiler {
 
             productionMap.put(_APrimed, p3);
 
-            Production p2 = createProduction(
+            Production p2 = Production.create(
                     _A,
                     symbolSequenceOfP2
             );
@@ -576,13 +704,13 @@ public class LL1Compiler implements Compiler {
                     if (symbolSequenceOfP1.getSymbols().get(0).equals(prefixSymbol)) {
                         if (symbolSequenceOfP1.getSymbols().size() > 1) {
                             _Betas.add(
-                                    createSymbolSequence(
+                                    SymbolSequence.create(
                                             ListUtils.subListExceptFirstElement(symbolSequenceOfP1.getSymbols())
                                     )
                             );
                         } else {
                             _Betas.add(
-                                    createSymbolSequence(
+                                    SymbolSequence.create(
                                             Symbol.EPSILON
                                     )
                             );
@@ -592,7 +720,7 @@ public class LL1Compiler implements Compiler {
                     }
                 }
 
-                Production p3 = createProduction(
+                Production p3 = Production.create(
                         _APrimed, // A′
                         _Betas // β1|β2|...|βn
                 );
@@ -600,11 +728,11 @@ public class LL1Compiler implements Compiler {
                 assertFalse(productionMap.containsKey(_APrimed));
                 productionMap.put(_APrimed, p3);
 
-                Production p2 = createProduction(
+                Production p2 = Production.create(
                         _A, // A
                         ListUtils.of(
                                 // aA′
-                                createSymbolSequence(
+                                SymbolSequence.create(
                                         prefixSymbol,
                                         _APrimed
                                 ),
@@ -650,7 +778,7 @@ public class LL1Compiler implements Compiler {
         }
 
         private Grammar createNewGrammar() {
-            return createGrammar(
+            return Grammar.create(
                     productionMap.entrySet()
                             .stream()
                             .map(Map.Entry::getValue)

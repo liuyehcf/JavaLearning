@@ -2,46 +2,45 @@ package org.liuyehcf.compile.compiler;
 
 import org.junit.Test;
 import org.liuyehcf.compile.definition.Grammar;
+import org.liuyehcf.compile.definition.Production;
 import org.liuyehcf.compile.definition.Symbol;
+import org.liuyehcf.compile.definition.SymbolSequence;
 
 import static org.junit.Assert.assertEquals;
-import static org.liuyehcf.compile.definition.Grammar.createGrammar;
-import static org.liuyehcf.compile.definition.Production.createProduction;
 import static org.liuyehcf.compile.definition.Symbol.createNonTerminator;
 import static org.liuyehcf.compile.definition.Symbol.createTerminator;
-import static org.liuyehcf.compile.definition.SymbolSequence.createSymbolSequence;
 
 public class TestLL1Compiler {
     @Test
     public void testGrammarConvert1() {
-        Grammar grammar = createGrammar(
-                createProduction(
+        Grammar grammar = Grammar.create(
+                Production.create(
                         createNonTerminator("E"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createNonTerminator("E"),
                                 createTerminator("+"),
                                 createNonTerminator("E")
                         )
                 ),
-                createProduction(
+                Production.create(
                         createNonTerminator("E"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createNonTerminator("E"),
                                 createTerminator("*"),
                                 createNonTerminator("E")
                         )
                 ),
-                createProduction(
+                Production.create(
                         createNonTerminator("E"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createTerminator("("),
                                 createNonTerminator("E"),
                                 createTerminator(")")
                         )
                 ),
-                createProduction(
+                Production.create(
                         createNonTerminator("E"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createTerminator("id")
                         )
                 )
@@ -58,40 +57,40 @@ public class TestLL1Compiler {
 
     @Test
     public void testGrammarConvert2() {
-        Grammar grammar = createGrammar(
-                createProduction(
+        Grammar grammar = Grammar.create(
+                Production.create(
                         createNonTerminator("D"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createNonTerminator("E")
                         )
                 ),
-                createProduction(
+                Production.create(
                         createNonTerminator("E"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createNonTerminator("E"),
                                 createTerminator("+"),
                                 createNonTerminator("E")
                         )
                 ),
-                createProduction(
+                Production.create(
                         createNonTerminator("E"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createNonTerminator("E"),
                                 createTerminator("*"),
                                 createNonTerminator("E")
                         )
                 ),
-                createProduction(
+                Production.create(
                         createNonTerminator("E"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createTerminator("("),
                                 createNonTerminator("E"),
                                 createTerminator(")")
                         )
                 ),
-                createProduction(
+                Production.create(
                         createNonTerminator("E"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createTerminator("id")
                         )
                 )
@@ -109,48 +108,48 @@ public class TestLL1Compiler {
 
     @Test
     public void testGrammarConvert3() {
-        Grammar grammar = createGrammar(
-                createProduction(
+        Grammar grammar = Grammar.create(
+                Production.create(
                         createNonTerminator("D"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createNonTerminator("E"),
                                 createTerminator("e")
                         )
                 ),
-                createProduction(
+                Production.create(
                         createNonTerminator("D"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createTerminator("e"),
                                 createNonTerminator("E")
                         )
                 ),
-                createProduction(
+                Production.create(
                         createNonTerminator("E"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createNonTerminator("E"),
                                 createTerminator("+"),
                                 createNonTerminator("E")
                         )
                 ),
-                createProduction(
+                Production.create(
                         createNonTerminator("E"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createNonTerminator("E"),
                                 createTerminator("*"),
                                 createNonTerminator("E")
                         )
                 ),
-                createProduction(
+                Production.create(
                         createNonTerminator("E"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createTerminator("("),
                                 createNonTerminator("E"),
                                 createTerminator(")")
                         )
                 ),
-                createProduction(
+                Production.create(
                         createNonTerminator("E"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createTerminator("id")
                         )
                 )
@@ -167,32 +166,32 @@ public class TestLL1Compiler {
 
     @Test
     public void testCommonPrefixExtract1() {
-        Grammar grammar = createGrammar(
-                createProduction(
+        Grammar grammar = Grammar.create(
+                Production.create(
                         createNonTerminator("A"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createTerminator("a"),
                                 createTerminator("b")
                         )
                 ),
-                createProduction(
+                Production.create(
                         createNonTerminator("A"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createTerminator("a"),
                                 createTerminator("b"),
                                 createTerminator("c")
                         )
                 ),
-                createProduction(
+                Production.create(
                         createNonTerminator("A"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createTerminator("b"),
                                 createTerminator("d")
                         )
                 ),
-                createProduction(
+                Production.create(
                         createNonTerminator("A"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createTerminator("b"),
                                 createTerminator("c")
                         )
@@ -210,43 +209,43 @@ public class TestLL1Compiler {
 
     @Test
     public void testCommonPrefixExtract2() {
-        Grammar grammar = createGrammar(
-                createProduction(
+        Grammar grammar = Grammar.create(
+                Production.create(
                         createNonTerminator("A"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createTerminator("a"),
                                 createTerminator("β1")
                         )
                 ),
-                createProduction(
+                Production.create(
                         createNonTerminator("A"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createTerminator("a"),
                                 createTerminator("β2")
                         )
                 ),
-                createProduction(
+                Production.create(
                         createNonTerminator("A"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createTerminator("a"),
                                 createTerminator("βn")
                         )
                 ),
-                createProduction(
+                Production.create(
                         createNonTerminator("A"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createTerminator("γ1")
                         )
                 ),
-                createProduction(
+                Production.create(
                         createNonTerminator("A"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createTerminator("γ2")
                         )
                 ),
-                createProduction(
+                Production.create(
                         createNonTerminator("A"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createTerminator("γm")
                         )
                 )
@@ -263,74 +262,74 @@ public class TestLL1Compiler {
 
     @Test
     public void testCommonPrefixExtract3() {
-        Grammar grammar = createGrammar(
-                createProduction(
+        Grammar grammar = Grammar.create(
+                Production.create(
                         createNonTerminator("A"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createTerminator("a")
                         )
                 ),
-                createProduction(
+                Production.create(
                         createNonTerminator("A"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createTerminator("a"),
                                 createTerminator("b")
                         )
                 ),
-                createProduction(
+                Production.create(
                         createNonTerminator("A"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createTerminator("a"),
                                 createTerminator("b"),
                                 createTerminator("c")
                         )
                 ),
-                createProduction(
+                Production.create(
                         createNonTerminator("A"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createTerminator("a"),
                                 createTerminator("b"),
                                 createTerminator("c"),
                                 createTerminator("d")
                         )
                 ),
-                createProduction(
+                Production.create(
                         createNonTerminator("A"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createTerminator("b")
                         )
                 ),
-                createProduction(
+                Production.create(
                         createNonTerminator("A"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createTerminator("b"),
                                 createTerminator("c")
                         )
                 ),
-                createProduction(
+                Production.create(
                         createNonTerminator("A"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createTerminator("b"),
                                 createTerminator("c"),
                                 createTerminator("d")
                         )
                 ),
-                createProduction(
+                Production.create(
                         createNonTerminator("A"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createTerminator("c")
                         )
                 ),
-                createProduction(
+                Production.create(
                         createNonTerminator("A"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createTerminator("c"),
                                 createTerminator("d")
                         )
                 ),
-                createProduction(
+                Production.create(
                         createNonTerminator("A"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createTerminator("d")
                         )
                 )
@@ -346,61 +345,61 @@ public class TestLL1Compiler {
     }
 
     @Test
-    public void testFirst1() {
-        Grammar grammar = createGrammar(
-                createProduction(
+    public void testFirstFollow1() {
+        Grammar grammar = Grammar.create(
+                Production.create(
                         createNonTerminator("E"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createNonTerminator("T"),
                                 createNonTerminator("E^")
                         )
                 ),
-                createProduction(
+                Production.create(
                         createNonTerminator("E^"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createTerminator("+"),
                                 createNonTerminator("T"),
                                 createNonTerminator("E^")
                         )
                 ),
-                createProduction(
+                Production.create(
                         createNonTerminator("E^"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 Symbol.EPSILON
                         )
                 ),
-                createProduction(
+                Production.create(
                         createNonTerminator("T"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createNonTerminator("F"),
                                 createNonTerminator("T^")
                         )
                 ),
-                createProduction(
+                Production.create(
                         createNonTerminator("T^"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createTerminator("*"),
                                 createNonTerminator("F"),
                                 createNonTerminator("T^")
                         )
                 ),
-                createProduction(
+                Production.create(
                         createNonTerminator("T^"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 Symbol.EPSILON
                         )
                 ),
-                createProduction(
+                Production.create(
                         createNonTerminator("F"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createTerminator("("),
                                 createNonTerminator("E"),
                                 createTerminator(")")
                         )
                 ),
-                createProduction(
+                Production.create(
                         createNonTerminator("F"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createTerminator("id")
                         )
                 )
@@ -417,5 +416,7 @@ public class TestLL1Compiler {
                 "{\"terminator\":{\"__EPSILON__\":\"__EPSILON__\",\"(\":\"(\",\")\":\")\",\"*\":\"*\",\"id\":\"id\",\"+\":\"+\"},\"nonTerminator\":{\"T\":\"(,id\",\"E\":\"(,id\",\"F\":\"(,id\",\"E^\":\"__EPSILON__,+\",\"T^\":\"__EPSILON__,*\"}}",
                 compiler.getFirstReadableJSONString()
         );
+
+        System.out.println(compiler.getFollowReadableJSONString());
     }
 }

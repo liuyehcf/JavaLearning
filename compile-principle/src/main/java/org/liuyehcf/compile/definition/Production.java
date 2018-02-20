@@ -1,5 +1,7 @@
 package org.liuyehcf.compile.definition;
 
+import org.liuyehcf.compile.utils.ListUtils;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -24,11 +26,11 @@ public class Production {
         this.right = right;
     }
 
-    public static Production createProduction(Symbol left, SymbolSequence... right) {
-        return createProduction(left, Arrays.asList(right));
+    public static Production create(Symbol left, SymbolSequence... right) {
+        return create(left, ListUtils.of(right));
     }
 
-    public static Production createProduction(Symbol left, List<SymbolSequence> right) {
+    public static Production create(Symbol left, List<SymbolSequence> right) {
         return new Production(left, right);
     }
 

@@ -2,43 +2,43 @@ package org.liuyehcf.compile.definition;
 
 import org.junit.Test;
 
-import static org.liuyehcf.compile.definition.Grammar.createGrammar;
-import static org.liuyehcf.compile.definition.Production.createProduction;
+import static org.liuyehcf.compile.definition.Grammar.create;
+import static org.liuyehcf.compile.definition.Production.create;
 import static org.liuyehcf.compile.definition.Symbol.createNonTerminator;
 import static org.liuyehcf.compile.definition.Symbol.createTerminator;
-import static org.liuyehcf.compile.definition.SymbolSequence.createSymbolSequence;
+import static org.liuyehcf.compile.definition.SymbolSequence.create;
 
 public class TestGrammar {
     @Test
     public void testCreateGrammar() {
-        Grammar grammar = createGrammar(
-                createProduction(
+        Grammar grammar = Grammar.create(
+                Production.create(
                         createNonTerminator("E"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createNonTerminator("E"),
                                 createTerminator("+"),
                                 createNonTerminator("E")
                         )
                 ),
-                createProduction(
+                Production.create(
                         createNonTerminator("E"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createNonTerminator("E"),
                                 createTerminator("*"),
                                 createNonTerminator("E")
                         )
                 ),
-                createProduction(
+                Production.create(
                         createNonTerminator("E"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createTerminator("("),
                                 createNonTerminator("E"),
                                 createTerminator(")")
                         )
                 ),
-                createProduction(
+                Production.create(
                         createNonTerminator("E"),
-                        createSymbolSequence(
+                        SymbolSequence.create(
                                 createTerminator("id")
                         )
                 )

@@ -1,5 +1,7 @@
 package org.liuyehcf.compile.definition;
 
+import org.liuyehcf.compile.utils.ListUtils;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -14,11 +16,11 @@ public class SymbolSequence {
         this.symbols = symbols;
     }
 
-    public static SymbolSequence createSymbolSequence(Symbol... symbols) {
-        return new SymbolSequence(Arrays.asList(symbols));
+    public static SymbolSequence create(Symbol... symbols) {
+        return new SymbolSequence(ListUtils.of(symbols));
     }
 
-    public static SymbolSequence createSymbolSequence(List<Symbol> symbols) {
+    public static SymbolSequence create(List<Symbol> symbols) {
         return new SymbolSequence(symbols);
     }
 
