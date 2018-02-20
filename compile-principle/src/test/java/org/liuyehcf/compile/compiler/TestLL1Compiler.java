@@ -50,7 +50,7 @@ public class TestLL1Compiler {
         Grammar convertedGrammar = compiler.getGrammar();
 
         assertEquals(
-                "{\"productions\":[\"E → (E)E′|idE′\",\"E′ → +EE′|*EE′|__EPSILON__\"]}",
+                "{\"productions\":[\"E → (E)E′|idE′\",\"E′ → +EE′|*EE′|__EPSILON__\",\"__START__ → (E)E′|idE′\"]}",
                 convertedGrammar.toReadableJSONString()
         );
     }
@@ -100,11 +100,10 @@ public class TestLL1Compiler {
         Grammar convertedGrammar = compiler.getGrammar();
 
         assertEquals(
-                "{\"productions\":[\"D → (E)E′|idE′\",\"E → (E)E′|idE′\",\"E′ → +EE′|*EE′|__EPSILON__\"]}",
+                "{\"productions\":[\"D → (E)E′|idE′\",\"E → (E)E′|idE′\",\"E′ → +EE′|*EE′|__EPSILON__\",\"__START__ → (E)E′|idE′\"]}",
                 convertedGrammar.toReadableJSONString()
         );
     }
-
 
     @Test
     public void testGrammarConvert3() {
@@ -159,7 +158,7 @@ public class TestLL1Compiler {
         Grammar convertedGrammar = compiler.getGrammar();
 
         assertEquals(
-                "{\"productions\":[\"D → (E)E′e|idE′e|eE\",\"E → (E)E′|idE′\",\"E′ → +EE′|*EE′|__EPSILON__\"]}",
+                "{\"productions\":[\"D → (E)E′e|idE′e|eE\",\"E → (E)E′|idE′\",\"E′ → +EE′|*EE′|__EPSILON__\",\"__START__ → (E)E′e|idE′e|eE\"]}",
                 convertedGrammar.toReadableJSONString()
         );
     }
@@ -202,7 +201,7 @@ public class TestLL1Compiler {
         Grammar convertedGrammar = compiler.getGrammar();
 
         assertEquals(
-                "{\"productions\":[\"A → bA′′|aA′\",\"A′ → bA′′′\",\"A′′ → d|c\",\"A′′′ → __EPSILON__|c\"]}",
+                "{\"productions\":[\"A → bA′′|aA′\",\"A′ → bA′′′\",\"A′′ → d|c\",\"A′′′ → __EPSILON__|c\",\"__START__ → bA′′|aA′\"]}",
                 convertedGrammar.toReadableJSONString()
         );
     }
@@ -255,7 +254,7 @@ public class TestLL1Compiler {
         Grammar convertedGrammar = compiler.getGrammar();
 
         assertEquals(
-                "{\"productions\":[\"A → aA′|γ1|γ2|γm\",\"A′ → β1|β2|βn\"]}",
+                "{\"productions\":[\"A → aA′|γ1|γ2|γm\",\"A′ → β1|β2|βn\",\"__START__ → aA′|γ1|γ2|γm\"]}",
                 convertedGrammar.toReadableJSONString()
         );
     }
@@ -339,7 +338,7 @@ public class TestLL1Compiler {
         Grammar convertedGrammar = compiler.getGrammar();
 
         assertEquals(
-                "{\"productions\":[\"A → cA′′′|bA′′|aA′|d\",\"A′ → bA′′′′′|__EPSILON__\",\"A′′ → cA′′′′|__EPSILON__\",\"A′′′ → __EPSILON__|d\",\"A′′′′ → __EPSILON__|d\",\"A′′′′′ → cA′′′′′′|__EPSILON__\",\"A′′′′′′ → __EPSILON__|d\"]}",
+                "{\"productions\":[\"A → cA′′′|bA′′|aA′|d\",\"A′ → bA′′′′′|__EPSILON__\",\"A′′ → cA′′′′|__EPSILON__\",\"A′′′ → __EPSILON__|d\",\"A′′′′ → __EPSILON__|d\",\"A′′′′′ → cA′′′′′′|__EPSILON__\",\"__START__ → cA′′′|bA′′|aA′|d\",\"A′′′′′′ → __EPSILON__|d\"]}",
                 convertedGrammar.toReadableJSONString()
         );
     }
@@ -409,11 +408,11 @@ public class TestLL1Compiler {
         Grammar convertedGrammar = compiler.getGrammar();
 
         assertEquals(
-                "{\"productions\":[\"T → (E)T^|idT^\",\"E → (E)T^E^|idT^E^\",\"F → (E)|id\",\"E^ → +TE^|__EPSILON__\",\"T^ → *FT^|__EPSILON__\"]}",
+                "{\"productions\":[\"T → (E)T^|idT^\",\"E → (E)T^E^|idT^E^\",\"F → (E)|id\",\"__START__ → (E)T^E^|idT^E^\",\"E^ → +TE^|__EPSILON__\",\"T^ → *FT^|__EPSILON__\"]}",
                 convertedGrammar.toReadableJSONString()
         );
         assertEquals(
-                "{\"terminator\":{\"__EPSILON__\":\"__EPSILON__\",\"(\":\"(\",\")\":\")\",\"*\":\"*\",\"id\":\"id\",\"+\":\"+\"},\"nonTerminator\":{\"T\":\"(,id\",\"E\":\"(,id\",\"F\":\"(,id\",\"E^\":\"__EPSILON__,+\",\"T^\":\"__EPSILON__,*\"}}",
+                "{\"terminator\":{\"__EPSILON__\":\"__EPSILON__\",\"(\":\"(\",\")\":\")\",\"*\":\"*\",\"id\":\"id\",\"+\":\"+\"},\"nonTerminator\":{\"T\":\"(,id\",\"E\":\"(,id\",\"F\":\"(,id\",\"__START__\":\"(,id\",\"E^\":\"__EPSILON__,+\",\"T^\":\"__EPSILON__,*\"}}",
                 compiler.getFirstReadableJSONString()
         );
 
