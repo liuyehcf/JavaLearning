@@ -39,6 +39,9 @@ public class LL1Compiler implements Compiler {
     // follow集
     private Map<Symbol, Set<Symbol>> follows;
 
+    // select集
+    private Map<Symbol, Set<Symbol>> selects;
+
     public LL1Compiler(Grammar originGrammar) {
         this.originGrammar = originGrammar;
         symbols = new HashSet<>();
@@ -243,60 +246,7 @@ public class LL1Compiler implements Compiler {
      * @return
      */
     public String getFirstReadableJSONString() {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append('{');
-        sb.append("\"terminator\":");
-        sb.append('{');
-
-        for (Symbol terminator : terminatorSymbols) {
-            sb.append('\"').append(terminator.toReadableJSONString()).append("\":");
-            sb.append('\"');
-
-            assertFalse(firsts.get(terminator).isEmpty());
-
-            for (Symbol firstSymbol : firsts.get(terminator)) {
-                sb.append(firstSymbol).append(',');
-            }
-
-            sb.setLength(sb.length() - 1);
-
-            sb.append('\"');
-            sb.append(',');
-        }
-
-        assertFalse(terminatorSymbols.isEmpty());
-        sb.setLength(sb.length() - 1);
-
-        sb.append('}');
-        sb.append(',');
-        sb.append("\"nonTerminator\":");
-        sb.append('{');
-
-        for (Symbol nonTerminator : nonTerminatorSymbols) {
-            sb.append('\"').append(nonTerminator.toReadableJSONString()).append("\":");
-            sb.append('\"');
-
-            assertFalse(firsts.get(nonTerminator).isEmpty());
-
-            for (Symbol firstSymbol : firsts.get(nonTerminator)) {
-                sb.append(firstSymbol).append(',');
-            }
-
-            sb.setLength(sb.length() - 1);
-
-            sb.append('\"');
-            sb.append(',');
-        }
-
-        assertFalse(nonTerminatorSymbols.isEmpty());
-        sb.setLength(sb.length() - 1);
-
-
-        sb.append('}');
-        sb.append('}');
-
-        return sb.toString();
+        return getReadableJSONStringFor(this.firsts);
     }
 
     /**
@@ -305,6 +255,10 @@ public class LL1Compiler implements Compiler {
      * @return
      */
     public String getFollowReadableJSONString() {
+        return getReadableJSONStringFor(this.follows);
+    }
+
+    private String getReadableJSONStringFor(Map<Symbol, Set<Symbol>> map) {
         StringBuilder sb = new StringBuilder();
 
         sb.append('{');
@@ -315,9 +269,9 @@ public class LL1Compiler implements Compiler {
             sb.append('\"').append(terminator.toReadableJSONString()).append("\":");
             sb.append('\"');
 
-            assertFalse(follows.get(terminator).isEmpty());
+            assertFalse(map.get(terminator).isEmpty());
 
-            for (Symbol firstSymbol : follows.get(terminator)) {
+            for (Symbol firstSymbol : map.get(terminator)) {
                 sb.append(firstSymbol).append(',');
             }
 
@@ -339,9 +293,9 @@ public class LL1Compiler implements Compiler {
             sb.append('\"').append(nonTerminator.toReadableJSONString()).append("\":");
             sb.append('\"');
 
-            assertFalse(follows.get(nonTerminator).isEmpty());
+            assertFalse(map.get(nonTerminator).isEmpty());
 
-            for (Symbol firstSymbol : follows.get(nonTerminator)) {
+            for (Symbol firstSymbol : map.get(nonTerminator)) {
                 sb.append(firstSymbol).append(',');
             }
 

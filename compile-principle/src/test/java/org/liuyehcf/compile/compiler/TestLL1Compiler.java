@@ -416,6 +416,9 @@ public class TestLL1Compiler {
                 compiler.getFirstReadableJSONString()
         );
 
-        System.out.println(compiler.getFollowReadableJSONString());
+        assertEquals(
+                "{\"terminator\":{\"__EPSILON__\":\"),+,__DOLLAR__\",\"(\":\"(,id\",\")\":\"),*,+,__DOLLAR__\",\"*\":\"(,id\",\"id\":\"),*,+,__DOLLAR__\",\"+\":\"(,id\"},\"nonTerminator\":{\"T\":\"),+,__DOLLAR__\",\"E\":\")\",\"F\":\"),*,+,__DOLLAR__\",\"__START__\":\"__DOLLAR__\",\"E^\":\"),__DOLLAR__\",\"T^\":\"),+,__DOLLAR__\"}}",
+                compiler.getFollowReadableJSONString()
+        );
     }
 }
