@@ -45,8 +45,8 @@ public class Grammar {
         boolean containsStartSymbol = false;
 
         // 首先，检查是否含有文法开始符号的产生式
-        for (Production production : productions) {
-            if (production.getLeft().equals(Symbol.START)) {
+        for (Production p : productions) {
+            if (p.getLeft().equals(Symbol.START)) {
                 containsStartSymbol = true;
                 break;
             }
@@ -84,8 +84,8 @@ public class Grammar {
                 .append("\"productions\":")
                 .append('[');
 
-        for (Production production : productions) {
-            sb.append(production.toReadableJSONString())
+        for (Production p : productions) {
+            sb.append(p.toReadableJSONString())
                     .append(",");
         }
 

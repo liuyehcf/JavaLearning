@@ -89,10 +89,10 @@ public class LLParserImpl implements LLParser {
     private void convertGrammar() {
         this.grammar = GrammarConverter.convert(originGrammar);
 
-        for (Production production : grammar.getProductions()) {
-            nonTerminatorSymbols.add(production.getLeft());
+        for (Production p : grammar.getProductions()) {
+            nonTerminatorSymbols.add(p.getLeft());
 
-            for (PrimaryProduction pp : production.getRight()) {
+            for (PrimaryProduction pp : p.getRight()) {
                 for (Symbol symbol : pp.getSymbols()) {
                     if (symbol.isTerminator()) {
                         terminatorSymbols.add(symbol);
@@ -102,8 +102,8 @@ public class LLParserImpl implements LLParser {
                 }
             }
 
-            assertFalse(productionMap.containsKey(production.getLeft()));
-            productionMap.put(production.getLeft(), production);
+            assertFalse(productionMap.containsKey(p.getLeft()));
+            productionMap.put(p.getLeft(), p);
         }
 
         symbols.addAll(nonTerminatorSymbols);
@@ -630,19 +630,14 @@ public class LLParserImpl implements LLParser {
      * 用于转换文法的静态内部类
      */
     public static final class GrammarConverter {
-        /**
-         * 文法定义
-         */
+
+        // 待转换的文法
         private final Grammar grammar;
 
-        /**
-         * 从非终结符映射到产生式的Map
-         */
+        // 非终结符 -> 产生式 的映射表
         private Map<Symbol, Production> productionMap;
 
-        /**
-         * 根据依赖关系将非终结符进行排序后的结果（有向图遍历）
-         */
+        // 根据依赖关系将非终结符进行排序后的结果（有向图遍历）
         private List<Symbol> sortedSymbols;
 
         private GrammarConverter(Grammar grammar) {
@@ -689,8 +684,8 @@ public class LLParserImpl implements LLParser {
         private void init() {
             if (productionMap == null) {
                 productionMap = new HashMap<>();
-                for (Production production : grammar.getProductions()) {
-                    Symbol nonTerminator = production.getLeft();
+                for (Production p : grammar.getProductions()) {
+                    Symbol nonTerminator = p.getLeft();
                     assertFalse(nonTerminator.isTerminator());
 
                     // 合并相同非终结符的产生式
@@ -699,11 +694,11 @@ public class LLParserImpl implements LLParser {
                                 nonTerminator,
                                 parallelProduction(
                                         productionMap.get(nonTerminator),
-                                        production
+                                        p
                                 )
                         );
                     } else {
-                        productionMap.put(nonTerminator, production);
+                        productionMap.put(nonTerminator, p);
                     }
 
                 }

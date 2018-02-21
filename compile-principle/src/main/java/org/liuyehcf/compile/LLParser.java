@@ -1,18 +1,6 @@
 package org.liuyehcf.compile;
 
-import org.liuyehcf.compile.definition.Grammar;
-
-public interface LLParser {
-    /**
-     * 获取Grammar
-     **/
-    Grammar getGrammar();
-
-    /**
-     * 给定字符串是否为当前文法的句子
-     */
-    boolean isMatch(String expression);
-
+public interface LLParser extends Parser {
     /**
      * 获取First、Follow、Select的JSON串
      */

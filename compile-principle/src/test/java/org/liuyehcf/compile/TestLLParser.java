@@ -78,7 +78,7 @@ public class TestLLParser {
         Grammar convertedGrammar = parser.getGrammar();
 
         assertEquals(
-                "{\"productions\":[\"E′ → + T E′ | __EPSILON__ |\",\"T′ → * F T′ | __EPSILON__ |\",\"T → ( E ) T′ | id T′ |\",\"E → ( E ) T′ E′ | id T′ E′ |\",\"F → ( E ) | id |\",\"__START__ → E |\"]}",
+                "{\"productions\":[\"E′ → + T E′ | __EPSILON__ \",\"T′ → * F T′ | __EPSILON__ \",\"T → ( E ) T′ | id T′ \",\"E → ( E ) T′ E′ | id T′ E′ \",\"F → ( E ) | id \",\"__START__ → E \"]}",
                 convertedGrammar.toReadableJSONString()
         );
         assertEquals(
@@ -182,7 +182,7 @@ public class TestLLParser {
         Grammar convertedGrammar = parser.getGrammar();
 
         assertEquals(
-                "{\"productions\":[\"STLIST → s STLISTN |\",\"PROGRAM → program DECLIST : TYPE ; STLIST end |\",\"DECLISTN → , id DECLISTN | __EPSILON__ |\",\"TYPE → real | int |\",\"STLISTN → ; s STLISTN | __EPSILON__ |\",\"DECLIST → id DECLISTN |\",\"__START__ → PROGRAM |\"]}",
+                "{\"productions\":[\"STLIST → s STLISTN \",\"PROGRAM → program DECLIST : TYPE ; STLIST end \",\"DECLISTN → , id DECLISTN | __EPSILON__ \",\"TYPE → real | int \",\"STLISTN → ; s STLISTN | __EPSILON__ \",\"DECLIST → id DECLISTN \",\"__START__ → PROGRAM \"]}",
                 convertedGrammar.toReadableJSONString()
         );
         assertEquals(

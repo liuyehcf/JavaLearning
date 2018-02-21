@@ -11,6 +11,11 @@ public class Symbol {
     public static final Symbol START = new Symbol(false, "__START__", 0, MorphemeType.INTERNAL);
     public static final Symbol EPSILON = new Symbol(true, "__EPSILON__", 0, MorphemeType.INTERNAL);
     public static final Symbol DOLLAR = new Symbol(true, "__DOLLAR__", 0, MorphemeType.INTERNAL);
+    public static final Symbol DOT = new Symbol(true, "__DOT__", 0, MorphemeType.INTERNAL);
+
+    private static final String SPECIAL_PREFIX = "__";
+    private static final String SPECIAL_SUFFIX = "__";
+    private static final String PRIME = "′";
 
     // 是否为终结符
     private final boolean isTerminator;
@@ -26,36 +31,7 @@ public class Symbol {
     private final MorphemeType type;
 
     /**
-     * 仅用于创建普通Symbol
-     *
-     * @param isTerminator
-     * @param value
-     */
-    private Symbol(boolean isTerminator, String value) {
-        this(isTerminator, value, MorphemeType.NORMAL);
-    }
-
-    /**
-     * 仅用于创建普通Symbol
-     *
-     * @param isTerminator
-     * @param value
-     */
-    private Symbol(boolean isTerminator, String value, MorphemeType type) {
-        if (value == null || type == null) {
-            throw new NullPointerException();
-        }
-        if (value.startsWith("__") || value.endsWith("__")) {
-            throw new IllegalArgumentException();
-        }
-        this.isTerminator = isTerminator;
-        this.value = value;
-        this.primeCount = 0;
-        this.type = type;
-    }
-
-    /**
-     * 仅用于创建一些特殊Symbol，以及异变符号
+     * 唯一构造方法
      *
      * @param isTerminator
      * @param value
@@ -93,7 +69,7 @@ public class Symbol {
         if (value == null) {
             throw new NullPointerException();
         }
-        if (value.startsWith("__") || value.endsWith("__")) {
+        if (value.startsWith(SPECIAL_PREFIX) || value.endsWith(SPECIAL_SUFFIX)) {
             throw new IllegalArgumentException();
         }
 
@@ -142,7 +118,7 @@ public class Symbol {
     private String toPrimeString() {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < primeCount; i++) {
-            sb.append("′");
+            sb.append(PRIME);
         }
         return sb.toString();
     }
