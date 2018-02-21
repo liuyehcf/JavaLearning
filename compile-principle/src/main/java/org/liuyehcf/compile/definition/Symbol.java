@@ -104,6 +104,14 @@ public class Symbol {
         return isTerminator;
     }
 
+    public String getValue() {
+        return value;
+    }
+
+    public MorphemeType getType() {
+        return type;
+    }
+
     /**
      * 带上异变后缀的符号字符串
      *

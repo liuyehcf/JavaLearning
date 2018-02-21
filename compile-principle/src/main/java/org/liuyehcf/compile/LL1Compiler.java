@@ -1,10 +1,12 @@
 package org.liuyehcf.compile;
 
-import org.liuyehcf.compile.Compiler;
+import org.liuyehcf.compile.core.MorphemeType;
+import org.liuyehcf.compile.core.ParseException;
 import org.liuyehcf.compile.definition.Grammar;
 import org.liuyehcf.compile.definition.Production;
 import org.liuyehcf.compile.definition.Symbol;
 import org.liuyehcf.compile.definition.SymbolSequence;
+import org.liuyehcf.compile.parse.Token;
 import org.liuyehcf.compile.utils.ListUtils;
 import org.liuyehcf.compile.utils.SetUtils;
 
@@ -14,7 +16,14 @@ import java.util.stream.Collectors;
 import static org.liuyehcf.compile.definition.Grammar.parallelProduction;
 import static org.liuyehcf.compile.utils.AssertUtils.*;
 
+
+/**
+ * LL1文法编译器
+ */
 public class LL1Compiler implements Compiler {
+
+    // 词法分析器
+    private final LexicalAnalyzer lexicalAnalyzer;
 
     // 原始文法
     private final Grammar originGrammar;
@@ -43,8 +52,12 @@ public class LL1Compiler implements Compiler {
     // select集
     private Map<Symbol, Map<SymbolSequence, Set<Symbol>>> selects;
 
-    public LL1Compiler(Grammar originGrammar) {
+    public LL1Compiler(Grammar originGrammar, LexicalAnalyzer lexicalAnalyzer) {
+        if (originGrammar == null || lexicalAnalyzer == null) {
+            throw new NullPointerException();
+        }
         this.originGrammar = originGrammar;
+        this.lexicalAnalyzer = lexicalAnalyzer;
         symbols = new HashSet<>();
         nonTerminatorSymbols = new HashSet<>();
         terminatorSymbols = new HashSet<>();
@@ -52,6 +65,8 @@ public class LL1Compiler implements Compiler {
         firsts = new HashMap<>();
         follows = new HashMap<>();
         selects = new HashMap<>();
+
+        init();
     }
 
     /**
@@ -162,7 +177,6 @@ public class LL1Compiler implements Compiler {
         }
     }
 
-
     private void calculateFollow() {
         // 将$放入FOLLOW(S)中，其中S是开始符号，$是输入右端的结束标记
         follows.put(Symbol.START, SetUtils.of(Symbol.DOLLAR));
@@ -262,19 +276,147 @@ public class LL1Compiler implements Compiler {
                 }
             }
         }
+
+
+        // 检查select集的唯一性
+//        for (Symbol _A : nonTerminatorSymbols) {
+//            Map<SymbolSequence, Set<Symbol>> map = selects.get(_A);
+//            assertNotNull(map);
+//
+//            Set<Symbol> selectsOfA = new HashSet<>();
+//
+//            for (Map.Entry<SymbolSequence, Set<Symbol>> entry : map.entrySet()) {
+//                for (Symbol eachSelectSymbol : entry.getValue()) {
+//                    assertTrue(selectsOfA.add(eachSelectSymbol));
+//                }
+//            }
+//        }
     }
 
     @Override
     public boolean isSentence(String sequence) {
-        return false;
+        LexicalAnalyzer.TokenIterator tokenIterator = lexicalAnalyzer.iterator(sequence);
+
+        LinkedList<Symbol> symbolStack = new LinkedList<>();
+        symbolStack.push(Symbol.DOLLAR);
+        symbolStack.push(Symbol.START);
+
+        Token token = null;
+        Symbol symbol;
+
+        try {
+            while (true) {
+                if (symbolStack.isEmpty() && !tokenIterator.hasNext()) {
+                    break;
+                }
+
+                if (symbolStack.isEmpty()) {
+                    throw new ParseException();
+                }
+
+                // 每次迭代都会消耗一个symbol
+                symbol = symbolStack.pop();
+
+                // 每次迭代未必会消耗一个token
+                if (token == null) {
+                    if (!tokenIterator.hasNext()) {
+                        throw new ParseException();
+                    }
+                    token = tokenIterator.next();
+                }
+
+                if (symbol.isTerminator()) {
+                    // 若当前符号是ε则不消耗token
+                    if (!symbol.equals(Symbol.EPSILON)) {
+                        if (symbol.getType().equals(MorphemeType.REGEX)) {
+                            if (!token.getType().equals(MorphemeType.REGEX)) {
+                                throw new ParseException();
+                            }
+                        }
+
+                        if (!token.getId().equals(symbol.getValue())) {
+                            throw new ParseException();
+                        }
+
+                        // 消耗一个token
+                        token = null;
+                    }
+                } else {
+                    SymbolSequence symbolSequence = findProductionByToken(symbol, token);
+
+                    // System.out.println(symbol.toReadableJSONString() + " → " + symbolSequence.toReadableJSONString());
+
+                    List<Symbol> reversedSymbols = new ArrayList<>(symbolSequence.getSymbols());
+
+                    Collections.reverse(reversedSymbols);
+
+                    for (Symbol nextSymbol : reversedSymbols) {
+                        symbolStack.push(nextSymbol);
+                    }
+                }
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        return true;
+    }
+
+    private SymbolSequence findProductionByToken(Symbol symbol, Token token) {
+        String key = token.getId();
+
+        Map<SymbolSequence, Set<Symbol>> map = selects.get(symbol);
+
+        SymbolSequence selectedOne = null;
+
+        for (Map.Entry<SymbolSequence, Set<Symbol>> entry : map.entrySet()) {
+            for (Symbol selectSymbol : entry.getValue()) {
+                if (selectSymbol.getValue().equals(key)) {
+                    selectedOne = entry.getKey();
+                }
+            }
+        }
+
+        assertNotNull(selectedOne);
+
+        return selectedOne;
     }
 
     @Override
     public Grammar getGrammar() {
-        if (this.grammar == null) {
-            init();
-        }
         return this.grammar;
+    }
+
+
+    public String toReadableJSONString() {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append('{');
+
+        sb.append('\"');
+        sb.append("FIRST");
+        sb.append('\"');
+        sb.append(':');
+        sb.append(getFirstReadableJSONString());
+
+        sb.append(',');
+        sb.append('\"');
+        sb.append("FOLLOW");
+        sb.append('\"');
+        sb.append(':');
+        sb.append(getFollowReadableJSONString());
+
+        sb.append(',');
+        sb.append('\"');
+        sb.append("SELECT");
+        sb.append('\"');
+        sb.append(':');
+        sb.append(getSelectReadableJSONString());
+
+        sb.append('}');
+
+        return sb.toString();
     }
 
     /**

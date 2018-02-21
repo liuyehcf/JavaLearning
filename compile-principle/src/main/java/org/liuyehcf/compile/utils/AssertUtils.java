@@ -18,4 +18,12 @@ public abstract class AssertUtils {
             throw new AssertionError();
         }
     }
+
+    public static void assertEquals(Object expect, Object target) {
+        assertNotNull(expect);
+        assertNotNull(target);
+        if (!expect.equals(target)) {
+            throw new AssertionError();
+        }
+    }
 }

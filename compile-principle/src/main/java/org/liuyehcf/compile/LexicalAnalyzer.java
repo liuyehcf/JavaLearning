@@ -4,10 +4,7 @@ import org.liuyehcf.compile.core.MorphemeType;
 import org.liuyehcf.compile.parse.Token;
 import org.liuyehcf.compile.utils.Pair;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -130,13 +127,28 @@ public class LexicalAnalyzer {
 
         private final Matcher matcher;
 
+        List<Token> tokens = new ArrayList<>();
+
+        private int index = 0;
+
         private TokenIterator(Matcher matcher) {
             this.matcher = matcher;
+            init();
         }
 
-        @Override
-        public boolean hasNext() {
-            return matcher.find();
+
+        private void init() {
+            while (matcher.find()) {
+                int groupIndex = findGroup();
+
+                String value = matcher.group(groupIndex);
+
+                String id = groups.get(groupIndex);
+
+                tokens.add(new Token(id, value, morphemes.get(id).getSecond()));
+            }
+
+            tokens.add(new Token("__DOLLAR__", "__DOLLAR__", MorphemeType.INTERNAL));
         }
 
         private int findGroup() {
@@ -154,14 +166,13 @@ public class LexicalAnalyzer {
         }
 
         @Override
+        public boolean hasNext() {
+            return index < tokens.size();
+        }
+
+        @Override
         public Token next() {
-            int groupIndex = findGroup();
-
-            String value = matcher.group(groupIndex);
-
-            String id = groups.get(groupIndex);
-
-            return new Token(id, value, morphemes.get(id).getSecond());
+            return tokens.get(index++);
         }
     }
 }

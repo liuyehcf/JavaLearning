@@ -1,14 +1,13 @@
 package org.liuyehcf.compile;
 
 import org.junit.Test;
-import org.liuyehcf.compile.Compiler;
-import org.liuyehcf.compile.LL1Compiler;
 import org.liuyehcf.compile.definition.Grammar;
 import org.liuyehcf.compile.definition.Production;
 import org.liuyehcf.compile.definition.Symbol;
 import org.liuyehcf.compile.definition.SymbolSequence;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.liuyehcf.compile.definition.Symbol.createNonTerminator;
 import static org.liuyehcf.compile.definition.Symbol.createTerminator;
 
@@ -48,8 +47,10 @@ public class TestLL1Compiler {
                 )
         );
 
-        Compiler compiler = new LL1Compiler(grammar);
+        LL1Compiler compiler = new LL1Compiler(grammar, getDefaultLexicalAnalyzer());
         Grammar convertedGrammar = compiler.getGrammar();
+
+        System.out.println(compiler.toReadableJSONString());
 
         assertEquals(
                 "{\"productions\":[\"E → (E)E′|idE′\",\"E′ → +EE′|*EE′|__EPSILON__\",\"__START__ → (E)E′|idE′\"]}",
@@ -98,7 +99,7 @@ public class TestLL1Compiler {
                 )
         );
 
-        Compiler compiler = new LL1Compiler(grammar);
+        Compiler compiler = new LL1Compiler(grammar, getDefaultLexicalAnalyzer());
         Grammar convertedGrammar = compiler.getGrammar();
 
         assertEquals(
@@ -156,7 +157,7 @@ public class TestLL1Compiler {
                 )
         );
 
-        Compiler compiler = new LL1Compiler(grammar);
+        Compiler compiler = new LL1Compiler(grammar, getDefaultLexicalAnalyzer());
         Grammar convertedGrammar = compiler.getGrammar();
 
         assertEquals(
@@ -199,7 +200,7 @@ public class TestLL1Compiler {
                 )
         );
 
-        Compiler compiler = new LL1Compiler(grammar);
+        Compiler compiler = new LL1Compiler(grammar, getDefaultLexicalAnalyzer());
         Grammar convertedGrammar = compiler.getGrammar();
 
         assertEquals(
@@ -252,7 +253,7 @@ public class TestLL1Compiler {
                 )
         );
 
-        Compiler compiler = new LL1Compiler(grammar);
+        Compiler compiler = new LL1Compiler(grammar, getDefaultLexicalAnalyzer());
         Grammar convertedGrammar = compiler.getGrammar();
 
         assertEquals(
@@ -336,7 +337,7 @@ public class TestLL1Compiler {
                 )
         );
 
-        Compiler compiler = new LL1Compiler(grammar);
+        Compiler compiler = new LL1Compiler(grammar, getDefaultLexicalAnalyzer());
         Grammar convertedGrammar = compiler.getGrammar();
 
         assertEquals(
@@ -346,7 +347,7 @@ public class TestLL1Compiler {
     }
 
     @Test
-    public void testFirstFollow1() {
+    public void testFirstFollowSelect1() {
         Grammar grammar = Grammar.create(
                 Production.create(
                         createNonTerminator("E"),
@@ -406,7 +407,7 @@ public class TestLL1Compiler {
                 )
         );
 
-        LL1Compiler compiler = new LL1Compiler(grammar);
+        LL1Compiler compiler = new LL1Compiler(grammar, getDefaultLexicalAnalyzer());
         Grammar convertedGrammar = compiler.getGrammar();
 
         assertEquals(
@@ -423,6 +424,92 @@ public class TestLL1Compiler {
                 compiler.getFollowReadableJSONString()
         );
 
-        System.out.println(compiler.getSelectReadableJSONString());
+        assertEquals(
+                "{\"T\":{\"T → (E)T^\":\"(\",\"T → idT^\":\"id\"},\"E\":{\"E → (E)T^E^\":\"(\",\"E → idT^E^\":\"id\"},\"F\":{\"F → (E)\":\"(\",\"F → id\":\"id\"},\"__START__\":{\"__START__ → (E)T^E^\":\"(\",\"__START__ → idT^E^\":\"id\"},\"E^\":{\"E^ → +TE^\":\"+\",\"E^ → __EPSILON__\":\"),__DOLLAR__\"},\"T^\":{\"T^ → *FT^\":\"*\",\"T^ → __EPSILON__\":\"),+,__DOLLAR__\"}}",
+                compiler.getSelectReadableJSONString()
+        );
+    }
+
+    @Test
+    public void testParse1() {
+        Grammar grammar = Grammar.create(
+                Production.create(
+                        createNonTerminator("E"),
+                        SymbolSequence.create(
+                                createNonTerminator("T"),
+                                createNonTerminator("E^")
+                        )
+                ),
+                Production.create(
+                        createNonTerminator("E^"),
+                        SymbolSequence.create(
+                                createTerminator("+"),
+                                createNonTerminator("T"),
+                                createNonTerminator("E^")
+                        )
+                ),
+                Production.create(
+                        createNonTerminator("E^"),
+                        SymbolSequence.create(
+                                Symbol.EPSILON
+                        )
+                ),
+                Production.create(
+                        createNonTerminator("T"),
+                        SymbolSequence.create(
+                                createNonTerminator("F"),
+                                createNonTerminator("T^")
+                        )
+                ),
+                Production.create(
+                        createNonTerminator("T^"),
+                        SymbolSequence.create(
+                                createTerminator("*"),
+                                createNonTerminator("F"),
+                                createNonTerminator("T^")
+                        )
+                ),
+                Production.create(
+                        createNonTerminator("T^"),
+                        SymbolSequence.create(
+                                Symbol.EPSILON
+                        )
+                ),
+                Production.create(
+                        createNonTerminator("F"),
+                        SymbolSequence.create(
+                                createTerminator("("),
+                                createNonTerminator("E"),
+                                createTerminator(")")
+                        )
+                ),
+                Production.create(
+                        createNonTerminator("F"),
+                        SymbolSequence.create(
+                                createTerminator("id")
+                        )
+                )
+        );
+
+        LexicalAnalyzer analyzer = LexicalAnalyzer.builder()
+                .addMorpheme("(")
+                .addMorpheme(")")
+                .addMorpheme("+")
+                .addMorpheme("*")
+                .addMorpheme("id")
+                .build();
+
+
+        Compiler compiler = new LL1Compiler(grammar, analyzer);
+
+        assertTrue(compiler.isSentence("id+id*id"));
+        assertTrue(compiler.isSentence("(id+id)*id"));
+        assertTrue(compiler.isSentence("id+(id*id)"));
+        assertTrue(compiler.isSentence("(id)+(id*id)"));
+    }
+
+
+    private LexicalAnalyzer getDefaultLexicalAnalyzer() {
+        return LexicalAnalyzer.builder().build();
     }
 }
