@@ -112,10 +112,8 @@ public class LL1Compiler implements Compiler {
 
     private void calculateFirst() {
         // 首先，处理所有的终结符
-        for (Symbol symbol : symbols) {
-            if (symbol.isTerminator()) {
-                firsts.put(symbol, SetUtils.of(symbol));
-            }
+        for (Symbol symbol : terminatorSymbols) {
+            firsts.put(symbol, SetUtils.of(symbol));
         }
 
         // 处理非终结符

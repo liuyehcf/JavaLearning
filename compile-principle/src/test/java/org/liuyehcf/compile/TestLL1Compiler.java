@@ -165,6 +165,103 @@ public class TestLL1Compiler {
     }
 
 
+    @Test
+    public void testParseCase2() {
+        String PROGRAM = "PROGRAM";
+        String DECLIST = "DECLIST";
+        String DECLISTN = "DECLISTN";
+        String STLIST = "STLIST";
+        String STLISTN = "STLISTN";
+        String TYPE = "TYPE";
+
+
+        Grammar grammar = Grammar.create(
+                Production.create(
+                        createNonTerminator(PROGRAM),
+                        SymbolSequence.create(
+                                createTerminator("program"),
+                                createNonTerminator(DECLIST),
+                                createTerminator(":"),
+                                createNonTerminator(TYPE),
+                                createTerminator(";"),
+                                createNonTerminator(STLIST),
+                                createTerminator("end")
+                        )
+                ),
+                Production.create(
+                        createNonTerminator(DECLIST),
+                        SymbolSequence.create(
+                                createTerminator("id"),
+                                createNonTerminator(DECLISTN)
+                        )
+                ),
+                Production.create(
+                        createNonTerminator(DECLISTN),
+                        SymbolSequence.create(
+                                createTerminator(","),
+                                createTerminator("id"),
+                                createNonTerminator(DECLISTN)
+                        )
+                ),
+                Production.create(
+                        createNonTerminator(DECLISTN),
+                        SymbolSequence.create(
+                                Symbol.EPSILON
+                        )
+                ),
+                Production.create(
+                        createNonTerminator(STLIST),
+                        SymbolSequence.create(
+                                createTerminator("s"),
+                                createNonTerminator(STLISTN)
+                        )
+                ),
+                Production.create(
+                        createNonTerminator(STLISTN),
+                        SymbolSequence.create(
+                                createTerminator(";"),
+                                createTerminator("s"),
+                                createNonTerminator(STLISTN)
+                        )
+                ),
+                Production.create(
+                        createNonTerminator(STLISTN),
+                        SymbolSequence.create(
+                                Symbol.EPSILON
+                        )
+                ),
+                Production.create(
+                        createNonTerminator(TYPE),
+                        SymbolSequence.create(
+                                createTerminator("real")
+                        )
+                ),
+                Production.create(
+                        createNonTerminator(TYPE),
+                        SymbolSequence.create(
+                                createTerminator("int")
+                        )
+                )
+        );
+
+
+        LexicalAnalyzer analyzer = LexicalAnalyzer.builder()
+                .addMorpheme("program")
+                .addMorpheme(":")
+                .addMorpheme(";")
+                .addMorpheme("end")
+                .addMorpheme("id")
+                .addMorpheme(",")
+                .addMorpheme("s")
+                .addMorpheme("real")
+                .addMorpheme("int")
+                .build();
+        LL1Compiler compiler = new LL1Compiler(grammar, analyzer);
+
+        //System.out.println(compiler.toReadableJSONString());
+
+    }
+
     private LexicalAnalyzer getDefaultLexicalAnalyzer() {
         return LexicalAnalyzer.builder().build();
     }
