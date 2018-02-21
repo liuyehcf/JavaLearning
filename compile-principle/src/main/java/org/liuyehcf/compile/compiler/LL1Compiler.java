@@ -40,7 +40,7 @@ public class LL1Compiler implements Compiler {
     private Map<Symbol, Set<Symbol>> follows;
 
     // select集
-    private Map<Symbol, Set<Symbol>> selects;
+    private Map<Symbol, Map<SymbolSequence, Set<Symbol>>> selects;
 
     public LL1Compiler(Grammar originGrammar) {
         this.originGrammar = originGrammar;
@@ -233,35 +233,32 @@ public class LL1Compiler implements Compiler {
         for (Symbol _A : nonTerminatorSymbols) {
             Production pA = productionMap.get(_A);
 
-            boolean containsEpsilon = false;
-
-            Set<Symbol> alphaFirsts = new HashSet<>();
-
             for (SymbolSequence symbolSequence : pA.getRight()) {
-                Symbol firstSymbolOfAlpha = symbolSequence.getSymbols().get(0);
+                Symbol firstAlpha = symbolSequence.getSymbols().get(0);
 
-                if (!this.firsts.get(firstSymbolOfAlpha).contains(Symbol.EPSILON)) {
-                    alphaFirsts.addAll(this.firsts.get(firstSymbolOfAlpha));
-                } else {
-                    containsEpsilon = true;
+                if (!selects.containsKey(_A)) {
+                    selects.put(_A, new HashMap<>());
                 }
-            }
+                assertFalse(selects.get(_A).containsKey(symbolSequence));
 
-            // 如果ε∈FIRST(α)，那么SELECT(A→α)=(FIRST(α)−{ε})∪FOLLOW(A)
-            if (containsEpsilon) {
-                assertFalse(selects.containsKey(_A));
-                selects.put(
-                        _A,
-                        SetUtils.of(
-                                SetUtils.extract(alphaFirsts, Symbol.EPSILON),
-                                follows.get(_A)
-                        )
-                );
-            }
-            // 如果ε∉FIRST(α)，那么SELECT(A→α)=FIRST(α)
-            else {
-                assertFalse(selects.containsKey(_A));
-                selects.put(_A, alphaFirsts);
+                selects.get(_A).put(symbolSequence, new HashSet<>());
+
+                // 如果ε∉FIRST(α)，那么SELECT(A→α)=FIRST(α)
+                if (!firsts.get(firstAlpha).contains(Symbol.EPSILON)) {
+
+                    selects.get(_A).get(symbolSequence).addAll(
+                            firsts.get(firstAlpha)
+                    );
+                }
+                // 如果ε∈FIRST(α)，那么SELECT(A→α)=(FIRST(α)−{ε})∪FOLLOW(A)
+                else {
+                    selects.get(_A).get(symbolSequence).addAll(
+                            SetUtils.of(
+                                    SetUtils.extract(firsts.get(firstAlpha), Symbol.EPSILON),
+                                    follows.get(_A)
+                            )
+                    );
+                }
             }
         }
     }
@@ -303,7 +300,50 @@ public class LL1Compiler implements Compiler {
      * @return
      */
     public String getSelectReadableJSONString() {
-        return getReadableJSONStringFor(this.selects, false, true);
+        StringBuilder sb = new StringBuilder();
+
+        sb.append('{');
+
+        for (Map.Entry<Symbol, Map<SymbolSequence, Set<Symbol>>> outEntry : selects.entrySet()) {
+            sb.append('\"');
+            sb.append(outEntry.getKey().toReadableJSONString());
+            sb.append('\"');
+            sb.append(':');
+
+            sb.append('{');
+
+            for (Map.Entry<SymbolSequence, Set<Symbol>> inEntry : outEntry.getValue().entrySet()) {
+                sb.append('\"');
+                sb.append(outEntry.getKey().toReadableJSONString())
+                        .append(" → ")
+                        .append(inEntry.getKey().toReadableJSONString());
+                sb.append('\"');
+                sb.append(':');
+
+                sb.append('\"');
+
+                for (Symbol firstSymbol : inEntry.getValue()) {
+                    sb.append(firstSymbol).append(',');
+                }
+
+                assertFalse(inEntry.getValue().isEmpty());
+                sb.setLength(sb.length() - 1);
+
+                sb.append('\"');
+                sb.append(',');
+            }
+
+            assertFalse(outEntry.getValue().entrySet().isEmpty());
+            sb.setLength(sb.length() - 1);
+            sb.append('}');
+            sb.append(',');
+        }
+
+        assertFalse(selects.isEmpty());
+        sb.setLength(sb.length() - 1);
+        sb.append('}');
+
+        return sb.toString();
     }
 
     private String getReadableJSONStringFor(Map<Symbol, Set<Symbol>> map, boolean containsTerminator, boolean containsNonTerminator) {

@@ -108,10 +108,10 @@ public class Symbol {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Symbol) {
-            Symbol symbol = (Symbol) obj;
-            return symbol.value.equals(this.value)
-                    && symbol.primeCount == this.primeCount
-                    && symbol.isTerminator == this.isTerminator;
+            Symbol other = (Symbol) obj;
+            return other.value.equals(this.value)
+                    && other.primeCount == this.primeCount
+                    && other.isTerminator == this.isTerminator;
         }
         return false;
     }
