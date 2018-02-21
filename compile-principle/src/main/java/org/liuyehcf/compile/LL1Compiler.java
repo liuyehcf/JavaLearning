@@ -396,7 +396,6 @@ public class LL1Compiler implements Compiler {
         return this.grammar;
     }
 
-
     public String toReadableJSONString() {
         StringBuilder sb = new StringBuilder();
 
@@ -427,64 +426,49 @@ public class LL1Compiler implements Compiler {
         return sb.toString();
     }
 
-    /**
-     * 打印JSON格式的FIRST集
-     *
-     * @return
-     */
     private String getFirstReadableJSONString() {
         return getReadableJSONStringFor(this.firsts, true, true);
     }
 
-    /**
-     * 打印JSON格式的FOLLOW集
-     *
-     * @return
-     */
     private String getFollowReadableJSONString() {
         return getReadableJSONStringFor(this.follows, false, true);
     }
 
-    /**
-     * 打印JSON格式的SELECT集
-     *
-     * @return
-     */
     private String getSelectReadableJSONString() {
         StringBuilder sb = new StringBuilder();
 
         sb.append('{');
 
-        for (Map.Entry<Symbol, Map<PrimaryProduction, Set<Symbol>>> outEntry : selects.entrySet()) {
+        for (Map.Entry<Symbol, Map<PrimaryProduction, Set<Symbol>>> outerEntry : selects.entrySet()) {
             sb.append('\"');
-            sb.append(outEntry.getKey().toReadableJSONString());
+            sb.append(outerEntry.getKey().toReadableJSONString());
             sb.append('\"');
             sb.append(':');
 
             sb.append('{');
 
-            for (Map.Entry<PrimaryProduction, Set<Symbol>> inEntry : outEntry.getValue().entrySet()) {
+            for (Map.Entry<PrimaryProduction, Set<Symbol>> innerEntry : outerEntry.getValue().entrySet()) {
                 sb.append('\"');
-                sb.append(outEntry.getKey().toReadableJSONString())
+                sb.append(outerEntry.getKey().toReadableJSONString())
                         .append(" → ")
-                        .append(inEntry.getKey().toReadableJSONString());
+                        .append(innerEntry.getKey().toReadableJSONString());
                 sb.append('\"');
                 sb.append(':');
 
                 sb.append('\"');
 
-                for (Symbol firstSymbol : inEntry.getValue()) {
+                for (Symbol firstSymbol : innerEntry.getValue()) {
                     sb.append(firstSymbol).append(',');
                 }
 
-                assertFalse(inEntry.getValue().isEmpty());
+                assertFalse(innerEntry.getValue().isEmpty());
                 sb.setLength(sb.length() - 1);
 
                 sb.append('\"');
                 sb.append(',');
             }
 
-            assertFalse(outEntry.getValue().entrySet().isEmpty());
+            assertFalse(outerEntry.getValue().entrySet().isEmpty());
             sb.setLength(sb.length() - 1);
             sb.append('}');
             sb.append(',');
@@ -562,6 +546,82 @@ public class LL1Compiler implements Compiler {
 
         return sb.toString();
     }
+
+    public String toMarkDownAnalysisTable() {
+        StringBuilder sb = new StringBuilder();
+
+        String separator = "|";
+
+        // 第一行：表头，各个终结符符号
+        sb.append(separator)
+                .append(' ')
+                .append("非终结符\\终结符")
+                .append(' ');
+
+        for (Symbol terminator : terminatorSymbols) {
+            sb.append(separator)
+                    .append(' ')
+                    .append(terminator.toReadableJSONString())
+                    .append(' ');
+        }
+
+        sb.append(separator).append('\n');
+
+        // 第二行：对齐格式
+        sb.append(separator);
+
+        for (int i = 0; i < terminatorSymbols.size(); i++) {
+            sb.append(":--")
+                    .append(separator);
+        }
+
+        sb.append('\n');
+
+        // 其余行：每一行代表某个非终结符在不同终结符下的产生式
+        // A → α
+        for (Symbol _A : nonTerminatorSymbols) {
+            // 第一列，产生式
+            sb.append(separator)
+                    .append(' ')
+                    .append(_A.toReadableJSONString())
+                    .append(' ');
+
+            for (Symbol terminator : terminatorSymbols) {
+                boolean exists = false;
+
+                PrimaryProduction ppA = null;
+
+                for (Map.Entry<PrimaryProduction, Set<Symbol>> entry : selects.get(_A).entrySet()) {
+
+                    Set<Symbol> selectsOfA = entry.getValue();
+
+                    if (selectsOfA.contains(terminator)) {
+                        ppA = entry.getKey();
+                        break;
+                    }
+                }
+
+                if (ppA != null) {
+                    sb.append(separator)
+                            .append(' ')
+                            .append(_A.toReadableJSONString())
+                            .append(" → ")
+                            .append(ppA.toReadableJSONString())
+                            .append(' ');
+                } else {
+                    sb.append(separator)
+                            .append(' ')
+                            .append('\\')
+                            .append(' ');
+                }
+            }
+
+            sb.append(separator).append('\n');
+        }
+
+        return sb.toString();
+    }
+
 
     /**
      * 用于转换文法的静态内部类

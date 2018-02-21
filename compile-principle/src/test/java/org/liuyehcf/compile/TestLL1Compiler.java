@@ -434,13 +434,15 @@ public class TestLL1Compiler {
                 .build();
 
 
-        Compiler compiler = new LL1Compiler(grammar, analyzer);
+        LL1Compiler compiler = new LL1Compiler(grammar, analyzer);
 
         assertTrue(compiler.isSentence("A12+B*D"));
         assertTrue(compiler.isSentence("(a+b01)*d03"));
         assertTrue(compiler.isSentence("(asdfsdfDASDF323+ASDFC0102D*d23234+(asdf+dd)*(d1d*k9))"));
         assertFalse(compiler.isSentence("000+(id*id)"));
         assertFalse(compiler.isSentence("()"));
+
+        System.out.println(compiler.toMarkDownAnalysisTable());
     }
 
     private LexicalAnalyzer getDefaultLexicalAnalyzer() {
