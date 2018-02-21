@@ -36,8 +36,11 @@ public class PrimaryProduction {
     public String toReadableJSONString() {
         StringBuilder sb = new StringBuilder();
 
-        for (Symbol symbol : symbols) {
-            sb.append(symbol.toReadableJSONString());
+        for (int i = 0; i < symbols.size(); i++) {
+            if (i != 0) {
+                sb.append(' ');
+            }
+            sb.append(symbols.get(i).toReadableJSONString());
         }
 
         return sb.toString();

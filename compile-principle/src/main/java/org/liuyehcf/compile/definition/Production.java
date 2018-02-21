@@ -57,7 +57,9 @@ public class Production {
 
         for (PrimaryProduction pp : right) {
             sb.append(pp.toReadableJSONString())
-                    .append(OR);
+                    .append(' ')
+                    .append(OR)
+                    .append(' ');
         }
 
         assertFalse(right.isEmpty());

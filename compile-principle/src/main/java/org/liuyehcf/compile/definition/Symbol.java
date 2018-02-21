@@ -118,7 +118,11 @@ public class Symbol {
      * @return
      */
     public String getPrimedValue() {
-        return value + toPrimeString();
+        if (primeCount == 0) {
+            return value;
+        } else {
+            return '(' + value + ')' + toPrimeString();
+        }
     }
 
     /**

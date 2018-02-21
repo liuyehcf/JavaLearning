@@ -3,9 +3,9 @@ package org.liuyehcf.compile;
 import org.junit.Test;
 import org.liuyehcf.compile.core.MorphemeType;
 import org.liuyehcf.compile.definition.Grammar;
+import org.liuyehcf.compile.definition.PrimaryProduction;
 import org.liuyehcf.compile.definition.Production;
 import org.liuyehcf.compile.definition.Symbol;
-import org.liuyehcf.compile.definition.PrimaryProduction;
 
 import static org.junit.Assert.*;
 import static org.liuyehcf.compile.TestLexicalAnalyzer.getIdRegex;
@@ -20,19 +20,19 @@ public class TestLL1Compiler {
                         createNonTerminator("E"),
                         PrimaryProduction.create(
                                 createNonTerminator("T"),
-                                createNonTerminator("E^")
+                                createNonTerminator("E′")
                         )
                 ),
                 Production.create(
-                        createNonTerminator("E^"),
+                        createNonTerminator("E′"),
                         PrimaryProduction.create(
                                 createTerminator("+"),
                                 createNonTerminator("T"),
-                                createNonTerminator("E^")
+                                createNonTerminator("E′")
                         )
                 ),
                 Production.create(
-                        createNonTerminator("E^"),
+                        createNonTerminator("E′"),
                         PrimaryProduction.create(
                                 Symbol.EPSILON
                         )
@@ -41,19 +41,19 @@ public class TestLL1Compiler {
                         createNonTerminator("T"),
                         PrimaryProduction.create(
                                 createNonTerminator("F"),
-                                createNonTerminator("T^")
+                                createNonTerminator("T′")
                         )
                 ),
                 Production.create(
-                        createNonTerminator("T^"),
+                        createNonTerminator("T′"),
                         PrimaryProduction.create(
                                 createTerminator("*"),
                                 createNonTerminator("F"),
-                                createNonTerminator("T^")
+                                createNonTerminator("T′")
                         )
                 ),
                 Production.create(
-                        createNonTerminator("T^"),
+                        createNonTerminator("T′"),
                         PrimaryProduction.create(
                                 Symbol.EPSILON
                         )
@@ -78,12 +78,23 @@ public class TestLL1Compiler {
         Grammar convertedGrammar = compiler.getGrammar();
 
         assertEquals(
-                "{\"productions\":[\"T → (E)T^|idT^\",\"E → (E)T^E^|idT^E^\",\"F → (E)|id\",\"__START__ → E\",\"E^ → +TE^|__EPSILON__\",\"T^ → *FT^|__EPSILON__\"]}",
+                "{\"productions\":[\"E′ → + T E′ | __EPSILON__ |\",\"T′ → * F T′ | __EPSILON__ |\",\"T → ( E ) T′ | id T′ |\",\"E → ( E ) T′ E′ | id T′ E′ |\",\"F → ( E ) | id |\",\"__START__ → E |\"]}",
                 convertedGrammar.toReadableJSONString()
         );
         assertEquals(
-                "{\"FIRST\":{\"terminator\":{\"__EPSILON__\":\"__EPSILON__\",\"(\":\"(\",\")\":\")\",\"*\":\"*\",\"id\":\"id\",\"+\":\"+\"},\"nonTerminator\":{\"T\":\"(,id\",\"E\":\"(,id\",\"F\":\"(,id\",\"__START__\":\"(,id\",\"E^\":\"__EPSILON__,+\",\"T^\":\"__EPSILON__,*\"}},\"FOLLOW\":{\"nonTerminator\":{\"T\":\"),+,__DOLLAR__\",\"E\":\"),__DOLLAR__\",\"F\":\"),*,+,__DOLLAR__\",\"__START__\":\"__DOLLAR__\",\"E^\":\"),__DOLLAR__\",\"T^\":\"),+,__DOLLAR__\"}},\"SELECT\":{\"T\":{\"T → (E)T^\":\"(\",\"T → idT^\":\"id\"},\"E\":{\"E → (E)T^E^\":\"(\",\"E → idT^E^\":\"id\"},\"F\":{\"F → (E)\":\"(\",\"F → id\":\"id\"},\"__START__\":{\"__START__ → E\":\"(,id\"},\"E^\":{\"E^ → +TE^\":\"+\",\"E^ → __EPSILON__\":\"),__DOLLAR__\"},\"T^\":{\"T^ → *FT^\":\"*\",\"T^ → __EPSILON__\":\"),+,__DOLLAR__\"}}}",
+                "{\"FIRST\":{\"terminator\":{\"__EPSILON__\":\"__EPSILON__\",\"(\":\"(\",\")\":\")\",\"*\":\"*\",\"+\":\"+\",\"id\":\"id\"},\"nonTerminator\":{\"E′\":\"__EPSILON__,+\",\"T′\":\"__EPSILON__,*\",\"T\":\"(,id\",\"E\":\"(,id\",\"F\":\"(,id\",\"__START__\":\"(,id\"}},\"FOLLOW\":{\"nonTerminator\":{\"E′\":\"),__DOLLAR__\",\"T′\":\"),+,__DOLLAR__\",\"T\":\"),+\",\"E\":\"),__DOLLAR__\",\"F\":\"),*,+\",\"__START__\":\"__DOLLAR__\"}},\"SELECT\":{\"E′\":{\"E′ → __EPSILON__\":\"),__DOLLAR__\",\"E′ → + T E′\":\"+\"},\"T′\":{\"T′ → __EPSILON__\":\"),+,__DOLLAR__\",\"T′ → * F T′\":\"*\"},\"T\":{\"T → ( E ) T′\":\"(\",\"T → id T′\":\"id\"},\"E\":{\"E → ( E ) T′ E′\":\"(\",\"E → id T′ E′\":\"id\"},\"F\":{\"F → ( E )\":\"(\",\"F → id\":\"id\"},\"__START__\":{\"__START__ → E\":\"(,id\"}}}",
                 compiler.toReadableJSONString()
+        );
+        assertEquals(
+                "| 非终结符\\终结符 | __EPSILON__ | ( | ) | * | + | id |\n" +
+                        "|:--|:--|:--|:--|:--|:--|:--|\n" +
+                        "| E′ | \\ | \\ | E′ → __EPSILON__ | \\ | E′ → + T E′ | \\ |\n" +
+                        "| T′ | \\ | \\ | T′ → __EPSILON__ | T′ → * F T′ | T′ → __EPSILON__ | \\ |\n" +
+                        "| T | \\ | T → ( E ) T′ | \\ | \\ | \\ | T → id T′ |\n" +
+                        "| E | \\ | E → ( E ) T′ E′ | \\ | \\ | \\ | E → id T′ E′ |\n" +
+                        "| F | \\ | F → ( E ) | \\ | \\ | \\ | F → id |\n" +
+                        "| __START__ | \\ | __START__ → E | \\ | \\ | \\ | __START__ → E |\n",
+                compiler.toMarkDownAnalysisTable()
         );
     }
 
@@ -171,12 +182,24 @@ public class TestLL1Compiler {
         Grammar convertedGrammar = compiler.getGrammar();
 
         assertEquals(
-                "{\"productions\":[\"STLIST → sSTLISTN\",\"PROGRAM → programDECLIST:TYPE;STLISTend\",\"DECLISTN → ,idDECLISTN|__EPSILON__\",\"TYPE → real|int\",\"STLISTN → ;sSTLISTN|__EPSILON__\",\"DECLIST → idDECLISTN\",\"__START__ → PROGRAM\"]}",
+                "{\"productions\":[\"STLIST → s STLISTN |\",\"PROGRAM → program DECLIST : TYPE ; STLIST end |\",\"DECLISTN → , id DECLISTN | __EPSILON__ |\",\"TYPE → real | int |\",\"STLISTN → ; s STLISTN | __EPSILON__ |\",\"DECLIST → id DECLISTN |\",\"__START__ → PROGRAM |\"]}",
                 convertedGrammar.toReadableJSONString()
         );
         assertEquals(
-                "{\"FIRST\":{\"terminator\":{\"s\":\"s\",\"__EPSILON__\":\"__EPSILON__\",\"real\":\"real\",\":\":\":\",\";\":\";\",\"id\":\"id\",\"end\":\"end\",\",\":\",\",\"program\":\"program\",\"int\":\"int\"},\"nonTerminator\":{\"STLIST\":\"s\",\"PROGRAM\":\"program\",\"DECLISTN\":\"__EPSILON__,,\",\"TYPE\":\"real,int\",\"STLISTN\":\"__EPSILON__,;\",\"DECLIST\":\"id\",\"__START__\":\"program\"}},\"FOLLOW\":{\"nonTerminator\":{\"STLIST\":\"end\",\"PROGRAM\":\"__DOLLAR__\",\"DECLISTN\":\":\",\"TYPE\":\";\",\"STLISTN\":\"end\",\"DECLIST\":\":\",\"__START__\":\"__DOLLAR__\"}},\"SELECT\":{\"STLIST\":{\"STLIST → sSTLISTN\":\"s\"},\"PROGRAM\":{\"PROGRAM → programDECLIST:TYPE;STLISTend\":\"program\"},\"DECLISTN\":{\"DECLISTN → __EPSILON__\":\":\",\"DECLISTN → ,idDECLISTN\":\",\"},\"TYPE\":{\"TYPE → real\":\"real\",\"TYPE → int\":\"int\"},\"STLISTN\":{\"STLISTN → __EPSILON__\":\"end\",\"STLISTN → ;sSTLISTN\":\";\"},\"DECLIST\":{\"DECLIST → idDECLISTN\":\"id\"},\"__START__\":{\"__START__ → PROGRAM\":\"program\"}}}",
+                "{\"FIRST\":{\"terminator\":{\"s\":\"s\",\"__EPSILON__\":\"__EPSILON__\",\"real\":\"real\",\":\":\":\",\";\":\";\",\"id\":\"id\",\"end\":\"end\",\",\":\",\",\"program\":\"program\",\"int\":\"int\"},\"nonTerminator\":{\"STLIST\":\"s\",\"PROGRAM\":\"program\",\"DECLISTN\":\"__EPSILON__,,\",\"TYPE\":\"real,int\",\"STLISTN\":\"__EPSILON__,;\",\"DECLIST\":\"id\",\"__START__\":\"program\"}},\"FOLLOW\":{\"nonTerminator\":{\"STLIST\":\"end\",\"PROGRAM\":\"__DOLLAR__\",\"DECLISTN\":\":\",\"TYPE\":\";\",\"STLISTN\":\"end\",\"DECLIST\":\":\",\"__START__\":\"__DOLLAR__\"}},\"SELECT\":{\"STLIST\":{\"STLIST → s STLISTN\":\"s\"},\"PROGRAM\":{\"PROGRAM → program DECLIST : TYPE ; STLIST end\":\"program\"},\"DECLISTN\":{\"DECLISTN → __EPSILON__\":\":\",\"DECLISTN → , id DECLISTN\":\",\"},\"TYPE\":{\"TYPE → real\":\"real\",\"TYPE → int\":\"int\"},\"STLISTN\":{\"STLISTN → __EPSILON__\":\"end\",\"STLISTN → ; s STLISTN\":\";\"},\"DECLIST\":{\"DECLIST → id DECLISTN\":\"id\"},\"__START__\":{\"__START__ → PROGRAM\":\"program\"}}}",
                 compiler.toReadableJSONString()
+        );
+        assertEquals(
+                "| 非终结符\\终结符 | s | __EPSILON__ | real | : | ; | id | end | , | program | int |\n" +
+                        "|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|\n" +
+                        "| STLIST | STLIST → s STLISTN | \\ | \\ | \\ | \\ | \\ | \\ | \\ | \\ | \\ |\n" +
+                        "| PROGRAM | \\ | \\ | \\ | \\ | \\ | \\ | \\ | \\ | PROGRAM → program DECLIST : TYPE ; STLIST end | \\ |\n" +
+                        "| DECLISTN | \\ | \\ | \\ | DECLISTN → __EPSILON__ | \\ | \\ | \\ | DECLISTN → , id DECLISTN | \\ | \\ |\n" +
+                        "| TYPE | \\ | \\ | TYPE → real | \\ | \\ | \\ | \\ | \\ | \\ | TYPE → int |\n" +
+                        "| STLISTN | \\ | \\ | \\ | \\ | STLISTN → ; s STLISTN | \\ | STLISTN → __EPSILON__ | \\ | \\ | \\ |\n" +
+                        "| DECLIST | \\ | \\ | \\ | \\ | \\ | DECLIST → id DECLISTN | \\ | \\ | \\ | \\ |\n" +
+                        "| __START__ | \\ | \\ | \\ | \\ | \\ | \\ | \\ | \\ | __START__ → PROGRAM | \\ |\n",
+                compiler.toMarkDownAnalysisTable()
         );
     }
 
@@ -187,19 +210,19 @@ public class TestLL1Compiler {
                         createNonTerminator("E"),
                         PrimaryProduction.create(
                                 createNonTerminator("T"),
-                                createNonTerminator("E^")
+                                createNonTerminator("E′")
                         )
                 ),
                 Production.create(
-                        createNonTerminator("E^"),
+                        createNonTerminator("E′"),
                         PrimaryProduction.create(
                                 createTerminator("+"),
                                 createNonTerminator("T"),
-                                createNonTerminator("E^")
+                                createNonTerminator("E′")
                         )
                 ),
                 Production.create(
-                        createNonTerminator("E^"),
+                        createNonTerminator("E′"),
                         PrimaryProduction.create(
                                 Symbol.EPSILON
                         )
@@ -208,19 +231,19 @@ public class TestLL1Compiler {
                         createNonTerminator("T"),
                         PrimaryProduction.create(
                                 createNonTerminator("F"),
-                                createNonTerminator("T^")
+                                createNonTerminator("T′")
                         )
                 ),
                 Production.create(
-                        createNonTerminator("T^"),
+                        createNonTerminator("T′"),
                         PrimaryProduction.create(
                                 createTerminator("*"),
                                 createNonTerminator("F"),
-                                createNonTerminator("T^")
+                                createNonTerminator("T′")
                         )
                 ),
                 Production.create(
-                        createNonTerminator("T^"),
+                        createNonTerminator("T′"),
                         PrimaryProduction.create(
                                 Symbol.EPSILON
                         )
@@ -371,19 +394,19 @@ public class TestLL1Compiler {
                         createNonTerminator("E"),
                         PrimaryProduction.create(
                                 createNonTerminator("T"),
-                                createNonTerminator("E^")
+                                createNonTerminator("E′")
                         )
                 ),
                 Production.create(
-                        createNonTerminator("E^"),
+                        createNonTerminator("E′"),
                         PrimaryProduction.create(
                                 createTerminator("+"),
                                 createNonTerminator("T"),
-                                createNonTerminator("E^")
+                                createNonTerminator("E′")
                         )
                 ),
                 Production.create(
-                        createNonTerminator("E^"),
+                        createNonTerminator("E′"),
                         PrimaryProduction.create(
                                 Symbol.EPSILON
                         )
@@ -392,19 +415,19 @@ public class TestLL1Compiler {
                         createNonTerminator("T"),
                         PrimaryProduction.create(
                                 createNonTerminator("F"),
-                                createNonTerminator("T^")
+                                createNonTerminator("T′")
                         )
                 ),
                 Production.create(
-                        createNonTerminator("T^"),
+                        createNonTerminator("T′"),
                         PrimaryProduction.create(
                                 createTerminator("*"),
                                 createNonTerminator("F"),
-                                createNonTerminator("T^")
+                                createNonTerminator("T′")
                         )
                 ),
                 Production.create(
-                        createNonTerminator("T^"),
+                        createNonTerminator("T′"),
                         PrimaryProduction.create(
                                 Symbol.EPSILON
                         )
@@ -441,8 +464,6 @@ public class TestLL1Compiler {
         assertTrue(compiler.isSentence("(asdfsdfDASDF323+ASDFC0102D*d23234+(asdf+dd)*(d1d*k9))"));
         assertFalse(compiler.isSentence("000+(id*id)"));
         assertFalse(compiler.isSentence("()"));
-
-        System.out.println(compiler.toMarkDownAnalysisTable());
     }
 
     private LexicalAnalyzer getDefaultLexicalAnalyzer() {

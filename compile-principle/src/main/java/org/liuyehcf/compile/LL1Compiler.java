@@ -574,6 +574,8 @@ public class LL1Compiler implements Compiler {
             sb.append(":--")
                     .append(separator);
         }
+        sb.append(":--")
+                .append(separator);
 
         sb.append('\n');
 
