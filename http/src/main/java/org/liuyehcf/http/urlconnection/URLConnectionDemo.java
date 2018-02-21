@@ -42,17 +42,17 @@ public class URLConnectionDemo {
             URL url = new URL("http://localhost:8080/login");
 
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("POST");//todo 必须有
-            conn.setRequestProperty("Content-Type", "application/json");//todo 必须有
+            conn.setRequestMethod("POST");// 必须有
+            conn.setRequestProperty("Content-Type", "application/json");// 必须有
             conn.setDoInput(true);
-            conn.setDoOutput(true);//todo 必须有
+            conn.setDoOutput(true);// 必须有
 
             conn.connect();
 
             String requestBody = "{\"name\":\"张三\",\"password\":\"123456789\"}";
             PrintWriter out = new PrintWriter(conn.getOutputStream());
             out.print(requestBody);
-            out.flush();//todo 别忘了这句
+            out.flush();// 别忘了这句
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             String line;

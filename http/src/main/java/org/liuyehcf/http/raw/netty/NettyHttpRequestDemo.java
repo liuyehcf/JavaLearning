@@ -37,7 +37,7 @@ public class NettyHttpRequestDemo {
                         }
                     });
 
-            // todo 需要启动String Boot模块中的web应用作为服务端
+            // 需要启动String Boot模块中的web应用作为服务端
             ChannelFuture channelFuture = bootstrap.connect("localhost", 8080).sync();
 
             Channel channel = channelFuture.channel();
@@ -76,7 +76,7 @@ public class NettyHttpRequestDemo {
                         }
                     });
 
-            // todo 需要启动String Boot模块中的web应用作为服务端
+            // 需要启动String Boot模块中的web应用作为服务端
             ChannelFuture channelFuture = bootstrap.connect("localhost", 8080).sync();
 
             Channel channel = channelFuture.channel();

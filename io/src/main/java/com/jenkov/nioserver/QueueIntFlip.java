@@ -20,7 +20,7 @@ public class QueueIntFlip {
 
     public QueueIntFlip(int capacity) {
         this.capacity = capacity;
-        this.elements = new int[capacity]; //todo get from TypeAllocator ?
+        this.elements = new int[capacity]; // get from TypeAllocator ?
     }
 
     public void reset() {

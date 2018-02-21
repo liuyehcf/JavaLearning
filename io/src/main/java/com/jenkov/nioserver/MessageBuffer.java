@@ -24,8 +24,8 @@ public class MessageBuffer {
     QueueIntFlip mediumMessageBufferFreeBlocks = new QueueIntFlip(128);  // 128  free sections
     QueueIntFlip largeMessageBufferFreeBlocks = new QueueIntFlip(16);   // 16   free sections
 
-    //todo make all message buffer capacities and block sizes configurable
-    //todo calculate free block queue sizes based on capacity and block size of buffers.
+    // make all message buffer capacities and block sizes configurable
+    // calculate free block queue sizes based on capacity and block size of buffers.
 
     public MessageBuffer() {
         //add all free sections to all free section queues.
@@ -45,7 +45,7 @@ public class MessageBuffer {
 
         if (nextFreeSmallBlock == -1) return null;
 
-        Message message = new Message(this);       //todo get from Message pool - caps memory usage.
+        Message message = new Message(this);       // get from Message pool - caps memory usage.
 
         message.sharedArray = this.smallMessageBuffer;
         message.capacity = CAPACITY_SMALL;

@@ -38,7 +38,7 @@ public class SocketAccepter implements Runnable {
 
                 System.out.println("Socket accepted: " + socketChannel);
 
-                //todo check if the queue can even accept more sockets.
+                // check if the queue can even accept more sockets.
                 this.socketQueue.add(new Socket(socketChannel));
 
             } catch (IOException e) {

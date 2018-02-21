@@ -26,7 +26,7 @@ public class MessageBufferTest {
         assertEquals(0, message2.length);
         assertEquals(4 * 1024, message2.capacity);
 
-        //todo test what happens if the small buffer space is depleted of messages.
+        // test what happens if the small buffer space is depleted of messages.
 
     }
 

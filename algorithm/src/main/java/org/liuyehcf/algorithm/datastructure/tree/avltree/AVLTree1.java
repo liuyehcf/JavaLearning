@@ -286,7 +286,7 @@ public class AVLTree1 {
             y.left = z.left;
             y.left.parent = y;
 
-            //todo 这里不需要更新p的高度,因为p的子树的高度此时并不知道是否正确,因此更新也没有意义,这也是deleteFixBalance必须遍历到root的原因
+            // 这里不需要更新p的高度,因为p的子树的高度此时并不知道是否正确,因此更新也没有意义,这也是deleteFixBalance必须遍历到root的原因
         }
         fixUp(x);
         if (!check())

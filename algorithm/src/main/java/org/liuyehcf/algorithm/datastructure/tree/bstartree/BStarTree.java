@@ -137,13 +137,13 @@ public class BStarTree {
             x.keys[i] = k;
             x.n++;
         } else {
-            //todo 这里的等号很关键
+            // 这里的等号很关键
             while (i >= 0 && x.keys[i] >= k) {
                 i--;
             }
             i++;
 
-            //todo 关键，自上而下寻找插入点时，即维护了索引的正确性
+            // 关键，自上而下寻找插入点时，即维护了索引的正确性
             if (i == x.n) {
                 x.keys[x.n - 1] = k;
                 i--;
@@ -159,13 +159,13 @@ public class BStarTree {
             }
             if (y.n == MAX_KEY_NUM) {
                 if (p != null && p.n < MAX_KEY_NUM) {
-                    //todo 这里当p的大小为MAX_KEY_NUM-1时，并且下面的条件成立，会导致仍然进入一个满的节点，但是如果采用分裂，那么会有一个节点的关键字数量小于MIN_KEY_NUM
+                    // 这里当p的大小为MAX_KEY_NUM-1时，并且下面的条件成立，会导致仍然进入一个满的节点，但是如果采用分裂，那么会有一个节点的关键字数量小于MIN_KEY_NUM
                     shiftToLeft(x, i - 1);
                     if (k <= p.keys[p.n - 1]) {
                         i--;
                     }
                 } else if (z != null && z.n < MAX_KEY_NUM) {
-                    //todo 这里当z的大小为MAX_KEY_NUM-1时，并且下面的条件成立，会导致仍然进入一个满的节点，但是如果采用分裂，那么会有一个节点的关键字数量小于MIN_KEY_NUM
+                    // 这里当z的大小为MAX_KEY_NUM-1时，并且下面的条件成立，会导致仍然进入一个满的节点，但是如果采用分裂，那么会有一个节点的关键字数量小于MIN_KEY_NUM
                     shiftToRight(x, i);
                     if (k > y.keys[y.n - 1]) {
                         i++;
@@ -320,7 +320,7 @@ public class BStarTree {
             x.children[j] = x.children[j - 1];
         }
 
-        //todo 下面这句非常重要，x.key[i]可能是经过维护的，即等于插入时的k值
+        // 下面这句非常重要，x.key[i]可能是经过维护的，即等于插入时的k值
         x.keys[i + 1] = x.keys[i];
         x.keys[i - 1] = p.keys[p.n - 1];
         x.keys[i] = y.keys[y.n - 1];

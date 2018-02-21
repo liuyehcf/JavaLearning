@@ -188,7 +188,7 @@ public class FibonacciHeap {
                     FibonacciHeapNode temp = x;
                     x = y;
                     y = temp;
-                    set.remove(y);//todo 此时删的是从set中取的元素
+                    set.remove(y);// 此时删的是从set中取的元素
                 }
                 heapLink(y, x);
                 degreeMap.remove(d);
@@ -197,7 +197,7 @@ public class FibonacciHeap {
 
             //将x节点填入到map中
             degreeMap.put(d, x);
-            set.remove(x);//todo 尝试着删吧,只有x还是之前从set取的元素时才会成功
+            set.remove(x);// 尝试着删吧,只有x还是之前从set取的元素时才会成功
         }
         this.min = null;
 
@@ -268,7 +268,7 @@ public class FibonacciHeap {
         } while (ite != firstChild);
 
         if (ite == firstChild) {
-            //todo 是否需要维护mark节点
+            // 是否需要维护mark节点
             FibonacciHeapNode left = ite.left;
             FibonacciHeapNode right = ite.right;
             if (left == ite) {

@@ -13,7 +13,6 @@ import static org.liuyehcf.compile.utils.AssertUtils.assertTrue;
 
 /**
  * 词法分析器，直接用JDK的正则表达式进行解析
- * todo 需要将morphemes按照词素类型进行分类，正则表达式的匹配必须放在最后面
  */
 public class LexicalAnalyzer {
 

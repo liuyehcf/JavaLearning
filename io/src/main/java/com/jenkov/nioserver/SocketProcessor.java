@@ -14,12 +14,12 @@ public class SocketProcessor implements Runnable {
 
     private Queue<Socket> inboundSocketQueue = null;
 
-    private MessageBuffer readMessageBuffer = null; //todo   Not used now - but perhaps will be later - to check for space in the buffer before reading from sockets
-    private MessageBuffer writeMessageBuffer = null; //todo   Not used now - but perhaps will be later - to check for space in the buffer before reading from sockets (space for more to write?)
+    private MessageBuffer readMessageBuffer = null; // Not used now - but perhaps will be later - to check for space in the buffer before reading from sockets
+    private MessageBuffer writeMessageBuffer = null; // Not used now - but perhaps will be later - to check for space in the buffer before reading from sockets (space for more to write?)
 
     private IMessageReaderFactory messageReaderFactory = null;
 
-    private Queue<Message> outboundMessageQueue = new LinkedList<>(); //todo use a better / faster queue.
+    private Queue<Message> outboundMessageQueue = new LinkedList<>(); // use a better / faster queue.
 
     private Map<Long, Socket> socketMap = new HashMap<>();
 

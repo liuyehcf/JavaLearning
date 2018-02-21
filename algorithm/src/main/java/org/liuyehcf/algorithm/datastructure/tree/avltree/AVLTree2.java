@@ -110,7 +110,7 @@ public class AVLTree2 {
         AVLTreeNode r = z;
 
         if (z.left.h == z.right.h + 2) {
-            //todo 这里的等号非常重要(插入过程时不可能取等号，删除过程可能取等号)
+            // 这里的等号非常重要(插入过程时不可能取等号，删除过程可能取等号)
             if (z.left.left.h >= z.left.right.h) {
                 r = rightRotate(z);
             } else if (z.left.left.h < z.left.right.h) {
@@ -119,7 +119,7 @@ public class AVLTree2 {
             }
 
         } else if (z.right.h == z.left.h + 2) {
-            //todo 这里的等号非常重要(插入过程时不可能取等号，删除过程可能取等号)
+            // 这里的等号非常重要(插入过程时不可能取等号，删除过程可能取等号)
             if (z.right.right.h >= z.right.left.h) {
                 r = leftRotate(z);
             } else if (z.right.right.h < z.right.left.h) {
@@ -257,7 +257,7 @@ public class AVLTree2 {
             transplant(z, z.left);
         } else {
             y = min(z.right);
-            //todo 这里的分类讨论非常重要,否则将会定位到错误的父节点
+            // 这里的分类讨论非常重要,否则将会定位到错误的父节点
             if (y == z.right) {
                 p = y;
             } else {
@@ -265,7 +265,7 @@ public class AVLTree2 {
             }
             transplant(y, y.right);
 
-            //todo 下面六句可以用z.val=y.val来代替,效果一样
+            // 下面六句可以用z.val=y.val来代替,效果一样
             y.right = z.right;
             y.right.parent = y;
 
@@ -273,8 +273,8 @@ public class AVLTree2 {
             y.left.parent = y;
 
             transplant(z, y);
-            y.h = z.h;//todo 这里高度必须维护
-            //todo 这里不需要更新p的高度,因为p的子树的高度此时并不知道是否正确,因此更新也没有意义,这也是deleteFixBalance必须遍历到root的原因
+            y.h = z.h;// 这里高度必须维护
+            // 这里不需要更新p的高度,因为p的子树的高度此时并不知道是否正确,因此更新也没有意义,这也是deleteFixBalance必须遍历到root的原因
         }
         if (p != nil)
             balanceFix(p);

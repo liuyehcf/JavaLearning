@@ -37,7 +37,7 @@ public class MessageWriter {
                 this.messageInProgress = this.writeQueue.remove(0);
             } else {
                 this.messageInProgress = null;
-                //todo unregister from selector
+                // unregister from selector
             }
         }
     }
