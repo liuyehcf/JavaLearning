@@ -5,7 +5,7 @@ import org.liuyehcf.compile.core.MorphemeType;
 import org.liuyehcf.compile.definition.Grammar;
 import org.liuyehcf.compile.definition.Production;
 import org.liuyehcf.compile.definition.Symbol;
-import org.liuyehcf.compile.definition.SymbolSequence;
+import org.liuyehcf.compile.definition.PrimaryProduction;
 
 import static org.junit.Assert.*;
 import static org.liuyehcf.compile.TestLexicalAnalyzer.getIdRegex;
@@ -18,14 +18,14 @@ public class TestLL1Compiler {
         Grammar grammar = Grammar.create(
                 Production.create(
                         createNonTerminator("E"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createNonTerminator("T"),
                                 createNonTerminator("E^")
                         )
                 ),
                 Production.create(
                         createNonTerminator("E^"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("+"),
                                 createNonTerminator("T"),
                                 createNonTerminator("E^")
@@ -33,20 +33,20 @@ public class TestLL1Compiler {
                 ),
                 Production.create(
                         createNonTerminator("E^"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 Symbol.EPSILON
                         )
                 ),
                 Production.create(
                         createNonTerminator("T"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createNonTerminator("F"),
                                 createNonTerminator("T^")
                         )
                 ),
                 Production.create(
                         createNonTerminator("T^"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("*"),
                                 createNonTerminator("F"),
                                 createNonTerminator("T^")
@@ -54,13 +54,13 @@ public class TestLL1Compiler {
                 ),
                 Production.create(
                         createNonTerminator("T^"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 Symbol.EPSILON
                         )
                 ),
                 Production.create(
                         createNonTerminator("F"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("("),
                                 createNonTerminator("E"),
                                 createTerminator(")")
@@ -68,7 +68,7 @@ public class TestLL1Compiler {
                 ),
                 Production.create(
                         createNonTerminator("F"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("id")
                         )
                 )
@@ -100,7 +100,7 @@ public class TestLL1Compiler {
         Grammar grammar = Grammar.create(
                 Production.create(
                         createNonTerminator(PROGRAM),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("program"),
                                 createNonTerminator(DECLIST),
                                 createTerminator(":"),
@@ -112,14 +112,14 @@ public class TestLL1Compiler {
                 ),
                 Production.create(
                         createNonTerminator(DECLIST),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("id"),
                                 createNonTerminator(DECLISTN)
                         )
                 ),
                 Production.create(
                         createNonTerminator(DECLISTN),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator(","),
                                 createTerminator("id"),
                                 createNonTerminator(DECLISTN)
@@ -127,20 +127,20 @@ public class TestLL1Compiler {
                 ),
                 Production.create(
                         createNonTerminator(DECLISTN),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 Symbol.EPSILON
                         )
                 ),
                 Production.create(
                         createNonTerminator(STLIST),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("s"),
                                 createNonTerminator(STLISTN)
                         )
                 ),
                 Production.create(
                         createNonTerminator(STLISTN),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator(";"),
                                 createTerminator("s"),
                                 createNonTerminator(STLISTN)
@@ -148,19 +148,19 @@ public class TestLL1Compiler {
                 ),
                 Production.create(
                         createNonTerminator(STLISTN),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 Symbol.EPSILON
                         )
                 ),
                 Production.create(
                         createNonTerminator(TYPE),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("real")
                         )
                 ),
                 Production.create(
                         createNonTerminator(TYPE),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("int")
                         )
                 )
@@ -185,14 +185,14 @@ public class TestLL1Compiler {
         Grammar grammar = Grammar.create(
                 Production.create(
                         createNonTerminator("E"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createNonTerminator("T"),
                                 createNonTerminator("E^")
                         )
                 ),
                 Production.create(
                         createNonTerminator("E^"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("+"),
                                 createNonTerminator("T"),
                                 createNonTerminator("E^")
@@ -200,20 +200,20 @@ public class TestLL1Compiler {
                 ),
                 Production.create(
                         createNonTerminator("E^"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 Symbol.EPSILON
                         )
                 ),
                 Production.create(
                         createNonTerminator("T"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createNonTerminator("F"),
                                 createNonTerminator("T^")
                         )
                 ),
                 Production.create(
                         createNonTerminator("T^"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("*"),
                                 createNonTerminator("F"),
                                 createNonTerminator("T^")
@@ -221,13 +221,13 @@ public class TestLL1Compiler {
                 ),
                 Production.create(
                         createNonTerminator("T^"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 Symbol.EPSILON
                         )
                 ),
                 Production.create(
                         createNonTerminator("F"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("("),
                                 createNonTerminator("E"),
                                 createTerminator(")")
@@ -235,7 +235,7 @@ public class TestLL1Compiler {
                 ),
                 Production.create(
                         createNonTerminator("F"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("id")
                         )
                 )
@@ -271,7 +271,7 @@ public class TestLL1Compiler {
         Grammar grammar = Grammar.create(
                 Production.create(
                         createNonTerminator(PROGRAM),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("program"),
                                 createNonTerminator(DECLIST),
                                 createTerminator(":"),
@@ -283,14 +283,14 @@ public class TestLL1Compiler {
                 ),
                 Production.create(
                         createNonTerminator(DECLIST),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("id"),
                                 createNonTerminator(DECLISTN)
                         )
                 ),
                 Production.create(
                         createNonTerminator(DECLISTN),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator(","),
                                 createTerminator("id"),
                                 createNonTerminator(DECLISTN)
@@ -298,20 +298,20 @@ public class TestLL1Compiler {
                 ),
                 Production.create(
                         createNonTerminator(DECLISTN),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 Symbol.EPSILON
                         )
                 ),
                 Production.create(
                         createNonTerminator(STLIST),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("s"),
                                 createNonTerminator(STLISTN)
                         )
                 ),
                 Production.create(
                         createNonTerminator(STLISTN),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator(";"),
                                 createTerminator("s"),
                                 createNonTerminator(STLISTN)
@@ -319,19 +319,19 @@ public class TestLL1Compiler {
                 ),
                 Production.create(
                         createNonTerminator(STLISTN),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 Symbol.EPSILON
                         )
                 ),
                 Production.create(
                         createNonTerminator(TYPE),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("real")
                         )
                 ),
                 Production.create(
                         createNonTerminator(TYPE),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("int")
                         )
                 )
@@ -369,14 +369,14 @@ public class TestLL1Compiler {
         Grammar grammar = Grammar.create(
                 Production.create(
                         createNonTerminator("E"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createNonTerminator("T"),
                                 createNonTerminator("E^")
                         )
                 ),
                 Production.create(
                         createNonTerminator("E^"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("+"),
                                 createNonTerminator("T"),
                                 createNonTerminator("E^")
@@ -384,20 +384,20 @@ public class TestLL1Compiler {
                 ),
                 Production.create(
                         createNonTerminator("E^"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 Symbol.EPSILON
                         )
                 ),
                 Production.create(
                         createNonTerminator("T"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createNonTerminator("F"),
                                 createNonTerminator("T^")
                         )
                 ),
                 Production.create(
                         createNonTerminator("T^"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("*"),
                                 createNonTerminator("F"),
                                 createNonTerminator("T^")
@@ -405,13 +405,13 @@ public class TestLL1Compiler {
                 ),
                 Production.create(
                         createNonTerminator("T^"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 Symbol.EPSILON
                         )
                 ),
                 Production.create(
                         createNonTerminator("F"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("("),
                                 createNonTerminator("E"),
                                 createTerminator(")")
@@ -419,7 +419,7 @@ public class TestLL1Compiler {
                 ),
                 Production.create(
                         createNonTerminator("F"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("id")
                         )
                 )

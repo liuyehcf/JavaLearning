@@ -7,20 +7,20 @@ import java.util.List;
 /**
  * 文法符号串
  */
-public class SymbolSequence {
+public class PrimaryProduction {
     // 文法符号串
     private final List<Symbol> symbols;
 
-    private SymbolSequence(List<Symbol> symbols) {
+    private PrimaryProduction(List<Symbol> symbols) {
         this.symbols = symbols;
     }
 
-    public static SymbolSequence create(Symbol... symbols) {
-        return new SymbolSequence(ListUtils.of(symbols));
+    public static PrimaryProduction create(Symbol... symbols) {
+        return new PrimaryProduction(ListUtils.of(symbols));
     }
 
-    public static SymbolSequence create(List<Symbol> symbols) {
-        return new SymbolSequence(symbols);
+    public static PrimaryProduction create(List<Symbol> symbols) {
+        return new PrimaryProduction(symbols);
     }
 
     public List<Symbol> getSymbols() {
@@ -61,8 +61,8 @@ public class SymbolSequence {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof SymbolSequence) {
-            SymbolSequence other = (SymbolSequence) obj;
+        if (obj instanceof PrimaryProduction) {
+            PrimaryProduction other = (PrimaryProduction) obj;
             if (other.symbols.size() == this.symbols.size()) {
                 for (int i = 0; i < this.symbols.size(); i++) {
                     if (!other.symbols.get(i).equals(this.symbols.get(i))) {

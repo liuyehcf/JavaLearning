@@ -2,7 +2,6 @@ package org.liuyehcf.compile.definition;
 
 import org.liuyehcf.compile.utils.ListUtils;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static org.liuyehcf.compile.utils.AssertUtils.assertFalse;
@@ -19,18 +18,18 @@ public class Production {
     private final Symbol left;
 
     // 并列关系的多个产生式右部
-    private final List<SymbolSequence> right;
+    private final List<PrimaryProduction> right;
 
-    private Production(Symbol left, List<SymbolSequence> right) {
+    private Production(Symbol left, List<PrimaryProduction> right) {
         this.left = left;
         this.right = right;
     }
 
-    public static Production create(Symbol left, SymbolSequence... right) {
+    public static Production create(Symbol left, PrimaryProduction... right) {
         return create(left, ListUtils.of(right));
     }
 
-    public static Production create(Symbol left, List<SymbolSequence> right) {
+    public static Production create(Symbol left, List<PrimaryProduction> right) {
         return new Production(left, right);
     }
 
@@ -38,7 +37,7 @@ public class Production {
         return left;
     }
 
-    public List<SymbolSequence> getRight() {
+    public List<PrimaryProduction> getRight() {
         return right;
     }
 
@@ -56,8 +55,8 @@ public class Production {
         sb.append(left.toReadableJSONString())
                 .append(" → ");
 
-        for (SymbolSequence symbolSequence : right) {
-            sb.append(symbolSequence.toReadableJSONString())
+        for (PrimaryProduction pp : right) {
+            sb.append(pp.toReadableJSONString())
                     .append(OR);
         }
 

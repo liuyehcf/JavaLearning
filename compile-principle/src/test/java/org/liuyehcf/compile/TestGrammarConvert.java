@@ -3,7 +3,7 @@ package org.liuyehcf.compile;
 import org.junit.Test;
 import org.liuyehcf.compile.definition.Grammar;
 import org.liuyehcf.compile.definition.Production;
-import org.liuyehcf.compile.definition.SymbolSequence;
+import org.liuyehcf.compile.definition.PrimaryProduction;
 
 import static org.junit.Assert.assertEquals;
 import static org.liuyehcf.compile.definition.Symbol.createNonTerminator;
@@ -15,7 +15,7 @@ public class TestGrammarConvert {
         Grammar grammar = Grammar.create(
                 Production.create(
                         createNonTerminator("E"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createNonTerminator("E"),
                                 createTerminator("+"),
                                 createNonTerminator("E")
@@ -23,7 +23,7 @@ public class TestGrammarConvert {
                 ),
                 Production.create(
                         createNonTerminator("E"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createNonTerminator("E"),
                                 createTerminator("*"),
                                 createNonTerminator("E")
@@ -31,7 +31,7 @@ public class TestGrammarConvert {
                 ),
                 Production.create(
                         createNonTerminator("E"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("("),
                                 createNonTerminator("E"),
                                 createTerminator(")")
@@ -39,7 +39,7 @@ public class TestGrammarConvert {
                 ),
                 Production.create(
                         createNonTerminator("E"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("id")
                         )
                 )
@@ -58,13 +58,13 @@ public class TestGrammarConvert {
         Grammar grammar = Grammar.create(
                 Production.create(
                         createNonTerminator("D"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createNonTerminator("E")
                         )
                 ),
                 Production.create(
                         createNonTerminator("E"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createNonTerminator("E"),
                                 createTerminator("+"),
                                 createNonTerminator("E")
@@ -72,7 +72,7 @@ public class TestGrammarConvert {
                 ),
                 Production.create(
                         createNonTerminator("E"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createNonTerminator("E"),
                                 createTerminator("*"),
                                 createNonTerminator("E")
@@ -80,7 +80,7 @@ public class TestGrammarConvert {
                 ),
                 Production.create(
                         createNonTerminator("E"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("("),
                                 createNonTerminator("E"),
                                 createTerminator(")")
@@ -88,7 +88,7 @@ public class TestGrammarConvert {
                 ),
                 Production.create(
                         createNonTerminator("E"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("id")
                         )
                 )
@@ -107,21 +107,21 @@ public class TestGrammarConvert {
         Grammar grammar = Grammar.create(
                 Production.create(
                         createNonTerminator("D"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createNonTerminator("E"),
                                 createTerminator("e")
                         )
                 ),
                 Production.create(
                         createNonTerminator("D"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("e"),
                                 createNonTerminator("E")
                         )
                 ),
                 Production.create(
                         createNonTerminator("E"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createNonTerminator("E"),
                                 createTerminator("+"),
                                 createNonTerminator("E")
@@ -129,7 +129,7 @@ public class TestGrammarConvert {
                 ),
                 Production.create(
                         createNonTerminator("E"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createNonTerminator("E"),
                                 createTerminator("*"),
                                 createNonTerminator("E")
@@ -137,7 +137,7 @@ public class TestGrammarConvert {
                 ),
                 Production.create(
                         createNonTerminator("E"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("("),
                                 createNonTerminator("E"),
                                 createTerminator(")")
@@ -145,7 +145,7 @@ public class TestGrammarConvert {
                 ),
                 Production.create(
                         createNonTerminator("E"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("id")
                         )
                 )
@@ -164,14 +164,14 @@ public class TestGrammarConvert {
         Grammar grammar = Grammar.create(
                 Production.create(
                         createNonTerminator("A"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("a"),
                                 createTerminator("b")
                         )
                 ),
                 Production.create(
                         createNonTerminator("A"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("a"),
                                 createTerminator("b"),
                                 createTerminator("c")
@@ -179,14 +179,14 @@ public class TestGrammarConvert {
                 ),
                 Production.create(
                         createNonTerminator("A"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("b"),
                                 createTerminator("d")
                         )
                 ),
                 Production.create(
                         createNonTerminator("A"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("b"),
                                 createTerminator("c")
                         )
@@ -206,40 +206,40 @@ public class TestGrammarConvert {
         Grammar grammar = Grammar.create(
                 Production.create(
                         createNonTerminator("A"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("a"),
                                 createTerminator("β1")
                         )
                 ),
                 Production.create(
                         createNonTerminator("A"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("a"),
                                 createTerminator("β2")
                         )
                 ),
                 Production.create(
                         createNonTerminator("A"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("a"),
                                 createTerminator("βn")
                         )
                 ),
                 Production.create(
                         createNonTerminator("A"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("γ1")
                         )
                 ),
                 Production.create(
                         createNonTerminator("A"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("γ2")
                         )
                 ),
                 Production.create(
                         createNonTerminator("A"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("γm")
                         )
                 )
@@ -258,20 +258,20 @@ public class TestGrammarConvert {
         Grammar grammar = Grammar.create(
                 Production.create(
                         createNonTerminator("A"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("a")
                         )
                 ),
                 Production.create(
                         createNonTerminator("A"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("a"),
                                 createTerminator("b")
                         )
                 ),
                 Production.create(
                         createNonTerminator("A"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("a"),
                                 createTerminator("b"),
                                 createTerminator("c")
@@ -279,7 +279,7 @@ public class TestGrammarConvert {
                 ),
                 Production.create(
                         createNonTerminator("A"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("a"),
                                 createTerminator("b"),
                                 createTerminator("c"),
@@ -288,20 +288,20 @@ public class TestGrammarConvert {
                 ),
                 Production.create(
                         createNonTerminator("A"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("b")
                         )
                 ),
                 Production.create(
                         createNonTerminator("A"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("b"),
                                 createTerminator("c")
                         )
                 ),
                 Production.create(
                         createNonTerminator("A"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("b"),
                                 createTerminator("c"),
                                 createTerminator("d")
@@ -309,20 +309,20 @@ public class TestGrammarConvert {
                 ),
                 Production.create(
                         createNonTerminator("A"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("c")
                         )
                 ),
                 Production.create(
                         createNonTerminator("A"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("c"),
                                 createTerminator("d")
                         )
                 ),
                 Production.create(
                         createNonTerminator("A"),
-                        SymbolSequence.create(
+                        PrimaryProduction.create(
                                 createTerminator("d")
                         )
                 )

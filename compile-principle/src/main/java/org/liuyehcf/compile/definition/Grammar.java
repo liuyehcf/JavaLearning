@@ -40,7 +40,7 @@ public class Grammar {
             productions.add(
                     Production.create(
                             Symbol.START,
-                            SymbolSequence.create(
+                            PrimaryProduction.create(
                                     symbol
                             )
                     )
@@ -59,7 +59,7 @@ public class Grammar {
     public static Production parallelProduction(Production p1, Production p2) {
         assertTrue(p1.getLeft().equals(p2.getLeft()));
 
-        List<SymbolSequence> right = new ArrayList<>(p1.getRight());
+        List<PrimaryProduction> right = new ArrayList<>(p1.getRight());
         right.addAll(p2.getRight());
 
         return Production.create(
