@@ -195,6 +195,10 @@ public class LL1Compiler implements Compiler {
                         Symbol _B = symbolSequence.getSymbols().get(i);
                         Symbol _BetaFirst = null;
 
+                        if (_B.isTerminator()) {
+                            continue;
+                        }
+
                         if (i < symbolSequence.getSymbols().size() - 1) {
                             _BetaFirst = symbolSequence.getSymbols().get(i + 1);
                         }
@@ -434,7 +438,7 @@ public class LL1Compiler implements Compiler {
      * @return
      */
     public String getFollowReadableJSONString() {
-        return getReadableJSONStringFor(this.follows, true, true);
+        return getReadableJSONStringFor(this.follows, false, true);
     }
 
     /**
