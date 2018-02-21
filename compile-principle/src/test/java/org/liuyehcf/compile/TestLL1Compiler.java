@@ -1,6 +1,8 @@
-package org.liuyehcf.compile.compiler;
+package org.liuyehcf.compile;
 
 import org.junit.Test;
+import org.liuyehcf.compile.Compiler;
+import org.liuyehcf.compile.LL1Compiler;
 import org.liuyehcf.compile.definition.Grammar;
 import org.liuyehcf.compile.definition.Production;
 import org.liuyehcf.compile.definition.Symbol;

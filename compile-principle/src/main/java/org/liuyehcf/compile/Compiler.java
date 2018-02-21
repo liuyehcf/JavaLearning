@@ -1,4 +1,4 @@
-package org.liuyehcf.compile.compiler;
+package org.liuyehcf.compile;
 
 import org.liuyehcf.compile.definition.Grammar;
 

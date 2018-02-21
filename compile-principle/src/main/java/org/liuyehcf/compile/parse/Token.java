@@ -1,31 +1,42 @@
 package org.liuyehcf.compile.parse;
 
+import org.liuyehcf.compile.core.MorphemeType;
+
 public class Token {
-    private String value;
-    private Boolean isTerminator;
-    private Integer type;
+
+    // token的id。若type不是REGEX，那么id与value相同
+    private final String id;
+
+    // token的值
+    private final String value;
+
+    // 词素类型
+    private final MorphemeType type;
+
+    public Token(String id, String value, MorphemeType type) {
+        this.id = id;
+        this.value = value;
+        this.type = type;
+    }
+
+    public String getId() {
+        return id;
+    }
 
     public String getValue() {
         return value;
     }
 
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    public Boolean getTerminator() {
-        return isTerminator;
-    }
-
-    public void setTerminator(Boolean terminator) {
-        isTerminator = terminator;
-    }
-
-    public Integer getType() {
+    public MorphemeType getType() {
         return type;
     }
 
-    public void setType(Integer type) {
-        this.type = type;
+    @Override
+    public String toString() {
+        return "{" +
+                "\"id\":\"" + id + '\"' +
+                ", \"value\":\"" + value + '\"' +
+                ", \"type\":\"" + type + '\"' +
+                '}';
     }
 }

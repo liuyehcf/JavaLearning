@@ -1,14 +1,16 @@
 package org.liuyehcf.compile.definition;
 
+import org.liuyehcf.compile.core.MorphemeType;
+
 /**
  * 文法符号，包括终结符和非终结符
  * 特殊符号用"__"作为前后缀，且全部字母大写，同时禁止普通Symbol带有"__"前后缀
  */
 public class Symbol {
 
-    public static final Symbol START = new Symbol(false, "__START__", 0);
-    public static final Symbol EPSILON = new Symbol(true, "__EPSILON__", 0);
-    public static final Symbol DOLLAR = new Symbol(true, "__DOLLAR__", 0);
+    public static final Symbol START = new Symbol(false, "__START__", 0, MorphemeType.INTERNAL);
+    public static final Symbol EPSILON = new Symbol(true, "__EPSILON__", 0, MorphemeType.INTERNAL);
+    public static final Symbol DOLLAR = new Symbol(true, "__DOLLAR__", 0, MorphemeType.INTERNAL);
 
     // 是否为终结符
     private final boolean isTerminator;
@@ -19,6 +21,10 @@ public class Symbol {
     // 一撇"′"的数量（value本身包含的"′"不算）
     private final int primeCount;
 
+    // 词素类型（符号也是一种词素），词素类型不同，value字段的含义也不同
+    // 如果是REGEX类型，那么value就是指正则表达式的id
+    private final MorphemeType type;
+
     /**
      * 仅用于创建普通Symbol
      *
@@ -26,7 +32,17 @@ public class Symbol {
      * @param value
      */
     private Symbol(boolean isTerminator, String value) {
-        if (value == null) {
+        this(isTerminator, value, MorphemeType.NORMAL);
+    }
+
+    /**
+     * 仅用于创建普通Symbol
+     *
+     * @param isTerminator
+     * @param value
+     */
+    private Symbol(boolean isTerminator, String value, MorphemeType type) {
+        if (value == null || type == null) {
             throw new NullPointerException();
         }
         if (value.startsWith("__") || value.endsWith("__")) {
@@ -35,6 +51,7 @@ public class Symbol {
         this.isTerminator = isTerminator;
         this.value = value;
         this.primeCount = 0;
+        this.type = type;
     }
 
     /**
@@ -44,21 +61,43 @@ public class Symbol {
      * @param value
      * @param primeCount
      */
-    private Symbol(boolean isTerminator, String value, int primeCount) {
-        if (value == null) {
+    private Symbol(boolean isTerminator, String value, int primeCount, MorphemeType type) {
+        if (value == null || type == null) {
             throw new NullPointerException();
         }
         this.isTerminator = isTerminator;
         this.value = value;
         this.primeCount = primeCount;
+        this.type = type;
     }
 
     public static Symbol createTerminator(String value) {
-        return new Symbol(true, value);
+        return createSymbol(true, value, MorphemeType.NORMAL);
+    }
+
+    public static Symbol createRegexTerminator(String value) {
+        return createSymbol(true, value, MorphemeType.REGEX);
     }
 
     public static Symbol createNonTerminator(String value) {
-        return new Symbol(false, value);
+        return createSymbol(false, value, MorphemeType.NORMAL);
+    }
+
+    /**
+     * 仅用于创建普通Symbol，需要检查value值的合法性
+     *
+     * @param isTerminator
+     * @param value
+     */
+    private static Symbol createSymbol(boolean isTerminator, String value, MorphemeType type) {
+        if (value == null) {
+            throw new NullPointerException();
+        }
+        if (value.startsWith("__") || value.endsWith("__")) {
+            throw new IllegalArgumentException();
+        }
+
+        return new Symbol(isTerminator, value, 0, type);
     }
 
     public boolean isTerminator() {
@@ -102,7 +141,7 @@ public class Symbol {
      * @return
      */
     public Symbol getPrimedSymbol() {
-        return new Symbol(this.isTerminator, this.value, this.primeCount + 1);
+        return new Symbol(this.isTerminator, this.value, this.primeCount + 1, this.type);
     }
 
     @Override
