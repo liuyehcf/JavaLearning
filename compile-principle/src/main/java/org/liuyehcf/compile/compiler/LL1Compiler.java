@@ -50,6 +50,7 @@ public class LL1Compiler implements Compiler {
         productionMap = new HashMap<>();
         firsts = new HashMap<>();
         follows = new HashMap<>();
+        selects = new HashMap<>();
     }
 
     /**
@@ -64,6 +65,9 @@ public class LL1Compiler implements Compiler {
 
         // 计算follow集
         calculateFollow();
+
+        // 计算select集
+        calculateSelect();
     }
 
     private void convertGrammar() {
@@ -103,49 +107,47 @@ public class LL1Compiler implements Compiler {
         while (!canBreak) {
             Map<Symbol, Set<Symbol>> newFirsts = new HashMap<>(this.firsts);
 
-            for (Symbol _X : symbols) {
-                if (!_X.isTerminator()) {
-                    Production pX = productionMap.get(_X);
+            for (Symbol _X : nonTerminatorSymbols) {
+                Production pX = productionMap.get(_X);
 
-                    assertNotNull(pX);
+                assertNotNull(pX);
 
-                    // 如果X是一个非终结符，且X→Y1...Yk∈P(k≥1)
-                    // 那么如果对于某个i，a在FIRST(Yi)中且ε在所有的FIRST(Y1),...,FIRST(Yi−1)中(即Y1...Yi−1⇒∗ε)，就把a加入到FIRST(X)中
-                    // 如果对于所有的j=1,2,...,k，ε在FIRST(Yj)中，那么将ε加入到FIRST(X)
+                // 如果X是一个非终结符，且X→Y1...Yk∈P(k≥1)
+                // 那么如果对于某个i，a在FIRST(Yi)中且ε在所有的FIRST(Y1),...,FIRST(Yi−1)中(即Y1...Yi−1⇒∗ε)，就把a加入到FIRST(X)中
+                // 如果对于所有的j=1,2,...,k，ε在FIRST(Yj)中，那么将ε加入到FIRST(X)
 
-                    // 这里需要遍历每个子产生式
-                    for (SymbolSequence symbolSequence : pX.getRight()) {
-                        boolean canReachEpsilon = true;
+                // 这里需要遍历每个子产生式
+                for (SymbolSequence symbolSequence : pX.getRight()) {
+                    boolean canReachEpsilon = true;
 
-                        for (int i = 0; i < symbolSequence.getSymbols().size(); i++) {
-                            Symbol _YI = symbolSequence.getSymbols().get(i);
-                            if (!newFirsts.containsKey(_YI)) {
-                                // 说明该符号的first集尚未计算，因此跳过当前子表达式
+                    for (int i = 0; i < symbolSequence.getSymbols().size(); i++) {
+                        Symbol _YI = symbolSequence.getSymbols().get(i);
+                        if (!newFirsts.containsKey(_YI)) {
+                            // 说明该符号的first集尚未计算，因此跳过当前子表达式
+                            canReachEpsilon = false;
+                            break;
+                        } else {
+                            // 首先，将_Y的first集(除了ε)添加到_X的first集中
+                            if (!newFirsts.containsKey(_X)) {
+                                newFirsts.put(_X, new HashSet<>());
+                            }
+                            newFirsts.get(_X).addAll(
+                                    SetUtils.extract(
+                                            newFirsts.get(_YI),
+                                            Symbol.EPSILON
+                                    )
+                            );
+
+                            // 若_Y的first集不包含ε，那么到子表达式循环结束
+                            if (!newFirsts.get(_YI).contains(Symbol.EPSILON)) {
                                 canReachEpsilon = false;
                                 break;
-                            } else {
-                                // 首先，将_Y的first集(除了ε)添加到_X的first集中
-                                if (!newFirsts.containsKey(_X)) {
-                                    newFirsts.put(_X, new HashSet<>());
-                                }
-                                newFirsts.get(_X).addAll(
-                                        SetUtils.extract(
-                                                newFirsts.get(_YI),
-                                                Symbol.EPSILON
-                                        )
-                                );
-
-                                // 若_Y的first集不包含ε，那么到子表达式循环结束
-                                if (!newFirsts.get(_YI).contains(Symbol.EPSILON)) {
-                                    canReachEpsilon = false;
-                                    break;
-                                }
                             }
                         }
+                    }
 
-                        if (canReachEpsilon) {
-                            newFirsts.get(_X).add(Symbol.EPSILON);
-                        }
+                    if (canReachEpsilon) {
+                        newFirsts.get(_X).add(Symbol.EPSILON);
                     }
                 }
             }
@@ -168,50 +170,48 @@ public class LL1Compiler implements Compiler {
         while (!canBreak) {
             Map<Symbol, Set<Symbol>> newFollows = new HashMap<>(this.follows);
 
-            for (Symbol _A : symbols) {
-                if (!_A.isTerminator()) {
-                    Production pA = productionMap.get(_A);
+            for (Symbol _A : nonTerminatorSymbols) {
+                Production pA = productionMap.get(_A);
 
-                    assertNotNull(pA);
+                assertNotNull(pA);
 
-                    for (SymbolSequence symbolSequence : pA.getRight()) {
-                        for (int i = 0; i < symbolSequence.getSymbols().size(); i++) {
-                            Symbol _B = symbolSequence.getSymbols().get(i);
-                            Symbol _BetaFirst = null;
+                for (SymbolSequence symbolSequence : pA.getRight()) {
+                    for (int i = 0; i < symbolSequence.getSymbols().size(); i++) {
+                        Symbol _B = symbolSequence.getSymbols().get(i);
+                        Symbol _BetaFirst = null;
 
-                            if (i < symbolSequence.getSymbols().size() - 1) {
-                                _BetaFirst = symbolSequence.getSymbols().get(i + 1);
+                        if (i < symbolSequence.getSymbols().size() - 1) {
+                            _BetaFirst = symbolSequence.getSymbols().get(i + 1);
+                        }
+
+                        // 如果存在一个产生式A→αBβ，那么FIRST(β)中除ε之外的所有符号都在FOLLOW(B)中
+                        if (_BetaFirst != null) {
+                            if (!newFollows.containsKey(_B)) {
+                                newFollows.put(_B, new HashSet<>());
                             }
 
-                            // 如果存在一个产生式A→αBβ，那么FIRST(β)中除ε之外的所有符号都在FOLLOW(B)中
-                            if (_BetaFirst != null) {
+                            assertNotNull(this.firsts.get(_BetaFirst));
+
+                            newFollows.get(_B).addAll(
+                                    SetUtils.extract(
+                                            this.firsts.get(_BetaFirst),
+                                            Symbol.EPSILON)
+                            );
+                        }
+
+                        // 如果存在一个产生式A→αB，或存在产生式A→αBβ且FIRST(β)包含ε，那么FOLLOW(A)中的所有符号都在FOLLOW(B)中
+                        if (_BetaFirst == null
+                                || this.firsts.get(_BetaFirst).contains(Symbol.EPSILON)) {
+
+                            if (newFollows.containsKey(_A)) {
+
                                 if (!newFollows.containsKey(_B)) {
                                     newFollows.put(_B, new HashSet<>());
                                 }
 
-                                assertNotNull(this.firsts.get(_BetaFirst));
-
                                 newFollows.get(_B).addAll(
-                                        SetUtils.extract(
-                                                this.firsts.get(_BetaFirst),
-                                                Symbol.EPSILON)
+                                        newFollows.get(_A)
                                 );
-                            }
-
-                            // 如果存在一个产生式A→αB，或存在产生式A→αBβ且FIRST(β)包含ε，那么FOLLOW(A)中的所有符号都在FOLLOW(B)中
-                            if (_BetaFirst == null
-                                    || this.firsts.get(_BetaFirst).contains(Symbol.EPSILON)) {
-
-                                if (newFollows.containsKey(_A)) {
-
-                                    if (!newFollows.containsKey(_B)) {
-                                        newFollows.put(_B, new HashSet<>());
-                                    }
-
-                                    newFollows.get(_B).addAll(
-                                            newFollows.get(_A)
-                                    );
-                                }
                             }
                         }
                     }
@@ -223,6 +223,45 @@ public class LL1Compiler implements Compiler {
             } else {
                 this.follows = newFollows;
                 canBreak = false;
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void calculateSelect() {
+
+        for (Symbol _A : nonTerminatorSymbols) {
+            Production pA = productionMap.get(_A);
+
+            boolean containsEpsilon = false;
+
+            Set<Symbol> alphaFirsts = new HashSet<>();
+
+            for (SymbolSequence symbolSequence : pA.getRight()) {
+                Symbol firstSymbolOfAlpha = symbolSequence.getSymbols().get(0);
+
+                if (!this.firsts.get(firstSymbolOfAlpha).contains(Symbol.EPSILON)) {
+                    alphaFirsts.addAll(this.firsts.get(firstSymbolOfAlpha));
+                } else {
+                    containsEpsilon = true;
+                }
+            }
+
+            // 如果ε∈FIRST(α)，那么SELECT(A→α)=(FIRST(α)−{ε})∪FOLLOW(A)
+            if (containsEpsilon) {
+                assertFalse(selects.containsKey(_A));
+                selects.put(
+                        _A,
+                        SetUtils.of(
+                                SetUtils.extract(alphaFirsts, Symbol.EPSILON),
+                                follows.get(_A)
+                        )
+                );
+            }
+            // 如果ε∉FIRST(α)，那么SELECT(A→α)=FIRST(α)
+            else {
+                assertFalse(selects.containsKey(_A));
+                selects.put(_A, alphaFirsts);
             }
         }
     }
@@ -246,7 +285,7 @@ public class LL1Compiler implements Compiler {
      * @return
      */
     public String getFirstReadableJSONString() {
-        return getReadableJSONStringFor(this.firsts);
+        return getReadableJSONStringFor(this.firsts, true, true);
     }
 
     /**
@@ -255,61 +294,79 @@ public class LL1Compiler implements Compiler {
      * @return
      */
     public String getFollowReadableJSONString() {
-        return getReadableJSONStringFor(this.follows);
+        return getReadableJSONStringFor(this.follows, true, true);
     }
 
-    private String getReadableJSONStringFor(Map<Symbol, Set<Symbol>> map) {
+    /**
+     * 打印JSON格式的SELECT集
+     *
+     * @return
+     */
+    public String getSelectReadableJSONString() {
+        return getReadableJSONStringFor(this.selects, false, true);
+    }
+
+    private String getReadableJSONStringFor(Map<Symbol, Set<Symbol>> map, boolean containsTerminator, boolean containsNonTerminator) {
         StringBuilder sb = new StringBuilder();
 
         sb.append('{');
-        sb.append("\"terminator\":");
-        sb.append('{');
 
-        for (Symbol terminator : terminatorSymbols) {
-            sb.append('\"').append(terminator.toReadableJSONString()).append("\":");
-            sb.append('\"');
+        if (containsTerminator) {
+            sb.append("\"terminator\":");
+            sb.append('{');
 
-            assertFalse(map.get(terminator).isEmpty());
+            for (Symbol terminator : terminatorSymbols) {
+                sb.append('\"').append(terminator.toReadableJSONString()).append("\":");
+                sb.append('\"');
 
-            for (Symbol firstSymbol : map.get(terminator)) {
-                sb.append(firstSymbol).append(',');
+                assertFalse(map.get(terminator).isEmpty());
+
+                for (Symbol firstSymbol : map.get(terminator)) {
+                    sb.append(firstSymbol).append(',');
+                }
+
+                sb.setLength(sb.length() - 1);
+
+                sb.append('\"');
+                sb.append(',');
             }
 
+            assertFalse(terminatorSymbols.isEmpty());
             sb.setLength(sb.length() - 1);
 
-            sb.append('\"');
+            sb.append('}');
+        }
+
+        if (containsTerminator && containsNonTerminator) {
             sb.append(',');
         }
 
-        assertFalse(terminatorSymbols.isEmpty());
-        sb.setLength(sb.length() - 1);
+        if (containsNonTerminator) {
+            sb.append("\"nonTerminator\":");
+            sb.append('{');
 
-        sb.append('}');
-        sb.append(',');
-        sb.append("\"nonTerminator\":");
-        sb.append('{');
+            for (Symbol nonTerminator : nonTerminatorSymbols) {
+                sb.append('\"').append(nonTerminator.toReadableJSONString()).append("\":");
+                sb.append('\"');
 
-        for (Symbol nonTerminator : nonTerminatorSymbols) {
-            sb.append('\"').append(nonTerminator.toReadableJSONString()).append("\":");
-            sb.append('\"');
+                assertFalse(map.get(nonTerminator).isEmpty());
 
-            assertFalse(map.get(nonTerminator).isEmpty());
+                for (Symbol firstSymbol : map.get(nonTerminator)) {
+                    sb.append(firstSymbol).append(',');
+                }
 
-            for (Symbol firstSymbol : map.get(nonTerminator)) {
-                sb.append(firstSymbol).append(',');
+                sb.setLength(sb.length() - 1);
+
+                sb.append('\"');
+                sb.append(',');
             }
 
+            assertFalse(nonTerminatorSymbols.isEmpty());
             sb.setLength(sb.length() - 1);
 
-            sb.append('\"');
-            sb.append(',');
+
+            sb.append('}');
         }
-
-        assertFalse(nonTerminatorSymbols.isEmpty());
-        sb.setLength(sb.length() - 1);
-
-
-        sb.append('}');
         sb.append('}');
 
         return sb.toString();

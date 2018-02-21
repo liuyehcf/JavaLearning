@@ -14,4 +14,12 @@ public abstract class SetUtils {
         newSet.remove(element);
         return newSet;
     }
+
+    public static <T> Set<T> of(Set<T>... sets) {
+        Set<T> newSet = new HashSet<>();
+        for (Set<T> set : sets) {
+            newSet.addAll(set);
+        }
+        return newSet;
+    }
 }
