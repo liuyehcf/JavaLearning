@@ -282,19 +282,19 @@ public class LL1Compiler implements Compiler {
         }
 
 
-        // 检查select集的唯一性
-//        for (Symbol _A : nonTerminatorSymbols) {
-//            Map<SymbolSequence, Set<Symbol>> map = selects.get(_A);
-//            assertNotNull(map);
-//
-//            Set<Symbol> selectsOfA = new HashSet<>();
-//
-//            for (Map.Entry<SymbolSequence, Set<Symbol>> entry : map.entrySet()) {
-//                for (Symbol eachSelectSymbol : entry.getValue()) {
-//                    assertTrue(selectsOfA.add(eachSelectSymbol));
-//                }
-//            }
-//        }
+        // 检查select集的唯一性：具有相同左部的产生式其SELECT集不相交
+        for (Symbol _A : nonTerminatorSymbols) {
+            Map<SymbolSequence, Set<Symbol>> map = selects.get(_A);
+            assertNotNull(map);
+
+            Set<Symbol> selectsOfA = new HashSet<>();
+
+            for (Map.Entry<SymbolSequence, Set<Symbol>> entry : map.entrySet()) {
+                for (Symbol eachSelectSymbol : entry.getValue()) {
+                    assertTrue(selectsOfA.add(eachSelectSymbol));
+                }
+            }
+        }
     }
 
     @Override
@@ -428,7 +428,7 @@ public class LL1Compiler implements Compiler {
      *
      * @return
      */
-    public String getFirstReadableJSONString() {
+    private String getFirstReadableJSONString() {
         return getReadableJSONStringFor(this.firsts, true, true);
     }
 
@@ -437,7 +437,7 @@ public class LL1Compiler implements Compiler {
      *
      * @return
      */
-    public String getFollowReadableJSONString() {
+    private String getFollowReadableJSONString() {
         return getReadableJSONStringFor(this.follows, false, true);
     }
 
@@ -446,7 +446,7 @@ public class LL1Compiler implements Compiler {
      *
      * @return
      */
-    public String getSelectReadableJSONString() {
+    private String getSelectReadableJSONString() {
         StringBuilder sb = new StringBuilder();
 
         sb.append('{');
@@ -562,7 +562,7 @@ public class LL1Compiler implements Compiler {
     /**
      * 用于转换文法的静态内部类
      */
-    private static final class GrammarConverter {
+    public static final class GrammarConverter {
         /**
          * 文法定义
          */
@@ -582,7 +582,7 @@ public class LL1Compiler implements Compiler {
             this.grammar = grammar;
         }
 
-        private static Grammar convert(Grammar grammar) {
+        public static Grammar convert(Grammar grammar) {
             return new GrammarConverter(grammar)
                     .convert();
         }
