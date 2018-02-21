@@ -6,6 +6,17 @@ import org.liuyehcf.compile.core.MorphemeType;
 import static org.junit.Assert.assertEquals;
 
 public class TestLexicalAnalyzer {
+    static String getIdRegex() {
+        String digit = "[0-9]";
+        String letter = "[a-zA-Z_]";
+        String id = letter + "(" + letter + "|" + digit + ")*";
+        return id;
+    }
+
+    static String getUnsignedIntegerRegex() {
+        return "[0-9]+";
+    }
+
     @Test
     public void testLexicalAnalyze1() {
         LexicalAnalyzer analyzer = LexicalAnalyzer.builder()
@@ -29,18 +40,6 @@ public class TestLexicalAnalyzer {
                 "1+2*3=7__DOLLAR__",
                 sb.toString()
         );
-    }
-
-
-    static String getIdRegex() {
-        String digit = "[0-9]";
-        String letter = "[a-zA-Z_]";
-        String id = letter + "(" + letter + "|" + digit + ")*";
-        return id;
-    }
-
-    static String getUnsignedIntegerRegex() {
-        return "[0-9]+";
     }
 
 }

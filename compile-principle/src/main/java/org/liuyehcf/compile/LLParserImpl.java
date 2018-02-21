@@ -20,7 +20,7 @@ import static org.liuyehcf.compile.utils.AssertUtils.*;
 /**
  * LL1文法编译器
  */
-public class LL1Compiler implements Compiler {
+public class LLParserImpl implements LLParser {
 
     // 词法分析器
     private final LexicalAnalyzer lexicalAnalyzer;
@@ -52,7 +52,7 @@ public class LL1Compiler implements Compiler {
     // select集
     private Map<Symbol, Map<PrimaryProduction, Set<Symbol>>> selects;
 
-    public LL1Compiler(Grammar originGrammar, LexicalAnalyzer lexicalAnalyzer) {
+    public LLParserImpl(Grammar originGrammar, LexicalAnalyzer lexicalAnalyzer) {
         if (originGrammar == null || lexicalAnalyzer == null) {
             throw new NullPointerException();
         }
@@ -301,8 +301,8 @@ public class LL1Compiler implements Compiler {
     }
 
     @Override
-    public boolean isSentence(String sequence) {
-        LexicalAnalyzer.TokenIterator tokenIterator = lexicalAnalyzer.iterator(sequence);
+    public boolean isMatch(String expression) {
+        LexicalAnalyzer.TokenIterator tokenIterator = lexicalAnalyzer.iterator(expression);
 
         LinkedList<Symbol> symbolStack = new LinkedList<>();
         symbolStack.push(Symbol.DOLLAR);
@@ -351,7 +351,7 @@ public class LL1Compiler implements Compiler {
                 } else {
                     PrimaryProduction pp = findProductionByToken(symbol, token);
 
-                    // System.out.println(symbol.toReadableJSONString() + " → " + pp.toReadableJSONString());
+                    // System.out.println(symbol.getStatus() + " → " + pp.getStatus());
 
                     List<Symbol> reversedSymbols = new ArrayList<>(pp.getSymbols());
 
@@ -396,7 +396,8 @@ public class LL1Compiler implements Compiler {
         return this.grammar;
     }
 
-    public String toReadableJSONString() {
+    @Override
+    public String getStatus() {
         StringBuilder sb = new StringBuilder();
 
         sb.append('{');
@@ -547,7 +548,8 @@ public class LL1Compiler implements Compiler {
         return sb.toString();
     }
 
-    public String toMarkDownAnalysisTable() {
+    @Override
+    public String getForecastAnalysisTable() {
         StringBuilder sb = new StringBuilder();
 
         String separator = "|";
@@ -589,7 +591,6 @@ public class LL1Compiler implements Compiler {
                     .append(' ');
 
             for (Symbol terminator : terminatorSymbols) {
-                boolean exists = false;
 
                 PrimaryProduction ppA = null;
 
@@ -777,10 +778,10 @@ public class LL1Compiler implements Compiler {
         }
 
         /**
-         * 将已消除直接/间接左递归的非终结符j的产生式代入产生式i中
+         * 将已消除直接/间接左递归的非终结符_AJ的产生式，代入左部为非终结符_AI的产生式中
          *
-         * @param _AI
-         * @param _AJ
+         * @param _AI 被替换的非终结符
+         * @param _AJ 用于替换的非终结符
          */
         private void substitutionNonTerminator(Symbol _AI, Symbol _AJ) {
 
@@ -838,7 +839,7 @@ public class LL1Compiler implements Compiler {
          * p2: A  → β1A′|β2A′|...|βmA′
          * p3: A′ → α1A′|α2A′|...|αnA′|ε
          *
-         * @param _A
+         * @param _A 产生式左侧非终结符
          */
         private void eliminateDirectLeftRecursion(Symbol _A) {
             Production p1 = productionMap.get(_A);
@@ -927,7 +928,7 @@ public class LL1Compiler implements Compiler {
          * p2: A  → aA′|γ1|γ2|...|γm
          * p3: A′ → β1|β2|...|βn
          *
-         * @param _A
+         * @param _A 产生式左部的非终结符
          */
         private void extractLeftCommonFactor(Symbol _A) {
             if (_A.equals(Symbol.START)) {
@@ -1025,7 +1026,7 @@ public class LL1Compiler implements Compiler {
         /**
          * 除去计数值为1的公共前缀
          *
-         * @param commonPrefixes
+         * @param commonPrefixes 公共前缀映射表
          */
         private void filterPrefixWithSingleCount(Map<Symbol, Integer> commonPrefixes) {
             List<Symbol> removeKeys = new ArrayList<>();

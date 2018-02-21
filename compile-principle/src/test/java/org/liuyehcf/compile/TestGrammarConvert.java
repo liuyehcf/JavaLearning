@@ -2,8 +2,8 @@ package org.liuyehcf.compile;
 
 import org.junit.Test;
 import org.liuyehcf.compile.definition.Grammar;
-import org.liuyehcf.compile.definition.Production;
 import org.liuyehcf.compile.definition.PrimaryProduction;
+import org.liuyehcf.compile.definition.Production;
 
 import static org.junit.Assert.assertEquals;
 import static org.liuyehcf.compile.definition.Symbol.createNonTerminator;
@@ -45,7 +45,7 @@ public class TestGrammarConvert {
                 )
         );
 
-        Grammar convertedGrammar = LL1Compiler.GrammarConverter.convert(grammar);
+        Grammar convertedGrammar = LLParserImpl.GrammarConverter.convert(grammar);
 
         assertEquals(
                 "{\"productions\":[\"E → ( E ) (E)′ | id (E)′ |\",\"(E)′ → + E (E)′ | * E (E)′ | __EPSILON__ |\",\"__START__ → E |\"]}",
@@ -94,7 +94,7 @@ public class TestGrammarConvert {
                 )
         );
 
-        Grammar convertedGrammar = LL1Compiler.GrammarConverter.convert(grammar);
+        Grammar convertedGrammar = LLParserImpl.GrammarConverter.convert(grammar);
 
         assertEquals(
                 "{\"productions\":[\"D → ( E ) (E)′ | id (E)′ |\",\"E → ( E ) (E)′ | id (E)′ |\",\"(E)′ → + E (E)′ | * E (E)′ | __EPSILON__ |\",\"__START__ → D |\"]}",
@@ -151,7 +151,7 @@ public class TestGrammarConvert {
                 )
         );
 
-        Grammar convertedGrammar = LL1Compiler.GrammarConverter.convert(grammar);
+        Grammar convertedGrammar = LLParserImpl.GrammarConverter.convert(grammar);
 
         assertEquals(
                 "{\"productions\":[\"D → ( E ) (E)′ e | id (E)′ e | e E |\",\"E → ( E ) (E)′ | id (E)′ |\",\"(E)′ → + E (E)′ | * E (E)′ | __EPSILON__ |\",\"__START__ → D |\"]}",
@@ -193,7 +193,7 @@ public class TestGrammarConvert {
                 )
         );
 
-        Grammar convertedGrammar = LL1Compiler.GrammarConverter.convert(grammar);
+        Grammar convertedGrammar = LLParserImpl.GrammarConverter.convert(grammar);
 
         assertEquals(
                 "{\"productions\":[\"A → b (A)′′ | a (A)′ |\",\"(A)′ → b (A)′′′ |\",\"(A)′′ → d | c |\",\"(A)′′′ → __EPSILON__ | c |\",\"__START__ → A |\"]}",
@@ -245,7 +245,7 @@ public class TestGrammarConvert {
                 )
         );
 
-        Grammar convertedGrammar = LL1Compiler.GrammarConverter.convert(grammar);
+        Grammar convertedGrammar = LLParserImpl.GrammarConverter.convert(grammar);
 
         assertEquals(
                 "{\"productions\":[\"A → a (A)′ | γ1 | γ2 | γm |\",\"(A)′ → β1 | β2 | βn |\",\"__START__ → A |\"]}",
@@ -328,7 +328,7 @@ public class TestGrammarConvert {
                 )
         );
 
-        Grammar convertedGrammar = LL1Compiler.GrammarConverter.convert(grammar);
+        Grammar convertedGrammar = LLParserImpl.GrammarConverter.convert(grammar);
 
         assertEquals(
                 "{\"productions\":[\"A → c (A)′′′ | b (A)′′ | a (A)′ | d |\",\"(A)′ → b (A)′′′′′ | __EPSILON__ |\",\"(A)′′ → c (A)′′′′ | __EPSILON__ |\",\"(A)′′′ → __EPSILON__ | d |\",\"(A)′′′′ → __EPSILON__ | d |\",\"(A)′′′′′ → c (A)′′′′′′ | __EPSILON__ |\",\"__START__ → A |\",\"(A)′′′′′′ → __EPSILON__ | d |\"]}",

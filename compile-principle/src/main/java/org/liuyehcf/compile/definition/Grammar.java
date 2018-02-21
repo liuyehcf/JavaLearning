@@ -22,6 +22,25 @@ public class Grammar {
         init();
     }
 
+    public static Grammar create(Production... productions) {
+        return new Grammar(ListUtils.of(productions));
+    }
+
+    public static Grammar create(List<Production> productions) {
+        return new Grammar(productions);
+    }
+
+    public static Production parallelProduction(Production p1, Production p2) {
+        assertTrue(p1.getLeft().equals(p2.getLeft()));
+
+        List<PrimaryProduction> right = new ArrayList<>(p1.getRight());
+        right.addAll(p2.getRight());
+
+        return Production.create(
+                p1.getLeft(),
+                right);
+    }
+
     private void init() {
         boolean containsStartSymbol = false;
 
@@ -46,25 +65,6 @@ public class Grammar {
                     )
             );
         }
-    }
-
-    public static Grammar create(Production... productions) {
-        return new Grammar(ListUtils.of(productions));
-    }
-
-    public static Grammar create(List<Production> productions) {
-        return new Grammar(productions);
-    }
-
-    public static Production parallelProduction(Production p1, Production p2) {
-        assertTrue(p1.getLeft().equals(p2.getLeft()));
-
-        List<PrimaryProduction> right = new ArrayList<>(p1.getRight());
-        right.addAll(p2.getRight());
-
-        return Production.create(
-                p1.getLeft(),
-                right);
     }
 
     public List<Production> getProductions() {

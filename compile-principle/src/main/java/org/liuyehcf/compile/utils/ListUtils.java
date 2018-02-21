@@ -32,11 +32,9 @@ public abstract class ListUtils {
         return newList;
     }
 
-    public static <T> List<T> of(List<T>... lists) {
-        List<T> newList = new ArrayList<>();
-        for (List<T> list : lists) {
-            newList.addAll(list);
-        }
+    public static <T> List<T> of(List<T> list1, List<T> list2) {
+        List<T> newList = new ArrayList<>(list1);
+        newList.addAll(list2);
         return newList;
     }
 }
