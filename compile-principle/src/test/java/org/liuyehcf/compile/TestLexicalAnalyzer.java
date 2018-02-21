@@ -24,6 +24,7 @@ public class TestLexicalAnalyzer {
         }
     }
 
+
     private String getIdRegex() {
         String digit = "[0-9]";
         String letter = "[a-zA-Z_]";

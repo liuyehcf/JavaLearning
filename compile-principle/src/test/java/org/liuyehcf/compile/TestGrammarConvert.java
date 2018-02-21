@@ -48,7 +48,7 @@ public class TestGrammarConvert {
         Grammar convertedGrammar = LL1Compiler.GrammarConverter.convert(grammar);
 
         assertEquals(
-                "{\"productions\":[\"E → (E)E′|idE′\",\"E′ → +EE′|*EE′|__EPSILON__\",\"__START__ → (E)E′|idE′\"]}",
+                "{\"productions\":[\"E → (E)E′|idE′\",\"E′ → +EE′|*EE′|__EPSILON__\",\"__START__ → E\"]}",
                 convertedGrammar.toReadableJSONString()
         );
     }
@@ -97,7 +97,7 @@ public class TestGrammarConvert {
         Grammar convertedGrammar = LL1Compiler.GrammarConverter.convert(grammar);
 
         assertEquals(
-                "{\"productions\":[\"D → (E)E′|idE′\",\"E → (E)E′|idE′\",\"E′ → +EE′|*EE′|__EPSILON__\",\"__START__ → (E)E′|idE′\"]}",
+                "{\"productions\":[\"D → (E)E′|idE′\",\"E → (E)E′|idE′\",\"E′ → +EE′|*EE′|__EPSILON__\",\"__START__ → D\"]}",
                 convertedGrammar.toReadableJSONString()
         );
     }
@@ -154,7 +154,7 @@ public class TestGrammarConvert {
         Grammar convertedGrammar = LL1Compiler.GrammarConverter.convert(grammar);
 
         assertEquals(
-                "{\"productions\":[\"D → (E)E′e|idE′e|eE\",\"E → (E)E′|idE′\",\"E′ → +EE′|*EE′|__EPSILON__\",\"__START__ → (E)E′e|idE′e|eE\"]}",
+                "{\"productions\":[\"D → (E)E′e|idE′e|eE\",\"E → (E)E′|idE′\",\"E′ → +EE′|*EE′|__EPSILON__\",\"__START__ → D\"]}",
                 convertedGrammar.toReadableJSONString()
         );
     }
@@ -196,7 +196,7 @@ public class TestGrammarConvert {
         Grammar convertedGrammar = LL1Compiler.GrammarConverter.convert(grammar);
 
         assertEquals(
-                "{\"productions\":[\"A → bA′′|aA′\",\"A′ → bA′′′\",\"A′′ → d|c\",\"A′′′ → __EPSILON__|c\",\"__START__ → bA′′|aA′\"]}",
+                "{\"productions\":[\"A → bA′′|aA′\",\"A′ → bA′′′\",\"A′′ → d|c\",\"A′′′ → __EPSILON__|c\",\"__START__ → A\"]}",
                 convertedGrammar.toReadableJSONString()
         );
     }
@@ -248,7 +248,7 @@ public class TestGrammarConvert {
         Grammar convertedGrammar = LL1Compiler.GrammarConverter.convert(grammar);
 
         assertEquals(
-                "{\"productions\":[\"A → aA′|γ1|γ2|γm\",\"A′ → β1|β2|βn\",\"__START__ → aA′|γ1|γ2|γm\"]}",
+                "{\"productions\":[\"A → aA′|γ1|γ2|γm\",\"A′ → β1|β2|βn\",\"__START__ → A\"]}",
                 convertedGrammar.toReadableJSONString()
         );
     }
@@ -331,7 +331,7 @@ public class TestGrammarConvert {
         Grammar convertedGrammar = LL1Compiler.GrammarConverter.convert(grammar);
 
         assertEquals(
-                "{\"productions\":[\"A → cA′′′|bA′′|aA′|d\",\"A′ → bA′′′′′|__EPSILON__\",\"A′′ → cA′′′′|__EPSILON__\",\"A′′′ → __EPSILON__|d\",\"A′′′′ → __EPSILON__|d\",\"A′′′′′ → cA′′′′′′|__EPSILON__\",\"__START__ → cA′′′|bA′′|aA′|d\",\"A′′′′′′ → __EPSILON__|d\"]}",
+                "{\"productions\":[\"A → cA′′′|bA′′|aA′|d\",\"A′ → bA′′′′′|__EPSILON__\",\"A′′ → cA′′′′|__EPSILON__\",\"A′′′ → __EPSILON__|d\",\"A′′′′ → __EPSILON__|d\",\"A′′′′′ → cA′′′′′′|__EPSILON__\",\"__START__ → A\",\"A′′′′′′ → __EPSILON__|d\"]}",
                 convertedGrammar.toReadableJSONString()
         );
     }

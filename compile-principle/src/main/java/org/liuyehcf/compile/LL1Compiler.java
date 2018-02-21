@@ -242,6 +242,11 @@ public class LL1Compiler implements Compiler {
                 canBreak = false;
             }
         }
+
+        // 检查一下是否所有的非终结符都有了follow集
+        for (Symbol nonTerminator : nonTerminatorSymbols) {
+            assertFalse(follows.get(nonTerminator).isEmpty());
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -358,14 +363,13 @@ public class LL1Compiler implements Compiler {
                 }
             }
         } catch (ParseException e) {
-            e.printStackTrace();
             return false;
         }
 
         return true;
     }
 
-    private SymbolSequence findProductionByToken(Symbol symbol, Token token) {
+    private SymbolSequence findProductionByToken(Symbol symbol, Token token) throws ParseException {
         String key = token.getId();
 
         Map<SymbolSequence, Set<Symbol>> map = selects.get(symbol);
@@ -380,7 +384,9 @@ public class LL1Compiler implements Compiler {
             }
         }
 
-        assertNotNull(selectedOne);
+        if (selectedOne == null) {
+            throw new ParseException();
+        }
 
         return selectedOne;
     }
@@ -716,6 +722,10 @@ public class LL1Compiler implements Compiler {
          */
         private void substitutionNonTerminator(Symbol _AI, Symbol _AJ) {
 
+            if (_AI.equals(Symbol.START)) {
+                return;
+            }
+
             Production pI = productionMap.get(_AI);
             Production pJ = productionMap.get(_AJ);
 
@@ -858,6 +868,10 @@ public class LL1Compiler implements Compiler {
          * @param _A
          */
         private void extractLeftCommonFactor(Symbol _A) {
+            if (_A.equals(Symbol.START)) {
+                return;
+            }
+
             Production p1 = productionMap.get(_A);
 
             // 所有平凡前缀计数
