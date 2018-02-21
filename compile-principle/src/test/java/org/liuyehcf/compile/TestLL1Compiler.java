@@ -1,12 +1,14 @@
 package org.liuyehcf.compile;
 
 import org.junit.Test;
+import org.liuyehcf.compile.core.MorphemeType;
 import org.liuyehcf.compile.definition.Grammar;
 import org.liuyehcf.compile.definition.Production;
 import org.liuyehcf.compile.definition.Symbol;
 import org.liuyehcf.compile.definition.SymbolSequence;
 
 import static org.junit.Assert.*;
+import static org.liuyehcf.compile.TestLexicalAnalyzer.getIdRegex;
 import static org.liuyehcf.compile.definition.Symbol.createNonTerminator;
 import static org.liuyehcf.compile.definition.Symbol.createTerminator;
 
@@ -362,7 +364,88 @@ public class TestLL1Compiler {
 
     }
 
+    @Test
+    public void testParseCase3() {
+        Grammar grammar = Grammar.create(
+                Production.create(
+                        createNonTerminator("E"),
+                        SymbolSequence.create(
+                                createNonTerminator("T"),
+                                createNonTerminator("E^")
+                        )
+                ),
+                Production.create(
+                        createNonTerminator("E^"),
+                        SymbolSequence.create(
+                                createTerminator("+"),
+                                createNonTerminator("T"),
+                                createNonTerminator("E^")
+                        )
+                ),
+                Production.create(
+                        createNonTerminator("E^"),
+                        SymbolSequence.create(
+                                Symbol.EPSILON
+                        )
+                ),
+                Production.create(
+                        createNonTerminator("T"),
+                        SymbolSequence.create(
+                                createNonTerminator("F"),
+                                createNonTerminator("T^")
+                        )
+                ),
+                Production.create(
+                        createNonTerminator("T^"),
+                        SymbolSequence.create(
+                                createTerminator("*"),
+                                createNonTerminator("F"),
+                                createNonTerminator("T^")
+                        )
+                ),
+                Production.create(
+                        createNonTerminator("T^"),
+                        SymbolSequence.create(
+                                Symbol.EPSILON
+                        )
+                ),
+                Production.create(
+                        createNonTerminator("F"),
+                        SymbolSequence.create(
+                                createTerminator("("),
+                                createNonTerminator("E"),
+                                createTerminator(")")
+                        )
+                ),
+                Production.create(
+                        createNonTerminator("F"),
+                        SymbolSequence.create(
+                                createTerminator("id")
+                        )
+                )
+        );
+
+        LexicalAnalyzer analyzer = LexicalAnalyzer.builder()
+                .addMorpheme("(")
+                .addMorpheme(")")
+                .addMorpheme("+")
+                .addMorpheme("*")
+                .addMorpheme("id", getIdRegex(), MorphemeType.REGEX)
+                .build();
+
+
+        Compiler compiler = new LL1Compiler(grammar, analyzer);
+
+        assertTrue(compiler.isSentence("A12+B*D"));
+        assertTrue(compiler.isSentence("(a+b01)*d03"));
+        assertTrue(compiler.isSentence("(asdfsdfDASDF323+ASDFC0102D*d23234+(asdf+dd)*(d1d*k9))"));
+        assertFalse(compiler.isSentence("000+(id*id)"));
+        assertFalse(compiler.isSentence("()"));
+    }
+
     private LexicalAnalyzer getDefaultLexicalAnalyzer() {
-        return LexicalAnalyzer.builder().build();
+        return LexicalAnalyzer.builder()
+                .addMorpheme("NULL")
+                .build();
     }
 }

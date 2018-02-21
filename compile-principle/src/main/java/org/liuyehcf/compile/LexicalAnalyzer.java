@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.liuyehcf.compile.utils.AssertUtils.assertFalse;
 import static org.liuyehcf.compile.utils.AssertUtils.assertTrue;
 
 /**
@@ -44,6 +45,15 @@ public class LexicalAnalyzer {
         // 正则表达式group -> 词素id 的映射表
         private Map<Integer, String> groups = new HashMap<>();
 
+        // 词素类型 -> (词素id,词素) 的映射表（为了在构造正则表达式的时候按类型排序）
+        private Map<MorphemeType, List<Pair<String, String>>> types = new HashMap<>();
+
+        private Builder() {
+            for (MorphemeType type : MorphemeType.values()) {
+                types.put(type, new ArrayList<>());
+            }
+        }
+
         public Builder addMorpheme(String morpheme) {
             return addMorpheme(morpheme, morpheme, MorphemeType.NORMAL);
         }
@@ -78,37 +88,42 @@ public class LexicalAnalyzer {
                 throw new IllegalArgumentException("id repeated");
             }
             morphemes.put(id, new Pair<>(morpheme, type));
+
+            types.get(type).add(new Pair<>(id, morpheme));
+
             return this;
         }
 
         public LexicalAnalyzer build() {
             StringBuilder regex = new StringBuilder();
 
+            // 正则表达式中的组号
             int groupId = 1;
 
-            for (Map.Entry<String, Pair<String, MorphemeType>> entry : morphemes.entrySet()) {
-                String id = entry.getKey();
-                String morpheme = entry.getValue().getFirst();
+            for (MorphemeType type : MorphemeType.values()) {
+                for (Pair<String, String> pair : types.get(type)) {
+                    String id = pair.getFirst();
+                    String morpheme = pair.getSecond();
 
-                regex.append('(').append(morpheme)
-                        .append(')').append("|");
+                    regex.append('(').append(morpheme)
+                            .append(')').append("|");
 
-                groups.put(groupId++, id);
+                    groups.put(groupId++, id);
 
-                // 跳过正则表达式中的括号
-                for (int i = 0; i < morpheme.length(); i++) {
-                    char c = morpheme.charAt(i);
+                    // 跳过正则表达式中的括号
+                    for (int i = 0; i < morpheme.length(); i++) {
+                        char c = morpheme.charAt(i);
 
-                    if (c == '('
-                            && (i == 0 || morpheme.charAt(i - 1) != '\\')) {
-                        groupId++;
+                        if (c == '('
+                                && (i == 0 || morpheme.charAt(i - 1) != '\\')) {
+                            groupId++;
+                        }
                     }
                 }
             }
 
-            if (!morphemes.isEmpty()) {
-                regex.setLength(regex.length() - 1);
-            }
+            assertFalse(morphemes.isEmpty());
+            regex.setLength(regex.length() - 1);
 
             Pattern pattern;
             try {
