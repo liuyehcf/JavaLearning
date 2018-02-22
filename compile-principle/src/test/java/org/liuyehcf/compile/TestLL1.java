@@ -467,6 +467,114 @@ public class TestLL1 {
         assertFalse(parser.isMatch("()"));
     }
 
+    @Test
+    public void testParseCase4() {
+        Grammar grammar = Grammar.create(
+                Production.create(
+                        createNonTerminator("A"),
+                        PrimaryProduction.create(
+                                createTerminator("a")
+                        )
+                ),
+                Production.create(
+                        createNonTerminator("A"),
+                        PrimaryProduction.create(
+                                createTerminator("a"),
+                                createTerminator("b")
+                        )
+                ),
+                Production.create(
+                        createNonTerminator("A"),
+                        PrimaryProduction.create(
+                                createTerminator("a"),
+                                createTerminator("b"),
+                                createTerminator("c")
+                        )
+                ),
+                Production.create(
+                        createNonTerminator("A"),
+                        PrimaryProduction.create(
+                                createTerminator("a"),
+                                createTerminator("b"),
+                                createTerminator("c"),
+                                createTerminator("d")
+                        )
+                ),
+                Production.create(
+                        createNonTerminator("A"),
+                        PrimaryProduction.create(
+                                createTerminator("b")
+                        )
+                ),
+                Production.create(
+                        createNonTerminator("A"),
+                        PrimaryProduction.create(
+                                createTerminator("b"),
+                                createTerminator("c")
+                        )
+                ),
+                Production.create(
+                        createNonTerminator("A"),
+                        PrimaryProduction.create(
+                                createTerminator("b"),
+                                createTerminator("c"),
+                                createTerminator("d")
+                        )
+                ),
+                Production.create(
+                        createNonTerminator("A"),
+                        PrimaryProduction.create(
+                                createTerminator("c")
+                        )
+                ),
+                Production.create(
+                        createNonTerminator("A"),
+                        PrimaryProduction.create(
+                                createTerminator("c"),
+                                createTerminator("d")
+                        )
+                ),
+                Production.create(
+                        createNonTerminator("A"),
+                        PrimaryProduction.create(
+                                createTerminator("d")
+                        )
+                )
+        );
+
+        LexicalAnalyzer analyzer = LexicalAnalyzer.builder()
+                .addMorpheme("a")
+                .addMorpheme("ab")
+                .addMorpheme("abc")
+                .addMorpheme("abcd")
+                .addMorpheme("b")
+                .addMorpheme("bc")
+                .addMorpheme("bcd")
+                .addMorpheme("c")
+                .addMorpheme("cd")
+                .addMorpheme("d")
+                .build();
+
+
+        LLParser parser = new LL1(grammar, analyzer);
+
+        assertTrue(parser.isMatch("a"));
+        assertTrue(parser.isMatch("ab"));
+        assertTrue(parser.isMatch("abc"));
+        assertTrue(parser.isMatch("abcd"));
+        assertTrue(parser.isMatch("b"));
+        assertTrue(parser.isMatch("bc"));
+        assertTrue(parser.isMatch("bcd"));
+        assertTrue(parser.isMatch("c"));
+        assertTrue(parser.isMatch("cd"));
+        assertTrue(parser.isMatch("d"));
+
+        assertFalse(parser.isMatch("e"));
+        assertFalse(parser.isMatch("ba"));
+        assertFalse(parser.isMatch("ac"));
+        assertFalse(parser.isMatch("bdc"));
+    }
+
     private LexicalAnalyzer getDefaultLexicalAnalyzer() {
         return LexicalAnalyzer.builder()
                 .addMorpheme("NULL")
