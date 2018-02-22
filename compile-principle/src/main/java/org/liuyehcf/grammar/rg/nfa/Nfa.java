@@ -1,9 +1,9 @@
 package org.liuyehcf.grammar.rg.nfa;
 
 import org.liuyehcf.grammar.definition.Grammar;
-import org.liuyehcf.grammar.definition.PrimaryProduction;
 import org.liuyehcf.grammar.definition.Symbol;
 import org.liuyehcf.grammar.rg.RGParser;
+import org.liuyehcf.grammar.rg.utils.GrammarUtils;
 import org.liuyehcf.grammar.rg.utils.SymbolUtils;
 
 import java.util.HashSet;
@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Set;
 
 import static org.liuyehcf.grammar.rg.nfa.NfaBuildIterator.createNfaClosuresMap;
-import static org.liuyehcf.grammar.utils.AssertUtils.assertTrue;
 
 
 /**
@@ -37,12 +36,8 @@ public class Nfa implements RGParser {
     }
 
     private void init() {
-        assertTrue(grammar.getProductions().size() == 1);
-        assertTrue(grammar.getProductions().get(0).getRight().size() == 1);
-        PrimaryProduction pp = grammar.getProductions().get(0).getRight().get(0);
-        List<Symbol> symbols = pp.getSymbols();
-
-        groupNfaClosures = createNfaClosuresMap(symbols);
+        groupNfaClosures = createNfaClosuresMap(
+                GrammarUtils.extractSymbolsFromGrammar(grammar));
     }
 
     @Override
@@ -88,13 +83,13 @@ public class Nfa implements RGParser {
         return false;
     }
 
-    //todo @Override
+    @Override
     public void print() {
         assert getWholeNfaClosure() != null;
         getWholeNfaClosure().print();
     }
 
-    //todo @Override
+    @Override
     public void printAllGroup() {
         for (int group = 0; group < groupNfaClosures.size(); group++) {
             System.out.println("Group [" + group + "]");

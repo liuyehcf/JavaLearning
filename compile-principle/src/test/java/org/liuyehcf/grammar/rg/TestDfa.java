@@ -1,7 +1,6 @@
 package org.liuyehcf.grammar.rg;
 
 import org.junit.Test;
-import org.liuyehcf.grammar.rg.utils.RegexAutoMachine;
 import org.liuyehcf.grammar.rg.utils.TestCaseBuilder;
 
 import java.util.ArrayList;
@@ -38,7 +37,7 @@ public class TestDfa {
                                boolean testRandomCases,
                                boolean printRandomCases,
                                int randomTimes) {
-        RGParser matcher = RegexAutoMachine.compile(regex).getDfaMatcher();
+        RGParser parser = RGBuilder.compile(regex).buildDfa();
 
         if (testAllPossibleCases) {
             Set<String> matchedCases = TestCaseBuilder.createAllOptionalTestCasesWithRegex(regex);
@@ -46,7 +45,7 @@ public class TestDfa {
                 System.out.println(matchedCases);
                 System.out.println("\n============================\n");
             }
-            testDfaWithMatchedCases(matcher, matchedCases);
+            testDfaWithMatchedCases(parser, matchedCases);
         }
 
         if (testRandomCases) {
@@ -55,15 +54,15 @@ public class TestDfa {
                 System.out.println(matchedCases);
                 System.out.println("\n============================\n");
             }
-            testDfaWithMatchedCases(matcher, matchedCases);
+            testDfaWithMatchedCases(parser, matchedCases);
         }
     }
 
 
-    private void testDfaWithMatchedCases(RGParser matcher, Set<String> matchedCases) {
+    private void testDfaWithMatchedCases(RGParser parser, Set<String> matchedCases) {
         List<String> unPassedCases = new ArrayList<>();
         for (String matchedCase : matchedCases) {
-            if (!matcher.isMatch(matchedCase)) {
+            if (!parser.isMatch(matchedCase)) {
                 unPassedCases.add(matchedCase);
             }
         }

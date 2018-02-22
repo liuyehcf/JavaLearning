@@ -4,22 +4,56 @@ import org.liuyehcf.grammar.definition.Grammar;
 import org.liuyehcf.grammar.definition.PrimaryProduction;
 import org.liuyehcf.grammar.definition.Production;
 import org.liuyehcf.grammar.definition.Symbol;
+import org.liuyehcf.grammar.rg.dfa.Dfa;
+import org.liuyehcf.grammar.rg.nfa.Nfa;
+import org.liuyehcf.grammar.rg.utils.GrammarUtils;
 import org.liuyehcf.grammar.rg.utils.SymbolUtils;
 
 import java.util.*;
 
 import static org.liuyehcf.grammar.utils.AssertUtils.*;
 
-public class RG implements RGParser {
+public class RGBuilder {
 
-    @Override
-    public boolean isMatch(String expression) {
-        return false;
+    // 正则文法
+    private final Grammar grammar;
+
+    // nfa自动机
+    private Nfa nfa;
+
+    // dfa自动机
+    private Dfa dfa;
+
+    private RGBuilder(Grammar grammar) {
+        this.grammar = grammar;
+        this.nfa = null;
+        this.dfa = null;
     }
 
-    @Override
-    public Grammar getGrammar() {
-        return null;
+    public static RGBuilder compile(String regex) {
+
+        Grammar grammar = GrammarConverter.convert(
+                GrammarUtils.createGrammarWithRegex(regex)
+        );
+
+        return new RGBuilder(grammar);
+    }
+
+    public RGParser buildNfa() {
+        if (nfa == null) {
+            nfa = new Nfa(grammar);
+        }
+        return nfa;
+    }
+
+    public RGParser buildDfa() {
+        if (dfa == null) {
+            if (nfa == null) {
+                buildNfa();
+            }
+            dfa = new Dfa(nfa);
+        }
+        return dfa;
     }
 
     public static final class GrammarConverter {
@@ -146,9 +180,9 @@ public class RG implements RGParser {
             Production production = productionMap.get(sortedNonTerminators.get(0));
 
             assertTrue(production.getRight().size() == 1);
-            PrimaryProduction symbolString = production.getRight().get(0);
+            PrimaryProduction pp = production.getRight().get(0);
 
-            for (Symbol symbol : symbolString.getSymbols()) {
+            for (Symbol symbol : pp.getSymbols()) {
                 // 正则语法第一条产生式不能包含非终结符
                 assertTrue(symbol.isTerminator());
             }
@@ -184,6 +218,5 @@ public class RG implements RGParser {
                 primaryProductionMap.put(nonTerminator, PrimaryProduction.create(modifiedSymbols));
             }
         }
-
     }
 }

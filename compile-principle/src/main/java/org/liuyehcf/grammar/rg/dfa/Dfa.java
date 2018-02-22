@@ -17,7 +17,7 @@ import java.util.*;
 public class Dfa implements RGParser {
 
     private final Nfa nfa;
-    List<DfaState> startDfaStates = new ArrayList<>();
+    private List<DfaState> startDfaStates = new ArrayList<>();
 
     public Dfa(Nfa nfa) {
         this.nfa = nfa;
@@ -49,13 +49,13 @@ public class Dfa implements RGParser {
         return null;
     }
 
-    //todo @Override
+    @Override
     public void print() {
         assert !startDfaStates.isEmpty();
         startDfaStates.get(0).print();
     }
 
-    // todo @Override
+    @Override
     public void printAllGroup() {
         for (int group = 0; group < startDfaStates.size(); group++) {
             System.out.println("Group [" + group + "]");

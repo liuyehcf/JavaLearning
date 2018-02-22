@@ -1,7 +1,6 @@
 package org.liuyehcf.grammar.rg;
 
 import org.junit.Test;
-import org.liuyehcf.grammar.rg.utils.RegexAutoMachine;
 import org.liuyehcf.grammar.rg.utils.TestCaseBuilder;
 
 import java.util.ArrayList;
@@ -37,7 +36,7 @@ public class TestNfa {
                                boolean testRandomCases,
                                boolean printRandomCases,
                                int randomTimes) {
-        RGParser matcher = RegexAutoMachine.compile(regex).getNfaMatcher();
+        RGParser parser = RGBuilder.compile(regex).buildNfa();
 
         if (testAllPossibleCases) {
             Set<String> matchedCases = TestCaseBuilder.createAllOptionalTestCasesWithRegex(regex);
@@ -45,7 +44,7 @@ public class TestNfa {
                 System.out.println(matchedCases);
                 System.out.println("\n============================\n");
             }
-            testNfaWithMatchedCases(matcher, matchedCases);
+            testNfaWithMatchedCases(parser, matchedCases);
         }
 
         if (testRandomCases) {
@@ -54,14 +53,14 @@ public class TestNfa {
                 System.out.println(matchedCases);
                 System.out.println("\n============================\n");
             }
-            testNfaWithMatchedCases(matcher, matchedCases);
+            testNfaWithMatchedCases(parser, matchedCases);
         }
     }
 
-    private void testNfaWithMatchedCases(RGParser matcher, Set<String> matchedCases) {
+    private void testNfaWithMatchedCases(RGParser parser, Set<String> matchedCases) {
         List<String> unPassedCases = new ArrayList<>();
         for (String matchedCase : matchedCases) {
-            if (!matcher.isMatch(matchedCase)) {
+            if (!parser.isMatch(matchedCase)) {
                 unPassedCases.add(matchedCase);
             }
         }
@@ -154,8 +153,8 @@ public class TestNfa {
 
     @Test
     public void testGroupPrint() {
-        RGParser matcher = RegexAutoMachine.compile("(abc(cd)(ef(g)))").getNfaMatcher();
+        RGParser parser = RGBuilder.compile("(abc(cd)(ef(g)))").buildNfa();
 
-        // matcher.printAllGroup(); todo
+         parser.printAllGroup();
     }
 }

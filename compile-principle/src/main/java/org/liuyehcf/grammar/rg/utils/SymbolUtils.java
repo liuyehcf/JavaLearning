@@ -7,6 +7,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static org.liuyehcf.grammar.definition.Symbol.createNonTerminator;
+import static org.liuyehcf.grammar.definition.Symbol.createTerminator;
 import static org.liuyehcf.grammar.utils.AssertUtils.assertTrue;
 
 public abstract class SymbolUtils {
@@ -30,7 +32,7 @@ public abstract class SymbolUtils {
             alphabetSymbols = new ArrayList<>();
             alphabetSymbolsMatchesAny = new ArrayList<>();
             for (char c = 0; c < 256; c++) {
-                alphabetSymbols.add(Symbol.createTerminator("" + c));
+                alphabetSymbols.add(createTerminator("" + c));
                 // jump over undefined chars
                 if (isLegalCharMatchesAny(c)) {
                     alphabetSymbolsMatchesAny.add(alphabetSymbols.get(c));
@@ -42,14 +44,6 @@ public abstract class SymbolUtils {
 
     public static boolean isLegalCharMatchesAny(char c) {
         return c != 10 && c != 13 && c != 133;
-    }
-
-    private static Symbol createAlphabetSymbol(String value) {
-        return Symbol.createTerminator(value);
-    }
-
-    public static Symbol createNonAlphabetSymbol(String value) {
-        return Symbol.createNonTerminator(value);
     }
 
     public static List<Symbol> getAlphabetSymbols() {

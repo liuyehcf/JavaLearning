@@ -6,6 +6,8 @@ import org.liuyehcf.grammar.definition.Production;
 import org.liuyehcf.grammar.definition.Symbol;
 import org.liuyehcf.grammar.rg.utils.GrammarUtils;
 
+import static org.liuyehcf.grammar.definition.Symbol.createNonTerminator;
+
 /**
  * Created by Liuye on 2017/10/24.
  */
@@ -58,29 +60,35 @@ public class TestRegex {
             createIdentifierRegex(),
     };
 
-    private static String createIdentifierRegex() {
-        Symbol digit = Symbol.createNonTerminator("digit");
-        Symbol letter_ = Symbol.createNonTerminator("letter_");
-        Symbol id = Symbol.createNonTerminator("id");
+    static Grammar createIdentifierGrammar() {
+        Symbol digit = createNonTerminator("digit");
+        Symbol letter_ = createNonTerminator("letter_");
+        Symbol id = createNonTerminator("id");
 
-        Grammar grammar = Grammar.create(
-                id,
-                Production.create(
-                        digit,
-                        GrammarUtils.createPrimaryProduction("[0123456789]")
-                ),
-                Production.create(
-                        letter_,
-                        GrammarUtils.createPrimaryProduction("[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_]")),
-                Production.create(
+        return RGBuilder.GrammarConverter.convert(
+                Grammar.create(
                         id,
-                        GrammarUtils.createPrimaryProduction(letter_, '(', letter_, '|', digit, ')', '*')
+                        Production.create(
+                                digit,
+                                GrammarUtils.createPrimaryProduction("[0123456789]")
+                        ),
+                        Production.create(
+                                letter_,
+                                GrammarUtils.createPrimaryProduction("[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_]")),
+                        Production.create(
+                                id,
+                                GrammarUtils.createPrimaryProduction(letter_, '(', letter_, '|', digit, ')', '*')
+                        )
                 )
         );
+    }
+
+    private static String createIdentifierRegex() {
+        Grammar grammar = createIdentifierGrammar();
 
         StringBuilder sb = new StringBuilder();
 
-        for (Symbol symbol : grammar.getProductions().get(0).getRight().get(0).getSymbols()) {
+        for (Symbol symbol : GrammarUtils.extractSymbolsFromGrammar(grammar)) {
             sb.append(symbol.getValue());
         }
 
