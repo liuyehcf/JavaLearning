@@ -27,7 +27,7 @@ public class TestLR0GrammarConvert {
         Parser parser = new LR0(grammar);
 
         assertEquals(
-                "{\"productions\":[\"S → __DOT__ b B B \",\"S → b __DOT__ B B \",\"S → b B __DOT__ B \",\"S → b B B __DOT__ \",\"__START__ → __DOT__ S \",\"__START__ → S __DOT__ \"]}",
+                "{\"productions\":[\"S → __DOT__ b B B\",\"S → b __DOT__ B B\",\"S → b B __DOT__ B\",\"S → b B B __DOT__\",\"__START__ → __DOT__ S\",\"__START__ → S __DOT__\"]}",
                 parser.getGrammar().toReadableJSONString()
         );
     }
@@ -70,7 +70,7 @@ public class TestLR0GrammarConvert {
         Parser parser = new LR0(grammar);
 
         assertEquals(
-                "{\"productions\":[\"E → __DOT__ E + E \",\"E → E __DOT__ + E \",\"E → E + __DOT__ E \",\"E → E + E __DOT__ \",\"E → __DOT__ E * E \",\"E → E __DOT__ * E \",\"E → E * __DOT__ E \",\"E → E * E __DOT__ \",\"E → __DOT__ ( E ) \",\"E → ( __DOT__ E ) \",\"E → ( E __DOT__ ) \",\"E → ( E ) __DOT__ \",\"E → __DOT__ id \",\"E → id __DOT__ \",\"__START__ → __DOT__ E \",\"__START__ → E __DOT__ \"]}",
+                "{\"productions\":[\"E → __DOT__ E + E\",\"E → E __DOT__ + E\",\"E → E + __DOT__ E\",\"E → E + E __DOT__\",\"E → __DOT__ E * E\",\"E → E __DOT__ * E\",\"E → E * __DOT__ E\",\"E → E * E __DOT__\",\"E → __DOT__ ( E )\",\"E → ( __DOT__ E )\",\"E → ( E __DOT__ )\",\"E → ( E ) __DOT__\",\"E → __DOT__ id\",\"E → id __DOT__\",\"__START__ → __DOT__ E\",\"__START__ → E __DOT__\"]}",
                 parser.getGrammar().toReadableJSONString()
         );
     }

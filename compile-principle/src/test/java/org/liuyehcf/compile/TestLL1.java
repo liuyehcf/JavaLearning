@@ -79,7 +79,7 @@ public class TestLL1 {
         Grammar convertedGrammar = parser.getGrammar();
 
         assertEquals(
-                "{\"productions\":[\"__START__ → E \",\"E′ → + T E′ | __EPSILON__ \",\"T′ → * F T′ | __EPSILON__ \",\"T → ( E ) T′ | id T′ \",\"E → ( E ) T′ E′ | id T′ E′ \",\"F → ( E ) | id \"]}",
+                "{\"productions\":[\"__START__ → E\",\"E′ → + T E′ | __EPSILON__\",\"T′ → * F T′ | __EPSILON__\",\"T → ( E ) T′ | id T′\",\"E → ( E ) T′ E′ | id T′ E′\",\"F → ( E ) | id\"]}",
                 convertedGrammar.toReadableJSONString()
         );
         assertEquals(
@@ -183,7 +183,7 @@ public class TestLL1 {
         Grammar convertedGrammar = parser.getGrammar();
 
         assertEquals(
-                "{\"productions\":[\"DECLIST → id DECLISTN \",\"DECLISTN → , id DECLISTN | __EPSILON__ \",\"__START__ → PROGRAM \",\"TYPE → real | int \",\"STLISTN → ; s STLISTN | __EPSILON__ \",\"PROGRAM → program DECLIST : TYPE ; STLIST end \",\"STLIST → s STLISTN \"]}",
+                "{\"productions\":[\"DECLIST → id DECLISTN\",\"DECLISTN → , id DECLISTN | __EPSILON__\",\"__START__ → PROGRAM\",\"TYPE → real | int\",\"STLISTN → ; s STLISTN | __EPSILON__\",\"PROGRAM → program DECLIST : TYPE ; STLIST end\",\"STLIST → s STLISTN\"]}",
                 convertedGrammar.toReadableJSONString()
         );
         assertEquals(

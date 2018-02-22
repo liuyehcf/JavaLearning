@@ -63,7 +63,7 @@ public class Production {
         }
 
         assertFalse(right.isEmpty());
-        sb.setLength(sb.length() - 2);
+        sb.setLength(sb.length() - 3);
 
         sb.append('\"');
 
