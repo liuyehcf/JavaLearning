@@ -1,8 +1,8 @@
 package org.liuyehcf.algorithm.compile.grammar.regex;
 
-import org.liuyehcf.algorithm.compile.grammar.regex.composition.GrammarDefinition;
+import org.liuyehcf.algorithm.compile.grammar.regex.composition.Grammar;
 import org.liuyehcf.algorithm.compile.grammar.regex.composition.Production;
-import org.liuyehcf.algorithm.compile.grammar.regex.composition.SymbolString;
+import org.liuyehcf.algorithm.compile.grammar.regex.composition.PrimeProduction;
 import org.liuyehcf.algorithm.compile.grammar.regex.symbol.Symbol;
 
 /**
@@ -62,10 +62,10 @@ public class TestRegex {
         Symbol letter_ = Symbol.createNonAlphabetSymbol("letter_");
         Symbol id = Symbol.createNonAlphabetSymbol("id");
 
-        GrammarDefinition grammarDefinition = new GrammarDefinition(
-                new Production(digit, new SymbolString("[0123456789]")),
-                new Production(letter_, new SymbolString("[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_]")),
-                new Production(id, new SymbolString(letter_, '(', letter_, '|', digit, ')', '*')));
+        Grammar grammarDefinition = new Grammar(
+                new Production(digit, new PrimeProduction("[0123456789]")),
+                new Production(letter_, new PrimeProduction("[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_]")),
+                new Production(id, new PrimeProduction(letter_, '(', letter_, '|', digit, ')', '*')));
 
         return grammarDefinition.getFinalSymbolString().toString();
     }

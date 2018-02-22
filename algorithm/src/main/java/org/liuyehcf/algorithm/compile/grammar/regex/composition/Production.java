@@ -6,29 +6,29 @@ import org.liuyehcf.algorithm.compile.grammar.regex.symbol.Symbol;
  * Created by Liuye on 2017/10/21.
  */
 public class Production {
-    private final Symbol nonAlphabetSymbol;
-    private final SymbolString symbolString;
+    private final Symbol left;
+    private final PrimeProduction right;
 
-    public Production(Symbol nonAlphabetSymbol,
-                      SymbolString symbolString) {
-        this.nonAlphabetSymbol = nonAlphabetSymbol;
-        this.symbolString = symbolString;
+    public Production(Symbol left,
+                      PrimeProduction right) {
+        this.left = left;
+        this.right = right;
     }
 
-    public Symbol getNonAlphabetSymbol() {
-        return nonAlphabetSymbol;
+    public Symbol getLeft() {
+        return left;
     }
 
-    public SymbolString getSymbolString() {
-        return symbolString;
+    public PrimeProduction getRight() {
+        return right;
     }
 
     @Override
     public String toString() {
         String s = "";
-        s += nonAlphabetSymbol.toString();
+        s += left.toString();
         s += " --> ";
-        s += symbolString.toString();
+        s += right.toString();
         s += "\n";
         return s;
     }

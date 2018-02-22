@@ -22,12 +22,12 @@ public class Symbol {
     public static final Symbol _middleParenthesisNot = getAlphabetSymbolWithChar('^');
     public static final Symbol _leftSmallParenthesis = getAlphabetSymbolWithChar('(');
     public static final Symbol _rightSmallParenthesis = getAlphabetSymbolWithChar(')');
-    private final String symbol;
-    private final boolean isOfAlphabet;
+    private final String value;
+    private final boolean isTerminator;
 
-    public Symbol(String symbol, boolean isOfAlphabet) {
-        this.symbol = symbol;
-        this.isOfAlphabet = isOfAlphabet;
+    public Symbol(String value, boolean isTerminator) {
+        this.value = value;
+        this.isTerminator = isTerminator;
     }
 
     public static Symbol getAlphabetSymbolWithChar(char symbol) {
@@ -74,26 +74,26 @@ public class Symbol {
         return oppositeSymbols;
     }
 
-    public String getSymbol() {
-        return symbol;
+    public String getValue() {
+        return value;
     }
 
     public char getChar() {
-        assert symbol.length() == 1;
-        return symbol.charAt(0);
+        assert value.length() == 1;
+        return value.charAt(0);
     }
 
-    public boolean isOfAlphabet() {
-        return isOfAlphabet;
+    public boolean isTerminator() {
+        return isTerminator;
     }
 
     protected String getTypeName() {
-        return isOfAlphabet ? "Alphabet" : "NonAlphabet";
+        return isTerminator ? "Alphabet" : "NonAlphabet";
     }
 
     @Override
     public String toString() {
-        return this.symbol;
+        return this.value;
     }
 
     @Override
@@ -103,8 +103,8 @@ public class Symbol {
 
     @Override
     public boolean equals(Object obj) {
-        return this.symbol.equals(((Symbol) obj).symbol)
-                && this.isOfAlphabet() == ((Symbol) obj).isOfAlphabet;
+        return this.value.equals(((Symbol) obj).value)
+                && this.isTerminator() == ((Symbol) obj).isTerminator;
 
     }
 }

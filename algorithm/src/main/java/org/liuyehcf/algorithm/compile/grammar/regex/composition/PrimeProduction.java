@@ -8,10 +8,10 @@ import java.util.List;
 /**
  * Created by Liuye on 2017/10/21.
  */
-public class SymbolString {
+public class PrimeProduction {
     private final List<Symbol> symbols;
 
-    public SymbolString(Object... objects) {
+    public PrimeProduction(Object... objects) {
         this.symbols = new ArrayList<>();
         for (Object obj : objects) {
             if (obj instanceof Character) {
@@ -26,7 +26,7 @@ public class SymbolString {
         }
     }
 
-    public SymbolString(List<Symbol> symbols) {
+    public PrimeProduction(List<Symbol> symbols) {
         this.symbols = symbols;
     }
 
@@ -39,7 +39,7 @@ public class SymbolString {
     }
 
     private void addNonAlphabetSymbol(Symbol symbol) {
-        assert !symbol.isOfAlphabet();
+        assert !symbol.isTerminator();
         this.symbols.add(symbol);
     }
 

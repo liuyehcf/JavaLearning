@@ -1,8 +1,8 @@
 package org.liuyehcf.algorithm.compile.grammar.regex.nfa;
 
-import org.liuyehcf.algorithm.compile.grammar.regex.composition.GrammarDefinition;
+import org.liuyehcf.algorithm.compile.grammar.regex.composition.Grammar;
 import org.liuyehcf.algorithm.compile.grammar.regex.composition.Matcher;
-import org.liuyehcf.algorithm.compile.grammar.regex.composition.SymbolString;
+import org.liuyehcf.algorithm.compile.grammar.regex.composition.PrimeProduction;
 import org.liuyehcf.algorithm.compile.grammar.regex.symbol.Symbol;
 
 import java.util.HashSet;
@@ -15,11 +15,11 @@ import static org.liuyehcf.algorithm.compile.grammar.regex.nfa.NfaBuildIterator.
  * Created by Liuye on 2017/10/21.
  */
 public class Nfa implements Matcher {
-    private final GrammarDefinition grammar;
+    private final Grammar grammar;
 
     private List<NfaClosure> groupNfaClosures;
 
-    public Nfa(GrammarDefinition grammar) {
+    public Nfa(Grammar grammar) {
         this.grammar = grammar;
         init();
     }
@@ -34,7 +34,7 @@ public class Nfa implements Matcher {
     }
 
     private void init() {
-        SymbolString finalSymbolString = grammar.getFinalSymbolString();
+        PrimeProduction finalSymbolString = grammar.getFinalSymbolString();
         List<Symbol> symbols = finalSymbolString.getSymbols();
 
         groupNfaClosures = createNfaClosuresMap(symbols);

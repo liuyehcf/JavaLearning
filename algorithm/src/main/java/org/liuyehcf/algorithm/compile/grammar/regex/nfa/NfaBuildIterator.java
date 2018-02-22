@@ -128,7 +128,7 @@ class NfaBuildIterator {
     }
 
     private void processEachSymbol() {
-        assert getCurSymbol().isOfAlphabet();
+        assert getCurSymbol().isTerminator();
         Symbol curSymbol = getCurSymbol();
 
         if (curSymbol.equals(Symbol._any)) {

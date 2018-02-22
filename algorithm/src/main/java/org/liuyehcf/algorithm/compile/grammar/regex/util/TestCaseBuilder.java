@@ -200,7 +200,7 @@ public abstract class TestCaseBuilder {
             if (getCurChar() == '\\') {
                 index++;
                 for (Symbol symbol : EscapedUtil.getSymbolsOfEscapedCharInMiddleParenthesis(getCurChar())) {
-                    optionalChars.add(symbol.getSymbol().charAt(0));
+                    optionalChars.add(symbol.getValue().charAt(0));
                 }
             } else {
                 optionalChars.add(getCurChar());
@@ -321,7 +321,7 @@ public abstract class TestCaseBuilder {
 
             index++;
             for (Symbol symbol : symbols) {
-                curContent = symbol.getSymbol();
+                curContent = symbol.getValue();
                 backtracking();
             }
 
@@ -456,7 +456,7 @@ public abstract class TestCaseBuilder {
 
             index++;
             int charIndex = random.nextInt(symbols.size());
-            curContent = symbols.get(charIndex).getSymbol();
+            curContent = symbols.get(charIndex).getValue();
 
             backtracking();
         }

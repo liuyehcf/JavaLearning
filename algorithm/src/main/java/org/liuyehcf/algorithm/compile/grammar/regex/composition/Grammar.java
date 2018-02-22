@@ -10,33 +10,33 @@ import java.util.Map;
 /**
  * Created by Liuye on 2017/10/21.
  */
-public class GrammarDefinition {
+public class Grammar {
     private static Symbol NONE_NON_ALPHABET = Symbol.createNonAlphabetSymbol("NONE_NON_ALPHABET");
-    Map<Symbol, SymbolString> finalSymbolSymbolStringMap;
+    Map<Symbol, PrimeProduction> finalSymbolSymbolStringMap;
     private List<Symbol> nonAlphabetSymbols;
     private Map<Symbol, Production> nonAlphabetSymbolProductionMap;
-    private SymbolString finalSymbolString;
+    private PrimeProduction finalSymbolString;
 
-    public GrammarDefinition(Production... productions) {
+    public Grammar(Production... productions) {
         nonAlphabetSymbols = new ArrayList<>();
         nonAlphabetSymbolProductionMap = new HashMap<>();
         for (Production production : productions) {
-            Symbol nonAlphabetSymbol = production.getNonAlphabetSymbol();
+            Symbol nonAlphabetSymbol = production.getLeft();
             if (nonAlphabetSymbolProductionMap.containsKey(nonAlphabetSymbol)) throw new RuntimeException();
             nonAlphabetSymbols.add(nonAlphabetSymbol);
             nonAlphabetSymbolProductionMap.put(nonAlphabetSymbol, production);
         }
     }
 
-    public static GrammarDefinition createGrammarDefinitionOfNormalRegex(String regex) {
-        GrammarDefinition grammarDefinition = new GrammarDefinition(
-                new Production(NONE_NON_ALPHABET, new SymbolString(regex))
+    public static Grammar createGrammarDefinitionOfNormalRegex(String regex) {
+        Grammar grammarDefinition = new Grammar(
+                new Production(NONE_NON_ALPHABET, new PrimeProduction(regex))
         );
 
         return grammarDefinition;
     }
 
-    public SymbolString getFinalSymbolString() {
+    public PrimeProduction getFinalSymbolString() {
         if (finalSymbolString == null) {
             parseFinalSymbolString();
         }
@@ -56,10 +56,10 @@ public class GrammarDefinition {
     private void checkIfFirstProductionHasNonAlphabetSymbol() {
         Production production = nonAlphabetSymbolProductionMap.get(nonAlphabetSymbols.get(0));
 
-        SymbolString symbolString = production.getSymbolString();
+        PrimeProduction symbolString = production.getRight();
 
         for (Symbol symbol : symbolString.getSymbols()) {
-            if (!symbol.isOfAlphabet())
+            if (!symbol.isTerminator())
                 throw new RuntimeException("正则语法第一条产生式包含非字母表字符");
         }
     }
@@ -71,8 +71,8 @@ public class GrammarDefinition {
             Symbol nonAlphabetSymbolOfCurProduction = nonAlphabetSymbols.get(i);
 
             Production curProduction = nonAlphabetSymbolProductionMap.get(nonAlphabetSymbolOfCurProduction);
-            for (Symbol symbol : curProduction.getSymbolString().getSymbols()) {
-                if (!symbol.isOfAlphabet()) {
+            for (Symbol symbol : curProduction.getRight().getSymbols()) {
+                if (!symbol.isTerminator()) {
                     finalSymbolsOfCurProduction.add(Symbol._leftSmallParenthesis);
                     finalSymbolsOfCurProduction.addAll(finalSymbolSymbolStringMap.get(symbol).getSymbols());
                     finalSymbolsOfCurProduction.add(Symbol._rightSmallParenthesis);
@@ -81,7 +81,7 @@ public class GrammarDefinition {
                 }
             }
 
-            finalSymbolSymbolStringMap.put(nonAlphabetSymbolOfCurProduction, new SymbolString(finalSymbolsOfCurProduction));
+            finalSymbolSymbolStringMap.put(nonAlphabetSymbolOfCurProduction, new PrimeProduction(finalSymbolsOfCurProduction));
         }
     }
 

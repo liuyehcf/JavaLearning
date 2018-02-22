@@ -1,6 +1,6 @@
 package org.liuyehcf.algorithm.compile.grammar.regex.util;
 
-import org.liuyehcf.algorithm.compile.grammar.regex.composition.GrammarDefinition;
+import org.liuyehcf.algorithm.compile.grammar.regex.composition.Grammar;
 import org.liuyehcf.algorithm.compile.grammar.regex.composition.Matcher;
 import org.liuyehcf.algorithm.compile.grammar.regex.dfa.Dfa;
 import org.liuyehcf.algorithm.compile.grammar.regex.nfa.Nfa;
@@ -18,7 +18,7 @@ public class RegexAutoMachine {
     }
 
     public static RegexAutoMachine compile(String regex) {
-        GrammarDefinition grammar = GrammarDefinition.createGrammarDefinitionOfNormalRegex(regex);
+        Grammar grammar = Grammar.createGrammarDefinitionOfNormalRegex(regex);
 
         Nfa nfa = new Nfa(grammar);
         Dfa dfa = new Dfa(nfa);
