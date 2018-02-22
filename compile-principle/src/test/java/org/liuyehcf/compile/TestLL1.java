@@ -79,22 +79,22 @@ public class TestLL1 {
         Grammar convertedGrammar = parser.getGrammar();
 
         assertEquals(
-                "{\"productions\":[\"E′ → + T E′ | __EPSILON__ \",\"T′ → * F T′ | __EPSILON__ \",\"T → ( E ) T′ | id T′ \",\"E → ( E ) T′ E′ | id T′ E′ \",\"F → ( E ) | id \",\"__START__ → E \"]}",
+                "{\"productions\":[\"__START__ → E \",\"E′ → + T E′ | __EPSILON__ \",\"T′ → * F T′ | __EPSILON__ \",\"T → ( E ) T′ | id T′ \",\"E → ( E ) T′ E′ | id T′ E′ \",\"F → ( E ) | id \"]}",
                 convertedGrammar.toReadableJSONString()
         );
         assertEquals(
-                "{\"FIRST\":{\"terminator\":{\"__EPSILON__\":\"__EPSILON__\",\"(\":\"(\",\")\":\")\",\"*\":\"*\",\"+\":\"+\",\"id\":\"id\"},\"nonTerminator\":{\"E′\":\"__EPSILON__,+\",\"T′\":\"__EPSILON__,*\",\"T\":\"(,id\",\"E\":\"(,id\",\"F\":\"(,id\",\"__START__\":\"(,id\"}},\"FOLLOW\":{\"nonTerminator\":{\"E′\":\"),__DOLLAR__\",\"T′\":\"),+,__DOLLAR__\",\"T\":\"),+\",\"E\":\"),__DOLLAR__\",\"F\":\"),*,+\",\"__START__\":\"__DOLLAR__\"}},\"SELECT\":{\"E′\":{\"E′ → __EPSILON__\":\"),__DOLLAR__\",\"E′ → + T E′\":\"+\"},\"T′\":{\"T′ → __EPSILON__\":\"),+,__DOLLAR__\",\"T′ → * F T′\":\"*\"},\"T\":{\"T → ( E ) T′\":\"(\",\"T → id T′\":\"id\"},\"E\":{\"E → ( E ) T′ E′\":\"(\",\"E → id T′ E′\":\"id\"},\"F\":{\"F → ( E )\":\"(\",\"F → id\":\"id\"},\"__START__\":{\"__START__ → E\":\"(,id\"}}}",
+                "{\"FIRST\":{\"terminator\":{\"__EPSILON__\":\"__EPSILON__\",\"(\":\"(\",\")\":\")\",\"*\":\"*\",\"+\":\"+\",\"id\":\"id\"},\"nonTerminator\":{\"__START__\":\"(,id\",\"E′\":\"__EPSILON__,+\",\"T′\":\"__EPSILON__,*\",\"T\":\"(,id\",\"E\":\"(,id\",\"F\":\"(,id\"}},\"FOLLOW\":{\"nonTerminator\":{\"__START__\":\"__DOLLAR__\",\"E′\":\"__DOLLAR__,)\",\"T′\":\"__DOLLAR__,),+\",\"T\":\"__DOLLAR__,),+\",\"E\":\"__DOLLAR__,)\",\"F\":\"__DOLLAR__,),*,+\"}},\"SELECT\":{\"__START__\":{\"__START__ → E\":\"(,id\"},\"E′\":{\"E′ → __EPSILON__\":\"__DOLLAR__,)\",\"E′ → + T E′\":\"+\"},\"T′\":{\"T′ → __EPSILON__\":\"__DOLLAR__,),+\",\"T′ → * F T′\":\"*\"},\"T\":{\"T → id T′\":\"id\",\"T → ( E ) T′\":\"(\"},\"E\":{\"E → ( E ) T′ E′\":\"(\",\"E → id T′ E′\":\"id\"},\"F\":{\"F → ( E )\":\"(\",\"F → id\":\"id\"}}}",
                 parser.getStatus()
         );
         assertEquals(
                 "| 非终结符\\终结符 | __EPSILON__ | ( | ) | * | + | id |\n" +
                         "|:--|:--|:--|:--|:--|:--|:--|\n" +
+                        "| __START__ | \\ | __START__ → E | \\ | \\ | \\ | __START__ → E |\n" +
                         "| E′ | \\ | \\ | E′ → __EPSILON__ | \\ | E′ → + T E′ | \\ |\n" +
                         "| T′ | \\ | \\ | T′ → __EPSILON__ | T′ → * F T′ | T′ → __EPSILON__ | \\ |\n" +
                         "| T | \\ | T → ( E ) T′ | \\ | \\ | \\ | T → id T′ |\n" +
                         "| E | \\ | E → ( E ) T′ E′ | \\ | \\ | \\ | E → id T′ E′ |\n" +
-                        "| F | \\ | F → ( E ) | \\ | \\ | \\ | F → id |\n" +
-                        "| __START__ | \\ | __START__ → E | \\ | \\ | \\ | __START__ → E |\n",
+                        "| F | \\ | F → ( E ) | \\ | \\ | \\ | F → id |\n",
                 parser.getForecastAnalysisTable()
         );
     }
@@ -183,23 +183,23 @@ public class TestLL1 {
         Grammar convertedGrammar = parser.getGrammar();
 
         assertEquals(
-                "{\"productions\":[\"STLIST → s STLISTN \",\"PROGRAM → program DECLIST : TYPE ; STLIST end \",\"DECLISTN → , id DECLISTN | __EPSILON__ \",\"TYPE → real | int \",\"STLISTN → ; s STLISTN | __EPSILON__ \",\"DECLIST → id DECLISTN \",\"__START__ → PROGRAM \"]}",
+                "{\"productions\":[\"DECLIST → id DECLISTN \",\"DECLISTN → , id DECLISTN | __EPSILON__ \",\"__START__ → PROGRAM \",\"TYPE → real | int \",\"STLISTN → ; s STLISTN | __EPSILON__ \",\"PROGRAM → program DECLIST : TYPE ; STLIST end \",\"STLIST → s STLISTN \"]}",
                 convertedGrammar.toReadableJSONString()
         );
         assertEquals(
-                "{\"FIRST\":{\"terminator\":{\"s\":\"s\",\"__EPSILON__\":\"__EPSILON__\",\"real\":\"real\",\":\":\":\",\";\":\";\",\"id\":\"id\",\"end\":\"end\",\",\":\",\",\"program\":\"program\",\"int\":\"int\"},\"nonTerminator\":{\"STLIST\":\"s\",\"PROGRAM\":\"program\",\"DECLISTN\":\"__EPSILON__,,\",\"TYPE\":\"real,int\",\"STLISTN\":\"__EPSILON__,;\",\"DECLIST\":\"id\",\"__START__\":\"program\"}},\"FOLLOW\":{\"nonTerminator\":{\"STLIST\":\"end\",\"PROGRAM\":\"__DOLLAR__\",\"DECLISTN\":\":\",\"TYPE\":\";\",\"STLISTN\":\"end\",\"DECLIST\":\":\",\"__START__\":\"__DOLLAR__\"}},\"SELECT\":{\"STLIST\":{\"STLIST → s STLISTN\":\"s\"},\"PROGRAM\":{\"PROGRAM → program DECLIST : TYPE ; STLIST end\":\"program\"},\"DECLISTN\":{\"DECLISTN → __EPSILON__\":\":\",\"DECLISTN → , id DECLISTN\":\",\"},\"TYPE\":{\"TYPE → real\":\"real\",\"TYPE → int\":\"int\"},\"STLISTN\":{\"STLISTN → __EPSILON__\":\"end\",\"STLISTN → ; s STLISTN\":\";\"},\"DECLIST\":{\"DECLIST → id DECLISTN\":\"id\"},\"__START__\":{\"__START__ → PROGRAM\":\"program\"}}}",
+                "{\"FIRST\":{\"terminator\":{\"__EPSILON__\":\"__EPSILON__\",\"int\":\"int\",\"real\":\"real\",\"s\":\"s\",\"program\":\"program\",\":\":\":\",\"id\":\"id\",\";\":\";\",\",\":\",\",\"end\":\"end\"},\"nonTerminator\":{\"DECLIST\":\"id\",\"DECLISTN\":\"__EPSILON__,,\",\"__START__\":\"program\",\"TYPE\":\"int,real\",\"STLISTN\":\"__EPSILON__,;\",\"PROGRAM\":\"program\",\"STLIST\":\"s\"}},\"FOLLOW\":{\"nonTerminator\":{\"DECLIST\":\":\",\"DECLISTN\":\":\",\"__START__\":\"__DOLLAR__\",\"TYPE\":\";\",\"STLISTN\":\"end\",\"PROGRAM\":\"__DOLLAR__\",\"STLIST\":\"end\"}},\"SELECT\":{\"DECLIST\":{\"DECLIST → id DECLISTN\":\"id\"},\"DECLISTN\":{\"DECLISTN → , id DECLISTN\":\",\",\"DECLISTN → __EPSILON__\":\":\"},\"__START__\":{\"__START__ → PROGRAM\":\"program\"},\"TYPE\":{\"TYPE → int\":\"int\",\"TYPE → real\":\"real\"},\"STLISTN\":{\"STLISTN → __EPSILON__\":\"end\",\"STLISTN → ; s STLISTN\":\";\"},\"PROGRAM\":{\"PROGRAM → program DECLIST : TYPE ; STLIST end\":\"program\"},\"STLIST\":{\"STLIST → s STLISTN\":\"s\"}}}",
                 parser.getStatus()
         );
         assertEquals(
-                "| 非终结符\\终结符 | s | __EPSILON__ | real | : | ; | id | end | , | program | int |\n" +
+                "| 非终结符\\终结符 | __EPSILON__ | int | real | s | program | : | id | ; | , | end |\n" +
                         "|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|\n" +
-                        "| STLIST | STLIST → s STLISTN | \\ | \\ | \\ | \\ | \\ | \\ | \\ | \\ | \\ |\n" +
-                        "| PROGRAM | \\ | \\ | \\ | \\ | \\ | \\ | \\ | \\ | PROGRAM → program DECLIST : TYPE ; STLIST end | \\ |\n" +
-                        "| DECLISTN | \\ | \\ | \\ | DECLISTN → __EPSILON__ | \\ | \\ | \\ | DECLISTN → , id DECLISTN | \\ | \\ |\n" +
-                        "| TYPE | \\ | \\ | TYPE → real | \\ | \\ | \\ | \\ | \\ | \\ | TYPE → int |\n" +
-                        "| STLISTN | \\ | \\ | \\ | \\ | STLISTN → ; s STLISTN | \\ | STLISTN → __EPSILON__ | \\ | \\ | \\ |\n" +
-                        "| DECLIST | \\ | \\ | \\ | \\ | \\ | DECLIST → id DECLISTN | \\ | \\ | \\ | \\ |\n" +
-                        "| __START__ | \\ | \\ | \\ | \\ | \\ | \\ | \\ | \\ | __START__ → PROGRAM | \\ |\n",
+                        "| DECLIST | \\ | \\ | \\ | \\ | \\ | \\ | DECLIST → id DECLISTN | \\ | \\ | \\ |\n" +
+                        "| DECLISTN | \\ | \\ | \\ | \\ | \\ | DECLISTN → __EPSILON__ | \\ | \\ | DECLISTN → , id DECLISTN | \\ |\n" +
+                        "| __START__ | \\ | \\ | \\ | \\ | __START__ → PROGRAM | \\ | \\ | \\ | \\ | \\ |\n" +
+                        "| TYPE | \\ | TYPE → int | TYPE → real | \\ | \\ | \\ | \\ | \\ | \\ | \\ |\n" +
+                        "| STLISTN | \\ | \\ | \\ | \\ | \\ | \\ | \\ | STLISTN → ; s STLISTN | \\ | STLISTN → __EPSILON__ |\n" +
+                        "| PROGRAM | \\ | \\ | \\ | \\ | PROGRAM → program DECLIST : TYPE ; STLIST end | \\ | \\ | \\ | \\ | \\ |\n" +
+                        "| STLIST | \\ | \\ | \\ | STLIST → s STLISTN | \\ | \\ | \\ | \\ | \\ | \\ |\n",
                 parser.getForecastAnalysisTable()
         );
     }

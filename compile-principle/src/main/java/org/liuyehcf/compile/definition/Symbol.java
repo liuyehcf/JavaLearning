@@ -138,7 +138,8 @@ public class Symbol {
             Symbol other = (Symbol) obj;
             return other.value.equals(this.value)
                     && other.primeCount == this.primeCount
-                    && other.isTerminator == this.isTerminator;
+                    && other.isTerminator == this.isTerminator
+                    && other.type.equals(this.type);
         }
         return false;
     }
@@ -147,7 +148,8 @@ public class Symbol {
     public int hashCode() {
         return Boolean.valueOf(this.isTerminator).hashCode() +
                 this.value.hashCode() +
-                Integer.valueOf(this.primeCount).hashCode();
+                Integer.valueOf(this.primeCount).hashCode() +
+                this.type.getOrder();// 这里不能用type.hashCode，这会调用Object的hashCode，导致每次运行hashCode不一致
     }
 
     public String toJSONString() {
