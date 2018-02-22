@@ -22,6 +22,10 @@ public class DfaStateDescription {
 
     @Override
     public boolean equals(Object obj) {
-        return this.description.equals(((DfaStateDescription) obj).description);
+        if (obj instanceof DfaStateDescription) {
+            DfaStateDescription other = (DfaStateDescription) obj;
+            return other.description.equals(this.description);
+        }
+        return false;
     }
 }

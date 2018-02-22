@@ -2,7 +2,6 @@ package org.liuyehcf.grammar.rg.dfa;
 
 import org.liuyehcf.grammar.definition.Symbol;
 import org.liuyehcf.grammar.rg.nfa.NfaState;
-import org.liuyehcf.grammar.rg.utils.SymbolUtils;
 
 import java.util.*;
 
@@ -162,6 +161,10 @@ public class DfaState {
 
     @Override
     public boolean equals(Object obj) {
-        return this.description.equals(((DfaState) obj).description);
+        if (obj instanceof DfaState) {
+            DfaState other = (DfaState) obj;
+            return other.description.equals(this.description);
+        }
+        return false;
     }
 }
