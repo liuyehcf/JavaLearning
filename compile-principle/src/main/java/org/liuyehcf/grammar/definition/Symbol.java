@@ -32,10 +32,6 @@ public class Symbol {
 
     /**
      * 唯一构造方法
-     *
-     * @param isTerminator
-     * @param value
-     * @param primeCount
      */
     private Symbol(boolean isTerminator, String value, int primeCount, MorphemeType type) {
         if (value == null || type == null) {
@@ -61,9 +57,6 @@ public class Symbol {
 
     /**
      * 仅用于创建普通Symbol，需要检查value值的合法性
-     *
-     * @param isTerminator
-     * @param value
      */
     private static Symbol createSymbol(boolean isTerminator, String value, MorphemeType type) {
         if (value == null) {
@@ -90,10 +83,8 @@ public class Symbol {
 
     /**
      * 带上异变后缀的符号字符串
-     *
-     * @return
      */
-    public String getPrimedValue() {
+    private String getPrimedValue() {
         if (primeCount == 0) {
             return value;
         } else {
@@ -103,8 +94,6 @@ public class Symbol {
 
     /**
      * 是否为异变符号
-     *
-     * @return
      */
     public boolean isPrimedSymbol() {
         return primeCount != 0;
@@ -112,8 +101,6 @@ public class Symbol {
 
     /**
      * 根据异变次数生成后缀符号，例如1次异变就是"′"
-     *
-     * @return
      */
     private String toPrimeString() {
         StringBuilder sb = new StringBuilder();
@@ -125,8 +112,6 @@ public class Symbol {
 
     /**
      * 产生一个异变符号
-     *
-     * @return
      */
     public Symbol getPrimedSymbol() {
         return new Symbol(this.isTerminator, this.value, this.primeCount + 1, this.type);

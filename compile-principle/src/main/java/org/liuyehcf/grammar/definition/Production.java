@@ -1,8 +1,9 @@
 package org.liuyehcf.grammar.definition;
 
-import org.liuyehcf.grammar.utils.ListUtils;
 import org.liuyehcf.grammar.utils.AssertUtils;
+import org.liuyehcf.grammar.utils.ListUtils;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -21,7 +22,7 @@ public class Production {
 
     private Production(Symbol left, List<PrimaryProduction> right) {
         this.left = left;
-        this.right = right;
+        this.right = Collections.unmodifiableList(right);
     }
 
     public static Production create(Symbol left, PrimaryProduction... right) {

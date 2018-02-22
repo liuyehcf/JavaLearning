@@ -3,8 +3,8 @@ package org.liuyehcf.grammar.definition;
 import org.liuyehcf.grammar.utils.AssertUtils;
 import org.liuyehcf.grammar.utils.ListUtils;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * 文法定义
@@ -19,8 +19,7 @@ public class Grammar {
 
     private Grammar(Symbol start, List<Production> productions) {
         this.start = start;
-
-        this.productions = combineProductionWithSameLeft(productions);
+        this.productions = Collections.unmodifiableList(productions);
     }
 
     public static Grammar create(Symbol start, Production... productions) {
@@ -29,47 +28,6 @@ public class Grammar {
 
     public static Grammar create(Symbol start, List<Production> productions) {
         return new Grammar(start, productions);
-    }
-
-    public static Production parallelProduction(Production p1, Production p2) {
-        AssertUtils.assertTrue(p1.getLeft().equals(p2.getLeft()));
-
-        List<PrimaryProduction> right = new ArrayList<>(p1.getRight());
-        right.addAll(p2.getRight());
-
-        return Production.create(
-                p1.getLeft(),
-                right);
-    }
-
-    /**
-     * 合并具有相同左部的产生式
-     */
-    private List<Production> combineProductionWithSameLeft(List<Production> productions) {
-        Map<Symbol, Production> productionMap = new HashMap<>();
-
-        for (Production p : productions) {
-            Symbol nonTerminator = p.getLeft();
-            AssertUtils.assertFalse(nonTerminator.isTerminator());
-
-            // 合并相同左部的产生式
-            if (productionMap.containsKey(nonTerminator)) {
-                productionMap.put(
-                        nonTerminator,
-                        parallelProduction(
-                                productionMap.get(nonTerminator),
-                                p
-                        )
-                );
-            } else {
-                productionMap.put(nonTerminator, p);
-            }
-        }
-
-        return Collections.unmodifiableList(productionMap.entrySet()
-                .stream()
-                .map(Map.Entry::getValue)
-                .collect(Collectors.toList()));
     }
 
     public Symbol getStart() {

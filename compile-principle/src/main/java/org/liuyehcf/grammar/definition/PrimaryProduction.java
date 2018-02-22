@@ -2,6 +2,7 @@ package org.liuyehcf.grammar.definition;
 
 import org.liuyehcf.grammar.utils.ListUtils;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -12,7 +13,7 @@ public class PrimaryProduction {
     private final List<Symbol> symbols;
 
     private PrimaryProduction(List<Symbol> symbols) {
-        this.symbols = symbols;
+        this.symbols = Collections.unmodifiableList(symbols);
     }
 
     public static PrimaryProduction create(Symbol... symbols) {

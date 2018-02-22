@@ -8,6 +8,7 @@ import org.liuyehcf.grammar.definition.PrimaryProduction;
 import org.liuyehcf.grammar.definition.Production;
 import org.liuyehcf.grammar.definition.Symbol;
 import org.liuyehcf.grammar.definition.converter.LreElfGrammarConverter;
+import org.liuyehcf.grammar.definition.converter.MergeGrammarConverter;
 import org.liuyehcf.grammar.parse.Token;
 import org.liuyehcf.grammar.utils.SetUtils;
 
@@ -89,7 +90,9 @@ public class LL1 implements LLParser {
     }
 
     private void convertGrammar() {
-        this.grammar = new LreElfGrammarConverter(originalGrammar).getConvertedGrammar();
+        this.grammar = new LreElfGrammarConverter(
+                new MergeGrammarConverter(originalGrammar).getConvertedGrammar()
+        ).getConvertedGrammar();
 
         this.start = this.grammar.getStart();
 

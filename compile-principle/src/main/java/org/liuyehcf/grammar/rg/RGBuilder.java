@@ -1,6 +1,7 @@
 package org.liuyehcf.grammar.rg;
 
 import org.liuyehcf.grammar.definition.Grammar;
+import org.liuyehcf.grammar.definition.converter.MergeGrammarConverter;
 import org.liuyehcf.grammar.definition.converter.SimplificationGrammarConverter;
 import org.liuyehcf.grammar.rg.dfa.Dfa;
 import org.liuyehcf.grammar.rg.nfa.Nfa;
@@ -26,7 +27,9 @@ public class RGBuilder {
     public static RGBuilder compile(String regex) {
 
         Grammar grammar = new SimplificationGrammarConverter(
-                GrammarUtils.createGrammarWithRegex(regex)
+                new MergeGrammarConverter(
+                        GrammarUtils.createGrammarWithRegex(regex)
+                ).getConvertedGrammar()
         ).getConvertedGrammar();
 
         return new RGBuilder(grammar);

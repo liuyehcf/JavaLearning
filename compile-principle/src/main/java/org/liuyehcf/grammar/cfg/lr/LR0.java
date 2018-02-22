@@ -1,6 +1,7 @@
 package org.liuyehcf.grammar.cfg.lr;
 
 import org.liuyehcf.grammar.definition.Grammar;
+import org.liuyehcf.grammar.definition.converter.MergeGrammarConverter;
 import org.liuyehcf.grammar.definition.converter.StatusExpandGrammarConverter;
 
 public class LR0 implements LRParser {
@@ -23,7 +24,9 @@ public class LR0 implements LRParser {
     }
 
     private void convertGrammar() {
-        this.grammar = new StatusExpandGrammarConverter(originalGrammar).getConvertedGrammar();
+        this.grammar = new StatusExpandGrammarConverter(
+                new MergeGrammarConverter(originalGrammar).getConvertedGrammar()
+        ).getConvertedGrammar();
     }
 
     @Override
