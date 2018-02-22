@@ -25,7 +25,9 @@ public class TestStatusExpandGrammarConverter {
                 )
         );
 
-        Grammar convertedGrammar = new StatusExpandGrammarConverter(grammar).getConvertedGrammar();
+        Grammar convertedGrammar = new MergeGrammarConverter(
+                new StatusExpandGrammarConverter(grammar).getConvertedGrammar()
+        ).getConvertedGrammar();
 
         assertEquals(
                 "{\"productions\":[\"S → __DOT__ b B B | b __DOT__ B B | b B __DOT__ B | b B B __DOT__\"]}",
@@ -69,7 +71,9 @@ public class TestStatusExpandGrammarConverter {
                 )
         );
 
-        Grammar convertedGrammar = new StatusExpandGrammarConverter(grammar).getConvertedGrammar();
+        Grammar convertedGrammar = new MergeGrammarConverter(
+                new StatusExpandGrammarConverter(grammar).getConvertedGrammar()
+        ).getConvertedGrammar();
 
         assertEquals(
                 "{\"productions\":[\"E → __DOT__ E + E | E __DOT__ + E | E + __DOT__ E | E + E __DOT__ | __DOT__ E * E | E __DOT__ * E | E * __DOT__ E | E * E __DOT__ | __DOT__ ( E ) | ( __DOT__ E ) | ( E __DOT__ ) | ( E ) __DOT__ | __DOT__ id | id __DOT__\"]}",
