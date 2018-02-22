@@ -1,6 +1,9 @@
 package org.liuyehcf.grammar.definition.converter;
 
-import org.liuyehcf.grammar.definition.*;
+import org.liuyehcf.grammar.definition.Grammar;
+import org.liuyehcf.grammar.definition.PrimaryProduction;
+import org.liuyehcf.grammar.definition.Production;
+import org.liuyehcf.grammar.definition.Symbol;
 import org.liuyehcf.grammar.utils.ListUtils;
 
 import java.util.*;
@@ -14,13 +17,7 @@ import static org.liuyehcf.grammar.utils.AssertUtils.assertTrue;
  * LRE：Left recursive elimination
  * ELF：Extract Left Factory
  */
-public class LreElfGrammarConvert implements GrammarConverter {
-
-    // 待转换的文法
-    private final Grammar originalGrammar;
-
-    // 转换后的文法
-    private Grammar convertedGrammar;
+public class LreElfGrammarConverter extends AbstractGrammarConverter {
 
     // 非终结符 -> 产生式 的映射表
     private Map<Symbol, Production> productionMap;
@@ -28,19 +25,12 @@ public class LreElfGrammarConvert implements GrammarConverter {
     // 根据依赖关系将非终结符进行排序后的结果（有向图遍历）
     private List<Symbol> sortedNonTerminators;
 
-    public LreElfGrammarConvert(Grammar originalGrammar) {
-        this.originalGrammar = originalGrammar;
+    public LreElfGrammarConverter(Grammar originalGrammar) {
+        super(originalGrammar);
     }
 
     @Override
-    public Grammar getConvertedGrammar() {
-        if (convertedGrammar == null) {
-            convertedGrammar = doConvert();
-        }
-        return convertedGrammar;
-    }
-
-    private Grammar doConvert() {
+    protected Grammar doConvert() {
         check();
 
         init();

@@ -4,6 +4,7 @@ package org.liuyehcf.grammar.rg;
 import org.liuyehcf.grammar.definition.Grammar;
 import org.liuyehcf.grammar.definition.Production;
 import org.liuyehcf.grammar.definition.Symbol;
+import org.liuyehcf.grammar.definition.converter.SimplificationGrammarConverter;
 import org.liuyehcf.grammar.rg.utils.GrammarUtils;
 
 import static org.liuyehcf.grammar.definition.Symbol.createNonTerminator;
@@ -65,7 +66,7 @@ public class TestRegex {
         Symbol letter_ = createNonTerminator("letter_");
         Symbol id = createNonTerminator("id");
 
-        return RGBuilder.GrammarConverter.convert(
+        return new SimplificationGrammarConverter(
                 Grammar.create(
                         id,
                         Production.create(
@@ -80,7 +81,7 @@ public class TestRegex {
                                 GrammarUtils.createPrimaryProduction(letter_, '(', letter_, '|', digit, ')', '*')
                         )
                 )
-        );
+        ).getConvertedGrammar();
     }
 
     private static String createIdentifierRegex() {

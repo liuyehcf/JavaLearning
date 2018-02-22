@@ -1,16 +1,16 @@
-package org.liuyehcf.grammar.cfg.ll;
+package org.liuyehcf.grammar.definition.converter;
 
 import org.junit.Test;
 import org.liuyehcf.grammar.definition.Grammar;
 import org.liuyehcf.grammar.definition.PrimaryProduction;
 import org.liuyehcf.grammar.definition.Production;
-import org.liuyehcf.grammar.definition.converter.LreElfGrammarConvert;
+import org.liuyehcf.grammar.definition.converter.LreElfGrammarConverter;
 
 import static org.junit.Assert.assertEquals;
 import static org.liuyehcf.grammar.definition.Symbol.createNonTerminator;
 import static org.liuyehcf.grammar.definition.Symbol.createTerminator;
 
-public class TestLL1GrammarConvert {
+public class TestLreElfGrammarConverter {
     @Test
     public void convertCase1() {
         Grammar grammar = Grammar.create(
@@ -47,7 +47,7 @@ public class TestLL1GrammarConvert {
                 )
         );
 
-        Grammar convertedGrammar = new LreElfGrammarConvert(grammar).getConvertedGrammar();
+        Grammar convertedGrammar = new LreElfGrammarConverter(grammar).getConvertedGrammar();
 
         assertEquals(
                 "{\"productions\":[\"E → ( E ) (E)′ | id (E)′\",\"(E)′ → + E (E)′ | * E (E)′ | __EPSILON__\"]}",
@@ -97,7 +97,7 @@ public class TestLL1GrammarConvert {
                 )
         );
 
-        Grammar convertedGrammar = new LreElfGrammarConvert(grammar).getConvertedGrammar();
+        Grammar convertedGrammar = new LreElfGrammarConverter(grammar).getConvertedGrammar();
 
         assertEquals(
                 "{\"productions\":[\"D → ( E ) (E)′ | id (E)′\",\"E → ( E ) (E)′ | id (E)′\",\"(E)′ → + E (E)′ | * E (E)′ | __EPSILON__\"]}",
@@ -155,7 +155,7 @@ public class TestLL1GrammarConvert {
                 )
         );
 
-        Grammar convertedGrammar = new LreElfGrammarConvert(grammar).getConvertedGrammar();
+        Grammar convertedGrammar = new LreElfGrammarConverter(grammar).getConvertedGrammar();
 
         assertEquals(
                 "{\"productions\":[\"D → ( E ) (E)′ e | id (E)′ e | e E\",\"E → ( E ) (E)′ | id (E)′\",\"(E)′ → + E (E)′ | * E (E)′ | __EPSILON__\"]}",
@@ -198,7 +198,7 @@ public class TestLL1GrammarConvert {
                 )
         );
 
-        Grammar convertedGrammar = new LreElfGrammarConvert(grammar).getConvertedGrammar();
+        Grammar convertedGrammar = new LreElfGrammarConverter(grammar).getConvertedGrammar();
 
         assertEquals(
                 "{\"productions\":[\"A → b (A)′′ | a (A)′\",\"(A)′ → b (A)′′′\",\"(A)′′ → d | c\",\"(A)′′′ → __EPSILON__ | c\"]}",
@@ -251,7 +251,7 @@ public class TestLL1GrammarConvert {
                 )
         );
 
-        Grammar convertedGrammar = new LreElfGrammarConvert(grammar).getConvertedGrammar();
+        Grammar convertedGrammar = new LreElfGrammarConverter(grammar).getConvertedGrammar();
 
         assertEquals(
                 "{\"productions\":[\"A → a (A)′ | γ1 | γ2 | γm\",\"(A)′ → β1 | β2 | βn\"]}",
@@ -335,7 +335,7 @@ public class TestLL1GrammarConvert {
                 )
         );
 
-        Grammar convertedGrammar = new LreElfGrammarConvert(grammar).getConvertedGrammar();
+        Grammar convertedGrammar = new LreElfGrammarConverter(grammar).getConvertedGrammar();
 
         assertEquals(
                 "{\"productions\":[\"A → c (A)′′′ | b (A)′′ | a (A)′ | d\",\"(A)′ → b (A)′′′′′ | __EPSILON__\",\"(A)′′ → c (A)′′′′ | __EPSILON__\",\"(A)′′′ → __EPSILON__ | d\",\"(A)′′′′ → __EPSILON__ | d\",\"(A)′′′′′ → c (A)′′′′′′ | __EPSILON__\",\"(A)′′′′′′ → __EPSILON__ | d\"]}",

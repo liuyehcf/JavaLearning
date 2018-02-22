@@ -1,8 +1,6 @@
-package org.liuyehcf.grammar.cfg.lr;
+package org.liuyehcf.grammar.definition.converter;
 
 import org.junit.Test;
-import org.liuyehcf.grammar.cfg.lr.LR0;
-import org.liuyehcf.grammar.Parser;
 import org.liuyehcf.grammar.definition.Grammar;
 import org.liuyehcf.grammar.definition.PrimaryProduction;
 import org.liuyehcf.grammar.definition.Production;
@@ -11,7 +9,7 @@ import static org.junit.Assert.assertEquals;
 import static org.liuyehcf.grammar.definition.Symbol.createNonTerminator;
 import static org.liuyehcf.grammar.definition.Symbol.createTerminator;
 
-public class TestLR0GrammarConvert {
+public class TestStatusExpandGrammarConverter {
 
     @Test
     public void convertCase1() {
@@ -27,11 +25,11 @@ public class TestLR0GrammarConvert {
                 )
         );
 
-        Parser parser = new LR0(grammar);
+        Grammar convertedGrammar = new StatusExpandGrammarConverter(grammar).getConvertedGrammar();
 
         assertEquals(
                 "{\"productions\":[\"S → __DOT__ b B B | b __DOT__ B B | b B __DOT__ B | b B B __DOT__\"]}",
-                parser.getGrammar().toReadableJSONString()
+                convertedGrammar.toReadableJSONString()
         );
     }
 
@@ -71,11 +69,11 @@ public class TestLR0GrammarConvert {
                 )
         );
 
-        Parser parser = new LR0(grammar);
+        Grammar convertedGrammar = new StatusExpandGrammarConverter(grammar).getConvertedGrammar();
 
         assertEquals(
                 "{\"productions\":[\"E → __DOT__ E + E | E __DOT__ + E | E + __DOT__ E | E + E __DOT__ | __DOT__ E * E | E __DOT__ * E | E * __DOT__ E | E * E __DOT__ | __DOT__ ( E ) | ( __DOT__ E ) | ( E __DOT__ ) | ( E ) __DOT__ | __DOT__ id | id __DOT__\"]}",
-                parser.getGrammar().toReadableJSONString()
+                convertedGrammar.toReadableJSONString()
         );
     }
 }

@@ -7,13 +7,11 @@ import org.liuyehcf.grammar.definition.Grammar;
 import org.liuyehcf.grammar.definition.PrimaryProduction;
 import org.liuyehcf.grammar.definition.Production;
 import org.liuyehcf.grammar.definition.Symbol;
-import org.liuyehcf.grammar.definition.converter.LreElfGrammarConvert;
+import org.liuyehcf.grammar.definition.converter.LreElfGrammarConverter;
 import org.liuyehcf.grammar.parse.Token;
-import org.liuyehcf.grammar.utils.ListUtils;
 import org.liuyehcf.grammar.utils.SetUtils;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.liuyehcf.grammar.utils.AssertUtils.*;
 
@@ -27,7 +25,7 @@ public class LL1 implements LLParser {
     private final LexicalAnalyzer lexicalAnalyzer;
 
     // 原始文法
-    private final Grammar originGrammar;
+    private final Grammar originalGrammar;
 
     // 转换后的文法
     private Grammar grammar;
@@ -56,11 +54,11 @@ public class LL1 implements LLParser {
     // select集
     private Map<Symbol, Map<PrimaryProduction, Set<Symbol>>> selects;
 
-    public LL1(Grammar originGrammar, LexicalAnalyzer lexicalAnalyzer) {
-        if (originGrammar == null || lexicalAnalyzer == null) {
+    public LL1(Grammar originalGrammar, LexicalAnalyzer lexicalAnalyzer) {
+        if (originalGrammar == null || lexicalAnalyzer == null) {
             throw new NullPointerException();
         }
-        this.originGrammar = originGrammar;
+        this.originalGrammar = originalGrammar;
         this.lexicalAnalyzer = lexicalAnalyzer;
         symbols = new HashSet<>();
         nonTerminatorSymbols = new HashSet<>();
@@ -91,7 +89,7 @@ public class LL1 implements LLParser {
     }
 
     private void convertGrammar() {
-        this.grammar = new LreElfGrammarConvert(originGrammar).getConvertedGrammar();
+        this.grammar = new LreElfGrammarConverter(originalGrammar).getConvertedGrammar();
 
         this.start = this.grammar.getStart();
 

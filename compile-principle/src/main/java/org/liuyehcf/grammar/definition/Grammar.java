@@ -1,7 +1,7 @@
 package org.liuyehcf.grammar.definition;
 
-import org.liuyehcf.grammar.utils.ListUtils;
 import org.liuyehcf.grammar.utils.AssertUtils;
+import org.liuyehcf.grammar.utils.ListUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
