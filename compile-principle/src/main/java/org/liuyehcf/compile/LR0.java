@@ -8,7 +8,7 @@ import org.liuyehcf.compile.definition.Symbol;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LRParserImpl implements LRParser {
+public class LR0 implements LRParser {
 
     // 原始文法
     private final Grammar originGrammar;
@@ -16,7 +16,7 @@ public class LRParserImpl implements LRParser {
     // 转换后的文法
     private Grammar grammar;
 
-    public LRParserImpl(Grammar grammar) {
+    public LR0(Grammar grammar) {
         this.originGrammar = grammar;
 
         init();

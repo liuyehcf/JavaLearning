@@ -10,6 +10,7 @@ import org.liuyehcf.compile.definition.Symbol;
 import static org.junit.Assert.*;
 import static org.liuyehcf.compile.TestLexicalAnalyzer.getIdRegex;
 import static org.liuyehcf.compile.definition.Symbol.createNonTerminator;
+import static org.liuyehcf.compile.definition.Symbol.createRegexTerminator;
 import static org.liuyehcf.compile.definition.Symbol.createTerminator;
 
 public class TestLLParser {
@@ -74,7 +75,7 @@ public class TestLLParser {
                 )
         );
 
-        LLParser parser = new LLParserImpl(grammar, getDefaultLexicalAnalyzer());
+        LLParser parser = new LL1(grammar, getDefaultLexicalAnalyzer());
         Grammar convertedGrammar = parser.getGrammar();
 
         assertEquals(
@@ -178,7 +179,7 @@ public class TestLLParser {
         );
 
 
-        LLParser parser = new LLParserImpl(grammar, getDefaultLexicalAnalyzer());
+        LLParser parser = new LL1(grammar, getDefaultLexicalAnalyzer());
         Grammar convertedGrammar = parser.getGrammar();
 
         assertEquals(
@@ -273,7 +274,7 @@ public class TestLLParser {
                 .build();
 
 
-        LLParser parser = new LLParserImpl(grammar, analyzer);
+        LLParser parser = new LL1(grammar, analyzer);
 
         assertTrue(parser.isMatch("id+id*id"));
         assertTrue(parser.isMatch("(id+id)*id"));
@@ -373,7 +374,7 @@ public class TestLLParser {
                 .addMorpheme("int")
                 .build();
 
-        LLParser parser = new LLParserImpl(grammar, analyzer);
+        LLParser parser = new LL1(grammar, analyzer);
 
         assertTrue(parser.isMatch("program id, id, id: real; s; s end"));
         assertTrue(parser.isMatch("program id: int; s; s end"));
@@ -443,7 +444,7 @@ public class TestLLParser {
                 Production.create(
                         createNonTerminator("F"),
                         PrimaryProduction.create(
-                                createTerminator("id")
+                                createRegexTerminator("id")
                         )
                 )
         );
@@ -457,7 +458,7 @@ public class TestLLParser {
                 .build();
 
 
-        LLParser parser = new LLParserImpl(grammar, analyzer);
+        LLParser parser = new LL1(grammar, analyzer);
 
         assertTrue(parser.isMatch("A12+B*D"));
         assertTrue(parser.isMatch("(a+b01)*d03"));

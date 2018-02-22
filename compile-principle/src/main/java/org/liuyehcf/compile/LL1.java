@@ -20,7 +20,7 @@ import static org.liuyehcf.compile.utils.AssertUtils.*;
 /**
  * LL1文法编译器
  */
-public class LLParserImpl implements LLParser {
+public class LL1 implements LLParser {
 
     // 词法分析器
     private final LexicalAnalyzer lexicalAnalyzer;
@@ -52,7 +52,7 @@ public class LLParserImpl implements LLParser {
     // select集
     private Map<Symbol, Map<PrimaryProduction, Set<Symbol>>> selects;
 
-    public LLParserImpl(Grammar originGrammar, LexicalAnalyzer lexicalAnalyzer) {
+    public LL1(Grammar originGrammar, LexicalAnalyzer lexicalAnalyzer) {
         if (originGrammar == null || lexicalAnalyzer == null) {
             throw new NullPointerException();
         }
@@ -335,8 +335,12 @@ public class LLParserImpl implements LLParser {
                 if (symbol.isTerminator()) {
                     // 若当前符号是ε则不消耗token
                     if (!symbol.equals(Symbol.EPSILON)) {
-                        if (symbol.getType().equals(MorphemeType.REGEX)) {
-                            if (!token.getType().equals(MorphemeType.REGEX)) {
+
+                        // symbol与token要么都是REGEX类型，要么都不是
+                        if (symbol.getType().equals(MorphemeType.REGEX)
+                                || token.getType().equals(MorphemeType.REGEX)) {
+                            if (!(symbol.getType().equals(MorphemeType.REGEX) &&
+                                    token.getType().equals(MorphemeType.REGEX))) {
                                 throw new ParseException();
                             }
                         }
