@@ -84,7 +84,7 @@ public class TestLL1 {
                 convertedGrammar.toReadableJSONString()
         );
         assertEquals(
-                "{\"FIRST\":{\"terminator\":{\"__EPSILON__\":\"__EPSILON__\",\"(\":\"(\",\")\":\")\",\"*\":\"*\",\"+\":\"+\",\"id\":\"id\"},\"nonTerminator\":{\"E′\":\"__EPSILON__,+\",\"T′\":\"__EPSILON__,*\",\"T\":\"(,id\",\"E\":\"(,id\",\"F\":\"(,id\"}},\"FOLLOW\":{\"nonTerminator\":{\"E′\":\"__DOLLAR__,)\",\"T′\":\"__DOLLAR__,),+\",\"T\":\"__DOLLAR__,),+\",\"E\":\"__DOLLAR__,)\",\"F\":\"__DOLLAR__,),*,+\"}},\"SELECT\":{\"E′\":{\"E′ → __EPSILON__\":\"__DOLLAR__,)\",\"E′ → + T E′\":\"+\"},\"T′\":{\"T′ → __EPSILON__\":\"__DOLLAR__,),+\",\"T′ → * F T′\":\"*\"},\"T\":{\"T → id T′\":\"id\",\"T → ( E ) T′\":\"(\"},\"E\":{\"E → ( E ) T′ E′\":\"(\",\"E → id T′ E′\":\"id\"},\"F\":{\"F → ( E )\":\"(\",\"F → id\":\"id\"}}}",
+                "{\"FIRST\":{\"terminator\":{\"__EPSILON__\":\"__EPSILON__\",\"(\":\"(\",\")\":\")\",\"*\":\"*\",\"+\":\"+\",\"id\":\"id\"},\"nonTerminator\":{\"E′\":\"__EPSILON__,+\",\"T′\":\"__EPSILON__,*\",\"T\":\"(,id\",\"E\":\"(,id\",\"F\":\"(,id\"}},\"FOLLOW\":{\"nonTerminator\":{\"E′\":\"),__DOLLAR__\",\"T′\":\"),+,__DOLLAR__\",\"T\":\"),+,__DOLLAR__\",\"E\":\"),__DOLLAR__\",\"F\":\"),*,+,__DOLLAR__\"}},\"SELECT\":{\"E′\":{\"E′ → __EPSILON__\":\"),__DOLLAR__\",\"E′ → + T E′\":\"+\"},\"T′\":{\"T′ → __EPSILON__\":\"),+,__DOLLAR__\",\"T′ → * F T′\":\"*\"},\"T\":{\"T → ( E ) T′\":\"(\",\"T → id T′\":\"id\"},\"E\":{\"E → id T′ E′\":\"id\",\"E → ( E ) T′ E′\":\"(\"},\"F\":{\"F → id\":\"id\",\"F → ( E )\":\"(\"}}}",
                 parser.getStatus()
         );
         assertEquals(
@@ -184,22 +184,22 @@ public class TestLL1 {
         Grammar convertedGrammar = parser.getGrammar();
 
         assertEquals(
-                "{\"productions\":[\"DECLIST → id DECLISTN\",\"DECLISTN → , id DECLISTN | __EPSILON__\",\"TYPE → real | int\",\"STLISTN → ; s STLISTN | __EPSILON__\",\"PROGRAM → program DECLIST : TYPE ; STLIST end\",\"STLIST → s STLISTN\"]}",
+                "{\"productions\":[\"PROGRAM → program DECLIST : TYPE ; STLIST end\",\"DECLISTN → , id DECLISTN | __EPSILON__\",\"STLIST → s STLISTN\",\"TYPE → real | int\",\"STLISTN → ; s STLISTN | __EPSILON__\",\"DECLIST → id DECLISTN\"]}",
                 convertedGrammar.toReadableJSONString()
         );
         assertEquals(
-                "{\"FIRST\":{\"terminator\":{\"__EPSILON__\":\"__EPSILON__\",\"int\":\"int\",\"real\":\"real\",\"s\":\"s\",\"program\":\"program\",\":\":\":\",\"id\":\"id\",\";\":\";\",\",\":\",\",\"end\":\"end\"},\"nonTerminator\":{\"DECLIST\":\"id\",\"DECLISTN\":\"__EPSILON__,,\",\"TYPE\":\"int,real\",\"STLISTN\":\"__EPSILON__,;\",\"PROGRAM\":\"program\",\"STLIST\":\"s\"}},\"FOLLOW\":{\"nonTerminator\":{\"DECLIST\":\":\",\"DECLISTN\":\":\",\"TYPE\":\";\",\"STLISTN\":\"end\",\"PROGRAM\":\"__DOLLAR__\",\"STLIST\":\"end\"}},\"SELECT\":{\"DECLIST\":{\"DECLIST → id DECLISTN\":\"id\"},\"DECLISTN\":{\"DECLISTN → , id DECLISTN\":\",\",\"DECLISTN → __EPSILON__\":\":\"},\"TYPE\":{\"TYPE → int\":\"int\",\"TYPE → real\":\"real\"},\"STLISTN\":{\"STLISTN → __EPSILON__\":\"end\",\"STLISTN → ; s STLISTN\":\";\"},\"PROGRAM\":{\"PROGRAM → program DECLIST : TYPE ; STLIST end\":\"program\"},\"STLIST\":{\"STLIST → s STLISTN\":\"s\"}}}",
+                "{\"FIRST\":{\"terminator\":{\"__EPSILON__\":\"__EPSILON__\",\"s\":\"s\",\":\":\":\",\"end\":\"end\",\"program\":\"program\",\";\":\";\",\"id\":\"id\",\"real\":\"real\",\",\":\",\",\"int\":\"int\"},\"nonTerminator\":{\"PROGRAM\":\"program\",\"STLIST\":\"s\",\"DECLISTN\":\"__EPSILON__,,\",\"TYPE\":\"real,int\",\"STLISTN\":\"__EPSILON__,;\",\"DECLIST\":\"id\"}},\"FOLLOW\":{\"nonTerminator\":{\"PROGRAM\":\"__DOLLAR__\",\"STLIST\":\"end\",\"DECLISTN\":\":\",\"TYPE\":\";\",\"STLISTN\":\"end\",\"DECLIST\":\":\"}},\"SELECT\":{\"PROGRAM\":{\"PROGRAM → program DECLIST : TYPE ; STLIST end\":\"program\"},\"STLIST\":{\"STLIST → s STLISTN\":\"s\"},\"DECLISTN\":{\"DECLISTN → __EPSILON__\":\":\",\"DECLISTN → , id DECLISTN\":\",\"},\"TYPE\":{\"TYPE → real\":\"real\",\"TYPE → int\":\"int\"},\"STLISTN\":{\"STLISTN → __EPSILON__\":\"end\",\"STLISTN → ; s STLISTN\":\";\"},\"DECLIST\":{\"DECLIST → id DECLISTN\":\"id\"}}}",
                 parser.getStatus()
         );
         assertEquals(
-                "| 非终结符\\终结符 | __EPSILON__ | int | real | s | program | : | id | ; | , | end |\n" +
+                "| 非终结符\\终结符 | __EPSILON__ | s | : | end | program | ; | id | real | , | int |\n" +
                         "|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|\n" +
-                        "| DECLIST | \\ | \\ | \\ | \\ | \\ | \\ | DECLIST → id DECLISTN | \\ | \\ | \\ |\n" +
-                        "| DECLISTN | \\ | \\ | \\ | \\ | \\ | DECLISTN → __EPSILON__ | \\ | \\ | DECLISTN → , id DECLISTN | \\ |\n" +
-                        "| TYPE | \\ | TYPE → int | TYPE → real | \\ | \\ | \\ | \\ | \\ | \\ | \\ |\n" +
-                        "| STLISTN | \\ | \\ | \\ | \\ | \\ | \\ | \\ | STLISTN → ; s STLISTN | \\ | STLISTN → __EPSILON__ |\n" +
                         "| PROGRAM | \\ | \\ | \\ | \\ | PROGRAM → program DECLIST : TYPE ; STLIST end | \\ | \\ | \\ | \\ | \\ |\n" +
-                        "| STLIST | \\ | \\ | \\ | STLIST → s STLISTN | \\ | \\ | \\ | \\ | \\ | \\ |\n",
+                        "| STLIST | \\ | STLIST → s STLISTN | \\ | \\ | \\ | \\ | \\ | \\ | \\ | \\ |\n" +
+                        "| DECLISTN | \\ | \\ | DECLISTN → __EPSILON__ | \\ | \\ | \\ | \\ | \\ | DECLISTN → , id DECLISTN | \\ |\n" +
+                        "| TYPE | \\ | \\ | \\ | \\ | \\ | \\ | \\ | TYPE → real | \\ | TYPE → int |\n" +
+                        "| STLISTN | \\ | \\ | \\ | STLISTN → __EPSILON__ | \\ | STLISTN → ; s STLISTN | \\ | \\ | \\ | \\ |\n" +
+                        "| DECLIST | \\ | \\ | \\ | \\ | \\ | \\ | DECLIST → id DECLISTN | \\ | \\ | \\ |\n",
                 parser.getForecastAnalysisTable()
         );
     }

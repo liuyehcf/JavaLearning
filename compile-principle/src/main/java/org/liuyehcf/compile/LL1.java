@@ -13,7 +13,6 @@ import org.liuyehcf.compile.utils.SetUtils;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.liuyehcf.compile.definition.Grammar.parallelProduction;
 import static org.liuyehcf.compile.utils.AssertUtils.*;
 
 
@@ -697,19 +696,9 @@ public class LL1 implements LLParser {
                     Symbol nonTerminator = p.getLeft();
                     assertFalse(nonTerminator.isTerminator());
 
-                    // 合并相同非终结符的产生式
-                    if (productionMap.containsKey(nonTerminator)) {
-                        productionMap.put(
-                                nonTerminator,
-                                parallelProduction(
-                                        productionMap.get(nonTerminator),
-                                        p
-                                )
-                        );
-                    } else {
-                        productionMap.put(nonTerminator, p);
-                    }
-
+                    // 必然不包含相同左部的产生式（在Grammar构造时已经合并过了）
+                    assertFalse(productionMap.containsKey(nonTerminator));
+                    productionMap.put(nonTerminator, p);
                 }
             }
 

@@ -162,7 +162,7 @@ public class LexicalAnalyzer {
                 tokens.add(new Token(id, value, morphemes.get(id).getSecond()));
             }
 
-            tokens.add(new Token("__DOLLAR__", "__DOLLAR__", MorphemeType.INTERNAL));
+            tokens.add(new Token("__DOLLAR__", "__DOLLAR__", MorphemeType.NORMAL));
         }
 
         private int findGroup() {

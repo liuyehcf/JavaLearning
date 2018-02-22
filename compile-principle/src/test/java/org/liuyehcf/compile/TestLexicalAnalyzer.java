@@ -20,7 +20,7 @@ public class TestLexicalAnalyzer {
     @Test
     public void testLexicalAnalyze1() {
         LexicalAnalyzer analyzer = LexicalAnalyzer.builder()
-                .addMorpheme("int", "int", MorphemeType.KEY)
+                .addMorpheme("int", "int", MorphemeType.NORMAL)
                 .addMorpheme("id", getIdRegex(), MorphemeType.REGEX)
                 .addMorpheme("=")
                 .addMorpheme("+")

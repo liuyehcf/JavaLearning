@@ -5,12 +5,13 @@ import org.liuyehcf.compile.core.MorphemeType;
 /**
  * 文法符号，包括终结符和非终结符
  * 特殊符号用"__"作为前后缀，且全部字母大写，同时禁止普通Symbol带有"__"前后缀
+ * 该类型与String一样，都是无状态的。只要字段数值一样，那么equals必定相同，hashCode也相同
  */
 public class Symbol {
 
-    public static final Symbol EPSILON = new Symbol(true, "__EPSILON__", 0, MorphemeType.INTERNAL);
-    public static final Symbol DOLLAR = new Symbol(true, "__DOLLAR__", 0, MorphemeType.INTERNAL);
-    public static final Symbol DOT = new Symbol(true, "__DOT__", 0, MorphemeType.INTERNAL);
+    public static final Symbol EPSILON = new Symbol(true, "__EPSILON__", 0, MorphemeType.NORMAL);
+    public static final Symbol DOLLAR = new Symbol(true, "__DOLLAR__", 0, MorphemeType.NORMAL);
+    public static final Symbol DOT = new Symbol(true, "__DOT__", 0, MorphemeType.NORMAL);
 
     private static final String SPECIAL_PREFIX = "__";
     private static final String SPECIAL_SUFFIX = "__";
@@ -135,9 +136,9 @@ public class Symbol {
     public boolean equals(Object obj) {
         if (obj instanceof Symbol) {
             Symbol other = (Symbol) obj;
-            return other.value.equals(this.value)
+            return other.isTerminator == this.isTerminator
+                    && other.value.equals(this.value)
                     && other.primeCount == this.primeCount
-                    && other.isTerminator == this.isTerminator
                     && other.type.equals(this.type);
         }
         return false;
@@ -145,10 +146,11 @@ public class Symbol {
 
     @Override
     public int hashCode() {
+        // 这里不能用type.hashCode，否则会调用Object的hashCode，导致每次运行hashCode不一致（会导致Map顺序变化，以至于测试用例通不过）
         return Boolean.valueOf(this.isTerminator).hashCode() +
                 this.value.hashCode() +
                 Integer.valueOf(this.primeCount).hashCode() +
-                this.type.getOrder();// 这里不能用type.hashCode，这会调用Object的hashCode，导致每次运行hashCode不一致
+                this.type.getOrder();
     }
 
     public String toJSONString() {
