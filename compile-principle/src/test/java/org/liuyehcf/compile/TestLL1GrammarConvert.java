@@ -13,6 +13,7 @@ public class TestLL1GrammarConvert {
     @Test
     public void convertCase1() {
         Grammar grammar = Grammar.create(
+                createNonTerminator("E"),
                 Production.create(
                         createNonTerminator("E"),
                         PrimaryProduction.create(
@@ -48,7 +49,7 @@ public class TestLL1GrammarConvert {
         Grammar convertedGrammar = LL1.GrammarConverter.convert(grammar);
 
         assertEquals(
-                "{\"productions\":[\"__START__ → E\",\"E → ( E ) (E)′ | id (E)′\",\"(E)′ → + E (E)′ | * E (E)′ | __EPSILON__\"]}",
+                "{\"productions\":[\"E → ( E ) (E)′ | id (E)′\",\"(E)′ → + E (E)′ | * E (E)′ | __EPSILON__\"]}",
                 convertedGrammar.toReadableJSONString()
         );
     }
@@ -56,6 +57,7 @@ public class TestLL1GrammarConvert {
     @Test
     public void convertCase2() {
         Grammar grammar = Grammar.create(
+                createNonTerminator("D"),
                 Production.create(
                         createNonTerminator("D"),
                         PrimaryProduction.create(
@@ -97,7 +99,7 @@ public class TestLL1GrammarConvert {
         Grammar convertedGrammar = LL1.GrammarConverter.convert(grammar);
 
         assertEquals(
-                "{\"productions\":[\"__START__ → D\",\"D → ( E ) (E)′ | id (E)′\",\"E → ( E ) (E)′ | id (E)′\",\"(E)′ → + E (E)′ | * E (E)′ | __EPSILON__\"]}",
+                "{\"productions\":[\"D → ( E ) (E)′ | id (E)′\",\"E → ( E ) (E)′ | id (E)′\",\"(E)′ → + E (E)′ | * E (E)′ | __EPSILON__\"]}",
                 convertedGrammar.toReadableJSONString()
         );
     }
@@ -105,6 +107,7 @@ public class TestLL1GrammarConvert {
     @Test
     public void convertCase3() {
         Grammar grammar = Grammar.create(
+                createNonTerminator("D"),
                 Production.create(
                         createNonTerminator("D"),
                         PrimaryProduction.create(
@@ -154,7 +157,7 @@ public class TestLL1GrammarConvert {
         Grammar convertedGrammar = LL1.GrammarConverter.convert(grammar);
 
         assertEquals(
-                "{\"productions\":[\"__START__ → D\",\"D → ( E ) (E)′ e | id (E)′ e | e E\",\"E → ( E ) (E)′ | id (E)′\",\"(E)′ → + E (E)′ | * E (E)′ | __EPSILON__\"]}",
+                "{\"productions\":[\"D → ( E ) (E)′ e | id (E)′ e | e E\",\"E → ( E ) (E)′ | id (E)′\",\"(E)′ → + E (E)′ | * E (E)′ | __EPSILON__\"]}",
                 convertedGrammar.toReadableJSONString()
         );
     }
@@ -162,6 +165,7 @@ public class TestLL1GrammarConvert {
     @Test
     public void convertCase4() {
         Grammar grammar = Grammar.create(
+                createNonTerminator("A"),
                 Production.create(
                         createNonTerminator("A"),
                         PrimaryProduction.create(
@@ -196,7 +200,7 @@ public class TestLL1GrammarConvert {
         Grammar convertedGrammar = LL1.GrammarConverter.convert(grammar);
 
         assertEquals(
-                "{\"productions\":[\"__START__ → A\",\"A → b (A)′′ | a (A)′\",\"(A)′ → b (A)′′′\",\"(A)′′ → d | c\",\"(A)′′′ → __EPSILON__ | c\"]}",
+                "{\"productions\":[\"A → b (A)′′ | a (A)′\",\"(A)′ → b (A)′′′\",\"(A)′′ → d | c\",\"(A)′′′ → __EPSILON__ | c\"]}",
                 convertedGrammar.toReadableJSONString()
         );
     }
@@ -204,6 +208,7 @@ public class TestLL1GrammarConvert {
     @Test
     public void convertCase5() {
         Grammar grammar = Grammar.create(
+                createNonTerminator("A"),
                 Production.create(
                         createNonTerminator("A"),
                         PrimaryProduction.create(
@@ -248,7 +253,7 @@ public class TestLL1GrammarConvert {
         Grammar convertedGrammar = LL1.GrammarConverter.convert(grammar);
 
         assertEquals(
-                "{\"productions\":[\"__START__ → A\",\"A → a (A)′ | γ1 | γ2 | γm\",\"(A)′ → β1 | β2 | βn\"]}",
+                "{\"productions\":[\"A → a (A)′ | γ1 | γ2 | γm\",\"(A)′ → β1 | β2 | βn\"]}",
                 convertedGrammar.toReadableJSONString()
         );
     }
@@ -256,6 +261,7 @@ public class TestLL1GrammarConvert {
     @Test
     public void convertCase6() {
         Grammar grammar = Grammar.create(
+                createNonTerminator("A"),
                 Production.create(
                         createNonTerminator("A"),
                         PrimaryProduction.create(
@@ -331,7 +337,7 @@ public class TestLL1GrammarConvert {
         Grammar convertedGrammar = LL1.GrammarConverter.convert(grammar);
 
         assertEquals(
-                "{\"productions\":[\"(A)′′′′′′ → __EPSILON__ | d\",\"__START__ → A\",\"A → c (A)′′′ | b (A)′′ | a (A)′ | d\",\"(A)′ → b (A)′′′′′ | __EPSILON__\",\"(A)′′ → c (A)′′′′ | __EPSILON__\",\"(A)′′′ → __EPSILON__ | d\",\"(A)′′′′ → __EPSILON__ | d\",\"(A)′′′′′ → c (A)′′′′′′ | __EPSILON__\"]}",
+                "{\"productions\":[\"(A)′′′′′′ → __EPSILON__ | d\",\"A → c (A)′′′ | b (A)′′ | a (A)′ | d\",\"(A)′ → b (A)′′′′′ | __EPSILON__\",\"(A)′′ → c (A)′′′′ | __EPSILON__\",\"(A)′′′ → __EPSILON__ | d\",\"(A)′′′′ → __EPSILON__ | d\",\"(A)′′′′′ → c (A)′′′′′′ | __EPSILON__\"]}",
                 convertedGrammar.toReadableJSONString()
         );
     }

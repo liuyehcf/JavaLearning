@@ -17,6 +17,7 @@ public class TestLL1 {
     @Test
     public void testFirstFollowSelectCase1() {
         Grammar grammar = Grammar.create(
+                createNonTerminator("E"),
                 Production.create(
                         createNonTerminator("E"),
                         PrimaryProduction.create(
@@ -79,17 +80,16 @@ public class TestLL1 {
         Grammar convertedGrammar = parser.getGrammar();
 
         assertEquals(
-                "{\"productions\":[\"__START__ → E\",\"E′ → + T E′ | __EPSILON__\",\"T′ → * F T′ | __EPSILON__\",\"T → ( E ) T′ | id T′\",\"E → ( E ) T′ E′ | id T′ E′\",\"F → ( E ) | id\"]}",
+                "{\"productions\":[\"E′ → + T E′ | __EPSILON__\",\"T′ → * F T′ | __EPSILON__\",\"T → ( E ) T′ | id T′\",\"E → ( E ) T′ E′ | id T′ E′\",\"F → ( E ) | id\"]}",
                 convertedGrammar.toReadableJSONString()
         );
         assertEquals(
-                "{\"FIRST\":{\"terminator\":{\"__EPSILON__\":\"__EPSILON__\",\"(\":\"(\",\")\":\")\",\"*\":\"*\",\"+\":\"+\",\"id\":\"id\"},\"nonTerminator\":{\"__START__\":\"(,id\",\"E′\":\"__EPSILON__,+\",\"T′\":\"__EPSILON__,*\",\"T\":\"(,id\",\"E\":\"(,id\",\"F\":\"(,id\"}},\"FOLLOW\":{\"nonTerminator\":{\"__START__\":\"__DOLLAR__\",\"E′\":\"__DOLLAR__,)\",\"T′\":\"__DOLLAR__,),+\",\"T\":\"__DOLLAR__,),+\",\"E\":\"__DOLLAR__,)\",\"F\":\"__DOLLAR__,),*,+\"}},\"SELECT\":{\"__START__\":{\"__START__ → E\":\"(,id\"},\"E′\":{\"E′ → __EPSILON__\":\"__DOLLAR__,)\",\"E′ → + T E′\":\"+\"},\"T′\":{\"T′ → __EPSILON__\":\"__DOLLAR__,),+\",\"T′ → * F T′\":\"*\"},\"T\":{\"T → id T′\":\"id\",\"T → ( E ) T′\":\"(\"},\"E\":{\"E → ( E ) T′ E′\":\"(\",\"E → id T′ E′\":\"id\"},\"F\":{\"F → ( E )\":\"(\",\"F → id\":\"id\"}}}",
+                "{\"FIRST\":{\"terminator\":{\"__EPSILON__\":\"__EPSILON__\",\"(\":\"(\",\")\":\")\",\"*\":\"*\",\"+\":\"+\",\"id\":\"id\"},\"nonTerminator\":{\"E′\":\"__EPSILON__,+\",\"T′\":\"__EPSILON__,*\",\"T\":\"(,id\",\"E\":\"(,id\",\"F\":\"(,id\"}},\"FOLLOW\":{\"nonTerminator\":{\"E′\":\"__DOLLAR__,)\",\"T′\":\"__DOLLAR__,),+\",\"T\":\"__DOLLAR__,),+\",\"E\":\"__DOLLAR__,)\",\"F\":\"__DOLLAR__,),*,+\"}},\"SELECT\":{\"E′\":{\"E′ → __EPSILON__\":\"__DOLLAR__,)\",\"E′ → + T E′\":\"+\"},\"T′\":{\"T′ → __EPSILON__\":\"__DOLLAR__,),+\",\"T′ → * F T′\":\"*\"},\"T\":{\"T → id T′\":\"id\",\"T → ( E ) T′\":\"(\"},\"E\":{\"E → ( E ) T′ E′\":\"(\",\"E → id T′ E′\":\"id\"},\"F\":{\"F → ( E )\":\"(\",\"F → id\":\"id\"}}}",
                 parser.getStatus()
         );
         assertEquals(
                 "| 非终结符\\终结符 | __EPSILON__ | ( | ) | * | + | id |\n" +
                         "|:--|:--|:--|:--|:--|:--|:--|\n" +
-                        "| __START__ | \\ | __START__ → E | \\ | \\ | \\ | __START__ → E |\n" +
                         "| E′ | \\ | \\ | E′ → __EPSILON__ | \\ | E′ → + T E′ | \\ |\n" +
                         "| T′ | \\ | \\ | T′ → __EPSILON__ | T′ → * F T′ | T′ → __EPSILON__ | \\ |\n" +
                         "| T | \\ | T → ( E ) T′ | \\ | \\ | \\ | T → id T′ |\n" +
@@ -110,6 +110,7 @@ public class TestLL1 {
 
 
         Grammar grammar = Grammar.create(
+                createNonTerminator(PROGRAM),
                 Production.create(
                         createNonTerminator(PROGRAM),
                         PrimaryProduction.create(
@@ -183,11 +184,11 @@ public class TestLL1 {
         Grammar convertedGrammar = parser.getGrammar();
 
         assertEquals(
-                "{\"productions\":[\"DECLIST → id DECLISTN\",\"DECLISTN → , id DECLISTN | __EPSILON__\",\"__START__ → PROGRAM\",\"TYPE → real | int\",\"STLISTN → ; s STLISTN | __EPSILON__\",\"PROGRAM → program DECLIST : TYPE ; STLIST end\",\"STLIST → s STLISTN\"]}",
+                "{\"productions\":[\"DECLIST → id DECLISTN\",\"DECLISTN → , id DECLISTN | __EPSILON__\",\"TYPE → real | int\",\"STLISTN → ; s STLISTN | __EPSILON__\",\"PROGRAM → program DECLIST : TYPE ; STLIST end\",\"STLIST → s STLISTN\"]}",
                 convertedGrammar.toReadableJSONString()
         );
         assertEquals(
-                "{\"FIRST\":{\"terminator\":{\"__EPSILON__\":\"__EPSILON__\",\"int\":\"int\",\"real\":\"real\",\"s\":\"s\",\"program\":\"program\",\":\":\":\",\"id\":\"id\",\";\":\";\",\",\":\",\",\"end\":\"end\"},\"nonTerminator\":{\"DECLIST\":\"id\",\"DECLISTN\":\"__EPSILON__,,\",\"__START__\":\"program\",\"TYPE\":\"int,real\",\"STLISTN\":\"__EPSILON__,;\",\"PROGRAM\":\"program\",\"STLIST\":\"s\"}},\"FOLLOW\":{\"nonTerminator\":{\"DECLIST\":\":\",\"DECLISTN\":\":\",\"__START__\":\"__DOLLAR__\",\"TYPE\":\";\",\"STLISTN\":\"end\",\"PROGRAM\":\"__DOLLAR__\",\"STLIST\":\"end\"}},\"SELECT\":{\"DECLIST\":{\"DECLIST → id DECLISTN\":\"id\"},\"DECLISTN\":{\"DECLISTN → , id DECLISTN\":\",\",\"DECLISTN → __EPSILON__\":\":\"},\"__START__\":{\"__START__ → PROGRAM\":\"program\"},\"TYPE\":{\"TYPE → int\":\"int\",\"TYPE → real\":\"real\"},\"STLISTN\":{\"STLISTN → __EPSILON__\":\"end\",\"STLISTN → ; s STLISTN\":\";\"},\"PROGRAM\":{\"PROGRAM → program DECLIST : TYPE ; STLIST end\":\"program\"},\"STLIST\":{\"STLIST → s STLISTN\":\"s\"}}}",
+                "{\"FIRST\":{\"terminator\":{\"__EPSILON__\":\"__EPSILON__\",\"int\":\"int\",\"real\":\"real\",\"s\":\"s\",\"program\":\"program\",\":\":\":\",\"id\":\"id\",\";\":\";\",\",\":\",\",\"end\":\"end\"},\"nonTerminator\":{\"DECLIST\":\"id\",\"DECLISTN\":\"__EPSILON__,,\",\"TYPE\":\"int,real\",\"STLISTN\":\"__EPSILON__,;\",\"PROGRAM\":\"program\",\"STLIST\":\"s\"}},\"FOLLOW\":{\"nonTerminator\":{\"DECLIST\":\":\",\"DECLISTN\":\":\",\"TYPE\":\";\",\"STLISTN\":\"end\",\"PROGRAM\":\"__DOLLAR__\",\"STLIST\":\"end\"}},\"SELECT\":{\"DECLIST\":{\"DECLIST → id DECLISTN\":\"id\"},\"DECLISTN\":{\"DECLISTN → , id DECLISTN\":\",\",\"DECLISTN → __EPSILON__\":\":\"},\"TYPE\":{\"TYPE → int\":\"int\",\"TYPE → real\":\"real\"},\"STLISTN\":{\"STLISTN → __EPSILON__\":\"end\",\"STLISTN → ; s STLISTN\":\";\"},\"PROGRAM\":{\"PROGRAM → program DECLIST : TYPE ; STLIST end\":\"program\"},\"STLIST\":{\"STLIST → s STLISTN\":\"s\"}}}",
                 parser.getStatus()
         );
         assertEquals(
@@ -195,7 +196,6 @@ public class TestLL1 {
                         "|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|\n" +
                         "| DECLIST | \\ | \\ | \\ | \\ | \\ | \\ | DECLIST → id DECLISTN | \\ | \\ | \\ |\n" +
                         "| DECLISTN | \\ | \\ | \\ | \\ | \\ | DECLISTN → __EPSILON__ | \\ | \\ | DECLISTN → , id DECLISTN | \\ |\n" +
-                        "| __START__ | \\ | \\ | \\ | \\ | __START__ → PROGRAM | \\ | \\ | \\ | \\ | \\ |\n" +
                         "| TYPE | \\ | TYPE → int | TYPE → real | \\ | \\ | \\ | \\ | \\ | \\ | \\ |\n" +
                         "| STLISTN | \\ | \\ | \\ | \\ | \\ | \\ | \\ | STLISTN → ; s STLISTN | \\ | STLISTN → __EPSILON__ |\n" +
                         "| PROGRAM | \\ | \\ | \\ | \\ | PROGRAM → program DECLIST : TYPE ; STLIST end | \\ | \\ | \\ | \\ | \\ |\n" +
@@ -207,6 +207,7 @@ public class TestLL1 {
     @Test
     public void testParseCase1() {
         Grammar grammar = Grammar.create(
+                createNonTerminator("E"),
                 Production.create(
                         createNonTerminator("E"),
                         PrimaryProduction.create(
@@ -293,6 +294,7 @@ public class TestLL1 {
 
 
         Grammar grammar = Grammar.create(
+                createNonTerminator(PROGRAM),
                 Production.create(
                         createNonTerminator(PROGRAM),
                         PrimaryProduction.create(
@@ -391,6 +393,7 @@ public class TestLL1 {
     @Test
     public void testParseCase3() {
         Grammar grammar = Grammar.create(
+                createNonTerminator("E"),
                 Production.create(
                         createNonTerminator("E"),
                         PrimaryProduction.create(
@@ -470,6 +473,7 @@ public class TestLL1 {
     @Test
     public void testParseCase4() {
         Grammar grammar = Grammar.create(
+                createNonTerminator("A"),
                 Production.create(
                         createNonTerminator("A"),
                         PrimaryProduction.create(

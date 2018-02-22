@@ -2,32 +2,34 @@ package org.liuyehcf.compile.definition;
 
 import org.liuyehcf.compile.utils.ListUtils;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
-import static org.liuyehcf.compile.utils.AssertUtils.assertFalse;
-import static org.liuyehcf.compile.utils.AssertUtils.assertTrue;
+import static org.liuyehcf.compile.utils.AssertUtils.*;
 
 /**
  * 文法定义
  */
 public class Grammar {
 
+    // 文法开始符号
+    private final Symbol start;
+
     // 文法包含的所有产生式
-    final private List<Production> productions;
+    private final List<Production> productions;
 
-    private Grammar(List<Production> productions) {
-        this.productions = productions;
+    private Grammar(Symbol start, List<Production> productions) {
+        this.start = start;
 
-        init();
+        this.productions = combineProductionWithSameLeft(productions);
     }
 
-    public static Grammar create(Production... productions) {
-        return new Grammar(ListUtils.of(productions));
+    public static Grammar create(Symbol start, Production... productions) {
+        return new Grammar(start, ListUtils.of(productions));
     }
 
-    public static Grammar create(List<Production> productions) {
-        return new Grammar(productions);
+    public static Grammar create(Symbol start, List<Production> productions) {
+        return new Grammar(start, productions);
     }
 
     public static Production parallelProduction(Production p1, Production p2) {
@@ -41,30 +43,38 @@ public class Grammar {
                 right);
     }
 
-    private void init() {
-        boolean containsStartSymbol = false;
+    /**
+     * 合并具有相同左部的产生式
+     */
+    private List<Production> combineProductionWithSameLeft(List<Production> productions) {
+        Map<Symbol, Production> productionMap = new HashMap<>();
 
-        // 首先，检查是否含有文法开始符号的产生式
         for (Production p : productions) {
-            if (p.getLeft().equals(Symbol.START)) {
-                containsStartSymbol = true;
-                break;
+            Symbol nonTerminator = p.getLeft();
+            assertFalse(nonTerminator.isTerminator());
+
+            // 合并相同左部的产生式
+            if (productionMap.containsKey(nonTerminator)) {
+                productionMap.put(
+                        nonTerminator,
+                        parallelProduction(
+                                productionMap.get(nonTerminator),
+                                p
+                        )
+                );
+            } else {
+                productionMap.put(nonTerminator, p);
             }
         }
 
-        if (!containsStartSymbol) {
-            Symbol symbol = productions.get(0).getLeft();
+        return Collections.unmodifiableList(productionMap.entrySet()
+                .stream()
+                .map(Map.Entry::getValue)
+                .collect(Collectors.toList()));
+    }
 
-            // 添加文法开始符号的产生式
-            productions.add(
-                    Production.create(
-                            Symbol.START,
-                            PrimaryProduction.create(
-                                    symbol
-                            )
-                    )
-            );
-        }
+    public Symbol getStart() {
+        return start;
     }
 
     public List<Production> getProductions() {

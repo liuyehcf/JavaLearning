@@ -31,6 +31,9 @@ public class LL1 implements LLParser {
     // 转换后的文法
     private Grammar grammar;
 
+    // 文法开始符号
+    private Symbol start;
+
     // 文法符号集合
     private Set<Symbol> symbols;
 
@@ -88,6 +91,8 @@ public class LL1 implements LLParser {
 
     private void convertGrammar() {
         this.grammar = GrammarConverter.convert(originGrammar);
+
+        this.start = this.grammar.getStart();
 
         for (Production p : grammar.getProductions()) {
             nonTerminatorSymbols.add(p.getLeft());
@@ -177,7 +182,7 @@ public class LL1 implements LLParser {
 
     private void calculateFollow() {
         // 将$放入FOLLOW(S)中，其中S是开始符号，$是输入右端的结束标记
-        follows.put(Symbol.START, SetUtils.of(Symbol.DOLLAR));
+        follows.put(start, SetUtils.of(Symbol.DOLLAR));
 
         boolean canBreak = false;
         while (!canBreak) {
@@ -306,7 +311,7 @@ public class LL1 implements LLParser {
 
         LinkedList<Symbol> symbolStack = new LinkedList<>();
         symbolStack.push(Symbol.DOLLAR);
-        symbolStack.push(Symbol.START);
+        symbolStack.push(start);
 
         Token token = null;
         Symbol symbol;
@@ -784,10 +789,6 @@ public class LL1 implements LLParser {
          */
         private void substitutionNonTerminator(Symbol _AI, Symbol _AJ) {
 
-            if (_AI.equals(Symbol.START)) {
-                return;
-            }
-
             Production pI = productionMap.get(_AI);
             Production pJ = productionMap.get(_AJ);
 
@@ -930,9 +931,6 @@ public class LL1 implements LLParser {
          * @param _A 产生式左部的非终结符
          */
         private void extractLeftCommonFactor(Symbol _A) {
-            if (_A.equals(Symbol.START)) {
-                return;
-            }
 
             Production p1 = productionMap.get(_A);
 
@@ -1051,6 +1049,7 @@ public class LL1 implements LLParser {
 
         private Grammar createNewGrammar() {
             return Grammar.create(
+                    grammar.getStart(),
                     productionMap.entrySet()
                             .stream()
                             .map(Map.Entry::getValue)

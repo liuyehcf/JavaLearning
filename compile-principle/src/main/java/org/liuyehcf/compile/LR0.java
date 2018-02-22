@@ -102,7 +102,10 @@ public class LR0 implements LRParser {
                 }
             }
 
-            return Grammar.create(newProductions);
+            return Grammar.create(
+                    grammar.getStart(),
+                    newProductions
+            );
         }
 
     }

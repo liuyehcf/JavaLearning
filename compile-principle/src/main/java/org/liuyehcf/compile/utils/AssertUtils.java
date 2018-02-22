@@ -19,6 +19,12 @@ public abstract class AssertUtils {
         }
     }
 
+    public static void assertNull(Object obj) {
+        if (obj != null) {
+            throw new AssertionError();
+        }
+    }
+
     public static void assertEquals(Object expect, Object target) {
         assertNotNull(expect);
         assertNotNull(target);
