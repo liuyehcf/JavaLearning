@@ -8,10 +8,10 @@ import java.util.List;
 /**
  * Created by Liuye on 2017/10/21.
  */
-public class PrimeProduction {
+public class PrimaryProduction {
     private final List<Symbol> symbols;
 
-    public PrimeProduction(Object... objects) {
+    public PrimaryProduction(Object... objects) {
         this.symbols = new ArrayList<>();
         for (Object obj : objects) {
             if (obj instanceof Character) {
@@ -26,7 +26,7 @@ public class PrimeProduction {
         }
     }
 
-    public PrimeProduction(List<Symbol> symbols) {
+    public PrimaryProduction(List<Symbol> symbols) {
         this.symbols = symbols;
     }
 

@@ -647,7 +647,7 @@ public class LL1 implements LLParser {
         private Map<Symbol, Production> productionMap;
 
         // 根据依赖关系将非终结符进行排序后的结果（有向图遍历）
-        private List<Symbol> sortedSymbols;
+        private List<Symbol> sortedNonTerminators;
 
         private GrammarConverter(Grammar grammar) {
             this.grammar = grammar;
@@ -663,10 +663,10 @@ public class LL1 implements LLParser {
 
             init();
 
-            for (int i = 0; i < sortedSymbols.size(); i++) {
-                Symbol _AI = sortedSymbols.get(i);
+            for (int i = 0; i < sortedNonTerminators.size(); i++) {
+                Symbol _AI = sortedNonTerminators.get(i);
                 for (int j = 0; j < i; j++) {
-                    Symbol _AJ = sortedSymbols.get(j);
+                    Symbol _AJ = sortedNonTerminators.get(j);
                     // 如果非终结符I的产生式里第一个非终结符是J，那么用J的产生式替换掉非终结符J
                     substitutionNonTerminator(_AI, _AJ);
                 }
@@ -703,10 +703,10 @@ public class LL1 implements LLParser {
                 }
             }
 
-            createOrderedSymbols();
+            initSortedNonTerminators();
         }
 
-        private void createOrderedSymbols() {
+        private void initSortedNonTerminators() {
             // 有向边，从key指向value
             Map<Symbol, List<Symbol>> edges = new HashMap<>();
 
@@ -768,7 +768,7 @@ public class LL1 implements LLParser {
 
             assertTrue(visitedSymbol.size() == productionMap.size());
 
-            this.sortedSymbols = visitedSymbol;
+            this.sortedNonTerminators = visitedSymbol;
         }
 
         /**

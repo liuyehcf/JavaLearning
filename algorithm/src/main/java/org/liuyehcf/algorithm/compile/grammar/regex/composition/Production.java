@@ -7,10 +7,10 @@ import org.liuyehcf.algorithm.compile.grammar.regex.symbol.Symbol;
  */
 public class Production {
     private final Symbol left;
-    private final PrimeProduction right;
+    private final PrimaryProduction right;
 
     public Production(Symbol left,
-                      PrimeProduction right) {
+                      PrimaryProduction right) {
         this.left = left;
         this.right = right;
     }
@@ -19,7 +19,7 @@ public class Production {
         return left;
     }
 
-    public PrimeProduction getRight() {
+    public PrimaryProduction getRight() {
         return right;
     }
 

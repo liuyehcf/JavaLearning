@@ -11,32 +11,32 @@ import java.util.Map;
  * Created by Liuye on 2017/10/21.
  */
 public class Grammar {
-    private static Symbol NONE_NON_ALPHABET = Symbol.createNonAlphabetSymbol("NONE_NON_ALPHABET");
-    Map<Symbol, PrimeProduction> finalSymbolSymbolStringMap;
-    private List<Symbol> nonAlphabetSymbols;
+    private static Symbol DEFAULT_NON_TERMINATOR = Symbol.createNonAlphabetSymbol("DEFAULT_NON_TERMINATOR");
+    Map<Symbol, PrimaryProduction> finalSymbolSymbolStringMap;
+    private List<Symbol> nonTerminator;
     private Map<Symbol, Production> nonAlphabetSymbolProductionMap;
-    private PrimeProduction finalSymbolString;
+    private PrimaryProduction finalSymbolString;
 
     public Grammar(Production... productions) {
-        nonAlphabetSymbols = new ArrayList<>();
+        nonTerminator = new ArrayList<>();
         nonAlphabetSymbolProductionMap = new HashMap<>();
         for (Production production : productions) {
             Symbol nonAlphabetSymbol = production.getLeft();
             if (nonAlphabetSymbolProductionMap.containsKey(nonAlphabetSymbol)) throw new RuntimeException();
-            nonAlphabetSymbols.add(nonAlphabetSymbol);
+            nonTerminator.add(nonAlphabetSymbol);
             nonAlphabetSymbolProductionMap.put(nonAlphabetSymbol, production);
         }
     }
 
     public static Grammar createGrammarDefinitionOfNormalRegex(String regex) {
         Grammar grammarDefinition = new Grammar(
-                new Production(NONE_NON_ALPHABET, new PrimeProduction(regex))
+                new Production(DEFAULT_NON_TERMINATOR, new PrimaryProduction(regex))
         );
 
         return grammarDefinition;
     }
 
-    public PrimeProduction getFinalSymbolString() {
+    public PrimaryProduction getFinalSymbolString() {
         if (finalSymbolString == null) {
             parseFinalSymbolString();
         }
@@ -49,14 +49,14 @@ public class Grammar {
 
         initFinalSymbolStringMap();
 
-        Symbol lastNonAlphabetSymbol = nonAlphabetSymbols.get(nonAlphabetSymbols.size() - 1);
+        Symbol lastNonAlphabetSymbol = nonTerminator.get(nonTerminator.size() - 1);
         this.finalSymbolString = finalSymbolSymbolStringMap.get(lastNonAlphabetSymbol);
     }
 
     private void checkIfFirstProductionHasNonAlphabetSymbol() {
-        Production production = nonAlphabetSymbolProductionMap.get(nonAlphabetSymbols.get(0));
+        Production production = nonAlphabetSymbolProductionMap.get(nonTerminator.get(0));
 
-        PrimeProduction symbolString = production.getRight();
+        PrimaryProduction symbolString = production.getRight();
 
         for (Symbol symbol : symbolString.getSymbols()) {
             if (!symbol.isTerminator())
@@ -66,9 +66,9 @@ public class Grammar {
 
     private void initFinalSymbolStringMap() {
         finalSymbolSymbolStringMap = new HashMap<>();
-        for (int i = 0; i < nonAlphabetSymbols.size(); i++) {
+        for (int i = 0; i < nonTerminator.size(); i++) {
             List<Symbol> finalSymbolsOfCurProduction = new ArrayList<>();
-            Symbol nonAlphabetSymbolOfCurProduction = nonAlphabetSymbols.get(i);
+            Symbol nonAlphabetSymbolOfCurProduction = nonTerminator.get(i);
 
             Production curProduction = nonAlphabetSymbolProductionMap.get(nonAlphabetSymbolOfCurProduction);
             for (Symbol symbol : curProduction.getRight().getSymbols()) {
@@ -81,14 +81,14 @@ public class Grammar {
                 }
             }
 
-            finalSymbolSymbolStringMap.put(nonAlphabetSymbolOfCurProduction, new PrimeProduction(finalSymbolsOfCurProduction));
+            finalSymbolSymbolStringMap.put(nonAlphabetSymbolOfCurProduction, new PrimaryProduction(finalSymbolsOfCurProduction));
         }
     }
 
     @Override
     public String toString() {
         String s = "";
-        for (Symbol symbol : nonAlphabetSymbols) {
+        for (Symbol symbol : nonTerminator) {
             s += nonAlphabetSymbolProductionMap.get(symbol).toString();
         }
         return s;
