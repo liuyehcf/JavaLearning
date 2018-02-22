@@ -9,7 +9,7 @@ import static org.junit.Assert.assertEquals;
 import static org.liuyehcf.compile.definition.Symbol.createNonTerminator;
 import static org.liuyehcf.compile.definition.Symbol.createTerminator;
 
-public class TestLRParserGrammarConvert {
+public class TestLR0GrammarConvert {
 
     @Test
     public void convertCase1() {

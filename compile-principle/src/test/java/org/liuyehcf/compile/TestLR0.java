@@ -1,4 +1,4 @@
 package org.liuyehcf.compile;
 
-public class TestLRParser {
+public class TestLR0 {
 }

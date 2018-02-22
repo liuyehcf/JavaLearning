@@ -13,7 +13,7 @@ import static org.liuyehcf.compile.definition.Symbol.createNonTerminator;
 import static org.liuyehcf.compile.definition.Symbol.createRegexTerminator;
 import static org.liuyehcf.compile.definition.Symbol.createTerminator;
 
-public class TestLLParser {
+public class TestLL1 {
     @Test
     public void testFirstFollowSelectCase1() {
         Grammar grammar = Grammar.create(
