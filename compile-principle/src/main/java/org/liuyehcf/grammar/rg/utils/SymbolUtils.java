@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.liuyehcf.grammar.definition.Symbol.createNonTerminator;
 import static org.liuyehcf.grammar.definition.Symbol.createTerminator;
 import static org.liuyehcf.grammar.utils.AssertUtils.assertTrue;
 

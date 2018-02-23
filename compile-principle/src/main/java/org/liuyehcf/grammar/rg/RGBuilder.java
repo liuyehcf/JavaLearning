@@ -15,6 +15,14 @@ public class RGBuilder implements GrammarHolder {
     // 文法转换流水线
     private static final GrammarConverterPipeline grammarConverterPipeline;
 
+    static {
+        grammarConverterPipeline = GrammarConverterPipelineImpl
+                .builder()
+                .registerGrammarConverter(MergeGrammarConverter.class)
+                .registerGrammarConverter(SimplificationGrammarConverter.class)
+                .build();
+    }
+
     // 正则文法
     private final Grammar grammar;
 
@@ -28,14 +36,6 @@ public class RGBuilder implements GrammarHolder {
         this.grammar = grammar;
         this.nfa = null;
         this.dfa = null;
-    }
-
-    static {
-        grammarConverterPipeline = GrammarConverterPipelineImpl
-                .builder()
-                .registerGrammarConverter(MergeGrammarConverter.class)
-                .registerGrammarConverter(SimplificationGrammarConverter.class)
-                .build();
     }
 
     public static RGBuilder compile(Grammar grammar) {

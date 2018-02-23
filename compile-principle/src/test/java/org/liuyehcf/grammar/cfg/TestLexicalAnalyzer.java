@@ -1,7 +1,6 @@
 package org.liuyehcf.grammar.cfg;
 
 import org.junit.Test;
-import org.liuyehcf.grammar.cfg.LexicalAnalyzer;
 import org.liuyehcf.grammar.core.MorphemeType;
 
 import static org.junit.Assert.assertEquals;

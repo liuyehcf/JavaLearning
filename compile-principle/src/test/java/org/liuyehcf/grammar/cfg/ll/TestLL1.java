@@ -10,9 +10,7 @@ import org.liuyehcf.grammar.definition.Symbol;
 
 import static org.junit.Assert.*;
 import static org.liuyehcf.grammar.cfg.TestLexicalAnalyzer.getIdRegex;
-import static org.liuyehcf.grammar.definition.Symbol.createNonTerminator;
-import static org.liuyehcf.grammar.definition.Symbol.createRegexTerminator;
-import static org.liuyehcf.grammar.definition.Symbol.createTerminator;
+import static org.liuyehcf.grammar.definition.Symbol.*;
 
 public class TestLL1 {
     @Test

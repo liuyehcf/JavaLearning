@@ -11,7 +11,7 @@ import java.util.*;
 public class NfaState {
     private static int count = 1;
     private final int id = count++;
-    private final List<NfaState> NONE = new ArrayList<>();
+    private final List<NfaState> NONE = Collections.unmodifiableList(new ArrayList<>());
     private boolean canReceive;
     private Map<Symbol, List<NfaState>> nextNfaStatesMap = new HashMap<>();
 

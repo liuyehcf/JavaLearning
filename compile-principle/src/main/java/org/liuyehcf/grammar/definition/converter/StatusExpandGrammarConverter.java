@@ -10,8 +10,8 @@ import java.util.List;
 
 /**
  * 将形如 A → a的文法转换成
- *      1. A → ·a
- *      2. A → a·
+ * 1. A → ·a
+ * 2. A → a·
  */
 public class StatusExpandGrammarConverter extends AbstractGrammarConverter {
 

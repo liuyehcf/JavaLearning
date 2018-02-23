@@ -2,8 +2,8 @@ package org.liuyehcf.grammar.cfg;
 
 import org.liuyehcf.grammar.core.MorphemeType;
 import org.liuyehcf.grammar.parse.Token;
-import org.liuyehcf.grammar.utils.Pair;
 import org.liuyehcf.grammar.utils.AssertUtils;
+import org.liuyehcf.grammar.utils.Pair;
 
 import java.util.*;
 import java.util.regex.Matcher;
