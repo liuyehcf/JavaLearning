@@ -155,5 +155,17 @@ public class TestNfa {
     public void testGroupPrint() {
         RGParser parser = RGBuilder.compile("(abc(cd)(ef(g)))").buildNfa();
         parser.print();
+
+        Matcher matcher = parser.matcher("abccdefg");
+
+
+        System.out.println(matcher.matches());
+
+        System.out.println(matcher.group(0));
+        System.out.println(matcher.group(1));
+        System.out.println(matcher.group(2));
+        System.out.println(matcher.group(3));
+        System.out.println(matcher.group(4));
+
     }
 }

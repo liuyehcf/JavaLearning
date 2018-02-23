@@ -127,12 +127,10 @@ class NfaBuildIterator {
             //todo assertTrue(groupNfaClosures.isEmpty());
             curNfaClosure = NfaClosure.getEmptyClosureForGroup(0);
         }
-        nfaClosure = curNfaClosure;
 
-        for (NfaState endNfaState : curNfaClosure.getEndNfaStates()) {
-            assertTrue(getCurGroup() == 0);
-            endNfaState.setReceive(getCurGroup());
-        }
+        setStartAndReceiveOfCurNfaClosure();
+
+        nfaClosure = curNfaClosure;
     }
 
     private void processEachSymbol() {
@@ -402,14 +400,46 @@ class NfaBuildIterator {
     private void combineTwoClosure(NfaClosure preNfaClosure, NfaClosure nextNfaClosure) {
         assertTrue(preNfaClosure.getGroup() == nextNfaClosure.getGroup());
 
+        // 符号说明:
+        //      S: 开始节点
+        //      E(i): 第i个终止节点
+        //      S.N(i): 开始节点的第i个后继节点
+        //      --*>: 经过多步跳转
+        //      -->: 经过一步跳转
+        //
+        // 连接前:
+        //      pre.S --*> Pre.E(1)              next.S --> next.N(1)
+        //      pre.S --*> Pre.E(2)              next.S --> next.N(2)
+        //       ...                               ...
+        //      Pre.S --*> Pre.E(n)              next.S --> next.N(m)
+        //
+        //
+        // 连接后: 将前一个NfaClosure的每一个终止节点，连接到下一个NfaClosure的起始节点的所有后继节点
+        //      pre.S --*> Pre.E(1) --> next.N(1)   pre.S --*> Pre.E(2) --> next.N(1)            pre.S --*> Pre.E(n) --> next.N(1)
+        //      pre.S --*> Pre.E(1) --> next.N(2)   pre.S --*> Pre.E(2) --> next.N(2)     ...    pre.S --*> Pre.E(n) --> next.N(2)
+        //                   ...                                 ...                                          ...
+        //      pre.S --*> Pre.E(1) --> next.N(m)   pre.S --*> Pre.E(2) --> next.N(m)            pre.S --*> Pre.E(n) --> next.N(m)
+        //
+        // next.S节点，在连接后被移除了
+
         for (NfaState endNfaStateOfPreNfaClosure : preNfaClosure.getEndNfaStates()) {
             NfaState startNfaStateOfNextNfaClosure = nextNfaClosure.getStartNfaState();
+
+            // 以下两行循环需要保留被移除的startNfaStateOfNextNfaClosure节点的状态信息，保留在每个endNfaStateOfPreNfaClosure中
+            for (int group : startNfaStateOfNextNfaClosure.getGroupStart()) {
+                endNfaStateOfPreNfaClosure.setStart(group);
+            }
+
+            for (int group : startNfaStateOfNextNfaClosure.getGroupReceive()) {
+                endNfaStateOfPreNfaClosure.setReceive(group);
+            }
+
+            // 以下循环用于连接两个NfaClosure
             for (Symbol inputSymbol : startNfaStateOfNextNfaClosure.getAllInputSymbol()) {
                 for (NfaState nextNfaState : startNfaStateOfNextNfaClosure.getNextNfaStatesWithInputSymbol(inputSymbol)) {
                     endNfaStateOfPreNfaClosure.addInputSymbolAndNextNfaState(inputSymbol, nextNfaState);
                 }
             }
-
         }
 
         preNfaClosure.setEndNfaStates(nextNfaClosure.getEndNfaStates());

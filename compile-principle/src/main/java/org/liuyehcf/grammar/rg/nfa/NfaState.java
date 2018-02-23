@@ -28,6 +28,14 @@ public class NfaState {
         return id;
     }
 
+    public Set<Integer> getGroupStart() {
+        return groupStart;
+    }
+
+    public Set<Integer> getGroupReceive() {
+        return groupReceive;
+    }
+
     public void setStart(int group) {
         assertFalse(groupStart.contains(group));
         groupStart.add(group);
