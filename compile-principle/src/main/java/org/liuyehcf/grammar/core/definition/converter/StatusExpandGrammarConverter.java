@@ -28,11 +28,11 @@ public class StatusExpandGrammarConverter extends AbstractGrammarConverter {
         //   v
         // A → ·B
         // A → B·
-        for (Production p : originalGrammar.getProductions()) {
-            Symbol _A = p.getLeft();
+        for (Production _P : originalGrammar.getProductions()) {
+            Symbol _A = _P.getLeft();
 
-            for (PrimaryProduction pp : p.getRight()) {
-                List<Symbol> symbols = pp.getSymbols();
+            for (PrimaryProduction _PP : _P.getRight()) {
+                List<Symbol> symbols = _PP.getSymbols();
                 int length = symbols.size();
 
                 // 构造新的  length+1个 PrimaryProduction

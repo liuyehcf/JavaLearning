@@ -51,13 +51,13 @@ public class SimplificationGrammarConverter extends AbstractGrammarConverter {
      * 初始化一些字段，包括非终结符集合，Production映射表
      */
     private void init() {
-        for (Production production : originalGrammar.getProductions()) {
-            Symbol nonTerminator = production.getLeft();
+        for (Production _P : originalGrammar.getProductions()) {
+            Symbol nonTerminator = _P.getLeft();
 
             assertFalse(productionMap.containsKey(nonTerminator));
 
             this.sortedNonTerminators.add(nonTerminator);
-            productionMap.put(nonTerminator, production);
+            productionMap.put(nonTerminator, _P);
         }
 
         initSortedNonTerminators();
@@ -79,8 +79,8 @@ public class SimplificationGrammarConverter extends AbstractGrammarConverter {
         for (Map.Entry<Symbol, Production> entry : productionMap.entrySet()) {
             Symbol toSymbol = entry.getKey();
 
-            for (PrimaryProduction pp : entry.getValue().getRight()) {
-                for (Symbol fromSymbol : pp.getSymbols()) {
+            for (PrimaryProduction _PP : entry.getValue().getRight()) {
+                for (Symbol fromSymbol : _PP.getSymbols()) {
                     if (!fromSymbol.isTerminator()) {
                         edges.get(fromSymbol).add(toSymbol);
 
@@ -122,15 +122,15 @@ public class SimplificationGrammarConverter extends AbstractGrammarConverter {
     }
 
     /**
-     * 检查正则文法第一条语句是否合法
+     * 检查正则文法第一条语句是否合法 TODO
      */
     private void checkIfFirstProductionContainsNonTerminator() {
-        Production production = productionMap.get(sortedNonTerminators.get(0));
+        Production _P = productionMap.get(sortedNonTerminators.get(0));
 
-        assertTrue(production.getRight().size() == 1);
-        PrimaryProduction pp = production.getRight().get(0);
+        assertTrue(_P.getRight().size() == 1);
+        PrimaryProduction _PP = _P.getRight().get(0);
 
-        for (Symbol symbol : pp.getSymbols()) {
+        for (Symbol symbol : _PP.getSymbols()) {
             // 正则语法第一条产生式不能包含非终结符
             assertTrue(symbol.isTerminator());
         }
@@ -144,11 +144,11 @@ public class SimplificationGrammarConverter extends AbstractGrammarConverter {
 
             List<Symbol> modifiedSymbols = new ArrayList<>();
 
-            Production p = productionMap.get(nonTerminator);
-            assertTrue(p.getRight().size() == 1);
-            PrimaryProduction pp = p.getRight().get(0);
+            Production _P = productionMap.get(nonTerminator);
+            assertTrue(_P.getRight().size() == 1);
+            PrimaryProduction _PP = _P.getRight().get(0);
 
-            for (Symbol symbol : pp.getSymbols()) {
+            for (Symbol symbol : _PP.getSymbols()) {
                 if (!symbol.isTerminator()) {
                     modifiedSymbols.add(SymbolUtils._leftSmallParenthesis);
 

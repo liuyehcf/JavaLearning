@@ -20,14 +20,14 @@ public class MergeGrammarConverter extends AbstractGrammarConverter {
         super(originalGrammar);
     }
 
-    private static Production parallelProduction(Production p1, Production p2) {
-        AssertUtils.assertTrue(p1.getLeft().equals(p2.getLeft()));
+    private static Production parallelProduction(Production _P1, Production _P2) {
+        AssertUtils.assertTrue(_P1.getLeft().equals(_P2.getLeft()));
 
-        List<PrimaryProduction> right = new ArrayList<>(p1.getRight());
-        right.addAll(p2.getRight());
+        List<PrimaryProduction> right = new ArrayList<>(_P1.getRight());
+        right.addAll(_P2.getRight());
 
         return Production.create(
-                p1.getLeft(),
+                _P1.getLeft(),
                 right);
     }
 
@@ -35,8 +35,8 @@ public class MergeGrammarConverter extends AbstractGrammarConverter {
     protected Grammar doConvert() {
         Map<Symbol, Production> productionMap = new HashMap<>();
 
-        for (Production p : originalGrammar.getProductions()) {
-            Symbol nonTerminator = p.getLeft();
+        for (Production _P : originalGrammar.getProductions()) {
+            Symbol nonTerminator = _P.getLeft();
             AssertUtils.assertFalse(nonTerminator.isTerminator());
 
             // 合并相同左部的产生式
@@ -45,11 +45,11 @@ public class MergeGrammarConverter extends AbstractGrammarConverter {
                         nonTerminator,
                         parallelProduction(
                                 productionMap.get(nonTerminator),
-                                p
+                                _P
                         )
                 );
             } else {
-                productionMap.put(nonTerminator, p);
+                productionMap.put(nonTerminator, _P);
             }
         }
 

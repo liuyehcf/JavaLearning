@@ -55,8 +55,8 @@ public class Production {
         sb.append(left.toReadableJSONString())
                 .append(" → ");
 
-        for (PrimaryProduction pp : right) {
-            sb.append(pp.toReadableJSONString())
+        for (PrimaryProduction _PP : right) {
+            sb.append(_PP.toReadableJSONString())
                     .append(' ')
                     .append(OR)
                     .append(' ');

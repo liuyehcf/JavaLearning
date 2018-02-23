@@ -51,8 +51,8 @@ public class Grammar {
                 .append("\"productions\":")
                 .append('[');
 
-        for (Production p : productions) {
-            sb.append(p.toReadableJSONString())
+        for (Production _P : productions) {
+            sb.append(_P.toReadableJSONString())
                     .append(",");
         }
 

@@ -104,11 +104,11 @@ public class LL1 implements LLParser {
 
         this.start = this.grammar.getStart();
 
-        for (Production p : grammar.getProductions()) {
-            nonTerminatorSymbols.add(p.getLeft());
+        for (Production _P : grammar.getProductions()) {
+            nonTerminatorSymbols.add(_P.getLeft());
 
-            for (PrimaryProduction pp : p.getRight()) {
-                for (Symbol symbol : pp.getSymbols()) {
+            for (PrimaryProduction _PP : _P.getRight()) {
+                for (Symbol symbol : _PP.getSymbols()) {
                     if (symbol.isTerminator()) {
                         terminatorSymbols.add(symbol);
                     } else {
@@ -117,8 +117,8 @@ public class LL1 implements LLParser {
                 }
             }
 
-            assertFalse(productionMap.containsKey(p.getLeft()));
-            productionMap.put(p.getLeft(), p);
+            assertFalse(productionMap.containsKey(_P.getLeft()));
+            productionMap.put(_P.getLeft(), _P);
         }
 
         symbols.addAll(nonTerminatorSymbols);
@@ -137,20 +137,20 @@ public class LL1 implements LLParser {
             Map<Symbol, Set<Symbol>> newFirsts = new HashMap<>(this.firsts);
 
             for (Symbol _X : nonTerminatorSymbols) {
-                Production pX = productionMap.get(_X);
+                Production _PX = productionMap.get(_X);
 
-                assertNotNull(pX);
+                assertNotNull(_PX);
 
                 // 如果X是一个非终结符，且X→Y1...Yk∈P(k≥1)
                 // 那么如果对于某个i，a在FIRST(Yi)中且ε在所有的FIRST(Y1),...,FIRST(Yi−1)中(即Y1...Yi−1⇒∗ε)，就把a加入到FIRST(X)中
                 // 如果对于所有的j=1,2,...,k，ε在FIRST(Yj)中，那么将ε加入到FIRST(X)
 
                 // 这里需要遍历每个子产生式
-                for (PrimaryProduction ppX : pX.getRight()) {
+                for (PrimaryProduction _PPX : _PX.getRight()) {
                     boolean canReachEpsilon = true;
 
-                    for (int i = 0; i < ppX.getSymbols().size(); i++) {
-                        Symbol _YI = ppX.getSymbols().get(i);
+                    for (int i = 0; i < _PPX.getSymbols().size(); i++) {
+                        Symbol _YI = _PPX.getSymbols().get(i);
                         if (!newFirsts.containsKey(_YI)) {
                             // 说明该符号的first集尚未计算，因此跳过当前子表达式
                             canReachEpsilon = false;
@@ -199,21 +199,21 @@ public class LL1 implements LLParser {
             Map<Symbol, Set<Symbol>> newFollows = new HashMap<>(this.follows);
 
             for (Symbol _A : nonTerminatorSymbols) {
-                Production pA = productionMap.get(_A);
+                Production _PA = productionMap.get(_A);
 
-                assertNotNull(pA);
+                assertNotNull(_PA);
 
-                for (PrimaryProduction ppA : pA.getRight()) {
-                    for (int i = 0; i < ppA.getSymbols().size(); i++) {
-                        Symbol _B = ppA.getSymbols().get(i);
+                for (PrimaryProduction _PPA : _PA.getRight()) {
+                    for (int i = 0; i < _PPA.getSymbols().size(); i++) {
+                        Symbol _B = _PPA.getSymbols().get(i);
                         Symbol _BetaFirst = null;
 
                         if (_B.isTerminator()) {
                             continue;
                         }
 
-                        if (i < ppA.getSymbols().size() - 1) {
-                            _BetaFirst = ppA.getSymbols().get(i + 1);
+                        if (i < _PPA.getSymbols().size() - 1) {
+                            _BetaFirst = _PPA.getSymbols().get(i + 1);
                         }
 
                         // 如果存在一个产生式A→αBβ，那么FIRST(β)中除ε之外的所有符号都在FOLLOW(B)中
@@ -268,28 +268,28 @@ public class LL1 implements LLParser {
     private void calculateSelect() {
 
         for (Symbol _A : nonTerminatorSymbols) {
-            Production pA = productionMap.get(_A);
+            Production _PA = productionMap.get(_A);
 
-            for (PrimaryProduction ppA : pA.getRight()) {
-                Symbol firstAlpha = ppA.getSymbols().get(0);
+            for (PrimaryProduction _PPA : _PA.getRight()) {
+                Symbol firstAlpha = _PPA.getSymbols().get(0);
 
                 if (!selects.containsKey(_A)) {
                     selects.put(_A, new HashMap<>());
                 }
-                assertFalse(selects.get(_A).containsKey(ppA));
+                assertFalse(selects.get(_A).containsKey(_PPA));
 
-                selects.get(_A).put(ppA, new HashSet<>());
+                selects.get(_A).put(_PPA, new HashSet<>());
 
                 // 如果ε∉FIRST(α)，那么SELECT(A→α)=FIRST(α)
                 if (!firsts.get(firstAlpha).contains(Symbol.EPSILON)) {
 
-                    selects.get(_A).get(ppA).addAll(
+                    selects.get(_A).get(_PPA).addAll(
                             firsts.get(firstAlpha)
                     );
                 }
                 // 如果ε∈FIRST(α)，那么SELECT(A→α)=(FIRST(α)−{ε})∪FOLLOW(A)
                 else {
-                    selects.get(_A).get(ppA).addAll(
+                    selects.get(_A).get(_PPA).addAll(
                             SetUtils.of(
                                     SetUtils.extract(firsts.get(firstAlpha), Symbol.EPSILON),
                                     follows.get(_A)
@@ -368,11 +368,11 @@ public class LL1 implements LLParser {
                         token = null;
                     }
                 } else {
-                    PrimaryProduction pp = findProductionByToken(symbol, token);
+                    PrimaryProduction _PP = findProductionByToken(symbol, token);
 
-                    // System.out.println(symbol.getStatus() + " → " + pp.getStatus());
+                    // System.out.println(symbol.getStatus() + " → " + _PP.getStatus());
 
-                    List<Symbol> reversedSymbols = new ArrayList<>(pp.getSymbols());
+                    List<Symbol> reversedSymbols = new ArrayList<>(_PP.getSymbols());
 
                     Collections.reverse(reversedSymbols);
 
@@ -393,21 +393,21 @@ public class LL1 implements LLParser {
 
         Map<PrimaryProduction, Set<Symbol>> map = selects.get(symbol);
 
-        PrimaryProduction ppSelectedOne = null;
+        PrimaryProduction _PPSelected = null;
 
         for (Map.Entry<PrimaryProduction, Set<Symbol>> entry : map.entrySet()) {
             for (Symbol selectedSymbol : entry.getValue()) {
                 if (selectedSymbol.getValue().equals(key)) {
-                    ppSelectedOne = entry.getKey();
+                    _PPSelected = entry.getKey();
                 }
             }
         }
 
-        if (ppSelectedOne == null) {
+        if (_PPSelected == null) {
             throw new ParserException();
         }
 
-        return ppSelectedOne;
+        return _PPSelected;
     }
 
     @Override
@@ -611,24 +611,24 @@ public class LL1 implements LLParser {
 
             for (Symbol terminator : terminatorSymbols) {
 
-                PrimaryProduction ppA = null;
+                PrimaryProduction _PPA = null;
 
                 for (Map.Entry<PrimaryProduction, Set<Symbol>> entry : selects.get(_A).entrySet()) {
 
                     Set<Symbol> selectsOfA = entry.getValue();
 
                     if (selectsOfA.contains(terminator)) {
-                        ppA = entry.getKey();
+                        _PPA = entry.getKey();
                         break;
                     }
                 }
 
-                if (ppA != null) {
+                if (_PPA != null) {
                     sb.append(separator)
                             .append(' ')
                             .append(_A.toReadableJSONString())
                             .append(" → ")
-                            .append(ppA.toReadableJSONString())
+                            .append(_PPA.toReadableJSONString())
                             .append(' ');
                 } else {
                     sb.append(separator)

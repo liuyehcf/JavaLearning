@@ -49,10 +49,10 @@ public abstract class GrammarUtils {
     public static List<Symbol> extractSymbolsFromGrammar(Grammar grammar) {
         assertTrue(grammar.getProductions().size() == 1);
 
-        Production p = grammar.getProductions().get(0);
+        Production _P = grammar.getProductions().get(0);
 
-        assertTrue(p.getRight().size() == 1);
+        assertTrue(_P.getRight().size() == 1);
 
-        return p.getRight().get(0).getSymbols();
+        return _P.getRight().get(0).getSymbols();
     }
 }

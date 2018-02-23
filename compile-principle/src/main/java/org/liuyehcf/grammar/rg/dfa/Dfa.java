@@ -50,6 +50,16 @@ public class Dfa implements RGParser {
     }
 
     @Override
+    public boolean find() {
+        return false;
+    }
+
+    @Override
+    public String group(int group) {
+        return null;
+    }
+
+    @Override
     public void print() {
         assert !startDfaStates.isEmpty();
         startDfaStates.get(0).print();
@@ -73,16 +83,16 @@ public class Dfa implements RGParser {
         private Set<DfaState> markedDfaStates = new HashSet<>();
         private Set<DfaState> unMarkedDfaStates = new HashSet<>();
 
-        public Transfer(NfaClosure nfaClosure) {
+        private Transfer(NfaClosure nfaClosure) {
             this.nfaClosure = nfaClosure;
             init();
         }
 
-        public static DfaState getStartDfaStateFromNfaClosure(NfaClosure nfaClosure) {
+        private static DfaState getStartDfaStateFromNfaClosure(NfaClosure nfaClosure) {
             return new Transfer(nfaClosure).getStartDfaState();
         }
 
-        public DfaState getStartDfaState() {
+        private DfaState getStartDfaState() {
             return startDfaState;
         }
 

@@ -54,6 +54,16 @@ public class Nfa implements RGParser {
         return null;
     }
 
+    @Override
+    public boolean find() {
+        return false;
+    }
+
+    @Override
+    public String group(int group) {
+        return null;
+    }
+
     private boolean isMatchDfs(NfaState curNfaState, String s, int index, Set<String> visitedNfaState) {
         List<NfaState> epsilonNextStates = curNfaState.getNextNfaStatesWithInputSymbol(
                 Symbol.EPSILON
