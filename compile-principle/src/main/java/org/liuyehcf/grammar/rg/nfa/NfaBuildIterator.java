@@ -298,6 +298,10 @@ class NfaBuildIterator {
     private void processWhenEncounteredLeftSmallParenthesis() {
         enterGroup();
 
+        pushCurNfaClosure();
+
+        buildEmptyNfaClosure();
+
         moveForward();
     }
 
@@ -384,6 +388,21 @@ class NfaBuildIterator {
         curNfaClosure = buildNfaClosureWithSymbols(Arrays.asList(getCurSymbol()));
     }
 
+    private void buildEmptyNfaClosure() {
+        curNfaClosure = buildNonOrdinaryNfaClosure();
+    }
+
+    private NfaClosure buildNonOrdinaryNfaClosure() {
+        NfaState startNfaState = new NfaState();
+        List<NfaState> endNfaStates = new ArrayList<>();
+
+        // todo 这里创建了一个多余的EPSILON边
+        startNfaState.addInputSymbolAndNextNfaState(Symbol.EPSILON, startNfaState);
+        endNfaStates.add(startNfaState);
+
+        return new NfaClosure(startNfaState, endNfaStates, getCurGroup());
+    }
+
     private NfaClosure buildNfaClosureWithSymbols(Collection<Symbol> symbols) {
         NfaState startNfaState = new NfaState();
         List<NfaState> endNfaStates = new ArrayList<>();
@@ -433,6 +452,8 @@ class NfaBuildIterator {
             for (int group : startNfaStateOfNextNfaClosure.getGroupReceive()) {
                 endNfaStateOfPreNfaClosure.setReceive(group);
             }
+
+
 
             // 以下循环用于连接两个NfaClosure
             for (Symbol inputSymbol : startNfaStateOfNextNfaClosure.getAllInputSymbol()) {

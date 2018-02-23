@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.liuyehcf.grammar.rg.TestRegex.*;
 
 /**
@@ -152,20 +154,57 @@ public class TestNfa {
     }
 
     @Test
-    public void testGroupPrint() {
-        RGParser parser = RGBuilder.compile("(abc(cd)(ef(g)))").buildNfa();
+    public void testGroupMatcher1() {
+        RGParser parser = RGBuilder.compile("(abc(cd)(ef(g)()))").buildNfa();
         parser.print();
 
         Matcher matcher = parser.matcher("abccdefg");
 
+        assertTrue(matcher.matches());
+        assertEquals(
+                "abccdefg",
+                matcher.group(0)
+        );
+        assertEquals(
+                "abccdefg",
+                matcher.group(1)
+        );
+        assertEquals(
+                "cd",
+                matcher.group(2)
+        );
+        assertEquals(
+                "efg",
+                matcher.group(3)
+        );
+        assertEquals(
+                "g",
+                matcher.group(4)
+        );
+        assertEquals(
+                "",
+                matcher.group(5)
+        );
+    }
 
-        System.out.println(matcher.matches());
+    @Test
+    public void testGroupMatcher2() {
+        RGParser parser = RGBuilder.compile("((a)|(b))").buildNfa();
 
-        System.out.println(matcher.group(0));
-        System.out.println(matcher.group(1));
+        parser.print();
+
+        Matcher matcher = parser.matcher("a");
+
+        assertTrue(matcher.matches());
+        assertEquals(
+                "a",
+                matcher.group(0)
+        );
+        assertEquals(
+                "a",
+                matcher.group(1)
+        );
+
         System.out.println(matcher.group(2));
-        System.out.println(matcher.group(3));
-        System.out.println(matcher.group(4));
-
     }
 }
