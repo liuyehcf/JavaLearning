@@ -3,7 +3,7 @@ package org.liuyehcf.grammar.rg.dfa;
 import org.liuyehcf.grammar.rg.Matcher;
 import org.liuyehcf.grammar.rg.utils.SymbolUtils;
 
-import static org.liuyehcf.grammar.utils.AssertUtils.assertFalse;
+import static org.liuyehcf.grammar.utils.AssertUtils.assertNotNull;
 
 public class DfaMatcher implements Matcher{
 
@@ -18,8 +18,8 @@ public class DfaMatcher implements Matcher{
 
     @Override
     public boolean matches() {
-        assertFalse(dfa.getGroupStartDfaStates().isEmpty());
-        DfaState curDfaState = dfa.getGroupStartDfaStates().get(0);
+        DfaState curDfaState = dfa.getStartDfaState();
+        assertNotNull(curDfaState);
         for (int i = 0; i < input.length(); i++) {
             DfaState nextDfaState = curDfaState.getNextDfaStateWithSymbol(
                     SymbolUtils.getAlphabetSymbolWithChar(input.charAt(i))

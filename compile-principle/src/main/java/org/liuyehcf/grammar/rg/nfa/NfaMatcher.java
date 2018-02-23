@@ -28,7 +28,7 @@ public class NfaMatcher implements Matcher {
 
     @Override
     public boolean matches() {
-        NfaState curNfaState = nfa.getWholeNfaClosure().getStartNfaState();
+        NfaState curNfaState = nfa.getNfaClosure().getStartNfaState();
 
         Set<String> visitedNfaState = new HashSet<>();
 
@@ -36,7 +36,7 @@ public class NfaMatcher implements Matcher {
     }
 
     private boolean isMatchDfs(NfaState curNfaState, String s, int index, Set<String> visitedNfaState) {
-        // 从当前状态出发，经过ε边的next状态集合
+        // 从当前节点出发，经过ε边的后继节点集合
         List<NfaState> epsilonNextStates = curNfaState.getNextNfaStatesWithInputSymbol(
                 Symbol.EPSILON
         );
@@ -50,10 +50,10 @@ public class NfaMatcher implements Matcher {
         }
 
         if (index == s.length()) {
-            return curNfaState.isCanReceive();
+            return curNfaState.canReceive(0);
         }
 
-        // 从当前状态出发，经过非ε边的next状态集合
+        // 从当前节点出发，经过非ε边的next节点集合
         List<NfaState> nextStates = curNfaState.getNextNfaStatesWithInputSymbol(
                 SymbolUtils.getAlphabetSymbolWithChar(s.charAt(index)));
 

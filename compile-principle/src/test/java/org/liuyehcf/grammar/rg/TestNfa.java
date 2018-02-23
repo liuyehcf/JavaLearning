@@ -154,6 +154,6 @@ public class TestNfa {
     @Test
     public void testGroupPrint() {
         RGParser parser = RGBuilder.compile("(abc(cd)(ef(g)))").buildNfa();
-        parser.printAllGroup();
+        parser.print();
     }
 }

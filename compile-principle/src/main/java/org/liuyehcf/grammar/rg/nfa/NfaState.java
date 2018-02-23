@@ -5,6 +5,8 @@ import org.liuyehcf.grammar.core.definition.Symbol;
 
 import java.util.*;
 
+import static org.liuyehcf.grammar.utils.AssertUtils.assertFalse;
+
 /**
  * Created by Liuye on 2017/10/21.
  */
@@ -12,19 +14,36 @@ public class NfaState {
     private static int count = 1;
     private final int id = count++;
     private final List<NfaState> NONE = Collections.unmodifiableList(new ArrayList<>());
-    private boolean canReceive;
+
+    // 当前节点作为 group i 的起始节点，那么i位于groupStart中
+    private Set<Integer> groupStart = new HashSet<>();
+
+    // 当前节点作为 group i 的接收节点，那么i位于groupReceive中
+    private Set<Integer> groupReceive = new HashSet<>();
+
+    // 输入符号 -> 后继节点集合 的映射表
     private Map<Symbol, List<NfaState>> nextNfaStatesMap = new HashMap<>();
 
     public int getId() {
         return id;
     }
 
-    public void setCanReceive() {
-        this.canReceive = true;
+    public void setStart(int group) {
+        assertFalse(groupStart.contains(group));
+        groupStart.add(group);
     }
 
-    public boolean isCanReceive() {
-        return canReceive;
+    public boolean isStart(int group) {
+        return groupStart.contains(group);
+    }
+
+    public void setReceive(int group) {
+        assertFalse(groupReceive.contains(group));
+        groupReceive.add(group);
+    }
+
+    public boolean canReceive(int group) {
+        return groupReceive.contains(group);
     }
 
     public Set<Symbol> getAllInputSymbol() {
@@ -32,11 +51,7 @@ public class NfaState {
     }
 
     public List<NfaState> getNextNfaStatesWithInputSymbol(Symbol symbol) {
-        if (nextNfaStatesMap.containsKey(symbol)) {
-            return nextNfaStatesMap.get(symbol);
-        } else {
-            return NONE;
-        }
+        return nextNfaStatesMap.getOrDefault(symbol, NONE);
     }
 
     public void addInputSymbolAndNextNfaState(Symbol symbol, NfaState nextNfaState) {

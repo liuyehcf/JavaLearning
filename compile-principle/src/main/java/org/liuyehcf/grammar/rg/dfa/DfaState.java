@@ -68,7 +68,7 @@ public class DfaState {
     public boolean addNfaState(NfaState nfaState) {
         boolean flag = nfaStates.add(nfaState);
         if (flag) {
-            if (nfaState.isCanReceive()) {
+            if (nfaState.canReceive(0)) { //todo
                 canReceive = true;
             }
             inputSymbols.addAll(nfaState.getAllInputSymbol());

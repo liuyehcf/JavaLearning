@@ -4,18 +4,21 @@ import org.liuyehcf.grammar.core.definition.Symbol;
 
 import java.util.*;
 
-import static org.liuyehcf.grammar.utils.AssertUtils.assertNotNull;
-
 /**
  * Created by Liuye on 2017/10/23.
  */
 public class NfaClosure {
     private static int count = 1;
     private final int id = count++;
+
+    // 起始节点
     private final NfaState startNfaState;
+
+    // 结束节点集合
     private List<NfaState> endNfaStates;
+
+    // 所在的group
     private int group;
-    private NfaClosure clonedNfaClosure;
 
     public NfaClosure(NfaState startNfaState, List<NfaState> endNfaStates, int initialGroup) {
         if (startNfaState == null) throw new RuntimeException();
@@ -58,6 +61,15 @@ public class NfaClosure {
         this.group = group;
     }
 
+    public void setStartAndReceive(int group) {
+        // 设置起始节点
+        startNfaState.setStart(group);
+
+        for(NfaState endNfaState:endNfaStates){
+            endNfaState.setReceive(group);
+        }
+    }
+
     public void print() {
         Set<NfaState> visited = new HashSet<>();
 
@@ -85,59 +97,6 @@ public class NfaClosure {
             System.out.print(nfaState + ", ");
         });
         System.out.println("\n");
-    }
-
-    public NfaClosure clone() {
-        if (clonedNfaClosure != null) {
-            return clonedNfaClosure;
-        }
-
-        Map<NfaState, NfaState> oldAndNewNfaStateMap = new HashMap<>();
-
-        dfsSearch(getStartNfaState(), oldAndNewNfaStateMap);
-        copy(oldAndNewNfaStateMap);
-
-        return clonedNfaClosure;
-    }
-
-    private void dfsSearch(NfaState curNfaState, Map<NfaState, NfaState> oldAndNewNfaStateMap) {
-        if (oldAndNewNfaStateMap.containsKey(curNfaState)) return;
-        oldAndNewNfaStateMap.put(curNfaState, new NfaState());
-
-        for (Symbol inputSymbol : curNfaState.getAllInputSymbol()) {
-            for (NfaState nextNfaState : curNfaState.getNextNfaStatesWithInputSymbol(inputSymbol)) {
-                dfsSearch(nextNfaState, oldAndNewNfaStateMap);
-            }
-        }
-    }
-
-    private void copy(Map<NfaState, NfaState> oldAndNewNfaStateMap) {
-        for (Map.Entry<NfaState, NfaState> entry : oldAndNewNfaStateMap.entrySet()) {
-            NfaState curNfaState = entry.getKey();
-
-            NfaState clonedCurNfaState = entry.getValue();
-            for (Symbol inputSymbol : curNfaState.getAllInputSymbol()) {
-                for (NfaState nextNfaState : curNfaState.getNextNfaStatesWithInputSymbol(inputSymbol)) {
-                    NfaState clonedNextNfaState = oldAndNewNfaStateMap.get(nextNfaState);
-
-                    assertNotNull(clonedCurNfaState);
-
-                    clonedCurNfaState.addInputSymbolAndNextNfaState(inputSymbol, clonedNextNfaState);
-                }
-            }
-        }
-
-
-        NfaState clonedStartNfaState = oldAndNewNfaStateMap.get(startNfaState);
-        List<NfaState> clonedEndNfaStates = new ArrayList<>();
-
-        for (NfaState endNfaState : endNfaStates) {
-            NfaState copiedEndNfaState = oldAndNewNfaStateMap.get(endNfaState);
-            clonedEndNfaStates.add(copiedEndNfaState);
-            copiedEndNfaState.setCanReceive();
-        }
-
-        clonedNfaClosure = new NfaClosure(clonedStartNfaState, clonedEndNfaStates, group);
     }
 
     @Override

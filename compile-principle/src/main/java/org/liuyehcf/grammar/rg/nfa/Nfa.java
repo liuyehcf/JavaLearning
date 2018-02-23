@@ -5,10 +5,7 @@ import org.liuyehcf.grammar.rg.Matcher;
 import org.liuyehcf.grammar.rg.RGParser;
 import org.liuyehcf.grammar.rg.utils.GrammarUtils;
 
-import java.util.List;
-
-import static org.liuyehcf.grammar.rg.nfa.NfaBuildIterator.createNfaClosuresMap;
-import static org.liuyehcf.grammar.utils.AssertUtils.assertFalse;
+import static org.liuyehcf.grammar.rg.nfa.NfaBuildIterator.createNfaClosure;
 import static org.liuyehcf.grammar.utils.AssertUtils.assertNotNull;
 
 
@@ -20,25 +17,20 @@ public class Nfa implements RGParser {
     // 正则文法
     private final Grammar grammar;
 
-    // 每个group对应的NfaClosure
-    private List<NfaClosure> groupNfaClosures;
+    // NfaClosure
+    private NfaClosure nfaClosure;
 
     public Nfa(Grammar grammar) {
         this.grammar = grammar;
         init();
     }
 
-    public List<NfaClosure> getGroupNfaClosures() {
-        return groupNfaClosures;
-    }
-
-    NfaClosure getWholeNfaClosure() {
-        assertFalse(groupNfaClosures.isEmpty());
-        return groupNfaClosures.get(0);
+    public NfaClosure getNfaClosure() {
+        return nfaClosure;
     }
 
     private void init() {
-        groupNfaClosures = createNfaClosuresMap(
+        nfaClosure = createNfaClosure(
                 GrammarUtils.extractSymbolsFromGrammar(grammar));
     }
 
@@ -59,17 +51,7 @@ public class Nfa implements RGParser {
 
     @Override
     public void print() {
-        assertNotNull(getWholeNfaClosure());
-        getWholeNfaClosure().print();
-    }
-
-    @Override
-    public void printAllGroup() {
-        for (int group = 0; group < groupNfaClosures.size(); group++) {
-            System.out.println("Group [" + group + "]");
-            groupNfaClosures.get(group).print();
-
-            System.out.println("\n--------------\n");
-        }
+        assertNotNull(nfaClosure);
+        nfaClosure.print();
     }
 }

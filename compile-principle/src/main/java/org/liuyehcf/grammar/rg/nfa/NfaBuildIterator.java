@@ -14,11 +14,22 @@ import static org.liuyehcf.grammar.utils.AssertUtils.*;
  */
 class NfaBuildIterator {
 
+    // 所有正则表达式语法中的符号
     private List<Symbol> symbols;
+
+    // 当前解析的位置
     private int index;
+
+    // 辅助栈
     private LinkedList<StackUnion> unions;
+
+    // 当前NfaClosure
     private NfaClosure curNfaClosure;
-    private List<NfaClosure> groupNfaClosures;
+
+    // 最终NfaClosure
+    private NfaClosure nfaClosure;
+
+    // group辅助工具
     private GroupUtil groupUtil;
 
     private NfaBuildIterator(List<Symbol> symbols) {
@@ -26,11 +37,10 @@ class NfaBuildIterator {
         index = 0;
         unions = new LinkedList<>();
         curNfaClosure = null;
-        groupNfaClosures = new ArrayList<>();
         groupUtil = new GroupUtil();
     }
 
-    static List<NfaClosure> createNfaClosuresMap(List<Symbol> symbols) {
+    static NfaClosure createNfaClosure(List<Symbol> symbols) {
         NfaBuildIterator buildIterator = new NfaBuildIterator(symbols);
 
         while (buildIterator.hasNext()) {
@@ -39,7 +49,7 @@ class NfaBuildIterator {
 
         buildIterator.finishWork();
 
-        return buildIterator.groupNfaClosures;
+        return buildIterator.nfaClosure;
     }
 
     private StackUnion createStackUnitWithNfaClosure(NfaClosure nfaClosure) {
@@ -114,21 +124,15 @@ class NfaBuildIterator {
         assertTrue(unions.isEmpty());
 
         if (curNfaClosure == null) {
-            assertTrue(groupNfaClosures.isEmpty());
+            //todo assertTrue(groupNfaClosures.isEmpty());
             curNfaClosure = NfaClosure.getEmptyClosureForGroup(0);
         }
-        groupNfaClosures.add(curNfaClosure);
+        nfaClosure = curNfaClosure;
 
         for (NfaState endNfaState : curNfaClosure.getEndNfaStates()) {
-            endNfaState.setCanReceive();
+            assertTrue(getCurGroup() == 0);
+            endNfaState.setReceive(getCurGroup());
         }
-
-        Collections.sort(groupNfaClosures, new Comparator<NfaClosure>() {
-            @Override
-            public int compare(NfaClosure o1, NfaClosure o2) {
-                return o1.getGroup() - o2.getGroup();
-            }
-        });
     }
 
     private void processEachSymbol() {
@@ -302,7 +306,7 @@ class NfaBuildIterator {
     private void processWhenEncounteredRightSmallParenthesis() {
         combineNfaClosuresOfCurGroup();
 
-        addClonedCurNfaClosureToGroupNfaClosures();
+        setStartAndReceiveOfCurNfaClosure();
 
         exitGroup();
 
@@ -360,9 +364,9 @@ class NfaBuildIterator {
         curNfaClosure = topStackUnion.getNfaClosure();
     }
 
-    private void addClonedCurNfaClosureToGroupNfaClosures() {
+    private void setStartAndReceiveOfCurNfaClosure() {
         assertNotNull(curNfaClosure);
-        groupNfaClosures.add(curNfaClosure.clone());
+        curNfaClosure.setStartAndReceive(getCurGroup());
     }
 
     private void changeGroupOfCurNfaClosure() {

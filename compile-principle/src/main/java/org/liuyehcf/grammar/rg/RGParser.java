@@ -9,6 +9,4 @@ public interface RGParser extends Parser {
     Matcher matcher(String input);
 
     void print();
-
-    void printAllGroup();
 }

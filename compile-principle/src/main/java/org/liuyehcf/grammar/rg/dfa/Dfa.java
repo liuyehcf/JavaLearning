@@ -12,6 +12,7 @@ import org.liuyehcf.grammar.rg.nfa.NfaState;
 import java.util.*;
 
 import static org.liuyehcf.grammar.utils.AssertUtils.assertFalse;
+import static org.liuyehcf.grammar.utils.AssertUtils.assertNotNull;
 import static org.liuyehcf.grammar.utils.AssertUtils.assertTrue;
 
 /**
@@ -22,8 +23,8 @@ public class Dfa implements RGParser {
     // Nfa自动机
     private final Nfa nfa;
 
-    // 每个group的起始状态
-    private List<DfaState> groupStartDfaStates = new ArrayList<>();
+    // 起始Dfa节点
+    private DfaState startDfaState;
 
     public Dfa(Nfa nfa) {
         this.nfa = nfa;
@@ -31,14 +32,11 @@ public class Dfa implements RGParser {
     }
 
     private void init() {
-        for (NfaClosure nfaClosure : nfa.getGroupNfaClosures()) {
-            // 独立地转换每一个NfaClosure
-            groupStartDfaStates.add(Transfer.getStartDfaStateFromNfaClosure(nfaClosure));
-        }
+        startDfaState = Transfer.getStartDfaStateFromNfaClosure(nfa.getNfaClosure());
     }
 
-    List<DfaState> getGroupStartDfaStates() {
-        return groupStartDfaStates;
+    DfaState getStartDfaState() {
+        return startDfaState;
     }
 
     @Override
@@ -58,18 +56,8 @@ public class Dfa implements RGParser {
 
     @Override
     public void print() {
-        assertFalse(groupStartDfaStates.isEmpty());
-        groupStartDfaStates.get(0).print();
-    }
-
-    @Override
-    public void printAllGroup() {
-        for (int group = 0; group < groupStartDfaStates.size(); group++) {
-            System.out.println("Group [" + group + "]");
-            groupStartDfaStates.get(group).print();
-
-            System.out.println("\n--------------\n");
-        }
+        assertNotNull(startDfaState);
+        startDfaState.print();
     }
 
     private static class Transfer {
