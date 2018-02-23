@@ -1,6 +1,8 @@
 package org.liuyehcf.grammar.cfg.lr;
 
 import org.liuyehcf.grammar.definition.Grammar;
+import org.liuyehcf.grammar.definition.converter.GrammarConverterPipeline;
+import org.liuyehcf.grammar.definition.converter.GrammarConverterPipelineImpl;
 import org.liuyehcf.grammar.definition.converter.MergeGrammarConverter;
 import org.liuyehcf.grammar.definition.converter.StatusExpandGrammarConverter;
 
@@ -9,11 +11,19 @@ public class LR0 implements LRParser {
     // 原始文法
     private final Grammar originalGrammar;
 
+    // 文法转换流水线
+    private final GrammarConverterPipeline grammarConverterPipeline;
+
     // 转换后的文法
     private Grammar grammar;
 
     public LR0(Grammar grammar) {
         this.originalGrammar = grammar;
+        this.grammarConverterPipeline = GrammarConverterPipelineImpl
+                .builder()
+                .registerGrammarConverter(MergeGrammarConverter.class)
+                .registerGrammarConverter(StatusExpandGrammarConverter.class)
+                .build();
 
         init();
     }
@@ -24,9 +34,7 @@ public class LR0 implements LRParser {
     }
 
     private void convertGrammar() {
-        this.grammar = new StatusExpandGrammarConverter(
-                new MergeGrammarConverter(originalGrammar).getConvertedGrammar()
-        ).getConvertedGrammar();
+        this.grammar = grammarConverterPipeline.convert(originalGrammar);
     }
 
     @Override

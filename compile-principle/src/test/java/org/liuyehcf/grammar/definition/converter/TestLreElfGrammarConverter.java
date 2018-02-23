@@ -46,9 +46,7 @@ public class TestLreElfGrammarConverter {
                 )
         );
 
-        Grammar convertedGrammar = new LreElfGrammarConverter(
-                new MergeGrammarConverter(grammar).getConvertedGrammar()
-        ).getConvertedGrammar();
+        Grammar convertedGrammar = getGrammarConverterPipeline().convert(grammar);
 
         assertEquals(
                 "{\"productions\":[\"E → ( E ) (E)′ | id (E)′\",\"(E)′ → + E (E)′ | * E (E)′ | __EPSILON__\"]}",
@@ -98,9 +96,7 @@ public class TestLreElfGrammarConverter {
                 )
         );
 
-        Grammar convertedGrammar = new LreElfGrammarConverter(
-                new MergeGrammarConverter(grammar).getConvertedGrammar()
-        ).getConvertedGrammar();
+        Grammar convertedGrammar = getGrammarConverterPipeline().convert(grammar);
 
         assertEquals(
                 "{\"productions\":[\"D → ( E ) (E)′ | id (E)′\",\"E → ( E ) (E)′ | id (E)′\",\"(E)′ → + E (E)′ | * E (E)′ | __EPSILON__\"]}",
@@ -158,9 +154,7 @@ public class TestLreElfGrammarConverter {
                 )
         );
 
-        Grammar convertedGrammar = new LreElfGrammarConverter(
-                new MergeGrammarConverter(grammar).getConvertedGrammar()
-        ).getConvertedGrammar();
+        Grammar convertedGrammar = getGrammarConverterPipeline().convert(grammar);
 
         assertEquals(
                 "{\"productions\":[\"D → ( E ) (E)′ e | id (E)′ e | e E\",\"E → ( E ) (E)′ | id (E)′\",\"(E)′ → + E (E)′ | * E (E)′ | __EPSILON__\"]}",
@@ -203,9 +197,7 @@ public class TestLreElfGrammarConverter {
                 )
         );
 
-        Grammar convertedGrammar = new LreElfGrammarConverter(
-                new MergeGrammarConverter(grammar).getConvertedGrammar()
-        ).getConvertedGrammar();
+        Grammar convertedGrammar = getGrammarConverterPipeline().convert(grammar);
 
         assertEquals(
                 "{\"productions\":[\"A → b (A)′′ | a (A)′\",\"(A)′ → b (A)′′′\",\"(A)′′ → d | c\",\"(A)′′′ → __EPSILON__ | c\"]}",
@@ -258,9 +250,7 @@ public class TestLreElfGrammarConverter {
                 )
         );
 
-        Grammar convertedGrammar = new LreElfGrammarConverter(
-                new MergeGrammarConverter(grammar).getConvertedGrammar()
-        ).getConvertedGrammar();
+        Grammar convertedGrammar = getGrammarConverterPipeline().convert(grammar);
 
         assertEquals(
                 "{\"productions\":[\"A → a (A)′ | γ1 | γ2 | γm\",\"(A)′ → β1 | β2 | βn\"]}",
@@ -344,13 +334,19 @@ public class TestLreElfGrammarConverter {
                 )
         );
 
-        Grammar convertedGrammar = new LreElfGrammarConverter(
-                new MergeGrammarConverter(grammar).getConvertedGrammar()
-        ).getConvertedGrammar();
+        Grammar convertedGrammar = getGrammarConverterPipeline().convert(grammar);
 
         assertEquals(
                 "{\"productions\":[\"A → c (A)′′′ | b (A)′′ | a (A)′ | d\",\"(A)′ → b (A)′′′′′ | __EPSILON__\",\"(A)′′ → c (A)′′′′ | __EPSILON__\",\"(A)′′′ → __EPSILON__ | d\",\"(A)′′′′ → __EPSILON__ | d\",\"(A)′′′′′ → c (A)′′′′′′ | __EPSILON__\",\"(A)′′′′′′ → __EPSILON__ | d\"]}",
                 convertedGrammar.toReadableJSONString()
         );
+    }
+
+    private GrammarConverterPipeline getGrammarConverterPipeline() {
+        return GrammarConverterPipelineImpl
+                .builder()
+                .registerGrammarConverter(MergeGrammarConverter.class)
+                .registerGrammarConverter(LreElfGrammarConverter.class)
+                .build();
     }
 }

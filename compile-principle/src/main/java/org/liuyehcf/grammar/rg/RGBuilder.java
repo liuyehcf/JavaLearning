@@ -1,13 +1,19 @@
 package org.liuyehcf.grammar.rg;
 
+import org.liuyehcf.grammar.GrammarHolder;
 import org.liuyehcf.grammar.definition.Grammar;
+import org.liuyehcf.grammar.definition.converter.GrammarConverterPipeline;
+import org.liuyehcf.grammar.definition.converter.GrammarConverterPipelineImpl;
 import org.liuyehcf.grammar.definition.converter.MergeGrammarConverter;
 import org.liuyehcf.grammar.definition.converter.SimplificationGrammarConverter;
 import org.liuyehcf.grammar.rg.dfa.Dfa;
 import org.liuyehcf.grammar.rg.nfa.Nfa;
 import org.liuyehcf.grammar.rg.utils.GrammarUtils;
 
-public class RGBuilder {
+public class RGBuilder implements GrammarHolder {
+
+    // 文法转换流水线
+    private static final GrammarConverterPipeline grammarConverterPipeline;
 
     // 正则文法
     private final Grammar grammar;
@@ -24,15 +30,33 @@ public class RGBuilder {
         this.dfa = null;
     }
 
+    static {
+        grammarConverterPipeline = GrammarConverterPipelineImpl
+                .builder()
+                .registerGrammarConverter(MergeGrammarConverter.class)
+                .registerGrammarConverter(SimplificationGrammarConverter.class)
+                .build();
+    }
+
+    public static RGBuilder compile(Grammar grammar) {
+
+        Grammar convertedGrammar = grammarConverterPipeline.convert(grammar);
+
+        return new RGBuilder(convertedGrammar);
+    }
+
     public static RGBuilder compile(String regex) {
 
-        Grammar grammar = new SimplificationGrammarConverter(
-                new MergeGrammarConverter(
-                        GrammarUtils.createGrammarWithRegex(regex)
-                ).getConvertedGrammar()
-        ).getConvertedGrammar();
+        Grammar grammar = grammarConverterPipeline.convert(
+                GrammarUtils.createGrammarWithRegex(regex)
+        );
 
         return new RGBuilder(grammar);
+    }
+
+    @Override
+    public Grammar getGrammar() {
+        return grammar;
     }
 
     public RGParser buildNfa() {

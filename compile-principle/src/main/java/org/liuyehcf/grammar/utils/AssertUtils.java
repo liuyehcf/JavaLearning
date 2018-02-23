@@ -1,14 +1,14 @@
 package org.liuyehcf.grammar.utils;
 
 public abstract class AssertUtils {
-    public static void assertTrue(Boolean flag) {
-        if (!flag) {
+    public static void assertTrue(Boolean condition) {
+        if (!condition) {
             throw new AssertionError();
         }
     }
 
-    public static void assertFalse(Boolean flag) {
-        if (flag) {
+    public static void assertFalse(Boolean condition) {
+        if (condition) {
             throw new AssertionError();
         }
     }

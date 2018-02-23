@@ -1,7 +1,6 @@
 package org.liuyehcf.grammar.definition.converter;
 
 import org.liuyehcf.grammar.definition.Grammar;
-import org.liuyehcf.grammar.definition.GrammarConverter;
 
 public abstract class AbstractGrammarConverter implements GrammarConverter {
     // 待转换的文法

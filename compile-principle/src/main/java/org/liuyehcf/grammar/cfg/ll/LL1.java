@@ -2,11 +2,13 @@ package org.liuyehcf.grammar.cfg.ll;
 
 import org.liuyehcf.grammar.cfg.LexicalAnalyzer;
 import org.liuyehcf.grammar.core.MorphemeType;
-import org.liuyehcf.grammar.core.ParseException;
+import org.liuyehcf.grammar.core.ParserException;
 import org.liuyehcf.grammar.definition.Grammar;
 import org.liuyehcf.grammar.definition.PrimaryProduction;
 import org.liuyehcf.grammar.definition.Production;
 import org.liuyehcf.grammar.definition.Symbol;
+import org.liuyehcf.grammar.definition.converter.GrammarConverterPipeline;
+import org.liuyehcf.grammar.definition.converter.GrammarConverterPipelineImpl;
 import org.liuyehcf.grammar.definition.converter.LreElfGrammarConverter;
 import org.liuyehcf.grammar.definition.converter.MergeGrammarConverter;
 import org.liuyehcf.grammar.parse.Token;
@@ -27,6 +29,9 @@ public class LL1 implements LLParser {
 
     // 原始文法
     private final Grammar originalGrammar;
+
+    // 文法转换流水线
+    private final GrammarConverterPipeline grammarConverterPipeline;
 
     // 转换后的文法
     private Grammar grammar;
@@ -60,6 +65,11 @@ public class LL1 implements LLParser {
             throw new NullPointerException();
         }
         this.originalGrammar = originalGrammar;
+        this.grammarConverterPipeline = GrammarConverterPipelineImpl
+                .builder()
+                .registerGrammarConverter(MergeGrammarConverter.class)
+                .registerGrammarConverter(LreElfGrammarConverter.class)
+                .build();
         this.lexicalAnalyzer = lexicalAnalyzer;
         symbols = new HashSet<>();
         nonTerminatorSymbols = new HashSet<>();
@@ -90,9 +100,7 @@ public class LL1 implements LLParser {
     }
 
     private void convertGrammar() {
-        this.grammar = new LreElfGrammarConverter(
-                new MergeGrammarConverter(originalGrammar).getConvertedGrammar()
-        ).getConvertedGrammar();
+        this.grammar = grammarConverterPipeline.convert(originalGrammar);
 
         this.start = this.grammar.getStart();
 
@@ -325,7 +333,7 @@ public class LL1 implements LLParser {
                 }
 
                 if (symbolStack.isEmpty()) {
-                    throw new ParseException();
+                    throw new ParserException();
                 }
 
                 // 每次迭代都会消耗一个symbol
@@ -334,7 +342,7 @@ public class LL1 implements LLParser {
                 // 每次迭代未必会消耗一个token
                 if (token == null) {
                     if (!tokenIterator.hasNext()) {
-                        throw new ParseException();
+                        throw new ParserException();
                     }
                     token = tokenIterator.next();
                 }
@@ -348,12 +356,12 @@ public class LL1 implements LLParser {
                                 || token.getType().equals(MorphemeType.REGEX)) {
                             if (!(symbol.getType().equals(MorphemeType.REGEX) &&
                                     token.getType().equals(MorphemeType.REGEX))) {
-                                throw new ParseException();
+                                throw new ParserException();
                             }
                         }
 
                         if (!token.getId().equals(symbol.getValue())) {
-                            throw new ParseException();
+                            throw new ParserException();
                         }
 
                         // 消耗一个token
@@ -373,14 +381,14 @@ public class LL1 implements LLParser {
                     }
                 }
             }
-        } catch (ParseException e) {
+        } catch (ParserException e) {
             return false;
         }
 
         return true;
     }
 
-    private PrimaryProduction findProductionByToken(Symbol symbol, Token token) throws ParseException {
+    private PrimaryProduction findProductionByToken(Symbol symbol, Token token) throws ParserException {
         String key = token.getId();
 
         Map<PrimaryProduction, Set<Symbol>> map = selects.get(symbol);
@@ -396,7 +404,7 @@ public class LL1 implements LLParser {
         }
 
         if (ppSelectedOne == null) {
-            throw new ParseException();
+            throw new ParserException();
         }
 
         return ppSelectedOne;

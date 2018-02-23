@@ -25,12 +25,10 @@ public class TestStatusExpandGrammarConverter {
                 )
         );
 
-        Grammar convertedGrammar = new MergeGrammarConverter(
-                new StatusExpandGrammarConverter(grammar).getConvertedGrammar()
-        ).getConvertedGrammar();
+        Grammar convertedGrammar = getGrammarConverterPipeline().convert(grammar);
 
         assertEquals(
-                "{\"productions\":[\"S → __DOT__ b B B | b __DOT__ B B | b B __DOT__ B | b B B __DOT__\"]}",
+                "{\"productions\":[\"S → __DOT__ b B B\",\"S → b __DOT__ B B\",\"S → b B __DOT__ B\",\"S → b B B __DOT__\"]}",
                 convertedGrammar.toReadableJSONString()
         );
     }
@@ -71,13 +69,19 @@ public class TestStatusExpandGrammarConverter {
                 )
         );
 
-        Grammar convertedGrammar = new MergeGrammarConverter(
-                new StatusExpandGrammarConverter(grammar).getConvertedGrammar()
-        ).getConvertedGrammar();
+        Grammar convertedGrammar = getGrammarConverterPipeline().convert(grammar);
 
         assertEquals(
-                "{\"productions\":[\"E → __DOT__ E + E | E __DOT__ + E | E + __DOT__ E | E + E __DOT__ | __DOT__ E * E | E __DOT__ * E | E * __DOT__ E | E * E __DOT__ | __DOT__ ( E ) | ( __DOT__ E ) | ( E __DOT__ ) | ( E ) __DOT__ | __DOT__ id | id __DOT__\"]}",
+                "{\"productions\":[\"E → __DOT__ E + E\",\"E → E __DOT__ + E\",\"E → E + __DOT__ E\",\"E → E + E __DOT__\",\"E → __DOT__ E * E\",\"E → E __DOT__ * E\",\"E → E * __DOT__ E\",\"E → E * E __DOT__\",\"E → __DOT__ ( E )\",\"E → ( __DOT__ E )\",\"E → ( E __DOT__ )\",\"E → ( E ) __DOT__\",\"E → __DOT__ id\",\"E → id __DOT__\"]}",
                 convertedGrammar.toReadableJSONString()
         );
+    }
+
+    private GrammarConverterPipeline getGrammarConverterPipeline() {
+        return GrammarConverterPipelineImpl
+                .builder()
+                .registerGrammarConverter(MergeGrammarConverter.class)
+                .registerGrammarConverter(StatusExpandGrammarConverter.class)
+                .build();
     }
 }

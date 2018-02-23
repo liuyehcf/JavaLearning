@@ -5,6 +5,7 @@ import org.liuyehcf.grammar.definition.Grammar;
 import org.liuyehcf.grammar.definition.PrimaryProduction;
 import org.liuyehcf.grammar.definition.Production;
 import org.liuyehcf.grammar.definition.Symbol;
+import org.liuyehcf.grammar.rg.RGBuilder;
 import org.liuyehcf.grammar.rg.utils.GrammarUtils;
 
 import static org.junit.Assert.assertEquals;
@@ -42,7 +43,7 @@ public class TestSimplificationGrammarConverter {
                 )
         );
 
-        Grammar convertedGrammar = new SimplificationGrammarConverter(grammar).getConvertedGrammar();
+        Grammar convertedGrammar = RGBuilder.compile(grammar).getGrammar();
 
         assertEquals(
                 "{\"productions\":[\"id → ( [ a b c d e f g h i j k l m n o p q r s t u v w x y z A B C D E F G H I J K L M N O P Q R S T U V W X Y Z _ ] ) ( ( [ a b c d e f g h i j k l m n o p q r s t u v w x y z A B C D E F G H I J K L M N O P Q R S T U V W X Y Z _ ] ) | ( [ 0 1 2 3 4 5 6 7 8 9 ] ) ) *\"]}",
@@ -80,7 +81,7 @@ public class TestSimplificationGrammarConverter {
                 )
         );
 
-        Grammar convertedGrammar = new SimplificationGrammarConverter(grammar).getConvertedGrammar();
+        Grammar convertedGrammar = RGBuilder.compile(grammar).getGrammar();
 
         assertEquals(
                 "{\"productions\":[\"id → ( [ a b c d e f g h i j k l m n o p q r s t u v w x y z A B C D E F G H I J K L M N O P Q R S T U V W X Y Z _ ] ) ( ( [ a b c d e f g h i j k l m n o p q r s t u v w x y z A B C D E F G H I J K L M N O P Q R S T U V W X Y Z _ ] ) | ( [ 0 1 2 3 4 5 6 7 8 9 ] ) ) *\"]}",
@@ -118,7 +119,7 @@ public class TestSimplificationGrammarConverter {
                 )
         );
 
-        Grammar convertedGrammar = new SimplificationGrammarConverter(grammar).getConvertedGrammar();
+        Grammar convertedGrammar = RGBuilder.compile(grammar).getGrammar();
 
         assertEquals(
                 "{\"productions\":[\"id → ( [ a b c d e f g h i j k l m n o p q r s t u v w x y z A B C D E F G H I J K L M N O P Q R S T U V W X Y Z _ ] ) ( ( [ a b c d e f g h i j k l m n o p q r s t u v w x y z A B C D E F G H I J K L M N O P Q R S T U V W X Y Z _ ] ) | ( [ 0 1 2 3 4 5 6 7 8 9 ] ) ) *\"]}",

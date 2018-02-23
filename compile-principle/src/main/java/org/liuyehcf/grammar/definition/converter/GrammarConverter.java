@@ -1,4 +1,6 @@
-package org.liuyehcf.grammar.definition;
+package org.liuyehcf.grammar.definition.converter;
+
+import org.liuyehcf.grammar.definition.Grammar;
 
 public interface GrammarConverter {
     /**
