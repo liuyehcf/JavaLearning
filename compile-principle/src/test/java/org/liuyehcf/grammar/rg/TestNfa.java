@@ -6,6 +6,7 @@ import org.liuyehcf.grammar.rg.utils.TestCaseBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -213,4 +214,38 @@ public class TestNfa {
                 matcher.group(3)
         );
     }
+
+    @Test
+    public void testGroupMatcher3() {
+        RGParser parser = RGBuilder.compile("((a(b|e))+)").buildNfa();
+
+        parser.print();
+
+        Matcher matcher = parser.matcher("abababae");
+
+        assertTrue(matcher.matches());
+        assertEquals(
+                "abababae",
+                matcher.group(0)
+        );
+        assertEquals(
+                "abababae",
+                matcher.group(1)
+        );
+        assertEquals(
+                "ab",
+                matcher.group(2)
+        );
+    }
+
+    @Test
+    public void testJDKRegex(){
+        Pattern p=Pattern.compile("((a(b|e))+)");
+        java.util.regex.Matcher matcher = p.matcher("abaeabaeab");
+
+        matcher.matches();
+
+        System.out.println(matcher.group(3));
+    }
+
 }

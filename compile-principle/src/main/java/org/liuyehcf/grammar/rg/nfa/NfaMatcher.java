@@ -53,7 +53,9 @@ public class NfaMatcher implements Matcher {
 
         if (!curNfaState.getGroupStart().isEmpty()) {
             for (int group : curNfaState.getGroupStart()) {
-                groupStartIndexes.put(group, index);
+                if (!groupStartIndexes.containsKey(group)) {
+                    groupStartIndexes.put(group, index);
+                }
             }
         }
 
