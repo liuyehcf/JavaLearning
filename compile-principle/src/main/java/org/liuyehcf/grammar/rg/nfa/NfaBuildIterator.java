@@ -32,6 +32,10 @@ class NfaBuildIterator {
     // group辅助工具
     private GroupUtil groupUtil;
 
+    // 如果发生了parallel操作，那么只有左右侧的那个NfaClosure中的终止节点需要被标记为canReceive
+    // 例如(a)|(b)|(c)，只有c需要被标记为canReceive
+    Set<NfaState> symbolsOfRightMostParalleledNfaClosure = null;
+
     private NfaBuildIterator(List<Symbol> symbols) {
         this.symbols = symbols;
         index = 0;
@@ -303,6 +307,7 @@ class NfaBuildIterator {
     private void processWhenEncounteredRightSmallParenthesis() {
         combineNfaClosuresOfCurGroup();
 
+        // todo 这里有问题，如果是parallel之后，只需标记部分的NfaState
         setStartAndReceiveOfCurNfaClosure();
 
         exitGroup();
@@ -345,6 +350,14 @@ class NfaBuildIterator {
                     unions.push(secondTopStackUnion);
                     break;
                 }
+
+                // 保留parallel操作中，左右侧的NfaClosure中的EndStates，在之后标记receive的时候，只需要标记这些节点
+                // todo
+//                if (symbolsOfRightMostParalleledNfaClosure == null) {
+//                    symbolsOfRightMostParalleledNfaClosure = new HashSet<>(
+//                            topStackUnion.getNfaClosure().getEndNfaStates());
+//                }
+
                 parallel(
                         thirdTopStackUnion.getNfaClosure(),
                         topStackUnion.getNfaClosure());
@@ -363,7 +376,8 @@ class NfaBuildIterator {
 
     private void setStartAndReceiveOfCurNfaClosure() {
         assertNotNull(curNfaClosure);
-        curNfaClosure.setStartAndReceive(getCurGroup());
+        curNfaClosure.setStartAndReceive(getCurGroup(), symbolsOfRightMostParalleledNfaClosure);
+        symbolsOfRightMostParalleledNfaClosure = null;
     }
 
     private void changeGroupOfCurNfaClosure() {
@@ -492,6 +506,8 @@ class NfaBuildIterator {
                 startNfaStateOfPreNfaClosure.addInputSymbolAndNextNfaState(inputSymbol, nextNfaState);
             }
         }
+
+        // todo 这里没有处理被丢弃的next.S节点的信息
 
         preNfaClosure.getEndNfaStates().addAll(nextNfaClosure.getEndNfaStates());
     }

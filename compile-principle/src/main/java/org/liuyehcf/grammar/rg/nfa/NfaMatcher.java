@@ -7,8 +7,6 @@ import org.liuyehcf.grammar.utils.Pair;
 
 import java.util.*;
 
-import static org.liuyehcf.grammar.utils.AssertUtils.assertTrue;
-
 public class NfaMatcher implements Matcher {
 
     // Nfa自动机
@@ -34,7 +32,16 @@ public class NfaMatcher implements Matcher {
 
         Set<String> visitedNfaState = new HashSet<>();
 
-        return isMatchDfs(curNfaState, input, 0, visitedNfaState);
+        boolean result = isMatchDfs(curNfaState, input, 0, visitedNfaState);
+
+        Set<Integer> keySets = groupStartIndexes.keySet();
+        for (int group : keySets.toArray(new Integer[0])) {
+            if (!groupEndIndexes.containsKey(group)) {
+                groupStartIndexes.remove(group);
+            }
+        }
+
+        return result;
     }
 
     private Pair<Map<Integer, Integer>, Map<Integer, Integer>> setGroupIndex(NfaState curNfaState, int index) {
@@ -105,8 +112,10 @@ public class NfaMatcher implements Matcher {
 
     @Override
     public String group(int group) {
-        assertTrue(groupStartIndexes.containsKey(group));
-        assertTrue(groupEndIndexes.containsKey(group));
+        if (!groupStartIndexes.containsKey(group)
+                || !groupEndIndexes.containsKey(group)) {
+            return null;
+        }
         return input.substring(
                 groupStartIndexes.get(group),
                 groupEndIndexes.get(group)

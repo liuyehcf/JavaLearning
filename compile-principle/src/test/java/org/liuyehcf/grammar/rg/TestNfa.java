@@ -204,7 +204,13 @@ public class TestNfa {
                 "a",
                 matcher.group(1)
         );
-
-        System.out.println(matcher.group(2));
+        assertEquals(
+                "a",
+                matcher.group(2)
+        );
+        assertEquals(
+                null,
+                matcher.group(3)
+        );
     }
 }

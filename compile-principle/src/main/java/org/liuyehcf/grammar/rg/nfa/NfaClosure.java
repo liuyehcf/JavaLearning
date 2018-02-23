@@ -61,12 +61,18 @@ public class NfaClosure {
         this.group = group;
     }
 
-    public void setStartAndReceive(int group) {
+    public void setStartAndReceive(int group, Set<NfaState> nfaStates) {
         // 设置起始节点
         startNfaState.setStart(group);
 
         for(NfaState endNfaState:endNfaStates){
-            endNfaState.setReceive(group);
+            if (nfaStates != null) {
+                if (nfaStates.contains(endNfaState)) {
+                    endNfaState.setReceive(group);
+                }
+            } else {
+                endNfaState.setReceive(group);
+            }
         }
     }
 
