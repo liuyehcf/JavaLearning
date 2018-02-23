@@ -3,6 +3,7 @@ package org.liuyehcf.grammar.rg.dfa;
 
 import org.liuyehcf.grammar.core.definition.Grammar;
 import org.liuyehcf.grammar.core.definition.Symbol;
+import org.liuyehcf.grammar.rg.Matcher;
 import org.liuyehcf.grammar.rg.RGParser;
 import org.liuyehcf.grammar.rg.nfa.Nfa;
 import org.liuyehcf.grammar.rg.nfa.NfaClosure;
@@ -10,6 +11,9 @@ import org.liuyehcf.grammar.rg.nfa.NfaState;
 import org.liuyehcf.grammar.rg.utils.SymbolUtils;
 
 import java.util.*;
+
+import static org.liuyehcf.grammar.utils.AssertUtils.assertFalse;
+import static org.liuyehcf.grammar.utils.AssertUtils.assertTrue;
 
 /**
  * Created by Liuye on 2017/10/21.
@@ -31,12 +35,12 @@ public class Dfa implements RGParser {
     }
 
     @Override
-    public boolean isMatch(String s) {
-        assert !startDfaStates.isEmpty();
+    public boolean matches(String input) {
+        assertFalse(startDfaStates.isEmpty());
         DfaState curDfaState = startDfaStates.get(0);
-        for (int i = 0; i < s.length(); i++) {
+        for (int i = 0; i < input.length(); i++) {
             DfaState nextDfaState = curDfaState.getNextDfaStateWithSymbol(
-                    SymbolUtils.getAlphabetSymbolWithChar(s.charAt(i))
+                    SymbolUtils.getAlphabetSymbolWithChar(input.charAt(i))
             );
             if (nextDfaState == null) return false;
             curDfaState = nextDfaState;
@@ -46,22 +50,17 @@ public class Dfa implements RGParser {
 
     @Override
     public Grammar getGrammar() {
-        return null;
+        return nfa.getGrammar();
     }
 
     @Override
-    public boolean find() {
-        return false;
-    }
-
-    @Override
-    public String group(int group) {
-        return null;
+    public Matcher matcher(String input) {
+        return new DfaMatcher(this, input);
     }
 
     @Override
     public void print() {
-        assert !startDfaStates.isEmpty();
+        assertFalse(startDfaStates.isEmpty());
         startDfaStates.get(0).print();
     }
 
@@ -129,10 +128,11 @@ public class Dfa implements RGParser {
         }
 
         private void addUnMarkedDfaState(DfaState dfaState) {
-            assert !dfaState.isMarked();
-            assert !dfaStatesMap.containsKey(dfaState.getDescription());
+            assertFalse(dfaState.isMarked());
+            assertFalse(dfaStatesMap.containsKey(dfaState.getDescription()));
             dfaStatesMap.put(dfaState.getDescription(), dfaState);
-            assert unMarkedDfaStates.add(dfaState);
+            assertFalse(unMarkedDfaStates.contains(dfaState));
+            unMarkedDfaStates.add(dfaState);
         }
 
         private DfaState getUnMarkedDfaState() {
@@ -141,16 +141,18 @@ public class Dfa implements RGParser {
             DfaState dfaState = null;
             if (it.hasNext()) {
                 dfaState = it.next();
-                assert !dfaState.isMarked();
+                assertFalse(dfaState.isMarked());
             }
             return dfaState;
         }
 
         private void markDfaState(DfaState dfaState) {
-            assert !dfaState.isMarked();
+            assertFalse(dfaState.isMarked());
             dfaState.setMarked();
-            assert unMarkedDfaStates.remove(dfaState);
-            assert markedDfaStates.add(dfaState);
+            assertTrue(unMarkedDfaStates.contains(dfaState));
+            unMarkedDfaStates.remove(dfaState);
+            assertFalse(markedDfaStates.contains(dfaState));
+            markedDfaStates.add(dfaState);
         }
     }
 }

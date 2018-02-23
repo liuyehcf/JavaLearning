@@ -38,7 +38,7 @@ public class LR0 implements LRParser {
     }
 
     @Override
-    public boolean isMatch(String expression) {
+    public boolean matches(String input) {
         return false;
     }
 

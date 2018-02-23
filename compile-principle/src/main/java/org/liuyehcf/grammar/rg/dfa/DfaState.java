@@ -5,6 +5,8 @@ import org.liuyehcf.grammar.rg.nfa.NfaState;
 
 import java.util.*;
 
+import static org.liuyehcf.grammar.utils.AssertUtils.assertFalse;
+
 /**
  * Created by Liuye on 2017/10/24.
  */
@@ -94,7 +96,7 @@ public class DfaState {
     }
 
     public void addInputSymbolAndNextDfaState(Symbol symbol, DfaState dfaState) {
-        assert !nextDfaStateMap.containsKey(symbol);
+        assertFalse(nextDfaStateMap.containsKey(symbol));
         nextDfaStateMap.put(symbol, dfaState);
     }
 

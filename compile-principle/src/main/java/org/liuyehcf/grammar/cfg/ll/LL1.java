@@ -316,8 +316,8 @@ public class LL1 implements LLParser {
     }
 
     @Override
-    public boolean isMatch(String expression) {
-        LexicalAnalyzer.TokenIterator tokenIterator = lexicalAnalyzer.iterator(expression);
+    public boolean matches(String input) {
+        LexicalAnalyzer.TokenIterator tokenIterator = lexicalAnalyzer.iterator(input);
 
         LinkedList<Symbol> symbolStack = new LinkedList<>();
         symbolStack.push(Symbol.DOLLAR);

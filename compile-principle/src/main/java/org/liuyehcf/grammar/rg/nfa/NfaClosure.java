@@ -4,6 +4,8 @@ import org.liuyehcf.grammar.core.definition.Symbol;
 
 import java.util.*;
 
+import static org.liuyehcf.grammar.utils.AssertUtils.assertNotNull;
+
 /**
  * Created by Liuye on 2017/10/23.
  */
@@ -117,7 +119,9 @@ public class NfaClosure {
             for (Symbol inputSymbol : curNfaState.getAllInputSymbol()) {
                 for (NfaState nextNfaState : curNfaState.getNextNfaStatesWithInputSymbol(inputSymbol)) {
                     NfaState clonedNextNfaState = oldAndNewNfaStateMap.get(nextNfaState);
-                    assert clonedCurNfaState != null;
+
+                    assertNotNull(clonedCurNfaState);
+
                     clonedCurNfaState.addInputSymbolAndNextNfaState(inputSymbol, clonedNextNfaState);
                 }
             }

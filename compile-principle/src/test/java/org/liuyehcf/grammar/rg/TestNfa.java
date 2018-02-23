@@ -60,7 +60,7 @@ public class TestNfa {
     private void testNfaWithMatchedCases(RGParser parser, Set<String> matchedCases) {
         List<String> unPassedCases = new ArrayList<>();
         for (String matchedCase : matchedCases) {
-            if (!parser.isMatch(matchedCase)) {
+            if (!parser.matches(matchedCase)) {
                 unPassedCases.add(matchedCase);
             }
         }

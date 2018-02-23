@@ -5,6 +5,8 @@ import org.liuyehcf.grammar.core.definition.Symbol;
 
 import java.util.*;
 
+import static org.liuyehcf.grammar.utils.AssertUtils.assertTrue;
+
 /**
  * Created by Liuye on 2017/10/24.
  */
@@ -419,7 +421,8 @@ public abstract class TestCaseBuilder {
             List<List<String>> testCasesOfAllParts = getTestCasesOfAllParts(combinedStringOfCurGroup);
 
             int textCaseIndex = random.nextInt(testCasesOfAllParts.size());
-            assert testCasesOfAllParts.get(textCaseIndex).size() == 1;
+            
+            assertTrue(testCasesOfAllParts.get(textCaseIndex).size() == 1);
             String testCase = testCasesOfAllParts.get(textCaseIndex).iterator().next();
 
             pushCurStackUnion();

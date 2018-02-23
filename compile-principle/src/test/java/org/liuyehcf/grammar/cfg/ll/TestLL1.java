@@ -276,10 +276,10 @@ public class TestLL1 {
 
         LLParser parser = new LL1(grammar, analyzer);
 
-        assertTrue(parser.isMatch("id+id*id"));
-        assertTrue(parser.isMatch("(id+id)*id"));
-        assertTrue(parser.isMatch("id+(id*id)"));
-        assertTrue(parser.isMatch("(id)+(id*id)"));
+        assertTrue(parser.matches("id+id*id"));
+        assertTrue(parser.matches("(id+id)*id"));
+        assertTrue(parser.matches("id+(id*id)"));
+        assertTrue(parser.matches("(id)+(id*id)"));
     }
 
     @Test
@@ -377,15 +377,15 @@ public class TestLL1 {
 
         LLParser parser = new LL1(grammar, analyzer);
 
-        assertTrue(parser.isMatch("program id, id, id: real; s; s end"));
-        assertTrue(parser.isMatch("program id: int; s; s end"));
-        assertTrue(parser.isMatch("program id, id: int; s end"));
+        assertTrue(parser.matches("program id, id, id: real; s; s end"));
+        assertTrue(parser.matches("program id: int; s; s end"));
+        assertTrue(parser.matches("program id, id: int; s end"));
 
-        assertFalse(parser.isMatch(" id, id, id: real; s; s end"));
-        assertFalse(parser.isMatch("program : real; s; s end"));
-        assertFalse(parser.isMatch("program id, id, id: double; s; s end"));
-        assertFalse(parser.isMatch("program id, id, id: real; s; s"));
-        assertFalse(parser.isMatch("program id, id, id: real; s, s end"));
+        assertFalse(parser.matches(" id, id, id: real; s; s end"));
+        assertFalse(parser.matches("program : real; s; s end"));
+        assertFalse(parser.matches("program id, id, id: double; s; s end"));
+        assertFalse(parser.matches("program id, id, id: real; s; s"));
+        assertFalse(parser.matches("program id, id, id: real; s, s end"));
 
     }
 
@@ -462,11 +462,11 @@ public class TestLL1 {
 
         LLParser parser = new LL1(grammar, analyzer);
 
-        assertTrue(parser.isMatch("A12+B*D"));
-        assertTrue(parser.isMatch("(a+b01)*d03"));
-        assertTrue(parser.isMatch("(asdfsdfDASDF323+ASDFC0102D*d23234+(asdf+dd)*(d1d*k9))"));
-        assertFalse(parser.isMatch("000+(id*id)"));
-        assertFalse(parser.isMatch("()"));
+        assertTrue(parser.matches("A12+B*D"));
+        assertTrue(parser.matches("(a+b01)*d03"));
+        assertTrue(parser.matches("(asdfsdfDASDF323+ASDFC0102D*d23234+(asdf+dd)*(d1d*k9))"));
+        assertFalse(parser.matches("000+(id*id)"));
+        assertFalse(parser.matches("()"));
     }
 
     @Test
@@ -561,21 +561,21 @@ public class TestLL1 {
 
         LLParser parser = new LL1(grammar, analyzer);
 
-        assertTrue(parser.isMatch("a"));
-        assertTrue(parser.isMatch("ab"));
-        assertTrue(parser.isMatch("abc"));
-        assertTrue(parser.isMatch("abcd"));
-        assertTrue(parser.isMatch("b"));
-        assertTrue(parser.isMatch("bc"));
-        assertTrue(parser.isMatch("bcd"));
-        assertTrue(parser.isMatch("c"));
-        assertTrue(parser.isMatch("cd"));
-        assertTrue(parser.isMatch("d"));
+        assertTrue(parser.matches("a"));
+        assertTrue(parser.matches("ab"));
+        assertTrue(parser.matches("abc"));
+        assertTrue(parser.matches("abcd"));
+        assertTrue(parser.matches("b"));
+        assertTrue(parser.matches("bc"));
+        assertTrue(parser.matches("bcd"));
+        assertTrue(parser.matches("c"));
+        assertTrue(parser.matches("cd"));
+        assertTrue(parser.matches("d"));
 
-        assertFalse(parser.isMatch("e"));
-        assertFalse(parser.isMatch("ba"));
-        assertFalse(parser.isMatch("ac"));
-        assertFalse(parser.isMatch("bdc"));
+        assertFalse(parser.matches("e"));
+        assertFalse(parser.matches("ba"));
+        assertFalse(parser.matches("ac"));
+        assertFalse(parser.matches("bdc"));
     }
 
     private LexicalAnalyzer getDefaultLexicalAnalyzer() {

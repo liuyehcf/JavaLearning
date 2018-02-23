@@ -1,16 +1,15 @@
 package org.liuyehcf.grammar.rg.nfa;
 
 import org.liuyehcf.grammar.core.definition.Grammar;
-import org.liuyehcf.grammar.core.definition.Symbol;
+import org.liuyehcf.grammar.rg.Matcher;
 import org.liuyehcf.grammar.rg.RGParser;
 import org.liuyehcf.grammar.rg.utils.GrammarUtils;
-import org.liuyehcf.grammar.rg.utils.SymbolUtils;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static org.liuyehcf.grammar.rg.nfa.NfaBuildIterator.createNfaClosuresMap;
+import static org.liuyehcf.grammar.utils.AssertUtils.assertFalse;
+import static org.liuyehcf.grammar.utils.AssertUtils.assertNotNull;
 
 
 /**
@@ -30,8 +29,8 @@ public class Nfa implements RGParser {
         return groupNfaClosures;
     }
 
-    private NfaClosure getWholeNfaClosure() {
-        assert !groupNfaClosures.isEmpty();
+    NfaClosure getWholeNfaClosure() {
+        assertFalse(groupNfaClosures.isEmpty());
         return groupNfaClosures.get(0);
     }
 
@@ -41,61 +40,23 @@ public class Nfa implements RGParser {
     }
 
     @Override
-    public boolean isMatch(String s) {
-        NfaState curNfaState = getWholeNfaClosure().getStartNfaState();
-
-        Set<String> visitedNfaState = new HashSet<>();
-
-        return isMatchDfs(curNfaState, s, 0, visitedNfaState);
+    public boolean matches(String input) {
+        return matcher(input).matches();
     }
 
     @Override
     public Grammar getGrammar() {
-        return null;
+        return grammar;
     }
 
     @Override
-    public boolean find() {
-        return false;
-    }
-
-    @Override
-    public String group(int group) {
-        return null;
-    }
-
-    private boolean isMatchDfs(NfaState curNfaState, String s, int index, Set<String> visitedNfaState) {
-        List<NfaState> epsilonNextStates = curNfaState.getNextNfaStatesWithInputSymbol(
-                Symbol.EPSILON
-        );
-        for (NfaState nextState : epsilonNextStates) {
-            String curStateString = nextState.toString() + index + Symbol.EPSILON;
-            if (visitedNfaState.add(curStateString)) {
-                if (isMatchDfs(nextState, s, index, visitedNfaState))
-                    return true;
-                visitedNfaState.remove(curStateString);
-            }
-        }
-
-        if (index == s.length()) {
-            return curNfaState.isCanReceive();
-        }
-
-        List<NfaState> nextStates = curNfaState.getNextNfaStatesWithInputSymbol(
-                SymbolUtils.getAlphabetSymbolWithChar(s.charAt(index)));
-
-        for (NfaState nextState : nextStates) {
-
-            if (isMatchDfs(nextState, s, index + 1, visitedNfaState))
-                return true;
-        }
-
-        return false;
+    public Matcher matcher(String input) {
+        return new NfaMatcher(this, input);
     }
 
     @Override
     public void print() {
-        assert getWholeNfaClosure() != null;
+        assertNotNull(getWholeNfaClosure());
         getWholeNfaClosure().print();
     }
 
