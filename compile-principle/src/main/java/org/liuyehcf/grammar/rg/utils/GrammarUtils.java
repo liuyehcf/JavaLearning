@@ -1,14 +1,14 @@
 package org.liuyehcf.grammar.rg.utils;
 
-import org.liuyehcf.grammar.definition.Grammar;
-import org.liuyehcf.grammar.definition.PrimaryProduction;
-import org.liuyehcf.grammar.definition.Production;
-import org.liuyehcf.grammar.definition.Symbol;
+import org.liuyehcf.grammar.core.definition.Grammar;
+import org.liuyehcf.grammar.core.definition.PrimaryProduction;
+import org.liuyehcf.grammar.core.definition.Production;
+import org.liuyehcf.grammar.core.definition.Symbol;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.liuyehcf.grammar.definition.Symbol.createNonTerminator;
+import static org.liuyehcf.grammar.core.definition.Symbol.createNonTerminator;
 import static org.liuyehcf.grammar.utils.AssertUtils.assertFalse;
 import static org.liuyehcf.grammar.utils.AssertUtils.assertTrue;
 

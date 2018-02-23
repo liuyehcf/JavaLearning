@@ -1,13 +1,13 @@
 package org.liuyehcf.grammar.rg.utils;
 
-import org.liuyehcf.grammar.definition.Symbol;
+import org.liuyehcf.grammar.core.definition.Symbol;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.liuyehcf.grammar.definition.Symbol.createTerminator;
+import static org.liuyehcf.grammar.core.definition.Symbol.createTerminator;
 import static org.liuyehcf.grammar.utils.AssertUtils.assertTrue;
 
 public abstract class SymbolUtils {

@@ -1,6 +1,6 @@
-package org.liuyehcf.grammar.definition.converter;
+package org.liuyehcf.grammar.core.definition.converter;
 
-import org.liuyehcf.grammar.definition.Grammar;
+import org.liuyehcf.grammar.core.definition.Grammar;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

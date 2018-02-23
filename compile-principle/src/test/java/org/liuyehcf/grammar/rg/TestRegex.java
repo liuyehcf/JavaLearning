@@ -1,13 +1,13 @@
 package org.liuyehcf.grammar.rg;
 
 
-import org.liuyehcf.grammar.definition.Grammar;
-import org.liuyehcf.grammar.definition.Production;
-import org.liuyehcf.grammar.definition.Symbol;
-import org.liuyehcf.grammar.definition.converter.SimplificationGrammarConverter;
+import org.liuyehcf.grammar.core.definition.Grammar;
+import org.liuyehcf.grammar.core.definition.Production;
+import org.liuyehcf.grammar.core.definition.Symbol;
+import org.liuyehcf.grammar.core.definition.converter.SimplificationGrammarConverter;
 import org.liuyehcf.grammar.rg.utils.GrammarUtils;
 
-import static org.liuyehcf.grammar.definition.Symbol.createNonTerminator;
+import static org.liuyehcf.grammar.core.definition.Symbol.createNonTerminator;
 
 /**
  * Created by Liuye on 2017/10/24.

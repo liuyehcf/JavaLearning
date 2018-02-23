@@ -1,6 +1,6 @@
 package org.liuyehcf.grammar.rg.dfa;
 
-import org.liuyehcf.grammar.definition.Symbol;
+import org.liuyehcf.grammar.core.definition.Symbol;
 import org.liuyehcf.grammar.rg.nfa.NfaState;
 
 import java.util.*;

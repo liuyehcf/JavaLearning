@@ -1,6 +1,6 @@
 package org.liuyehcf.grammar;
 
-import org.liuyehcf.grammar.definition.Grammar;
+import org.liuyehcf.grammar.core.definition.Grammar;
 
 public interface GrammarHolder {
     /**

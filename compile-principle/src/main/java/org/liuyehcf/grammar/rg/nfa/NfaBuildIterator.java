@@ -1,7 +1,7 @@
 package org.liuyehcf.grammar.rg.nfa;
 
 
-import org.liuyehcf.grammar.definition.Symbol;
+import org.liuyehcf.grammar.core.definition.Symbol;
 import org.liuyehcf.grammar.rg.utils.EscapedUtil;
 import org.liuyehcf.grammar.rg.utils.SymbolUtils;
 

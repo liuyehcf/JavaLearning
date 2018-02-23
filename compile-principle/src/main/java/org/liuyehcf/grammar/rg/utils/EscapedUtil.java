@@ -1,6 +1,6 @@
 package org.liuyehcf.grammar.rg.utils;
 
-import org.liuyehcf.grammar.definition.Symbol;
+import org.liuyehcf.grammar.core.definition.Symbol;
 
 import java.util.*;
 

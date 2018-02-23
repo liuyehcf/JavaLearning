@@ -1,4 +1,4 @@
-package org.liuyehcf.grammar.definition;
+package org.liuyehcf.grammar.core.definition;
 
 import org.liuyehcf.grammar.core.MorphemeType;
 

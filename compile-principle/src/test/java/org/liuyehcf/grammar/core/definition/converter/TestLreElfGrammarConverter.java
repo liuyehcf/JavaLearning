@@ -1,13 +1,13 @@
-package org.liuyehcf.grammar.definition.converter;
+package org.liuyehcf.grammar.core.definition.converter;
 
 import org.junit.Test;
-import org.liuyehcf.grammar.definition.Grammar;
-import org.liuyehcf.grammar.definition.PrimaryProduction;
-import org.liuyehcf.grammar.definition.Production;
+import org.liuyehcf.grammar.core.definition.Grammar;
+import org.liuyehcf.grammar.core.definition.PrimaryProduction;
+import org.liuyehcf.grammar.core.definition.Production;
 
 import static org.junit.Assert.assertEquals;
-import static org.liuyehcf.grammar.definition.Symbol.createNonTerminator;
-import static org.liuyehcf.grammar.definition.Symbol.createTerminator;
+import static org.liuyehcf.grammar.core.definition.Symbol.createNonTerminator;
+import static org.liuyehcf.grammar.core.definition.Symbol.createTerminator;
 
 public class TestLreElfGrammarConverter {
     @Test

@@ -1,9 +1,9 @@
-package org.liuyehcf.grammar.definition.converter;
+package org.liuyehcf.grammar.core.definition.converter;
 
-import org.liuyehcf.grammar.definition.Grammar;
-import org.liuyehcf.grammar.definition.PrimaryProduction;
-import org.liuyehcf.grammar.definition.Production;
-import org.liuyehcf.grammar.definition.Symbol;
+import org.liuyehcf.grammar.core.definition.Grammar;
+import org.liuyehcf.grammar.core.definition.PrimaryProduction;
+import org.liuyehcf.grammar.core.definition.Production;
+import org.liuyehcf.grammar.core.definition.Symbol;
 import org.liuyehcf.grammar.utils.ListUtils;
 
 import java.util.*;

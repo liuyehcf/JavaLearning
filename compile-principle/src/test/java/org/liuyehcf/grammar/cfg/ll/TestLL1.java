@@ -3,14 +3,14 @@ package org.liuyehcf.grammar.cfg.ll;
 import org.junit.Test;
 import org.liuyehcf.grammar.cfg.LexicalAnalyzer;
 import org.liuyehcf.grammar.core.MorphemeType;
-import org.liuyehcf.grammar.definition.Grammar;
-import org.liuyehcf.grammar.definition.PrimaryProduction;
-import org.liuyehcf.grammar.definition.Production;
-import org.liuyehcf.grammar.definition.Symbol;
+import org.liuyehcf.grammar.core.definition.Grammar;
+import org.liuyehcf.grammar.core.definition.PrimaryProduction;
+import org.liuyehcf.grammar.core.definition.Production;
+import org.liuyehcf.grammar.core.definition.Symbol;
 
 import static org.junit.Assert.*;
 import static org.liuyehcf.grammar.cfg.TestLexicalAnalyzer.getIdRegex;
-import static org.liuyehcf.grammar.definition.Symbol.*;
+import static org.liuyehcf.grammar.core.definition.Symbol.*;
 
 public class TestLL1 {
     @Test

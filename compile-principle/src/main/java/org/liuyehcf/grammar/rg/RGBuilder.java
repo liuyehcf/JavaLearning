@@ -1,11 +1,11 @@
 package org.liuyehcf.grammar.rg;
 
 import org.liuyehcf.grammar.GrammarHolder;
-import org.liuyehcf.grammar.definition.Grammar;
-import org.liuyehcf.grammar.definition.converter.GrammarConverterPipeline;
-import org.liuyehcf.grammar.definition.converter.GrammarConverterPipelineImpl;
-import org.liuyehcf.grammar.definition.converter.MergeGrammarConverter;
-import org.liuyehcf.grammar.definition.converter.SimplificationGrammarConverter;
+import org.liuyehcf.grammar.core.definition.Grammar;
+import org.liuyehcf.grammar.core.definition.converter.GrammarConverterPipeline;
+import org.liuyehcf.grammar.core.definition.converter.GrammarConverterPipelineImpl;
+import org.liuyehcf.grammar.core.definition.converter.MergeGrammarConverter;
+import org.liuyehcf.grammar.core.definition.converter.SimplificationGrammarConverter;
 import org.liuyehcf.grammar.rg.dfa.Dfa;
 import org.liuyehcf.grammar.rg.nfa.Nfa;
 import org.liuyehcf.grammar.rg.utils.GrammarUtils;
