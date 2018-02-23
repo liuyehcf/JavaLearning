@@ -16,8 +16,11 @@ import static org.liuyehcf.grammar.utils.AssertUtils.assertNotNull;
  * Created by Liuye on 2017/10/21.
  */
 public class Nfa implements RGParser {
+
+    // 正则文法
     private final Grammar grammar;
 
+    // 每个group对应的NfaClosure
     private List<NfaClosure> groupNfaClosures;
 
     public Nfa(Grammar grammar) {

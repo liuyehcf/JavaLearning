@@ -8,7 +8,6 @@ import org.liuyehcf.grammar.rg.RGParser;
 import org.liuyehcf.grammar.rg.nfa.Nfa;
 import org.liuyehcf.grammar.rg.nfa.NfaClosure;
 import org.liuyehcf.grammar.rg.nfa.NfaState;
-import org.liuyehcf.grammar.rg.utils.SymbolUtils;
 
 import java.util.*;
 
@@ -20,8 +19,11 @@ import static org.liuyehcf.grammar.utils.AssertUtils.assertTrue;
  */
 public class Dfa implements RGParser {
 
+    // Nfa自动机
     private final Nfa nfa;
-    private List<DfaState> startDfaStates = new ArrayList<>();
+
+    // 每个group的起始状态
+    private List<DfaState> groupStartDfaStates = new ArrayList<>();
 
     public Dfa(Nfa nfa) {
         this.nfa = nfa;
@@ -30,22 +32,18 @@ public class Dfa implements RGParser {
 
     private void init() {
         for (NfaClosure nfaClosure : nfa.getGroupNfaClosures()) {
-            startDfaStates.add(Transfer.getStartDfaStateFromNfaClosure(nfaClosure));
+            // 独立地转换每一个NfaClosure
+            groupStartDfaStates.add(Transfer.getStartDfaStateFromNfaClosure(nfaClosure));
         }
+    }
+
+    List<DfaState> getGroupStartDfaStates() {
+        return groupStartDfaStates;
     }
 
     @Override
     public boolean matches(String input) {
-        assertFalse(startDfaStates.isEmpty());
-        DfaState curDfaState = startDfaStates.get(0);
-        for (int i = 0; i < input.length(); i++) {
-            DfaState nextDfaState = curDfaState.getNextDfaStateWithSymbol(
-                    SymbolUtils.getAlphabetSymbolWithChar(input.charAt(i))
-            );
-            if (nextDfaState == null) return false;
-            curDfaState = nextDfaState;
-        }
-        return curDfaState.isCanReceive();
+        return matcher(input).matches();
     }
 
     @Override
@@ -60,15 +58,15 @@ public class Dfa implements RGParser {
 
     @Override
     public void print() {
-        assertFalse(startDfaStates.isEmpty());
-        startDfaStates.get(0).print();
+        assertFalse(groupStartDfaStates.isEmpty());
+        groupStartDfaStates.get(0).print();
     }
 
     @Override
     public void printAllGroup() {
-        for (int group = 0; group < startDfaStates.size(); group++) {
+        for (int group = 0; group < groupStartDfaStates.size(); group++) {
             System.out.println("Group [" + group + "]");
-            startDfaStates.get(group).print();
+            groupStartDfaStates.get(group).print();
 
             System.out.println("\n--------------\n");
         }
