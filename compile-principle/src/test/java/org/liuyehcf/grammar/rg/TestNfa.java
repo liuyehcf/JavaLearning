@@ -1,7 +1,6 @@
 package org.liuyehcf.grammar.rg;
 
 import org.junit.Test;
-import org.liuyehcf.grammar.rg.nfa.Nfa;
 import org.liuyehcf.grammar.rg.utils.TestCaseBuilder;
 
 import java.util.ArrayList;

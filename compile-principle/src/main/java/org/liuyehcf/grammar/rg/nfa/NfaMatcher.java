@@ -61,6 +61,22 @@ public class NfaMatcher implements Matcher {
 
     private boolean isMatchDfs(NfaState curNfaState, String s, int index, Set<String> visitedNfaState) {
 
+        // 首先走非ε边，贪婪模式
+        if (index != s.length()) {
+            // 从当前节点出发，经过非ε边的next节点集合
+            Set<NfaState> nextStates = curNfaState.getNextNfaStatesWithInputSymbol(
+                    SymbolUtils.getAlphabetSymbolWithChar(s.charAt(index)));
+
+            for (NfaState nextState : nextStates) {
+
+                if (isMatchDfsProxy(nextState, s, index + 1, visitedNfaState))
+                    return true;
+            }
+        }
+
+        if (index == s.length() && curNfaState.canReceive()) {
+            return true;
+        }
 
         // 从当前节点出发，经过ε边的后继节点集合
         Set<NfaState> epsilonNextStates = curNfaState.getNextNfaStatesWithInputSymbol(
@@ -76,20 +92,6 @@ public class NfaMatcher implements Matcher {
                     return true;
                 visitedNfaState.remove(curStateString);
             }
-        }
-
-        if (index == s.length()) {
-            return curNfaState.canReceive();
-        }
-
-        // 从当前节点出发，经过非ε边的next节点集合
-        Set<NfaState> nextStates = curNfaState.getNextNfaStatesWithInputSymbol(
-                SymbolUtils.getAlphabetSymbolWithChar(s.charAt(index)));
-
-        for (NfaState nextState : nextStates) {
-
-            if (isMatchDfsProxy(nextState, s, index + 1, visitedNfaState))
-                return true;
         }
 
         return false;
