@@ -75,8 +75,10 @@ public class NfaClosure {
 
         LinkedList<NfaState> stack = new LinkedList<>();
 
-        if (getStartNfaState() != null)
+        if (getStartNfaState() != null) {
+            visited.add(getStartNfaState());
             stack.push(getStartNfaState());
+        }
 
         while (!stack.isEmpty()) {
             NfaState curNfaState = stack.pop();
@@ -97,6 +99,8 @@ public class NfaClosure {
             System.out.print(nfaState + ", ");
         });
         System.out.println("\n");
+
+        visited.forEach(nfaState -> System.out.println(nfaState.getStatus()));
     }
 
     @Override

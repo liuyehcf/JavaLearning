@@ -54,7 +54,6 @@ public class Dfa implements RGParser {
         return new DfaMatcher(this, input);
     }
 
-    @Override
     public void print() {
         assertNotNull(startDfaState);
         startDfaState.print();

@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.liuyehcf.grammar.rg.TestRegex.*;
 
@@ -19,244 +18,137 @@ public class TestNfa {
 
     private void testRegexGroup(String[] regexGroup,
                                 boolean testAllPossibleCases,
-                                boolean printAllPossibleCases,
-                                boolean testRandomCases,
-                                boolean printRandomCases,
-                                int randomTimes) {
+                                int randomTimes,
+                                boolean testGroup) {
         for (String regex : regexGroup) {
             testEachRegex(regex,
                     testAllPossibleCases,
-                    printAllPossibleCases,
-                    testRandomCases,
-                    printRandomCases,
-                    randomTimes);
+                    randomTimes,
+                    testGroup);
         }
     }
 
     private void testEachRegex(String regex,
                                boolean testAllPossibleCases,
-                               boolean printAllPossibleCases,
-                               boolean testRandomCases,
-                               boolean printRandomCases,
-                               int randomTimes) {
+                               int randomTimes,
+                               boolean testGroup) {
         RGParser parser = RGBuilder.compile(regex).buildNfa();
 
-        if (testAllPossibleCases) {
-            Set<String> matchedCases = TestCaseBuilder.createAllOptionalTestCasesWithRegex(regex);
-            if (printAllPossibleCases) {
-                System.out.println(matchedCases);
-                System.out.println("\n============================\n");
-            }
-            testNfaWithMatchedCases(parser, matchedCases);
-        }
+        Pattern pattern = Pattern.compile(regex);
+        List<String> unPassedCases = null;
 
-        if (testRandomCases) {
-            Set<String> matchedCases = TestCaseBuilder.createRandomTestCasesWithRegex(regex, randomTimes);
-            if (printRandomCases) {
-                System.out.println(matchedCases);
-                System.out.println("\n============================\n");
+        try {
+            if (testAllPossibleCases) {
+                Set<String> matchedCases = TestCaseBuilder.createAllOptionalTestCasesWithRegex(regex);
+                unPassedCases = testNfaWithMatchedCases(pattern, parser, matchedCases, testGroup);
+                assertTrue(unPassedCases.isEmpty());
             }
-            testNfaWithMatchedCases(parser, matchedCases);
+
+            Set<String> matchedCases = TestCaseBuilder.createRandomTestCasesWithRegex(regex, randomTimes);
+            unPassedCases = testNfaWithMatchedCases(pattern, parser, matchedCases, testGroup);
+            assertTrue(unPassedCases.isEmpty());
+        } catch (AssertionError e) {
+            System.err.println("Regex: [" + regex + "], unPassedCases: " + unPassedCases);
+            throw e;
         }
     }
 
-    private void testNfaWithMatchedCases(RGParser parser, Set<String> matchedCases) {
+    private List<String> testNfaWithMatchedCases(Pattern pattern, RGParser parser, Set<String> matchedCases, boolean testGroup) {
         List<String> unPassedCases = new ArrayList<>();
         for (String matchedCase : matchedCases) {
-            if (!parser.matches(matchedCase)) {
+
+            java.util.regex.Matcher jdkMatcher = pattern.matcher(matchedCase);
+            Matcher nfaMatcher = parser.matcher(matchedCase);
+
+            assertTrue(jdkMatcher.matches());
+
+            if (!nfaMatcher.matches()) {
                 unPassedCases.add(matchedCase);
+                continue;
+            }
+
+            if (testGroup) {
+                for (int group = 0; group < jdkMatcher.groupCount(); group++) {
+                    String jdkGroup = jdkMatcher.group(group);
+                    String nfaGroup = nfaMatcher.group(group);
+                    if (jdkGroup == null) {
+                        if (nfaGroup != null) {
+                            unPassedCases.add(matchedCase);
+                        }
+                    } else {
+                        if (!jdkGroup.equals(nfaGroup)) {
+                            unPassedCases.add(matchedCase);
+                        }
+                    }
+                }
             }
         }
 
-        if (!unPassedCases.isEmpty()) {
-            System.err.println(unPassedCases);
-            throw new RuntimeException();
-        }
+        return unPassedCases;
     }
 
     @Test
     public void testGroup1() {
         testRegexGroup(REGEX_GROUP_1,
                 true,
-                false,
-                true,
-                false,
-                1000);
+                1000,
+                true);
     }
 
     @Test
     public void testGroup2() {
         testRegexGroup(REGEX_GROUP_2,
                 true,
-                false,
-                true,
-                false,
-                1000);
+                1000,
+                true);
     }
 
     @Test
     public void testGroup3() {
         testRegexGroup(REGEX_GROUP_3,
                 true,
-                false,
-                true,
-                false,
-                1000);
+                1000,
+                true);
     }
 
     @Test
     public void testGroup4() {
         testRegexGroup(REGEX_GROUP_4,
                 true,
-                false,
-                true,
-                false,
-                1000);
+                1000,
+                true);
     }
 
     @Test
     public void testGroup5() {
         testRegexGroup(REGEX_GROUP_5,
                 true,
-                false,
-                true,
-                false,
-                1000);
+                1000,
+                true);
     }
 
     @Test
     public void testGroup6() {
         testRegexGroup(REGEX_GROUP_6,
                 false,
-                false,
-                true,
-                false,
-                100);
+                100,
+                true);
     }
 
     @Test
     public void testGroup7() {
         testRegexGroup(REGEX_GROUP_7,
                 false,
-                false,
-                true,
-                false,
-                100);
+                100,
+                true);
     }
 
     @Test
     public void testGroupSpecial() {
+        // todo ，这里的正则表达式涉及到贪婪模式，因此不测 group
         testRegexGroup(REGEX_GROUP_SPECIAL,
                 false,
-                false,
-                false,
-                false,
-                1);
+                100,
+                false);
     }
-
-    @Test
-    public void testGroupMatcher1() {
-        RGParser parser = RGBuilder.compile("(abc(cd)(ef(g)()))").buildNfa();
-        parser.print();
-
-        Matcher matcher = parser.matcher("abccdefg");
-
-        assertTrue(matcher.matches());
-        assertEquals(
-                "abccdefg",
-                matcher.group(0)
-        );
-        assertEquals(
-                "abccdefg",
-                matcher.group(1)
-        );
-        assertEquals(
-                "cd",
-                matcher.group(2)
-        );
-        assertEquals(
-                "efg",
-                matcher.group(3)
-        );
-        assertEquals(
-                "g",
-                matcher.group(4)
-        );
-        assertEquals(
-                "",
-                matcher.group(5)
-        );
-    }
-
-    @Test
-    public void testGroupMatcher2() {
-        RGParser parser = RGBuilder.compile("((a)|(b))").buildNfa();
-
-        parser.print();
-
-        Matcher matcher = parser.matcher("a");
-
-        assertTrue(matcher.matches());
-        assertEquals(
-                "a",
-                matcher.group(0)
-        );
-        assertEquals(
-                "a",
-                matcher.group(1)
-        );
-        assertEquals(
-                "a",
-                matcher.group(2)
-        );
-        assertEquals(
-                null,
-                matcher.group(3)
-        );
-    }
-
-    @Test
-    public void testGroupMatcher3() {
-        RGParser parser = RGBuilder.compile("((a)+)").buildNfa();
-
-        parser.print();
-
-        Matcher matcher = parser.matcher("aaaaaaa");
-
-        assertTrue(matcher.matches());
-        assertEquals(
-                "aaaaaaa",
-                matcher.group(0)
-        );
-        assertEquals(
-                "aaaaaaa",
-                matcher.group(1)
-        );
-        assertEquals(
-                "a",
-                matcher.group(2)
-        );
-    }
-
-    @Test
-    public void testGroupMatcher4() {
-        RGParser parser = RGBuilder.compile("a*").buildNfa();
-
-        parser.print();
-
-        Matcher matcher = parser.matcher("");
-
-        assertTrue(matcher.matches());
-    }
-
-    @Test
-    public void testJDKRegex(){
-        Pattern p=Pattern.compile("((a(b|e))+)");
-        java.util.regex.Matcher matcher = p.matcher("abaeabaeab");
-
-        matcher.matches();
-
-        System.out.println(matcher.group(3));
-    }
-
 }

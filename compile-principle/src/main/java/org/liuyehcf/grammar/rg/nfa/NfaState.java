@@ -9,6 +9,7 @@ import static org.liuyehcf.grammar.utils.AssertUtils.assertFalse;
 
 /**
  * Created by Liuye on 2017/10/21.
+ * todo 这个类作为Hash元素
  */
 public class NfaState {
     private static int count = 1;
@@ -76,5 +77,11 @@ public class NfaState {
     @Override
     public String toString() {
         return "NfaState[" + id + "]";
+    }
+
+    public String getStatus() {
+        return toString() + '\n' +
+                ", groupStart" + groupStart + '\n' +
+                ", groupReceive" + groupReceive + '\n';
     }
 }

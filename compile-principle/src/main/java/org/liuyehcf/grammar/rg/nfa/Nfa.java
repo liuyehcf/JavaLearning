@@ -49,7 +49,6 @@ public class Nfa implements RGParser {
         return new NfaMatcher(this, input);
     }
 
-    @Override
     public void print() {
         assertNotNull(nfaClosure);
         nfaClosure.print();

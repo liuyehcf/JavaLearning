@@ -184,6 +184,7 @@ class NfaBuildIterator {
     private void wrapCurNfaClosureForStar() {
         NfaClosure wrapNfaClosure = buildWrapNfaClosure();
 
+        // 注意，如果要实现组匹配，那么以下三个节点都是必须的。否则会产生节点二义性，例如((a+))与((a)+)
         NfaState startNfaStateOfWrapNfaClosure = wrapNfaClosure.getStartNfaState();
         NfaState secondStartNfaStateOfWrapNfaClosure = new NfaState();
         NfaState endNfaStateOfWrapNfaClosure = wrapNfaClosure.getEndNfaStates().get(0);
