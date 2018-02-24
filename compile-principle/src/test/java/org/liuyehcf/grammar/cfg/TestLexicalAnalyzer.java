@@ -1,6 +1,8 @@
 package org.liuyehcf.grammar.cfg;
 
 import org.junit.Test;
+import org.liuyehcf.grammar.JdkLexicalAnalyzer;
+import org.liuyehcf.grammar.LexicalAnalyzer;
 import org.liuyehcf.grammar.core.MorphemeType;
 
 import static org.junit.Assert.assertEquals;
@@ -19,7 +21,7 @@ public class TestLexicalAnalyzer {
 
     @Test
     public void testLexicalAnalyze1() {
-        LexicalAnalyzer analyzer = LexicalAnalyzer.builder()
+        LexicalAnalyzer analyzer = JdkLexicalAnalyzer.builder()
                 .addMorpheme("int", "int", MorphemeType.NORMAL)
                 .addMorpheme("id", getIdRegex(), MorphemeType.REGEX)
                 .addMorpheme("=")
@@ -28,7 +30,7 @@ public class TestLexicalAnalyzer {
                 .addMorpheme("unsignedInteger", getUnsignedIntegerRegex(), MorphemeType.REGEX)
                 .build();
 
-        LexicalAnalyzer.TokenIterator iterator = analyzer.iterator("1+2*3=7");
+        JdkLexicalAnalyzer.TokenIterator iterator = analyzer.iterator("1+2*3=7");
 
 
         StringBuilder sb = new StringBuilder();

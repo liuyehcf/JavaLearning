@@ -1,51 +1,40 @@
-package org.liuyehcf.grammar.cfg;
+package org.liuyehcf.grammar;
 
 import org.liuyehcf.grammar.core.MorphemeType;
 import org.liuyehcf.grammar.core.parse.Token;
+import org.liuyehcf.grammar.rg.Matcher;
 import org.liuyehcf.grammar.utils.AssertUtils;
 import org.liuyehcf.grammar.utils.Pair;
 
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-/**
- * 词法分析器，直接用JDK的正则表达式进行解析
- */
-public class LexicalAnalyzer {
+public abstract class AbstractLexicalAnalyzer implements LexicalAnalyzer {
+    protected final Map<String, Pair<String, MorphemeType>> morphemes;
 
-    private final Map<String, Pair<String, MorphemeType>> morphemes;
+    protected final Map<Integer, String> groups;
 
-    private final Map<Integer, String> groups;
+    protected final String regex;
 
-    private final Pattern pattern;
-
-    private LexicalAnalyzer(Map<String, Pair<String, MorphemeType>> morphemes, Map<Integer, String> groups, Pattern pattern) {
+    protected AbstractLexicalAnalyzer(Map<String, Pair<String, MorphemeType>> morphemes, Map<Integer, String> groups, String regex) {
         this.morphemes = Collections.unmodifiableMap(morphemes);
         this.groups = Collections.unmodifiableMap(groups);
-        this.pattern = pattern;
+        this.regex = regex;
     }
 
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    public TokenIterator iterator(String expression) {
-        return new TokenIterator(pattern.matcher(expression));
-    }
-
-    public static final class Builder {
+    public abstract static class Builder {
 
         // 词素id -> (词素,类型) 的映射表
-        private Map<String, Pair<String, MorphemeType>> morphemes = new HashMap<>();
+        protected Map<String, Pair<String, MorphemeType>> morphemes = new HashMap<>();
 
         // 正则表达式group -> 词素id 的映射表
-        private Map<Integer, String> groups = new HashMap<>();
+        protected Map<Integer, String> groups = new HashMap<>();
 
         // 词素类型 -> (词素id,词素) 的映射表（为了在构造正则表达式的时候按类型排序）
-        private Map<MorphemeType, List<Pair<String, String>>> types = new HashMap<>();
+        protected Map<MorphemeType, List<Pair<String, String>>> types = new HashMap<>();
 
-        private Builder() {
+        protected String regex;
+
+        protected Builder() {
             for (MorphemeType type : MorphemeType.values()) {
                 types.put(type, new ArrayList<>());
             }
@@ -91,8 +80,8 @@ public class LexicalAnalyzer {
             return this;
         }
 
-        public LexicalAnalyzer build() {
-            StringBuilder regex = new StringBuilder();
+        public final LexicalAnalyzer build() {
+            StringBuilder regexBuilder = new StringBuilder();
 
             // 正则表达式中的组号
             int groupId = 1;
@@ -102,7 +91,7 @@ public class LexicalAnalyzer {
                     String id = pair.getFirst();
                     String morpheme = pair.getSecond();
 
-                    regex.append('(').append(morpheme)
+                    regexBuilder.append('(').append(morpheme)
                             .append(')').append("|");
 
                     groups.put(groupId++, id);
@@ -120,22 +109,17 @@ public class LexicalAnalyzer {
             }
 
             AssertUtils.assertFalse(morphemes.isEmpty());
-            regex.setLength(regex.length() - 1);
+            regexBuilder.setLength(regexBuilder.length() - 1);
 
-            Pattern pattern;
-            try {
-                pattern = Pattern.compile(regex.toString());
-            } catch (Throwable e) {
-                System.err.println(e.getMessage());
-                e.printStackTrace();
-                throw new RuntimeException(e);
-            }
+            regex = regexBuilder.toString();
 
-            return new LexicalAnalyzer(morphemes, groups, pattern);
+            return createLexicalAnalyzer();
         }
+
+        protected abstract LexicalAnalyzer createLexicalAnalyzer();
     }
 
-    public final class TokenIterator implements Iterator<Token> {
+    protected final class TokenIteratorImpl implements LexicalAnalyzer.TokenIterator {
 
         private final Matcher matcher;
 
@@ -143,11 +127,10 @@ public class LexicalAnalyzer {
 
         private int index = 0;
 
-        private TokenIterator(Matcher matcher) {
+        TokenIteratorImpl(Matcher matcher) {
             this.matcher = matcher;
             init();
         }
-
 
         private void init() {
             while (matcher.find()) {

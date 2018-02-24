@@ -159,4 +159,15 @@ public class TestNfa {
                 100,
                 false);
     }
+
+    @Test
+    public void test(){
+        RGParser parser=RGBuilder.compile("()").buildNfa();
+
+        Matcher matcher=parser.matcher("");
+
+        while(matcher.find()){
+            System.out.println(matcher.group(0));
+        }
+    }
 }

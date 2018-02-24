@@ -1,7 +1,8 @@
 package org.liuyehcf.grammar.cfg.ll;
 
 import org.junit.Test;
-import org.liuyehcf.grammar.cfg.LexicalAnalyzer;
+import org.liuyehcf.grammar.JdkLexicalAnalyzer;
+import org.liuyehcf.grammar.LexicalAnalyzer;
 import org.liuyehcf.grammar.core.MorphemeType;
 import org.liuyehcf.grammar.core.definition.Grammar;
 import org.liuyehcf.grammar.core.definition.PrimaryProduction;
@@ -265,7 +266,7 @@ public class TestLL1 {
                 )
         );
 
-        LexicalAnalyzer analyzer = LexicalAnalyzer.builder()
+        LexicalAnalyzer analyzer = JdkLexicalAnalyzer.builder()
                 .addMorpheme("(")
                 .addMorpheme(")")
                 .addMorpheme("+")
@@ -363,7 +364,7 @@ public class TestLL1 {
         );
 
 
-        LexicalAnalyzer analyzer = LexicalAnalyzer.builder()
+        LexicalAnalyzer analyzer = JdkLexicalAnalyzer.builder()
                 .addMorpheme("program")
                 .addMorpheme(":")
                 .addMorpheme(";")
@@ -451,7 +452,7 @@ public class TestLL1 {
                 )
         );
 
-        LexicalAnalyzer analyzer = LexicalAnalyzer.builder()
+        LexicalAnalyzer analyzer = JdkLexicalAnalyzer.builder()
                 .addMorpheme("(")
                 .addMorpheme(")")
                 .addMorpheme("+")
@@ -545,7 +546,7 @@ public class TestLL1 {
                 )
         );
 
-        LexicalAnalyzer analyzer = LexicalAnalyzer.builder()
+        LexicalAnalyzer analyzer = JdkLexicalAnalyzer.builder()
                 .addMorpheme("a")
                 .addMorpheme("ab")
                 .addMorpheme("abc")
@@ -579,7 +580,7 @@ public class TestLL1 {
     }
 
     private LexicalAnalyzer getDefaultLexicalAnalyzer() {
-        return LexicalAnalyzer.builder()
+        return JdkLexicalAnalyzer.builder()
                 .addMorpheme("NULL")
                 .build();
     }

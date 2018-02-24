@@ -1,6 +1,7 @@
 package org.liuyehcf.grammar.cfg.ll;
 
-import org.liuyehcf.grammar.cfg.LexicalAnalyzer;
+import org.liuyehcf.grammar.JdkLexicalAnalyzer;
+import org.liuyehcf.grammar.LexicalAnalyzer;
 import org.liuyehcf.grammar.core.MorphemeType;
 import org.liuyehcf.grammar.core.ParserException;
 import org.liuyehcf.grammar.core.definition.Grammar;
@@ -317,7 +318,7 @@ public class LL1 implements LLParser {
 
     @Override
     public boolean matches(String input) {
-        LexicalAnalyzer.TokenIterator tokenIterator = lexicalAnalyzer.iterator(input);
+        JdkLexicalAnalyzer.TokenIterator tokenIterator = lexicalAnalyzer.iterator(input);
 
         LinkedList<Symbol> symbolStack = new LinkedList<>();
         symbolStack.push(Symbol.DOLLAR);

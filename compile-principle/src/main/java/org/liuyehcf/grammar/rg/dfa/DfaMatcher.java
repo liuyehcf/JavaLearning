@@ -24,6 +24,9 @@ public class DfaMatcher implements Matcher{
     private Map<Integer, Integer> groupEndIndexes = new HashMap<>();
 
     DfaMatcher(Dfa dfa, String input) {
+        if (dfa == null || input == null) {
+            throw new NullPointerException();
+        }
         this.dfa = dfa;
         this.input = input;
     }
