@@ -22,8 +22,8 @@ public class NfaState {
     // 当前节点作为 group i 的接收节点，那么i位于groupReceive中
     private Set<Integer> groupReceive = new HashSet<>();
 
-    // 输入符号 -> 后继节点集合 的映射表
-    private Map<Symbol, Set<NfaState>> nextNfaStatesMap = new HashMap<>();
+    // 输入符号 -> 后继节点集合 的映射表。这里用LinkedHashMap保证了节点加入的先后顺序，详见"NfaBuildIterator.parallel"方法
+    private Map<Symbol, Set<NfaState>> nextNfaStatesMap = new LinkedHashMap<>();
 
     public int getId() {
         return id;
@@ -69,7 +69,8 @@ public class NfaState {
 
     public void addInputSymbolAndNextNfaState(Symbol symbol, NfaState nextNfaState) {
         if (!nextNfaStatesMap.containsKey(symbol)) {
-            nextNfaStatesMap.put(symbol, new HashSet<>());
+            // 同理，这里也需要使用LinkedHashSet来保证同一个符号下的节点先后次序
+            nextNfaStatesMap.put(symbol, new LinkedHashSet<>());
         }
         nextNfaStatesMap.get(symbol).add(nextNfaState);
     }

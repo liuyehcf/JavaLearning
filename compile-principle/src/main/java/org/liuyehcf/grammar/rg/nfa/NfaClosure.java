@@ -65,7 +65,7 @@ public class NfaClosure {
         // 设置起始节点
         startNfaState.setStart(group);
 
-        for(NfaState endNfaState:endNfaStates){
+        for (NfaState endNfaState : endNfaStates) {
             endNfaState.setReceive(group);
         }
     }

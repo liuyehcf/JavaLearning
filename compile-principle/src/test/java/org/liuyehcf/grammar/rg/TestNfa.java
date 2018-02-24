@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.liuyehcf.grammar.rg.TestRegex.*;
 
 /**
@@ -161,13 +161,58 @@ public class TestNfa {
     }
 
     @Test
-    public void test(){
-        RGParser parser=RGBuilder.compile("()").buildNfa();
+    public void testFindCase1() {
+        RGParser parser = RGBuilder.compile("()").buildNfa();
 
-        Matcher matcher=parser.matcher("");
+        Matcher matcher = parser.matcher("");
 
-        while(matcher.find()){
-            System.out.println(matcher.group(0));
-        }
+        matcher.matches();
+
+        assertEquals(
+                "",
+                matcher.group(0)
+        );
+    }
+
+    @Test
+    public void testFindCase2() {
+        RGParser parser = RGBuilder.compile(createIdentifierRegex()).buildNfa();
+
+        Matcher matcher = parser.matcher("a11 aa  asdfasdf111 _asdf");
+
+        assertTrue(matcher.find());
+        assertEquals(
+                "a11",
+                matcher.group(0)
+        );
+        assertTrue(matcher.find());
+        assertEquals(
+                "aa",
+                matcher.group(0)
+        );
+        assertTrue(matcher.find());
+        assertEquals(
+                "asdfasdf111",
+                matcher.group(0)
+        );
+        assertTrue(matcher.find());
+        assertEquals(
+                "_asdf",
+                matcher.group(0)
+        );
+        assertFalse(matcher.find());
+    }
+
+    @Test
+    public void testFindCase3() {
+        RGParser parser = RGBuilder.compile("(a+)*").buildNfa();
+
+        Matcher matcher = parser.matcher("aaaaaaaaa");
+
+        assertTrue(matcher.matches());
+        assertEquals(
+                "aaaaaaaaa",
+                matcher.group(1)
+        );
     }
 }

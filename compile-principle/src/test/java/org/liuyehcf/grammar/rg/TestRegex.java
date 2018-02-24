@@ -11,7 +11,7 @@ import static org.liuyehcf.grammar.core.definition.Symbol.createNonTerminator;
 
 /**
  * Created by Liuye on 2017/10/24.
- * 目前暂不支持"(e+)*"这样的正则表达式的组匹配，这涉及到匹配模式（贪婪、占有、勉强）
+ * 目前暂不支持"(a+)*|(a*)+"
  */
 public class TestRegex {
     static final String[] REGEX_GROUP_1 = {
@@ -56,6 +56,7 @@ public class TestRegex {
     static final String[] REGEX_GROUP_8 = {
             "()", "()()", "(())", "((()))()()(()((()(()))))()",
             "(abc(cd)(ef(g)()))", "((a)|(b))", "((a)+)", "a*", "((a(b|e))*)",
+            "(a*)+", "(a+)*", "(a+)*|(a*)+",
             "a(b(d(e|f)*)|((g(h|i)+)))+",
             "a(b(d(e+|f*))|((g(\\d|i)+)))+",
             "(a)", "(0)", "(\\d)", "(\\w)", "(.)", "(a+)", "(0*)", "(\0)",
@@ -94,7 +95,7 @@ public class TestRegex {
         ).getConvertedGrammar();
     }
 
-    private static String createIdentifierRegex() {
+    static String createIdentifierRegex() {
         Grammar grammar = createIdentifierGrammar();
 
         StringBuilder sb = new StringBuilder();

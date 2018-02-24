@@ -3,6 +3,7 @@ package org.liuyehcf.grammar.cfg.ll;
 import org.junit.Test;
 import org.liuyehcf.grammar.JdkLexicalAnalyzer;
 import org.liuyehcf.grammar.LexicalAnalyzer;
+import org.liuyehcf.grammar.NfaLexicalAnalyzer;
 import org.liuyehcf.grammar.core.MorphemeType;
 import org.liuyehcf.grammar.core.definition.Grammar;
 import org.liuyehcf.grammar.core.definition.PrimaryProduction;
@@ -16,65 +17,7 @@ import static org.liuyehcf.grammar.core.definition.Symbol.*;
 public class TestLL1 {
     @Test
     public void testFirstFollowSelectCase1() {
-        Grammar grammar = Grammar.create(
-                createNonTerminator("E"),
-                Production.create(
-                        createNonTerminator("E"),
-                        PrimaryProduction.create(
-                                createNonTerminator("T"),
-                                createNonTerminator("E′")
-                        )
-                ),
-                Production.create(
-                        createNonTerminator("E′"),
-                        PrimaryProduction.create(
-                                createTerminator("+"),
-                                createNonTerminator("T"),
-                                createNonTerminator("E′")
-                        )
-                ),
-                Production.create(
-                        createNonTerminator("E′"),
-                        PrimaryProduction.create(
-                                Symbol.EPSILON
-                        )
-                ),
-                Production.create(
-                        createNonTerminator("T"),
-                        PrimaryProduction.create(
-                                createNonTerminator("F"),
-                                createNonTerminator("T′")
-                        )
-                ),
-                Production.create(
-                        createNonTerminator("T′"),
-                        PrimaryProduction.create(
-                                createTerminator("*"),
-                                createNonTerminator("F"),
-                                createNonTerminator("T′")
-                        )
-                ),
-                Production.create(
-                        createNonTerminator("T′"),
-                        PrimaryProduction.create(
-                                Symbol.EPSILON
-                        )
-                ),
-                Production.create(
-                        createNonTerminator("F"),
-                        PrimaryProduction.create(
-                                createTerminator("("),
-                                createNonTerminator("E"),
-                                createTerminator(")")
-                        )
-                ),
-                Production.create(
-                        createNonTerminator("F"),
-                        PrimaryProduction.create(
-                                createTerminator("id")
-                        )
-                )
-        );
+        Grammar grammar = createGrammar2();
 
         LLParser parser = new LL1(grammar, getDefaultLexicalAnalyzer());
         Grammar convertedGrammar = parser.getGrammar();
@@ -101,84 +44,7 @@ public class TestLL1 {
 
     @Test
     public void testFirstFollowSelectCase2() {
-        String PROGRAM = "PROGRAM";
-        String DECLIST = "DECLIST";
-        String DECLISTN = "DECLISTN";
-        String STLIST = "STLIST";
-        String STLISTN = "STLISTN";
-        String TYPE = "TYPE";
-
-
-        Grammar grammar = Grammar.create(
-                createNonTerminator(PROGRAM),
-                Production.create(
-                        createNonTerminator(PROGRAM),
-                        PrimaryProduction.create(
-                                createTerminator("program"),
-                                createNonTerminator(DECLIST),
-                                createTerminator(":"),
-                                createNonTerminator(TYPE),
-                                createTerminator(";"),
-                                createNonTerminator(STLIST),
-                                createTerminator("end")
-                        )
-                ),
-                Production.create(
-                        createNonTerminator(DECLIST),
-                        PrimaryProduction.create(
-                                createTerminator("id"),
-                                createNonTerminator(DECLISTN)
-                        )
-                ),
-                Production.create(
-                        createNonTerminator(DECLISTN),
-                        PrimaryProduction.create(
-                                createTerminator(","),
-                                createTerminator("id"),
-                                createNonTerminator(DECLISTN)
-                        )
-                ),
-                Production.create(
-                        createNonTerminator(DECLISTN),
-                        PrimaryProduction.create(
-                                Symbol.EPSILON
-                        )
-                ),
-                Production.create(
-                        createNonTerminator(STLIST),
-                        PrimaryProduction.create(
-                                createTerminator("s"),
-                                createNonTerminator(STLISTN)
-                        )
-                ),
-                Production.create(
-                        createNonTerminator(STLISTN),
-                        PrimaryProduction.create(
-                                createTerminator(";"),
-                                createTerminator("s"),
-                                createNonTerminator(STLISTN)
-                        )
-                ),
-                Production.create(
-                        createNonTerminator(STLISTN),
-                        PrimaryProduction.create(
-                                Symbol.EPSILON
-                        )
-                ),
-                Production.create(
-                        createNonTerminator(TYPE),
-                        PrimaryProduction.create(
-                                createTerminator("real")
-                        )
-                ),
-                Production.create(
-                        createNonTerminator(TYPE),
-                        PrimaryProduction.create(
-                                createTerminator("int")
-                        )
-                )
-        );
-
+        Grammar grammar = createGrammar3();
 
         LLParser parser = new LL1(grammar, getDefaultLexicalAnalyzer());
         Grammar convertedGrammar = parser.getGrammar();
@@ -205,66 +71,8 @@ public class TestLL1 {
     }
 
     @Test
-    public void testParseCase1() {
-        Grammar grammar = Grammar.create(
-                createNonTerminator("E"),
-                Production.create(
-                        createNonTerminator("E"),
-                        PrimaryProduction.create(
-                                createNonTerminator("T"),
-                                createNonTerminator("E′")
-                        )
-                ),
-                Production.create(
-                        createNonTerminator("E′"),
-                        PrimaryProduction.create(
-                                createTerminator("+"),
-                                createNonTerminator("T"),
-                                createNonTerminator("E′")
-                        )
-                ),
-                Production.create(
-                        createNonTerminator("E′"),
-                        PrimaryProduction.create(
-                                Symbol.EPSILON
-                        )
-                ),
-                Production.create(
-                        createNonTerminator("T"),
-                        PrimaryProduction.create(
-                                createNonTerminator("F"),
-                                createNonTerminator("T′")
-                        )
-                ),
-                Production.create(
-                        createNonTerminator("T′"),
-                        PrimaryProduction.create(
-                                createTerminator("*"),
-                                createNonTerminator("F"),
-                                createNonTerminator("T′")
-                        )
-                ),
-                Production.create(
-                        createNonTerminator("T′"),
-                        PrimaryProduction.create(
-                                Symbol.EPSILON
-                        )
-                ),
-                Production.create(
-                        createNonTerminator("F"),
-                        PrimaryProduction.create(
-                                createTerminator("("),
-                                createNonTerminator("E"),
-                                createTerminator(")")
-                        )
-                ),
-                Production.create(
-                        createNonTerminator("F"),
-                        PrimaryProduction.create(
-                                createTerminator("id")
-                        )
-                )
-        );
+    public void testParseCase1WithJdkLexicalAnalyzer() {
+        Grammar grammar = createGrammar2();
 
         LexicalAnalyzer analyzer = JdkLexicalAnalyzer.builder()
                 .addMorpheme("(")
@@ -273,7 +81,6 @@ public class TestLL1 {
                 .addMorpheme("*")
                 .addMorpheme("id")
                 .build();
-
 
         LLParser parser = new LL1(grammar, analyzer);
 
@@ -284,85 +91,28 @@ public class TestLL1 {
     }
 
     @Test
-    public void testParseCase2() {
-        String PROGRAM = "PROGRAM";
-        String DECLIST = "DECLIST";
-        String DECLISTN = "DECLISTN";
-        String STLIST = "STLIST";
-        String STLISTN = "STLISTN";
-        String TYPE = "TYPE";
+    public void testParseCase1WithNfaLexicalAnalyzer() {
+        Grammar grammar = createGrammar2();
 
+        LexicalAnalyzer analyzer = NfaLexicalAnalyzer.builder()
+                .addMorpheme("(")
+                .addMorpheme(")")
+                .addMorpheme("+")
+                .addMorpheme("*")
+                .addMorpheme("id")
+                .build();
 
-        Grammar grammar = Grammar.create(
-                createNonTerminator(PROGRAM),
-                Production.create(
-                        createNonTerminator(PROGRAM),
-                        PrimaryProduction.create(
-                                createTerminator("program"),
-                                createNonTerminator(DECLIST),
-                                createTerminator(":"),
-                                createNonTerminator(TYPE),
-                                createTerminator(";"),
-                                createNonTerminator(STLIST),
-                                createTerminator("end")
-                        )
-                ),
-                Production.create(
-                        createNonTerminator(DECLIST),
-                        PrimaryProduction.create(
-                                createTerminator("id"),
-                                createNonTerminator(DECLISTN)
-                        )
-                ),
-                Production.create(
-                        createNonTerminator(DECLISTN),
-                        PrimaryProduction.create(
-                                createTerminator(","),
-                                createTerminator("id"),
-                                createNonTerminator(DECLISTN)
-                        )
-                ),
-                Production.create(
-                        createNonTerminator(DECLISTN),
-                        PrimaryProduction.create(
-                                Symbol.EPSILON
-                        )
-                ),
-                Production.create(
-                        createNonTerminator(STLIST),
-                        PrimaryProduction.create(
-                                createTerminator("s"),
-                                createNonTerminator(STLISTN)
-                        )
-                ),
-                Production.create(
-                        createNonTerminator(STLISTN),
-                        PrimaryProduction.create(
-                                createTerminator(";"),
-                                createTerminator("s"),
-                                createNonTerminator(STLISTN)
-                        )
-                ),
-                Production.create(
-                        createNonTerminator(STLISTN),
-                        PrimaryProduction.create(
-                                Symbol.EPSILON
-                        )
-                ),
-                Production.create(
-                        createNonTerminator(TYPE),
-                        PrimaryProduction.create(
-                                createTerminator("real")
-                        )
-                ),
-                Production.create(
-                        createNonTerminator(TYPE),
-                        PrimaryProduction.create(
-                                createTerminator("int")
-                        )
-                )
-        );
+        LLParser parser = new LL1(grammar, analyzer);
 
+        assertTrue(parser.matches("id+id*id"));
+        assertTrue(parser.matches("(id+id)*id"));
+        assertTrue(parser.matches("id+(id*id)"));
+        assertTrue(parser.matches("(id)+(id*id)"));
+    }
+
+    @Test
+    public void testParseCase2WithJdkLexicalAnalyzer() {
+        Grammar grammar = createGrammar3();
 
         LexicalAnalyzer analyzer = JdkLexicalAnalyzer.builder()
                 .addMorpheme("program")
@@ -387,12 +137,164 @@ public class TestLL1 {
         assertFalse(parser.matches("program id, id, id: double; s; s end"));
         assertFalse(parser.matches("program id, id, id: real; s; s"));
         assertFalse(parser.matches("program id, id, id: real; s, s end"));
-
     }
 
     @Test
-    public void testParseCase3() {
-        Grammar grammar = Grammar.create(
+    public void testParseCase2WithNfaLexicalAnalyzer() {
+        Grammar grammar = createGrammar3();
+
+        LexicalAnalyzer analyzer = NfaLexicalAnalyzer.builder()
+                .addMorpheme("program")
+                .addMorpheme(":")
+                .addMorpheme(";")
+                .addMorpheme("end")
+                .addMorpheme("id")
+                .addMorpheme(",")
+                .addMorpheme("s")
+                .addMorpheme("real")
+                .addMorpheme("int")
+                .build();
+
+        LLParser parser = new LL1(grammar, analyzer);
+
+        assertTrue(parser.matches("program id, id, id: real; s; s end"));
+        assertTrue(parser.matches("program id: int; s; s end"));
+        assertTrue(parser.matches("program id, id: int; s end"));
+
+        assertFalse(parser.matches(" id, id, id: real; s; s end"));
+        assertFalse(parser.matches("program : real; s; s end"));
+        assertFalse(parser.matches("program id, id, id: double; s; s end"));
+        assertFalse(parser.matches("program id, id, id: real; s; s"));
+        assertFalse(parser.matches("program id, id, id: real; s, s end"));
+    }
+
+    @Test
+    public void testParseCase3WithJdkLexicalAnalyzer() {
+        Grammar grammar = createGrammar1();
+
+        LexicalAnalyzer analyzer = JdkLexicalAnalyzer.builder()
+                .addMorpheme("(")
+                .addMorpheme(")")
+                .addMorpheme("+")
+                .addMorpheme("*")
+                .addMorpheme("id", getIdRegex(), MorphemeType.REGEX)
+                .build();
+
+
+        LLParser parser = new LL1(grammar, analyzer);
+
+        assertTrue(parser.matches("A12+B*D"));
+        assertTrue(parser.matches("(a+b01)*d03"));
+        assertTrue(parser.matches("(asdfsdfDASDF323+ASDFC0102D*d23234+(asdf+dd)*(d1d*k9))"));
+        assertFalse(parser.matches("000+(id*id)"));
+        assertFalse(parser.matches("()"));
+    }
+
+    @Test
+    public void testParseCase3WithNfaLexicalAnalyzer() {
+        Grammar grammar = createGrammar1();
+
+        LexicalAnalyzer analyzer = NfaLexicalAnalyzer.builder()
+                .addMorpheme("(")
+                .addMorpheme(")")
+                .addMorpheme("+")
+                .addMorpheme("*")
+                .addMorpheme("id", getIdRegex(), MorphemeType.REGEX)
+                .build();
+
+
+        LLParser parser = new LL1(grammar, analyzer);
+
+        assertTrue(parser.matches("A12+B*D"));
+        assertTrue(parser.matches("(a+b01)*d03"));
+        assertTrue(parser.matches("(asdfsdfDASDF323+ASDFC0102D*d23234+(asdf+dd)*(d1d*k9))"));
+        assertFalse(parser.matches("000+(id*id)"));
+        assertFalse(parser.matches("()"));
+    }
+
+    @Test
+    public void testParseCase4WithJdkLexicalAnalyzer() {
+        Grammar grammar = createGrammar4();
+
+        LexicalAnalyzer analyzer = JdkLexicalAnalyzer.builder()
+                .addMorpheme("a")
+                .addMorpheme("ab")
+                .addMorpheme("abc")
+                .addMorpheme("abcd")
+                .addMorpheme("b")
+                .addMorpheme("bc")
+                .addMorpheme("bcd")
+                .addMorpheme("c")
+                .addMorpheme("cd")
+                .addMorpheme("d")
+                .build();
+
+
+        LLParser parser = new LL1(grammar, analyzer);
+
+        assertTrue(parser.matches("a"));
+        assertTrue(parser.matches("ab"));
+        assertTrue(parser.matches("abc"));
+        assertTrue(parser.matches("abcd"));
+        assertTrue(parser.matches("b"));
+        assertTrue(parser.matches("bc"));
+        assertTrue(parser.matches("bcd"));
+        assertTrue(parser.matches("c"));
+        assertTrue(parser.matches("cd"));
+        assertTrue(parser.matches("d"));
+
+        assertFalse(parser.matches("e"));
+        assertFalse(parser.matches("ba"));
+        assertFalse(parser.matches("ac"));
+        assertFalse(parser.matches("bdc"));
+    }
+
+    //@Test todo 这个没法匹配 "(a)|(b)|(ab)" 匹配ab时出问题
+    public void testParseCase4WithNfaLexicalAnalyzer() {
+        Grammar grammar = createGrammar4();
+
+        LexicalAnalyzer analyzer = NfaLexicalAnalyzer.builder()
+                .addMorpheme("a")
+                .addMorpheme("ab")
+                .addMorpheme("abc")
+                .addMorpheme("abcd")
+                .addMorpheme("b")
+                .addMorpheme("bc")
+                .addMorpheme("bcd")
+                .addMorpheme("c")
+                .addMorpheme("cd")
+                .addMorpheme("d")
+                .build();
+
+
+        LLParser parser = new LL1(grammar, analyzer);
+
+        assertTrue(parser.matches("a"));
+        assertTrue(parser.matches("ab"));
+        assertTrue(parser.matches("abc"));
+        assertTrue(parser.matches("abcd"));
+        assertTrue(parser.matches("b"));
+        assertTrue(parser.matches("bc"));
+        assertTrue(parser.matches("bcd"));
+        assertTrue(parser.matches("c"));
+        assertTrue(parser.matches("cd"));
+        assertTrue(parser.matches("d"));
+
+        assertFalse(parser.matches("e"));
+        assertFalse(parser.matches("ba"));
+        assertFalse(parser.matches("ac"));
+        assertFalse(parser.matches("bdc"));
+    }
+
+
+    private LexicalAnalyzer getDefaultLexicalAnalyzer() {
+        return JdkLexicalAnalyzer.builder()
+                .addMorpheme("NULL")
+                .build();
+    }
+
+    private Grammar createGrammar1() {
+        return Grammar.create(
                 createNonTerminator("E"),
                 Production.create(
                         createNonTerminator("E"),
@@ -451,28 +353,151 @@ public class TestLL1 {
                         )
                 )
         );
-
-        LexicalAnalyzer analyzer = JdkLexicalAnalyzer.builder()
-                .addMorpheme("(")
-                .addMorpheme(")")
-                .addMorpheme("+")
-                .addMorpheme("*")
-                .addMorpheme("id", getIdRegex(), MorphemeType.REGEX)
-                .build();
-
-
-        LLParser parser = new LL1(grammar, analyzer);
-
-        assertTrue(parser.matches("A12+B*D"));
-        assertTrue(parser.matches("(a+b01)*d03"));
-        assertTrue(parser.matches("(asdfsdfDASDF323+ASDFC0102D*d23234+(asdf+dd)*(d1d*k9))"));
-        assertFalse(parser.matches("000+(id*id)"));
-        assertFalse(parser.matches("()"));
     }
 
-    @Test
-    public void testParseCase4() {
-        Grammar grammar = Grammar.create(
+    private Grammar createGrammar2() {
+        return Grammar.create(
+                createNonTerminator("E"),
+                Production.create(
+                        createNonTerminator("E"),
+                        PrimaryProduction.create(
+                                createNonTerminator("T"),
+                                createNonTerminator("E′")
+                        )
+                ),
+                Production.create(
+                        createNonTerminator("E′"),
+                        PrimaryProduction.create(
+                                createTerminator("+"),
+                                createNonTerminator("T"),
+                                createNonTerminator("E′")
+                        )
+                ),
+                Production.create(
+                        createNonTerminator("E′"),
+                        PrimaryProduction.create(
+                                Symbol.EPSILON
+                        )
+                ),
+                Production.create(
+                        createNonTerminator("T"),
+                        PrimaryProduction.create(
+                                createNonTerminator("F"),
+                                createNonTerminator("T′")
+                        )
+                ),
+                Production.create(
+                        createNonTerminator("T′"),
+                        PrimaryProduction.create(
+                                createTerminator("*"),
+                                createNonTerminator("F"),
+                                createNonTerminator("T′")
+                        )
+                ),
+                Production.create(
+                        createNonTerminator("T′"),
+                        PrimaryProduction.create(
+                                Symbol.EPSILON
+                        )
+                ),
+                Production.create(
+                        createNonTerminator("F"),
+                        PrimaryProduction.create(
+                                createTerminator("("),
+                                createNonTerminator("E"),
+                                createTerminator(")")
+                        )
+                ),
+                Production.create(
+                        createNonTerminator("F"),
+                        PrimaryProduction.create(
+                                createTerminator("id")
+                        )
+                )
+        );
+    }
+
+    private Grammar createGrammar3() {
+        String PROGRAM = "PROGRAM";
+        String DECLIST = "DECLIST";
+        String DECLISTN = "DECLISTN";
+        String STLIST = "STLIST";
+        String STLISTN = "STLISTN";
+        String TYPE = "TYPE";
+
+        return Grammar.create(
+                createNonTerminator(PROGRAM),
+                Production.create(
+                        createNonTerminator(PROGRAM),
+                        PrimaryProduction.create(
+                                createTerminator("program"),
+                                createNonTerminator(DECLIST),
+                                createTerminator(":"),
+                                createNonTerminator(TYPE),
+                                createTerminator(";"),
+                                createNonTerminator(STLIST),
+                                createTerminator("end")
+                        )
+                ),
+                Production.create(
+                        createNonTerminator(DECLIST),
+                        PrimaryProduction.create(
+                                createTerminator("id"),
+                                createNonTerminator(DECLISTN)
+                        )
+                ),
+                Production.create(
+                        createNonTerminator(DECLISTN),
+                        PrimaryProduction.create(
+                                createTerminator(","),
+                                createTerminator("id"),
+                                createNonTerminator(DECLISTN)
+                        )
+                ),
+                Production.create(
+                        createNonTerminator(DECLISTN),
+                        PrimaryProduction.create(
+                                Symbol.EPSILON
+                        )
+                ),
+                Production.create(
+                        createNonTerminator(STLIST),
+                        PrimaryProduction.create(
+                                createTerminator("s"),
+                                createNonTerminator(STLISTN)
+                        )
+                ),
+                Production.create(
+                        createNonTerminator(STLISTN),
+                        PrimaryProduction.create(
+                                createTerminator(";"),
+                                createTerminator("s"),
+                                createNonTerminator(STLISTN)
+                        )
+                ),
+                Production.create(
+                        createNonTerminator(STLISTN),
+                        PrimaryProduction.create(
+                                Symbol.EPSILON
+                        )
+                ),
+                Production.create(
+                        createNonTerminator(TYPE),
+                        PrimaryProduction.create(
+                                createTerminator("real")
+                        )
+                ),
+                Production.create(
+                        createNonTerminator(TYPE),
+                        PrimaryProduction.create(
+                                createTerminator("int")
+                        )
+                )
+        );
+    }
+
+    private Grammar createGrammar4() {
+        return Grammar.create(
                 createNonTerminator("A"),
                 Production.create(
                         createNonTerminator("A"),
@@ -545,43 +570,6 @@ public class TestLL1 {
                         )
                 )
         );
-
-        LexicalAnalyzer analyzer = JdkLexicalAnalyzer.builder()
-                .addMorpheme("a")
-                .addMorpheme("ab")
-                .addMorpheme("abc")
-                .addMorpheme("abcd")
-                .addMorpheme("b")
-                .addMorpheme("bc")
-                .addMorpheme("bcd")
-                .addMorpheme("c")
-                .addMorpheme("cd")
-                .addMorpheme("d")
-                .build();
-
-
-        LLParser parser = new LL1(grammar, analyzer);
-
-        assertTrue(parser.matches("a"));
-        assertTrue(parser.matches("ab"));
-        assertTrue(parser.matches("abc"));
-        assertTrue(parser.matches("abcd"));
-        assertTrue(parser.matches("b"));
-        assertTrue(parser.matches("bc"));
-        assertTrue(parser.matches("bcd"));
-        assertTrue(parser.matches("c"));
-        assertTrue(parser.matches("cd"));
-        assertTrue(parser.matches("d"));
-
-        assertFalse(parser.matches("e"));
-        assertFalse(parser.matches("ba"));
-        assertFalse(parser.matches("ac"));
-        assertFalse(parser.matches("bdc"));
-    }
-
-    private LexicalAnalyzer getDefaultLexicalAnalyzer() {
-        return JdkLexicalAnalyzer.builder()
-                .addMorpheme("NULL")
-                .build();
     }
 }
+

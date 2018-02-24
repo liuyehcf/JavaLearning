@@ -12,6 +12,7 @@ import static org.liuyehcf.grammar.utils.AssertUtils.*;
 
 /**
  * Created by Liuye on 2017/10/23.
+ * todo 目前还不支持：1. 匹配模式的选择 2. [a-z]，即'-'符号
  */
 class NfaBuildIterator {
 
@@ -676,6 +677,7 @@ class NfaBuildIterator {
             }
         }
 
+        // NfaClosure中的邻接节点Map用的是LinkedHashMap，这就保证了nextNfaClosure的邻接节点优先级低于preNfaClosure的邻接节点
         preNfaClosure.getEndNfaStates().addAll(nextNfaClosure.getEndNfaStates());
     }
 

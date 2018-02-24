@@ -9,7 +9,7 @@ import java.util.Set;
 
 import static org.liuyehcf.grammar.utils.AssertUtils.assertNotNull;
 
-public class DfaMatcher implements Matcher{
+public class DfaMatcher implements Matcher {
 
     // Dfa自动机
     private final Dfa dfa;

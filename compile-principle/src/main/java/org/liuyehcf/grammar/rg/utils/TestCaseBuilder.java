@@ -432,7 +432,7 @@ public abstract class TestCaseBuilder {
             List<List<String>> testCasesOfAllParts = getTestCasesOfAllParts(combinedStringOfCurGroup);
 
             int textCaseIndex = random.nextInt(testCasesOfAllParts.size());
-            
+
             assertTrue(testCasesOfAllParts.get(textCaseIndex).size() == 1);
             String testCase = testCasesOfAllParts.get(textCaseIndex).iterator().next();
 

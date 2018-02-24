@@ -5,10 +5,7 @@ import org.liuyehcf.grammar.rg.Matcher;
 import org.liuyehcf.grammar.rg.utils.SymbolUtils;
 import org.liuyehcf.grammar.utils.Pair;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.liuyehcf.grammar.utils.AssertUtils.assertNull;
 
@@ -19,18 +16,16 @@ public class NfaMatcher implements Matcher {
 
     // 待匹配的输入字符串
     private final String input;
-
+    // 匹配的区间
+    List<Pair<Integer, Integer>> matchIntervals;
     // group i --> 起始索引 的映射表，闭集
     private Map<Integer, Integer> groupStartIndexes = null;
-
     // group i --> 接收索引 的映射表，闭集
     private Map<Integer, Integer> groupEndIndexes = null;
-
-    // 剩余未匹配的起始索引
-    private int firstOfRemain = 0;
-
     // 目前进行匹配操作的子串
     private String subInput;
+    // 匹配子串索引
+    private int indexOfMatchIntervals;
 
     NfaMatcher(Nfa nfa, String input) {
         if (nfa == null || input == null) {
@@ -38,10 +33,6 @@ public class NfaMatcher implements Matcher {
         }
         this.nfa = nfa;
         this.input = input;
-    }
-
-    public static void main(String[] args) {
-        System.out.println("".substring(0, 0));
     }
 
     @Override
@@ -112,7 +103,7 @@ public class NfaMatcher implements Matcher {
 
     private boolean isMatchDfs(NfaState curNfaState, int index, Set<String> visitedNfaState) {
 
-        // 首先走非ε边，贪婪模式
+        // 首先走非ε边，贪婪模式（todo 并非完全贪婪）
         if (index != subInput.length()) {
             // 从当前节点出发，经过非ε边的next节点集合
             Set<NfaState> nextStates = curNfaState.getNextNfaStatesWithInputSymbol(
@@ -150,27 +141,88 @@ public class NfaMatcher implements Matcher {
 
     @Override
     public boolean find() {
-        // todo 非贪婪模式
-        int index = firstOfRemain;
-        try {
-            while (index < input.length()) {
-                for (int i = firstOfRemain; i <= index; i++) {
-                    if (doMatch(input.substring(i, index + 1))) {
-                        return true;
+        //todo 不支持 "(a)|(b)|(ab)"，如果字符串是ab，正确地应该是a和b，而这里直接是ab。
+
+        if (matchIntervals == null) {
+            initMatchIntervals();
+        }
+
+        if (indexOfMatchIntervals < matchIntervals.size()) {
+
+            Pair<Integer, Integer> interval = matchIntervals.get(indexOfMatchIntervals);
+
+            doMatch(input.substring(
+                    interval.getFirst(),
+                    interval.getSecond()
+            ));
+
+            indexOfMatchIntervals++;
+
+            return true;
+        }
+        return false;
+    }
+
+    private void initMatchIntervals() {
+        matchIntervals = new ArrayList<>();
+
+        if (input.length() == 0) {
+            if (matches()) {
+                matchIntervals.add(new Pair<>(0, 0));
+            }
+        }
+
+        for (int startIndex = 0; startIndex < input.length(); startIndex++) {
+            for (int endIndex = startIndex + 1; endIndex <= input.length(); endIndex++) {
+                if (doMatch(input.substring(startIndex, endIndex))) {
+                    matchIntervals.add(new Pair<>(startIndex, endIndex));
+                }
+            }
+        }
+
+        if (matchIntervals.isEmpty()) {
+            return;
+        }
+
+        // 目前仅支持以贪婪模式查询匹配的子串
+        // 首先排序
+        matchIntervals.sort(new Comparator<Pair<Integer, Integer>>() {
+            @Override
+            public int compare(Pair<Integer, Integer> o1, Pair<Integer, Integer> o2) {
+                if (o1.getFirst() < o2.getFirst()) {
+                    return -1;
+                } else if (o1.getFirst() > o2.getFirst()) {
+                    return 1;
+                } else {
+                    if (o1.getSecond() > o2.getSecond()) {
+                        return -1;
+                    } else {
+                        return 1;
                     }
                 }
-                index++;
+            }
+        });
+
+        // 然后合并包含的区间，例如[1,6)包含着[1,2] [3,5)，那么删去[1,2] [3,5)两个区间
+        List<Pair<Integer, Integer>> filteredMatchIntervals = new ArrayList<>();
+
+        // 第一个匹配的区间必定被选中
+        Pair<Integer, Integer> preInterval = matchIntervals.get(0);
+
+        for (int i = 1; i < matchIntervals.size(); i++) {
+            Pair<Integer, Integer> nextInterval = matchIntervals.get(i);
+
+            // 若区间完全分离
+            if (nextInterval.getFirst() >= preInterval.getSecond()) {
+                filteredMatchIntervals.add(preInterval);
+                preInterval = nextInterval;
             }
 
-            if (index == input.length() &&
-                    "".equals(input)) {
-                return matches();
-            }
-
-            return false;
-        } finally {
-            firstOfRemain = index + 1;
         }
+
+        filteredMatchIntervals.add(preInterval);
+
+        matchIntervals = filteredMatchIntervals;
     }
 
     @Override

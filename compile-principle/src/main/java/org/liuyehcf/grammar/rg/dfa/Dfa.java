@@ -11,9 +11,7 @@ import org.liuyehcf.grammar.rg.nfa.NfaState;
 
 import java.util.*;
 
-import static org.liuyehcf.grammar.utils.AssertUtils.assertFalse;
-import static org.liuyehcf.grammar.utils.AssertUtils.assertNotNull;
-import static org.liuyehcf.grammar.utils.AssertUtils.assertTrue;
+import static org.liuyehcf.grammar.utils.AssertUtils.*;
 
 /**
  * Created by Liuye on 2017/10/21.
