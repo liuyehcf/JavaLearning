@@ -14,6 +14,7 @@ public abstract class SymbolUtils {
 
     private static List<Symbol> alphabetSymbols = null;
     private static List<Symbol> alphabetSymbolsMatchesAny = null;
+    public static final Symbol _unKnow = getAlphabetSymbolWithChar('?');
     public static final Symbol _any = getAlphabetSymbolWithChar('.');
     public static final Symbol _or = getAlphabetSymbolWithChar('|');
     public static final Symbol _star = getAlphabetSymbolWithChar('*');

@@ -1,6 +1,7 @@
 package org.liuyehcf.grammar.rg;
 
 import org.junit.Test;
+import org.liuyehcf.grammar.rg.nfa.Nfa;
 import org.liuyehcf.grammar.rg.utils.TestCaseBuilder;
 
 import java.util.ArrayList;
@@ -60,6 +61,10 @@ public class TestNfa {
             java.util.regex.Matcher jdkMatcher = pattern.matcher(matchedCase);
             Matcher nfaMatcher = parser.matcher(matchedCase);
 
+            if(!jdkMatcher.matches()){
+                System.out.println(pattern.pattern());
+                System.out.println(matchedCase);
+            }
             assertTrue(jdkMatcher.matches());
 
             if (!nfaMatcher.matches()) {
@@ -112,14 +117,6 @@ public class TestNfa {
     }
 
     @Test
-    public void testGroup4() {
-        testRegexGroup(REGEX_GROUP_4,
-                true,
-                1000,
-                true);
-    }
-
-    @Test
     public void testGroup5() {
         testRegexGroup(REGEX_GROUP_5,
                 true,
@@ -130,8 +127,8 @@ public class TestNfa {
     @Test
     public void testGroup6() {
         testRegexGroup(REGEX_GROUP_6,
-                false,
-                100,
+                true,
+                1000,
                 true);
     }
 
@@ -144,11 +141,39 @@ public class TestNfa {
     }
 
     @Test
+    public void testGroup8() {
+        testRegexGroup(REGEX_GROUP_8,
+                false,
+                100,
+                true);
+    }
+
+    @Test
     public void testGroupSpecial() {
         // todo ，这里的正则表达式涉及到贪婪模式，因此不测 group
         testRegexGroup(REGEX_GROUP_SPECIAL,
                 false,
                 100,
                 false);
+    }
+
+    @Test
+    public void test(){
+        String regex="(e+)*";
+
+        Nfa parser=(Nfa)RGBuilder.compile(regex).buildNfa();
+
+        parser.print();
+
+        Matcher matcher=parser.matcher("eeeeeeee");
+
+        matcher.matches();
+
+        System.out.println(matcher.group(1));
+
+    }
+
+    public static void main(String[] args) {
+        Pattern p=Pattern.compile("a(b(d(e+|f)*)|((g(\\d|i)+)))+");
     }
 }

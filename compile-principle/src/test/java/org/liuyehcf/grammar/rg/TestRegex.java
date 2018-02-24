@@ -26,18 +26,24 @@ public class TestRegex {
             "[^\\[]", "[^\\]]", "[^\\d]", "[^\\D]", "[^\\d]", "[^\\D]",
     };
     static final String[] REGEX_GROUP_4 = {
+            "a?", "z?", "!?", "\0?", "\n?", ".?",
+            "\\.?", "\\|?", "\\*?", "\\+?", "\\[?", "\\]?", "\\(?", "\\)?",
+            "\\d?", "\\D?", "\\w?", "\\W?", "\\s?", "\\S?",
+            "a?c?", "a?c?efg", "012a?c?efg"
+    };
+    static final String[] REGEX_GROUP_5 = {
             "a*", "z*", "!*", "\0*", "\n*", ".*",
             "\\.*", "\\|*", "\\**", "\\+*", "\\[*", "\\]*", "\\(*", "\\)*",
             "\\d*", "\\D*", "\\w*", "\\W*", "\\s*", "\\S*",
             "a*c*", "a*c*efg", "012a*c*efg"
     };
-    static final String[] REGEX_GROUP_5 = {
+    static final String[] REGEX_GROUP_6 = {
             "a+", "z+", "!+", "\0+", "\n+", ".+",
             "\\.+", "\\|+", "\\*+", "\\++", "\\[+", "\\]+", "\\(+", "\\)+",
             "\\d+", "\\D+", "\\w+", "\\W+", "\\s", "\\S",
             "a+c+", "a+c+efg", "012a+c+efg"
     };
-    static final String[] REGEX_GROUP_6 = {
+    static final String[] REGEX_GROUP_7 = {
             "a|b", "aaaaa|b", "a|bbbbbb", "0000|11111",
             "a|b12c|c|d!ef|ge+l#ksjd|a*po",
             "a|[abc\\d]", "[^\\W]|bc",
@@ -46,7 +52,7 @@ public class TestRegex {
             "a*|b+|c|.|[12]3|asdjf[\\dhaks]jdhf|ced|ac\\d+edf|\0\\w",
             "111[\\d]ac|cd[^\\W].\\*+|cd09!%@#"
     };
-    static final String[] REGEX_GROUP_7 = {
+    static final String[] REGEX_GROUP_8 = {
             "()", "()()", "(())", "((()))()()(()((()(()))))()",
             "(abc(cd)(ef(g)()))", "((a)|(b))", "((a)+)", "a*", "((a(b|e))*)",
             "a(b(d(e|f)*)|((g(h|i)+)))+",
@@ -55,9 +61,9 @@ public class TestRegex {
             "(a|b)", "([0123])", "(a|bc[\\d])",
             "(a|b+)", "(c[0123]+e)", "(a|bc[\\d])",
             "(ab*c+|1[^\\w]+)|(a(b(e(g|o9))+)).",
-            "a|(bcd|(efg|[\\w]))c\\++|liuye",
+            "a|(bc?d|(efg|[\\w]))c\\++|liuye",
             "((a+())~!@#[\\d]ac)(\0)()((098)(2\\.9(3()(c()de)r[^\\S]c)s)ef)a()",
-            "(ab|cd*f|es(d)(3|[\\s]|0a|9(3(37(9))99|283(a(())!%#@)(a|(4(d)([1z])))(7()1+)9)))"
+            "(ab|cd*f|es(d)(3|[\\s]|0a|9(3(37(9+)?)99|283(a(())!%#@)(a|(4(d)([1z])))(7()1+)9)))"
     };
     static final String[] REGEX_GROUP_SPECIAL = {
             "\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*",//email

@@ -68,6 +68,9 @@ public abstract class TestCaseBuilder {
             case '|':
                 processWhenEncounteredOr();
                 break;
+            case '?':
+                processWhenEncounteredUnKnow();
+                break;
             case '*':
                 processWhenEncounteredStar();
                 break;
@@ -114,6 +117,8 @@ public abstract class TestCaseBuilder {
     protected abstract void processWhenEncounteredAny();
 
     protected abstract void processWhenEncounteredOr();
+
+    protected abstract void processWhenEncounteredUnKnow();
 
     protected abstract void processWhenEncounteredStar();
 
@@ -287,6 +292,11 @@ public abstract class TestCaseBuilder {
         }
 
         @Override
+        protected void processWhenEncounteredUnKnow() {
+            makeDifferentRepeatCases(0, 1);
+        }
+
+        @Override
         protected void processWhenEncounteredStar() {
             makeDifferentRepeatCases(0, 1, 2, 4, 8);
         }
@@ -427,6 +437,15 @@ public abstract class TestCaseBuilder {
 
             pushCurStackUnion();
             curContent = testCase;
+
+            backtracking();
+        }
+
+        @Override
+        protected void processWhenEncounteredUnKnow() {
+            index++;
+
+            curContent = copy(curContent, random.nextInt(2));
 
             backtracking();
         }
