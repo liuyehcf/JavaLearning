@@ -79,7 +79,7 @@ public class NfaMatcher implements Matcher {
         }
 
         if (index == s.length()) {
-            return curNfaState.canReceive(0);
+            return curNfaState.canReceive();
         }
 
         // 从当前节点出发，经过非ε边的next节点集合

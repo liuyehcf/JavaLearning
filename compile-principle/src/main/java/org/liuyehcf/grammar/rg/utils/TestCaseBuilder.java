@@ -2,6 +2,7 @@ package org.liuyehcf.grammar.rg.utils;
 
 
 import org.liuyehcf.grammar.core.definition.Symbol;
+import org.liuyehcf.grammar.utils.ListUtils;
 
 import java.util.*;
 
@@ -167,7 +168,7 @@ public abstract class TestCaseBuilder {
     List<List<String>> getTestCasesOfAllParts(String combinedStringOfCurGroup) {
 
         List<List<String>> testCasesOfAllParts = new ArrayList<>();
-        testCasesOfAllParts.add(Arrays.asList(combinedStringOfCurGroup));
+        testCasesOfAllParts.add(ListUtils.of(combinedStringOfCurGroup));
 
         addAllAdjacentOrParts(testCasesOfAllParts);
 
@@ -189,11 +190,11 @@ public abstract class TestCaseBuilder {
     }
 
     String copy(String origin, int times) {
-        String s = "";
+        StringBuilder sb = new StringBuilder();
         while (times-- > 0) {
-            s += origin;
+            sb.append(origin);
         }
-        return s;
+        return sb.toString();
     }
 
     List<Character> getAllOptionalChars() {

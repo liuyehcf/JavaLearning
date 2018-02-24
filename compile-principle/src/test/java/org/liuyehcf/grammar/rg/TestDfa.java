@@ -6,7 +6,9 @@ import org.liuyehcf.grammar.rg.utils.TestCaseBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
+import static org.junit.Assert.assertTrue;
 import static org.liuyehcf.grammar.rg.TestRegex.*;
 
 
@@ -17,140 +19,147 @@ public class TestDfa {
 
     private void testRegexGroup(String[] regexGroup,
                                 boolean testAllPossibleCases,
-                                boolean printAllPossibleCases,
-                                boolean testRandomCases,
-                                boolean printRandomCases,
-                                int randomTimes) {
+                                int randomTimes,
+                                boolean testGroup) {
         for (String regex : regexGroup) {
             testEachRegex(regex,
                     testAllPossibleCases,
-                    printAllPossibleCases,
-                    testRandomCases,
-                    printRandomCases,
-                    randomTimes);
+                    randomTimes,
+                    testGroup);
         }
     }
 
     private void testEachRegex(String regex,
                                boolean testAllPossibleCases,
-                               boolean printAllPossibleCases,
-                               boolean testRandomCases,
-                               boolean printRandomCases,
-                               int randomTimes) {
+                               int randomTimes,
+                               boolean testGroup) {
         RGParser parser = RGBuilder.compile(regex).buildDfa();
 
-        if (testAllPossibleCases) {
-            Set<String> matchedCases = TestCaseBuilder.createAllOptionalTestCasesWithRegex(regex);
-            if (printAllPossibleCases) {
-                System.out.println(matchedCases);
-                System.out.println("\n============================\n");
-            }
-            testDfaWithMatchedCases(parser, matchedCases);
-        }
+        Pattern pattern = Pattern.compile(regex);
+        List<String> unPassedCases = null;
 
-        if (testRandomCases) {
-            Set<String> matchedCases = TestCaseBuilder.createRandomTestCasesWithRegex(regex, randomTimes);
-            if (printRandomCases) {
-                System.out.println(matchedCases);
-                System.out.println("\n============================\n");
+        try {
+            if (testAllPossibleCases) {
+                Set<String> matchedCases = TestCaseBuilder.createAllOptionalTestCasesWithRegex(regex);
+                unPassedCases = testDfaWithMatchedCases(pattern, parser, matchedCases, testGroup);
             }
-            testDfaWithMatchedCases(parser, matchedCases);
+
+            Set<String> matchedCases = TestCaseBuilder.createRandomTestCasesWithRegex(regex, randomTimes);
+            unPassedCases = testDfaWithMatchedCases(pattern, parser, matchedCases, testGroup);
+            assertTrue(unPassedCases.isEmpty());
+        } catch (AssertionError e) {
+            System.err.println("Regex: [" + regex + "], unPassedCases: " + unPassedCases);
+            throw e;
         }
     }
 
 
-    private void testDfaWithMatchedCases(RGParser parser, Set<String> matchedCases) {
+    private List<String> testDfaWithMatchedCases(Pattern pattern, RGParser parser, Set<String> matchedCases, boolean testGroup) {
         List<String> unPassedCases = new ArrayList<>();
         for (String matchedCase : matchedCases) {
-            if (!parser.matches(matchedCase)) {
+
+            java.util.regex.Matcher jdkMatcher = pattern.matcher(matchedCase);
+            Matcher dfaMatcher = parser.matcher(matchedCase);
+
+            assertTrue(jdkMatcher.matches());
+
+            if (!dfaMatcher.matches()) {
                 unPassedCases.add(matchedCase);
+                continue;
+            }
+
+            if (testGroup) {
+                for (int group = 0; group < jdkMatcher.groupCount(); group++) {
+                    String jdkGroup = jdkMatcher.group(group);
+                    String dfaGroup = dfaMatcher.group(group);
+
+                    if (jdkGroup == null) {
+                        if (dfaGroup != null) {
+                            unPassedCases.add(matchedCase);
+                        }
+                    } else {
+                        if (!jdkGroup.equals(dfaGroup)) {
+                            unPassedCases.add(matchedCase);
+                        }
+                    }
+                }
             }
         }
 
-        if (!unPassedCases.isEmpty()) {
-            System.err.println(unPassedCases);
-            throw new RuntimeException();
-        }
+        return unPassedCases;
     }
 
     @Test
     public void testGroup1() {
         testRegexGroup(REGEX_GROUP_1,
                 true,
-                false,
-                true,
-                false,
-                1000);
+                1000,
+                false);
     }
 
     @Test
     public void testGroup2() {
         testRegexGroup(REGEX_GROUP_2,
                 true,
-                false,
-                true,
-                false,
-                1000);
+                1000,
+                false);
     }
 
     @Test
     public void testGroup3() {
         testRegexGroup(REGEX_GROUP_3,
                 true,
-                false,
-                true,
-                false,
-                1000);
+                1000,
+                false);
     }
+
 
     @Test
     public void testGroup4() {
         testRegexGroup(REGEX_GROUP_4,
                 true,
-                false,
-                true,
-                false,
-                1000);
+                1000,
+                false);
     }
 
     @Test
     public void testGroup5() {
         testRegexGroup(REGEX_GROUP_5,
                 true,
-                false,
-                true,
-                false,
-                1000);
+                1000,
+                false);
     }
 
     @Test
     public void testGroup6() {
         testRegexGroup(REGEX_GROUP_6,
-                false,
-                false,
                 true,
-                false,
-                1000);
+                1000,
+                false);
     }
 
     @Test
     public void testGroup7() {
         testRegexGroup(REGEX_GROUP_7,
                 false,
+                1000,
+                false);
+    }
+
+    @Test
+    public void testGroup8() {
+        testRegexGroup(REGEX_GROUP_8,
                 false,
-                true,
-                false,
-                1000);
+                1000,
+                false);
     }
 
     @Test
     public void testGroupSpecial() {
         testRegexGroup(REGEX_GROUP_SPECIAL,
                 false,
-                false,
-                true,
-                false,
-                1000);
+                1000,
+                false);
     }
 
 }

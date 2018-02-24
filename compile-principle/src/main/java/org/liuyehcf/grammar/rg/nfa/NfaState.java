@@ -55,6 +55,10 @@ public class NfaState {
         return groupReceive.contains(group);
     }
 
+    public boolean canReceive() {
+        return canReceive(0);
+    }
+
     public Set<Symbol> getAllInputSymbol() {
         return nextNfaStatesMap.keySet();
     }

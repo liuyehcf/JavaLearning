@@ -4,6 +4,7 @@ import org.liuyehcf.grammar.core.definition.Symbol;
 import org.liuyehcf.grammar.rg.nfa.NfaState;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.liuyehcf.grammar.utils.AssertUtils.assertFalse;
 
@@ -15,7 +16,7 @@ public class DfaState {
 
     private final int id = count++;
 
-    private DfaStateDescription description = new DfaStateDescription("");
+    private DfaStateDescription description = new DfaStateDescription(new HashSet<>());
 
     private boolean isMarked = false;
 
@@ -25,7 +26,11 @@ public class DfaState {
 
     private Map<Symbol, DfaState> nextDfaStateMap = new HashMap<>();
 
-    private boolean canReceive = false;
+    // 当前节点作为 group i 的起始节点，那么i位于groupStart中
+    private Set<Integer> groupStart = new HashSet<>();
+
+    // 当前节点作为 group i 的接收节点，那么i位于groupReceive中
+    private Set<Integer> groupReceive = new HashSet<>();
 
     public static DfaState createDfaStateWithNfaStates(List<NfaState> nfaStates) {
         LinkedList<NfaState> stack = new LinkedList<>();
@@ -61,16 +66,42 @@ public class DfaState {
         isMarked = true;
     }
 
-    public boolean isCanReceive() {
-        return canReceive;
+    public Set<Integer> getGroupStart() {
+        return groupStart;
+    }
+
+    public Set<Integer> getGroupReceive() {
+        return groupReceive;
+    }
+
+    public void setStart(int group) {
+        assertFalse(groupStart.contains(group));
+        groupStart.add(group);
+    }
+
+    public boolean isStart(int group) {
+        return groupStart.contains(group);
+    }
+
+    public void setReceive(int group) {
+        assertFalse(groupReceive.contains(group));
+        groupReceive.add(group);
+    }
+
+    public boolean canReceive(int group) {
+        return groupReceive.contains(group);
+    }
+
+    public boolean canReceive() {
+        return canReceive(0);
     }
 
     public boolean addNfaState(NfaState nfaState) {
         boolean flag = nfaStates.add(nfaState);
         if (flag) {
-            if (nfaState.canReceive(0)) { //todo
-                canReceive = true;
-            }
+            groupStart.addAll(nfaState.getGroupStart());
+            groupReceive.addAll(nfaState.getGroupReceive());
+
             inputSymbols.addAll(nfaState.getAllInputSymbol());
             inputSymbols.remove(Symbol.EPSILON);
         }
@@ -113,14 +144,9 @@ public class DfaState {
     }
 
     public void setDescription() {
-        List<NfaState> nfaStates = new ArrayList<>(this.nfaStates);
-        Collections.sort(nfaStates, new Comparator<NfaState>() {
-            @Override
-            public int compare(NfaState o1, NfaState o2) {
-                return o1.getId() - o2.getId();
-            }
-        });
-        description = new DfaStateDescription(nfaStates.toString());
+        description = new DfaStateDescription(
+                this.nfaStates.stream().map(NfaState::getId).collect(Collectors.toSet())
+        );
     }
 
     public void print() {
@@ -134,7 +160,7 @@ public class DfaState {
 
         while (!stack.isEmpty()) {
             DfaState curDfaState = stack.pop();
-            if (curDfaState.isCanReceive()) {
+            if (curDfaState.canReceive()) {
                 endDfaStates.add(curDfaState);
             }
 

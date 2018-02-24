@@ -153,19 +153,6 @@ public class TestNfa {
     }
 
     @Test
-    public void test() {
-        String regex = "(e+|f)*";
-
-        Nfa parser = (Nfa) RGBuilder.compile(regex).buildNfa();
-
-        Matcher matcher=parser.matcher("eeeeeeef");
-
-        matcher.matches();
-
-        System.out.println(matcher.group(1));
-    }
-
-    @Test
     public void testGroupSpecial() {
         // todo ，这里的正则表达式涉及到贪婪模式，因此不测 group
         testRegexGroup(REGEX_GROUP_SPECIAL,
