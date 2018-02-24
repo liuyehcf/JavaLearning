@@ -5,7 +5,10 @@ import org.liuyehcf.grammar.rg.Matcher;
 import org.liuyehcf.grammar.rg.utils.SymbolUtils;
 import org.liuyehcf.grammar.utils.Pair;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class NfaMatcher implements Matcher {
 
@@ -53,9 +56,7 @@ public class NfaMatcher implements Matcher {
 
         if (!curNfaState.getGroupStart().isEmpty()) {
             for (int group : curNfaState.getGroupStart()) {
-                if (!groupStartIndexes.containsKey(group)) {
-                    groupStartIndexes.put(group, index);
-                }
+                groupStartIndexes.put(group, index);
             }
         }
 

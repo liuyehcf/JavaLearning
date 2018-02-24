@@ -217,23 +217,23 @@ public class TestNfa {
 
     @Test
     public void testGroupMatcher3() {
-        RGParser parser = RGBuilder.compile("((a(b|e))+)").buildNfa();
+        RGParser parser = RGBuilder.compile("((a)+)").buildNfa();
 
         parser.print();
 
-        Matcher matcher = parser.matcher("abababae");
+        Matcher matcher = parser.matcher("aaaaaaa");
 
         assertTrue(matcher.matches());
         assertEquals(
-                "abababae",
+                "aaaaaaa",
                 matcher.group(0)
         );
         assertEquals(
-                "abababae",
+                "aaaaaaa",
                 matcher.group(1)
         );
         assertEquals(
-                "ab",
+                "a",
                 matcher.group(2)
         );
     }

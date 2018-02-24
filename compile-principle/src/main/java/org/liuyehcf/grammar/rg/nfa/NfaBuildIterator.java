@@ -174,51 +174,86 @@ class NfaBuildIterator {
     }
 
     private void processWhenEncounteredStar() {
-        wrapCurNfaClosureWithNewCurClosure();
+        wrapCurNfaClosureForStar();
 
         pushCurNfaClosure();
 
         moveForward();
     }
 
-    private void wrapCurNfaClosureWithNewCurClosure() {
-        NfaClosure wrapNfaClosure = new NfaClosure(new NfaState(), ListUtils.of(new NfaState()), getCurGroup());
+    private void wrapCurNfaClosureForStar() {
+        NfaClosure wrapNfaClosure = buildWrapNfaClosure();
 
-        NfaState startOfWrapNfaClosure = wrapNfaClosure.getStartNfaState();
-        NfaState endOfWrapNfaClosure = wrapNfaClosure.getEndNfaStates().get(0);
+        NfaState startNfaStateOfWrapNfaClosure = wrapNfaClosure.getStartNfaState();
+        NfaState secondStartNfaStateOfWrapNfaClosure = new NfaState();
+        NfaState endNfaStateOfWrapNfaClosure = wrapNfaClosure.getEndNfaStates().get(0);
 
         // 外层开始节点连接到外层终止节点
-        startOfWrapNfaClosure.addInputSymbolAndNextNfaState(Symbol.EPSILON, endOfWrapNfaClosure);
+        startNfaStateOfWrapNfaClosure.addInputSymbolAndNextNfaState(Symbol.EPSILON, endNfaStateOfWrapNfaClosure);
+
+        // 外层开始节点连接到外层第二个节点
+        startNfaStateOfWrapNfaClosure.addInputSymbolAndNextNfaState(Symbol.EPSILON, secondStartNfaStateOfWrapNfaClosure);
+
+        // 外层第二个节点连接到外层终止节点
+        secondStartNfaStateOfWrapNfaClosure.addInputSymbolAndNextNfaState(Symbol.EPSILON, endNfaStateOfWrapNfaClosure);
 
         assertNotNull(curNfaClosure);
-        NfaState startOfCurNfaClosure = curNfaClosure.getStartNfaState();
+        NfaState startNfaStateOfCurNfaClosure = curNfaClosure.getStartNfaState();
 
-        // 外层开始节点连接到内层开始节点
-        startOfWrapNfaClosure.addInputSymbolAndNextNfaState(Symbol.EPSILON, startOfCurNfaClosure);
-
-        // 内层开始节点连接到外层终止节点
-        startOfCurNfaClosure.addInputSymbolAndNextNfaState(Symbol.EPSILON, endOfWrapNfaClosure);
+        // 外层第二个节点连接到内层开始节点
+        secondStartNfaStateOfWrapNfaClosure.addInputSymbolAndNextNfaState(Symbol.EPSILON, startNfaStateOfCurNfaClosure);
 
         for (NfaState endNfaState : curNfaClosure.getEndNfaStates()) {
-            // 内层结束节点连接到内层开始节点
-            endNfaState.addInputSymbolAndNextNfaState(Symbol.EPSILON, startOfCurNfaClosure);
+            // 内层结束节点连接到外层第二个节点
+            endNfaState.addInputSymbolAndNextNfaState(Symbol.EPSILON, secondStartNfaStateOfWrapNfaClosure);
         }
 
         curNfaClosure = wrapNfaClosure;
     }
 
+    private NfaClosure buildWrapNfaClosure() {
+        NfaState startNfaState = new NfaState();
+        NfaState endNfaState = new NfaState();
+
+        return new NfaClosure(startNfaState, ListUtils.of(endNfaState), getCurGroup());
+    }
+
     private void processWhenEncounteredAdd() {
-        buildEpsilonConnectionFromEachEndNfaStateToStartNfaState();
+        wrapCurNfaClosureForAdd();
 
         pushCurNfaClosure();
 
         moveForward();
     }
 
-    private void buildEpsilonConnectionFromEachEndNfaStateToStartNfaState() {
+    private void wrapCurNfaClosureForAdd() {
+        NfaClosure wrapNfaClosure = buildWrapNfaClosure();
+
+        NfaState startNfaStateOfWrapNfaClosure = wrapNfaClosure.getStartNfaState();
+        NfaState secondStartNfaStateOfWrapNfaClosure = new NfaState();
+        NfaState endNfaStateOfWrapNfaClosure = wrapNfaClosure.getEndNfaStates().get(0);
+
+        // 外层开始节点连接到外层终止节点
+        startNfaStateOfWrapNfaClosure.addInputSymbolAndNextNfaState(Symbol.EPSILON, endNfaStateOfWrapNfaClosure);
+
+        // 外层第二个节点连接到外层终止节点
+        secondStartNfaStateOfWrapNfaClosure.addInputSymbolAndNextNfaState(Symbol.EPSILON, endNfaStateOfWrapNfaClosure);
+
+        assertNotNull(curNfaClosure);
+        NfaState startNfaStateOfCurNfaClosure = curNfaClosure.getStartNfaState();
+
+        // 外层开始节点连接到内层开始节点
+        startNfaStateOfWrapNfaClosure.addInputSymbolAndNextNfaState(Symbol.EPSILON, startNfaStateOfCurNfaClosure);
+
+        // 外层第二个节点连接到内层开始节点
+        secondStartNfaStateOfWrapNfaClosure.addInputSymbolAndNextNfaState(Symbol.EPSILON, startNfaStateOfCurNfaClosure);
+
         for (NfaState endNfaState : curNfaClosure.getEndNfaStates()) {
-            endNfaState.addInputSymbolAndNextNfaState(Symbol.EPSILON, curNfaClosure.getStartNfaState());
+            // 内层结束节点连接到外层第二个节点
+            endNfaState.addInputSymbolAndNextNfaState(Symbol.EPSILON, secondStartNfaStateOfWrapNfaClosure);
         }
+
+        curNfaClosure = wrapNfaClosure;
     }
 
     private void processWhenEncounteredEscaped() {
