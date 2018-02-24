@@ -249,7 +249,7 @@ public class TestLL1 {
         assertFalse(parser.matches("bdc"));
     }
 
-    //@Test todo 这个没法匹配 "(a)|(b)|(ab)" 匹配ab时出问题
+    @Test
     public void testParseCase4WithNfaLexicalAnalyzer() {
         Grammar grammar = createGrammar4();
 
@@ -285,7 +285,6 @@ public class TestLL1 {
         assertFalse(parser.matches("ac"));
         assertFalse(parser.matches("bdc"));
     }
-
 
     private LexicalAnalyzer getDefaultLexicalAnalyzer() {
         return JdkLexicalAnalyzer.builder()

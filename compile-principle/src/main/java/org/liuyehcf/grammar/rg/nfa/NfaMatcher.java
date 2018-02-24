@@ -16,14 +16,19 @@ public class NfaMatcher implements Matcher {
 
     // 待匹配的输入字符串
     private final String input;
-    // 匹配的区间
-    List<Pair<Integer, Integer>> matchIntervals;
+
     // group i --> 起始索引 的映射表，闭集
     private Map<Integer, Integer> groupStartIndexes = null;
+
     // group i --> 接收索引 的映射表，闭集
     private Map<Integer, Integer> groupEndIndexes = null;
+
+    // 匹配的区间集合
+    private List<Pair<Integer, Integer>> matchIntervals;
+
     // 目前进行匹配操作的子串
     private String subInput;
+
     // 匹配子串索引
     private int indexOfMatchIntervals;
 
@@ -37,10 +42,10 @@ public class NfaMatcher implements Matcher {
 
     @Override
     public boolean matches() {
-        return doMatch(input);
+        return doMatch(input) != null;
     }
 
-    private boolean doMatch(String curInput) {
+    private NfaState doMatch(String curInput) {
         this.subInput = curInput;
 
         groupStartIndexes = new HashMap<>();
@@ -50,7 +55,7 @@ public class NfaMatcher implements Matcher {
 
         Set<String> visitedNfaState = new HashSet<>();
 
-        boolean result = isMatchDfsProxy(curNfaState, 0, visitedNfaState);
+        NfaState result = isMatchDfsProxy(curNfaState, 0, visitedNfaState);
 
         Set<Integer> keySets = groupStartIndexes.keySet();
         for (int group : keySets.toArray(new Integer[0])) {
@@ -62,12 +67,12 @@ public class NfaMatcher implements Matcher {
         return result;
     }
 
-    private boolean isMatchDfsProxy(NfaState curNfaState, int index, Set<String> visitedNfaState) {
+    private NfaState isMatchDfsProxy(NfaState curNfaState, int index, Set<String> visitedNfaState) {
         Pair<Map<Integer, Integer>, Map<Integer, Integer>> pair = setGroupIndex(curNfaState, index);
 
-        boolean result = isMatchDfs(curNfaState, index, visitedNfaState);
+        NfaState result = isMatchDfs(curNfaState, index, visitedNfaState);
 
-        if (!result) {
+        if (result == null) {
             groupBackTrack(pair);
         }
 
@@ -101,9 +106,9 @@ public class NfaMatcher implements Matcher {
         groupEndIndexes = pair.getSecond();
     }
 
-    private boolean isMatchDfs(NfaState curNfaState, int index, Set<String> visitedNfaState) {
+    private NfaState isMatchDfs(NfaState curNfaState, int index, Set<String> visitedNfaState) {
 
-        // 首先走非ε边，贪婪模式（todo 并非完全贪婪）
+        // 首先走非ε边，贪婪模式
         if (index != subInput.length()) {
             // 从当前节点出发，经过非ε边的next节点集合
             Set<NfaState> nextStates = curNfaState.getNextNfaStatesWithInputSymbol(
@@ -111,13 +116,15 @@ public class NfaMatcher implements Matcher {
 
             for (NfaState nextState : nextStates) {
 
-                if (isMatchDfsProxy(nextState, index + 1, visitedNfaState))
-                    return true;
+                NfaState result;
+                if ((result = isMatchDfsProxy(nextState, index + 1, visitedNfaState)) != null) {
+                    return result;
+                }
             }
         }
 
         if (index == subInput.length() && curNfaState.canReceive()) {
-            return true;
+            return curNfaState;
         }
 
         // 从当前节点出发，经过ε边的后继节点集合
@@ -130,18 +137,20 @@ public class NfaMatcher implements Matcher {
             String curStateString = nextState.toString() + index;
 
             if (visitedNfaState.add(curStateString)) {
-                if (isMatchDfsProxy(nextState, index, visitedNfaState))
-                    return true;
+                NfaState result;
+                if ((result = isMatchDfsProxy(nextState, index, visitedNfaState)) != null) {
+                    return result;
+                }
                 visitedNfaState.remove(curStateString);
             }
         }
 
-        return false;
+        return null;
     }
 
     @Override
     public boolean find() {
-        //todo 不支持 "(a)|(b)|(ab)"，如果字符串是ab，正确地应该是a和b，而这里直接是ab。
+        // todo 解决了 "(a)|(b)|(ab)" 匹配 "ab" 的问题，不知道还有没有其他find贪婪匹配问题
 
         if (matchIntervals == null) {
             initMatchIntervals();
@@ -164,6 +173,7 @@ public class NfaMatcher implements Matcher {
     }
 
     private void initMatchIntervals() {
+        Map<Pair<Integer, Integer>, NfaState> intervalNfaStateMap = new HashMap<>();
         matchIntervals = new ArrayList<>();
 
         if (input.length() == 0) {
@@ -174,8 +184,11 @@ public class NfaMatcher implements Matcher {
 
         for (int startIndex = 0; startIndex < input.length(); startIndex++) {
             for (int endIndex = startIndex + 1; endIndex <= input.length(); endIndex++) {
-                if (doMatch(input.substring(startIndex, endIndex))) {
-                    matchIntervals.add(new Pair<>(startIndex, endIndex));
+                NfaState result;
+                if ((result = doMatch(input.substring(startIndex, endIndex))) != null) {
+                    Pair<Integer, Integer> interval = new Pair<>(startIndex, endIndex);
+                    matchIntervals.add(interval);
+                    intervalNfaStateMap.put(interval, result);
                 }
             }
         }
@@ -186,19 +199,18 @@ public class NfaMatcher implements Matcher {
 
         // 目前仅支持以贪婪模式查询匹配的子串
         // 首先排序
-        matchIntervals.sort(new Comparator<Pair<Integer, Integer>>() {
-            @Override
-            public int compare(Pair<Integer, Integer> o1, Pair<Integer, Integer> o2) {
-                if (o1.getFirst() < o2.getFirst()) {
+        matchIntervals.sort((o1, o2) -> {
+            if (o1.getFirst() < o2.getFirst()) {
+                return -1;
+            } else if (o1.getFirst() > o2.getFirst()) {
+                return 1;
+            } else {
+                if (o1.getSecond() < o2.getSecond()) {
                     return -1;
-                } else if (o1.getFirst() > o2.getFirst()) {
+                } else if (o1.getSecond() > o2.getSecond()) {
                     return 1;
                 } else {
-                    if (o1.getSecond() > o2.getSecond()) {
-                        return -1;
-                    } else {
-                        return 1;
-                    }
+                    return 0;
                 }
             }
         });
@@ -206,11 +218,19 @@ public class NfaMatcher implements Matcher {
         // 然后合并包含的区间，例如[1,6)包含着[1,2] [3,5)，那么删去[1,2] [3,5)两个区间
         List<Pair<Integer, Integer>> filteredMatchIntervals = new ArrayList<>();
 
-        // 第一个匹配的区间必定被选中
         Pair<Integer, Integer> preInterval = matchIntervals.get(0);
 
         for (int i = 1; i < matchIntervals.size(); i++) {
             Pair<Integer, Integer> nextInterval = matchIntervals.get(i);
+
+            // 当区间包含时
+            if (preInterval.getFirst() >= nextInterval.getFirst()
+                    && preInterval.getSecond() <= nextInterval.getSecond()) {
+                // 如果终止状态不同，说明不是*或者+之类，可能是"(a)|(b)|(ab)"匹配"ab"这种情况，那么需要保留小的区间；否则就是"a*"，匹配aa，保留大的区间
+                if (intervalNfaStateMap.get(preInterval).equals(intervalNfaStateMap.get(nextInterval))) {
+                    preInterval = nextInterval;
+                }
+            }
 
             // 若区间完全分离
             if (nextInterval.getFirst() >= preInterval.getSecond()) {

@@ -2,6 +2,7 @@ package org.liuyehcf.grammar.rg;
 
 import org.junit.Test;
 import org.liuyehcf.grammar.rg.utils.TestCaseBuilder;
+import org.liuyehcf.grammar.utils.ListUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -200,6 +201,40 @@ public class TestNfa {
                 "aaaaaaaaa",
                 matcher.group(1)
         );
+    }
+
+    @Test
+    public void testFindCase4() {
+        RGParser parser = RGBuilder.compile("(a)|(b)|(ab)").buildNfa();
+
+        Matcher matcher = parser.matcher("ab aaa bbb abb abab");
+
+        List<String> expects = ListUtils.of("a", "b", "a", "a", "a", "b", "b", "b", "a", "b", "b", "a", "b", "a", "b");
+
+        int index = 0;
+        while (matcher.find()) {
+            assertEquals(
+                    expects.get(index++),
+                    matcher.group(0)
+            );
+        }
+    }
+
+    @Test
+    public void testFindCase5() {
+        RGParser parser = RGBuilder.compile("((a)|(b)|(ab))+").buildNfa();
+
+        Matcher matcher = parser.matcher("ab aaa bbb abb abab");
+
+        List<String> expects = ListUtils.of("ab", "aaa", "bbb", "abb", "abab");
+
+        int index = 0;
+        while (matcher.find()) {
+            assertEquals(
+                    expects.get(index++),
+                    matcher.group(0)
+            );
+        }
     }
 
 
