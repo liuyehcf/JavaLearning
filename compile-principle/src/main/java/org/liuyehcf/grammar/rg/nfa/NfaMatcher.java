@@ -173,7 +173,9 @@ public class NfaMatcher implements Matcher {
     }
 
     private void initMatchIntervals() {
+        // 该映射表用来解决"(a)|(b)|(ab)" 匹配 "ab" 的问题
         Map<Pair<Integer, Integer>, NfaState> intervalNfaStateMap = new HashMap<>();
+
         matchIntervals = new ArrayList<>();
 
         if (input.length() == 0) {
