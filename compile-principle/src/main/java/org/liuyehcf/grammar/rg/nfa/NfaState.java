@@ -13,7 +13,7 @@ import static org.liuyehcf.grammar.utils.AssertUtils.assertFalse;
 public class NfaState {
     private static int count = 1;
     private final int id = count++;
-    private final List<NfaState> NONE = Collections.unmodifiableList(new ArrayList<>());
+    private final Set<NfaState> NONE = Collections.unmodifiableSet(new HashSet<>());
 
     // 当前节点作为 group i 的起始节点，那么i位于groupStart中
     private Set<Integer> groupStart = new HashSet<>();
@@ -22,7 +22,7 @@ public class NfaState {
     private Set<Integer> groupReceive = new HashSet<>();
 
     // 输入符号 -> 后继节点集合 的映射表
-    private Map<Symbol, List<NfaState>> nextNfaStatesMap = new HashMap<>();
+    private Map<Symbol, Set<NfaState>> nextNfaStatesMap = new HashMap<>();
 
     public int getId() {
         return id;
@@ -58,13 +58,13 @@ public class NfaState {
         return nextNfaStatesMap.keySet();
     }
 
-    public List<NfaState> getNextNfaStatesWithInputSymbol(Symbol symbol) {
+    public Set<NfaState> getNextNfaStatesWithInputSymbol(Symbol symbol) {
         return nextNfaStatesMap.getOrDefault(symbol, NONE);
     }
 
     public void addInputSymbolAndNextNfaState(Symbol symbol, NfaState nextNfaState) {
         if (!nextNfaStatesMap.containsKey(symbol)) {
-            nextNfaStatesMap.put(symbol, new ArrayList<>());
+            nextNfaStatesMap.put(symbol, new HashSet<>());
         }
         nextNfaStatesMap.get(symbol).add(nextNfaState);
     }

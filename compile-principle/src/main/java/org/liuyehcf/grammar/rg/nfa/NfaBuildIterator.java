@@ -4,6 +4,7 @@ package org.liuyehcf.grammar.rg.nfa;
 import org.liuyehcf.grammar.core.definition.Symbol;
 import org.liuyehcf.grammar.rg.utils.EscapedUtil;
 import org.liuyehcf.grammar.rg.utils.SymbolUtils;
+import org.liuyehcf.grammar.utils.ListUtils;
 
 import java.util.*;
 
@@ -173,50 +174,37 @@ class NfaBuildIterator {
     }
 
     private void processWhenEncounteredStar() {
-        buildNormalCircleForCurNfaClosure();
-
-        buildEpsilonCircleOfAllEndNfaStateForCurNfaClosure();
-
-        removeAllConnectionsOfStartNfaStateOfCurNfaClosure();
-
-        buildEpsilonConnectionFromStartNfaStateToEachEndNfaStateForCurNfaClosure();
+        wrapCurNfaClosureWithNewCurClosure();
 
         pushCurNfaClosure();
 
         moveForward();
     }
 
-    private void buildNormalCircleForCurNfaClosure() {
-        NfaState startNfaState = curNfaClosure.getStartNfaState();
-        List<NfaState> endNfaStates = curNfaClosure.getEndNfaStates();
-        for (NfaState endNfaState : endNfaStates) {
-            for (Symbol inputSymbol : startNfaState.getAllInputSymbol()) {
-                for (NfaState nextNfaStateOfStartNfaState : startNfaState.getNextNfaStatesWithInputSymbol(inputSymbol)) {
-                    endNfaState.addInputSymbolAndNextNfaState(inputSymbol, nextNfaStateOfStartNfaState);
-                }
-            }
-        }
-    }
+    private void wrapCurNfaClosureWithNewCurClosure() {
+        NfaClosure wrapNfaClosure = new NfaClosure(new NfaState(), ListUtils.of(new NfaState()), getCurGroup());
 
-    private void buildEpsilonCircleOfAllEndNfaStateForCurNfaClosure() {
-        List<NfaState> endNfaStates = curNfaClosure.getEndNfaStates();
-        for (int i = 0; i < endNfaStates.size(); i++) {
-            endNfaStates.get(i).addInputSymbolAndNextNfaState(
-                    Symbol.EPSILON,
-                    endNfaStates.get((i + 1) % endNfaStates.size()));
-        }
-    }
+        NfaState startOfWrapNfaClosure = wrapNfaClosure.getStartNfaState();
+        NfaState endOfWrapNfaClosure = wrapNfaClosure.getEndNfaStates().get(0);
 
-    private void removeAllConnectionsOfStartNfaStateOfCurNfaClosure() {
-        NfaState startNfaState = curNfaClosure.getStartNfaState();
-        startNfaState.cleanConnections();
-    }
+        // 外层开始节点连接到外层终止节点
+        startOfWrapNfaClosure.addInputSymbolAndNextNfaState(Symbol.EPSILON, endOfWrapNfaClosure);
 
-    private void buildEpsilonConnectionFromStartNfaStateToEachEndNfaStateForCurNfaClosure() {
+        assertNotNull(curNfaClosure);
+        NfaState startOfCurNfaClosure = curNfaClosure.getStartNfaState();
+
+        // 外层开始节点连接到内层开始节点
+        startOfWrapNfaClosure.addInputSymbolAndNextNfaState(Symbol.EPSILON, startOfCurNfaClosure);
+
+        // 内层开始节点连接到外层终止节点
+        startOfCurNfaClosure.addInputSymbolAndNextNfaState(Symbol.EPSILON, endOfWrapNfaClosure);
+
         for (NfaState endNfaState : curNfaClosure.getEndNfaStates()) {
-            curNfaClosure.getStartNfaState().
-                    addInputSymbolAndNextNfaState(Symbol.EPSILON, endNfaState);
+            // 内层结束节点连接到内层开始节点
+            endNfaState.addInputSymbolAndNextNfaState(Symbol.EPSILON, startOfCurNfaClosure);
         }
+
+        curNfaClosure = wrapNfaClosure;
     }
 
     private void processWhenEncounteredAdd() {

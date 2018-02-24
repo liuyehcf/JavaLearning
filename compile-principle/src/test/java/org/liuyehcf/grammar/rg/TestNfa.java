@@ -239,6 +239,17 @@ public class TestNfa {
     }
 
     @Test
+    public void testGroupMatcher4() {
+        RGParser parser = RGBuilder.compile("a*").buildNfa();
+
+        parser.print();
+
+        Matcher matcher = parser.matcher("");
+
+        assertTrue(matcher.matches());
+    }
+
+    @Test
     public void testJDKRegex(){
         Pattern p=Pattern.compile("((a(b|e))+)");
         java.util.regex.Matcher matcher = p.matcher("abaeabaeab");

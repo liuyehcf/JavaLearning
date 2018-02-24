@@ -72,7 +72,7 @@ public class NfaMatcher implements Matcher {
         Pair<Map<Integer, Integer>, Map<Integer, Integer>> pair = setGroupIndex(curNfaState, index);
 
         // 从当前节点出发，经过ε边的后继节点集合
-        List<NfaState> epsilonNextStates = curNfaState.getNextNfaStatesWithInputSymbol(
+        Set<NfaState> epsilonNextStates = curNfaState.getNextNfaStatesWithInputSymbol(
                 Symbol.EPSILON
         );
         for (NfaState nextState : epsilonNextStates) {
@@ -91,7 +91,7 @@ public class NfaMatcher implements Matcher {
         }
 
         // 从当前节点出发，经过非ε边的next节点集合
-        List<NfaState> nextStates = curNfaState.getNextNfaStatesWithInputSymbol(
+        Set<NfaState> nextStates = curNfaState.getNextNfaStatesWithInputSymbol(
                 SymbolUtils.getAlphabetSymbolWithChar(s.charAt(index)));
 
         for (NfaState nextState : nextStates) {
