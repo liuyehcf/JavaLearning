@@ -354,52 +354,53 @@ class NfaBuildIterator {
          *                                            \  /
          *                                             \/
          *
-         *                    ┌───────────────────────── 2 ──────────────────────────┐
-         *                    ┃                                                      ┃
-         *                    ┃                                                      V
-         *                    ┃             Outer.S  ───────────── 1 ────────────> Outer.E
-         *                    ┃                ┃
-         *                    ┃                3
-         *                    ┃                ┃
-         *                    ┃                V
-         *                Outer.P ─── 4 ──> Inner.S ───────*> Inner.E(1) ─────────┐
-         *                    Λ                ├───────────*> Inner.E(2) ─────┐   ┃
-         *                    ┃                ┃       ...                    ┃   ┃
-         *                    ┃                └───────────*> Inner.E(n) ──┐  ┃   ┃
-         *                    ┃                                            ┃  ┃   ┃
-         *                    ┃                                            ┃  ┃   ┃
-         *                    ├───────────────────── 5 ────────────────────┘  ┃   ┃
-         *                    ┃                                               ┃   ┃
-         *                    ├───────────────────── 5 ───────────────────────┘   ┃
-         *                    ┃                                                   ┃
-         *                    └───────────────────── 5 ───────────────────────────┘
+         *
+         *
+         *
+         *
+         *    Outer.S ─── 1 ───> Outer.P ──── 2 ───> Inner.S ───────*> Inner.E(1) ─────────┬──────── 5 ──────> Outer.Q ───── 3 ───> Outer.E
+         *                           Λ                  ┃                                  ┃                     Λ
+         *                           ┃                  ┃                                  ┃                     ┃
+         *                           ┃                  ├───────────*> Inner.E(2) ─────┬───┼──────── 5 ──────────┤
+         *                           ┃                  ┃       ...                    ┃   ┃                     ┃
+         *                           ┃                  └───────────*> Inner.E(n) ──┬──┼───┼──────── 5 ──────────┘
+         *                           ┃                                              ┃  ┃   ┃
+         *                           ┃                                              ┃  ┃   ┃
+         *                           ├───────────────────── 4 ──────────────────────┘  ┃   ┃
+         *                           ┃                                                 ┃   ┃
+         *                           ├───────────────────── 4 ─────────────────────────┘   ┃
+         *                           ┃                                                     ┃
+         *                           └───────────────────── 4 ─────────────────────────────┘
+         *
          *
          */
 
         NfaClosure wrapNfaClosure = buildWrapNfaClosure();
 
+        // 必须保证wrapNfaClosure单入单出，否则group匹配会出现边界问题
         NfaState _OUTER_S = wrapNfaClosure.getStartNfaState();
         NfaState _OUTER_P = new NfaState();
+        NfaState _OUTER_Q = new NfaState();
         NfaState _OUTER_E = wrapNfaClosure.getEndNfaStates().get(0);
-
-        // (1)
-        _OUTER_S.addInputSymbolAndNextNfaState(Symbol.EPSILON, _OUTER_E);
-
-        // (2)
-        _OUTER_P.addInputSymbolAndNextNfaState(Symbol.EPSILON, _OUTER_E);
 
         assertNotNull(curNfaClosure);
         NfaState _INNER_S = curNfaClosure.getStartNfaState();
 
-        // (3)
-        _OUTER_S.addInputSymbolAndNextNfaState(Symbol.EPSILON, _INNER_S);
+        // (1)
+        _OUTER_S.addInputSymbolAndNextNfaState(Symbol.EPSILON, _OUTER_P);
 
-        // (4)
+        // (2)
         _OUTER_P.addInputSymbolAndNextNfaState(Symbol.EPSILON, _INNER_S);
 
+        // (3)
+        _OUTER_Q.addInputSymbolAndNextNfaState(Symbol.EPSILON, _OUTER_E);
+
         for (NfaState _INNER_E : curNfaClosure.getEndNfaStates()) {
-            // (5)
+            // (4)
             _INNER_E.addInputSymbolAndNextNfaState(Symbol.EPSILON, _OUTER_P);
+
+            // (5)
+            _INNER_E.addInputSymbolAndNextNfaState(Symbol.EPSILON, _OUTER_Q);
         }
 
         curNfaClosure = wrapNfaClosure;

@@ -61,10 +61,6 @@ public class TestNfa {
             java.util.regex.Matcher jdkMatcher = pattern.matcher(matchedCase);
             Matcher nfaMatcher = parser.matcher(matchedCase);
 
-            if(!jdkMatcher.matches()){
-                System.out.println(pattern.pattern());
-                System.out.println(matchedCase);
-            }
             assertTrue(jdkMatcher.matches());
 
             if (!nfaMatcher.matches()) {
@@ -117,6 +113,14 @@ public class TestNfa {
     }
 
     @Test
+    public void testGroup4() {
+        testRegexGroup(REGEX_GROUP_4,
+                true,
+                1000,
+                true);
+    }
+
+    @Test
     public void testGroup5() {
         testRegexGroup(REGEX_GROUP_5,
                 true,
@@ -149,31 +153,24 @@ public class TestNfa {
     }
 
     @Test
+    public void test() {
+        String regex = "(e+|f)*";
+
+        Nfa parser = (Nfa) RGBuilder.compile(regex).buildNfa();
+
+        Matcher matcher=parser.matcher("eeeeeeef");
+
+        matcher.matches();
+
+        System.out.println(matcher.group(1));
+    }
+
+    @Test
     public void testGroupSpecial() {
         // todo ，这里的正则表达式涉及到贪婪模式，因此不测 group
         testRegexGroup(REGEX_GROUP_SPECIAL,
                 false,
                 100,
                 false);
-    }
-
-    @Test
-    public void test(){
-        String regex="(e+)*";
-
-        Nfa parser=(Nfa)RGBuilder.compile(regex).buildNfa();
-
-        parser.print();
-
-        Matcher matcher=parser.matcher("eeeeeeee");
-
-        matcher.matches();
-
-        System.out.println(matcher.group(1));
-
-    }
-
-    public static void main(String[] args) {
-        Pattern p=Pattern.compile("a(b(d(e+|f)*)|((g(\\d|i)+)))+");
     }
 }
