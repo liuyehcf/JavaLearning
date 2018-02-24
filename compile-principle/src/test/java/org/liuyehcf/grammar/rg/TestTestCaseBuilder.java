@@ -48,6 +48,7 @@ public class TestTestCaseBuilder {
         Pattern p = Pattern.compile(regex);
         List<String> wrongCases = new ArrayList<>();
         for (String testCase : testCases) {
+            System.out.println(testCase);
             Matcher m = p.matcher(testCase);
             if (!m.matches()) {
                 wrongCases.add(testCase);

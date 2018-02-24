@@ -11,7 +11,6 @@ import static org.liuyehcf.grammar.core.definition.Symbol.createNonTerminator;
 
 /**
  * Created by Liuye on 2017/10/24.
- * 目前暂不支持"(a+)*|(a*)+"
  */
 public class TestRegex {
     static final String[] REGEX_GROUP_1 = {

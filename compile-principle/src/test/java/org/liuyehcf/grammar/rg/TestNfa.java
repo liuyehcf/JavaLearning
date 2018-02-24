@@ -1,6 +1,7 @@
 package org.liuyehcf.grammar.rg;
 
 import org.junit.Test;
+import org.liuyehcf.grammar.rg.nfa.Nfa;
 import org.liuyehcf.grammar.rg.utils.TestCaseBuilder;
 
 import java.util.ArrayList;
@@ -153,11 +154,10 @@ public class TestNfa {
 
     @Test
     public void testGroupSpecial() {
-        // todo ，这里的正则表达式涉及到贪婪模式，因此不测 group
         testRegexGroup(REGEX_GROUP_SPECIAL,
                 false,
-                100,
-                false);
+                1000,
+                true);
     }
 
     @Test
@@ -215,4 +215,36 @@ public class TestNfa {
                 matcher.group(1)
         );
     }
+
+
+    @Test
+    public void test1() {
+        Nfa parser = (Nfa) RGBuilder.compile("\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*").buildNfa();
+
+        Matcher matcher = parser.matcher("LLL.LLL@LLL.MMM.MM.MMM.MMM-111.111");
+
+        System.out.println(matcher.matches());
+
+        System.out.println(matcher.group(0));
+        System.out.println(matcher.group(1));
+        System.out.println(matcher.group(2));
+        System.out.println(matcher.group(3));
+    }
+
+
+
+    @Test
+    public void test11() {
+        Pattern parser = Pattern.compile("\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*");
+
+        java.util.regex.Matcher matcher = parser.matcher("LLL.LLL@LLL.MMM.MM.MMM.MMM-111.111");
+
+        System.out.println(matcher.matches());
+
+        System.out.println(matcher.group(0));
+        System.out.println(matcher.group(1));
+        System.out.println(matcher.group(2));
+        System.out.println(matcher.group(3));
+    }
+
 }

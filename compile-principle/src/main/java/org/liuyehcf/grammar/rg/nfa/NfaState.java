@@ -23,6 +23,7 @@ public class NfaState {
     private Set<Integer> groupReceive = new HashSet<>();
 
     // 输入符号 -> 后继节点集合 的映射表。这里用LinkedHashMap保证了节点加入的先后顺序，详见"NfaBuildIterator.parallel"方法
+    // 此外，如果对于一个输入符号有多个后继节点，那么这些后继节点的先后次序也需要维护，因此用的是LinkedHashSet
     private Map<Symbol, Set<NfaState>> nextNfaStatesMap = new LinkedHashMap<>();
 
     public int getId() {

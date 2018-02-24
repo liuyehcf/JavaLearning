@@ -204,10 +204,14 @@ class NfaBuildIterator {
          *                                            \  /
          *                                             \/
          *
-         *                ┌────────────────────────────────────────── 1 ───────────────────────────────────────────────┐
+         *
+         *                   请注意，步骤1，2的相对顺序不可乱，步骤的次序即匹配的策略（贪婪or勉强or占有），这里的连线都是ε边
+         *
+         *
+         *                ┌────────────────────────────────────────── 2 ───────────────────────────────────────────────┐
          *                ┃                                                                                            ┃
          *                ┃                                                                                            V
-         *             Outer.S ──── 2 ───> Inner.S ───────*> Inner.E(1) ──────── 4 ─────> Outer.Q ──────── 3 ─────> Outer.E
+         *             Outer.S ──── 1 ───> Inner.S ───────*> Inner.E(1) ──────── 4 ─────> Outer.Q ──────── 3 ─────> Outer.E
          *                                    ┃                                             Λ
          *                                    ┃                                             ┃
          *                                    ├───────────*> Inner.E(2) ──────── 4 ─────────┤
@@ -227,10 +231,10 @@ class NfaBuildIterator {
         NfaState _INNER_S = curNfaClosure.getStartNfaState();
 
         // (1)
-        _OUTER_S.addInputSymbolAndNextNfaState(Symbol.EPSILON, _OUTER_E);
+        _OUTER_S.addInputSymbolAndNextNfaState(Symbol.EPSILON, _INNER_S);
 
         // (2)
-        _OUTER_S.addInputSymbolAndNextNfaState(Symbol.EPSILON, _INNER_S);
+        _OUTER_S.addInputSymbolAndNextNfaState(Symbol.EPSILON, _OUTER_E);
 
         // (3)
         _OUTER_Q.addInputSymbolAndNextNfaState(Symbol.EPSILON, _OUTER_E);
@@ -272,12 +276,12 @@ class NfaBuildIterator {
          *                                            \  /
          *                                             \/
          *
+         *                   请注意，步骤2，3的相对顺序不可乱，步骤的次序即匹配的策略（贪婪or勉强or占有），这里的连线都是ε边
          *
-         *
-         *                           ┌───────────────────────────────── 2 ──────────────────────────────┐
+         *                           ┌───────────────────────────────── 3 ──────────────────────────────┐
          *                           ┃                                                                  ┃
          *                           ┃                                                                  V
-         *    Outer.S ─── 1 ───> Outer.P ───── 3 ───> Inner.S ───────*> Inner.E(1) ─────────┐        Outer.E
+         *    Outer.S ─── 1 ───> Outer.P ───── 2 ───> Inner.S ───────*> Inner.E(1) ─────────┐        Outer.E
          *                           Λ                   ├───────────*> Inner.E(2) ─────┐   ┃
          *                           ┃                   ┃       ...                    ┃   ┃
          *                           ┃                   └───────────*> Inner.E(n) ──┐  ┃   ┃
@@ -306,10 +310,10 @@ class NfaBuildIterator {
         _OUTER_S.addInputSymbolAndNextNfaState(Symbol.EPSILON, _OUTER_P);
 
         // (2)
-        _OUTER_P.addInputSymbolAndNextNfaState(Symbol.EPSILON, _OUTER_E);
+        _OUTER_P.addInputSymbolAndNextNfaState(Symbol.EPSILON, _INNER_S);
 
         // (3)
-        _OUTER_P.addInputSymbolAndNextNfaState(Symbol.EPSILON, _INNER_S);
+        _OUTER_P.addInputSymbolAndNextNfaState(Symbol.EPSILON, _OUTER_E);
 
         for (NfaState INNER_E : curNfaClosure.getEndNfaStates()) {
             // (4)
@@ -356,7 +360,7 @@ class NfaBuildIterator {
          *                                             \/
          *
          *
-         *
+         *                   请注意，步骤4，5的相对顺序不可乱，步骤的次序即匹配的策略（贪婪or勉强or占有），这里的连线都是ε边
          *
          *
          *    Outer.S ─── 1 ───> Outer.P ──── 2 ───> Inner.S ───────*> Inner.E(1) ─────────┬──────── 5 ──────> Outer.Q ───── 3 ───> Outer.E
