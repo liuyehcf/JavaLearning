@@ -68,7 +68,8 @@ public class NfaMatcher implements Matcher {
         );
         for (NfaState nextState : epsilonNextStates) {
             // 为了避免重复经过相同的 ε边，每次访问ε边，给一个标记
-            String curStateString = nextState.toString() + index + Symbol.EPSILON;
+            // 在匹配目标字符串的不同位置时，允许经过相同的ε边
+            String curStateString = nextState.toString() + index;
 
             if (visitedNfaState.add(curStateString)) {
                 if (isMatchDfsProxy(nextState, s, index, visitedNfaState))

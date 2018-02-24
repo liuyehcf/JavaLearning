@@ -9,7 +9,7 @@ import static org.liuyehcf.grammar.utils.AssertUtils.assertFalse;
 
 /**
  * Created by Liuye on 2017/10/21.
- * todo 这个类作为Hash元素
+ * 该类会作为Hash表的键值，直接利用Object的equals方法与hashCode方法
  */
 public class NfaState {
     private static int count = 1;
@@ -68,10 +68,6 @@ public class NfaState {
             nextNfaStatesMap.put(symbol, new HashSet<>());
         }
         nextNfaStatesMap.get(symbol).add(nextNfaState);
-    }
-
-    public void cleanConnections() {
-        nextNfaStatesMap.clear();
     }
 
     @Override
