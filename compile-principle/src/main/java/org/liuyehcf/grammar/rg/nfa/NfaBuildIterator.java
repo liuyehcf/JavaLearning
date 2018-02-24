@@ -187,7 +187,7 @@ class NfaBuildIterator {
          * Outer: 外层NfaClosure
          * S: 开始节点
          * E(i): 第i个终止节点
-         * S.N(i): 开始节点的第i个后继节点
+         * M: 外层NfaClosure的一个特殊节点
          * --*>: 经过多步跳转
          * -->: 经过一步跳转
          *
@@ -202,22 +202,22 @@ class NfaBuildIterator {
          *                                            \  /
          *                                             \/
          *
-         *       ┌─────────────────────────────────────────────────────────────────────────────────┐
-         *       ┃                                                                                 ┃
-         *       ┃              ┌──────────────────────────────────────────────────────────────────┤
-         *       ┃              ┃                                                                  ┃
-         *       ┃              ┃                                                                  v
-         *    Outer.S ────> Outer.S.N ──────> Inner.S ───────*> Inner.E(1) ─────────┐           Outer.E
-         *                      ^                ├───────────*> Inner.E(2) ─────┐   ┃
-         *                      ┃                ┃       ...                    ┃   ┃
-         *                      ┃                └───────────*> Inner.E(n) ──┐  ┃   ┃
-         *                      ┃                                            ┃  ┃   ┃
-         *                      ┃                                            ┃  ┃   ┃
-         *                      ├────────────────────────────────────────────┘  ┃   ┃
-         *                      ┃                                               ┃   ┃
-         *                      ├───────────────────────────────────────────────┘   ┃
-         *                      ┃                                                   ┃
-         *                      └───────────────────────────────────────────────────┘
+         *       ┌───────────────────────────────────── 1 ──────────────────────────────────────────────┐
+         *       ┃                                                                                      ┃
+         *       ┃                   ┌───────────────────────────────── 3 ──────────────────────────────┤
+         *       ┃                   ┃                                                                  ┃
+         *       ┃                   ┃                                                                  V
+         *    Outer.S ─── 2 ───> Outer.M ───── 4 ───> Inner.S ───────*> Inner.E(1) ─────────┐        Outer.E
+         *                           Λ                   ├───────────*> Inner.E(2) ─────┐   ┃
+         *                           ┃                   ┃       ...                    ┃   ┃
+         *                           ┃                   └───────────*> Inner.E(n) ──┐  ┃   ┃
+         *                           ┃                                               ┃  ┃   ┃
+         *                           ┃                                               ┃  ┃   ┃
+         *                           ├───────────────────── 5 ───────────────────────┘  ┃   ┃
+         *                           ┃                                                  ┃   ┃
+         *                           ├───────────────────── 5 ──────────────────────────┘   ┃
+         *                           ┃                                                      ┃
+         *                           └───────────────────── 5 ──────────────────────────────┘
          *
          */
 
@@ -226,22 +226,27 @@ class NfaBuildIterator {
 
         // 注意，如果要实现组匹配，那么以下三个节点都是必须的。否则会产生节点二义性，例如((a+))与((a)+)
         NfaState _OUTER_S = wrapNfaClosure.getStartNfaState();
-        NfaState _OUTER_S_N = new NfaState();
+        NfaState _OUTER_M = new NfaState();
         NfaState _OUTER_E = wrapNfaClosure.getEndNfaStates().get(0);
 
+        // (1)
         _OUTER_S.addInputSymbolAndNextNfaState(Symbol.EPSILON, _OUTER_E);
 
-        _OUTER_S.addInputSymbolAndNextNfaState(Symbol.EPSILON, _OUTER_S_N);
+        // (2)
+        _OUTER_S.addInputSymbolAndNextNfaState(Symbol.EPSILON, _OUTER_M);
 
-        _OUTER_S_N.addInputSymbolAndNextNfaState(Symbol.EPSILON, _OUTER_E);
+        // (3)
+        _OUTER_M.addInputSymbolAndNextNfaState(Symbol.EPSILON, _OUTER_E);
 
         assertNotNull(curNfaClosure);
         NfaState _INNER_S = curNfaClosure.getStartNfaState();
 
-        _OUTER_S_N.addInputSymbolAndNextNfaState(Symbol.EPSILON, _INNER_S);
+        // (4)
+        _OUTER_M.addInputSymbolAndNextNfaState(Symbol.EPSILON, _INNER_S);
 
         for (NfaState INNER_E : curNfaClosure.getEndNfaStates()) {
-            INNER_E.addInputSymbolAndNextNfaState(Symbol.EPSILON, _OUTER_S_N);
+            // (5)
+            INNER_E.addInputSymbolAndNextNfaState(Symbol.EPSILON, _OUTER_M);
         }
 
         curNfaClosure = wrapNfaClosure;
@@ -263,30 +268,72 @@ class NfaBuildIterator {
     }
 
     private void wrapCurNfaClosureForAdd() {
+        /*
+         * Inner: 内层NfaClosure
+         * Outer: 外层NfaClosure
+         * S: 开始节点
+         * E(i): 第i个终止节点
+         * M: 外层NfaClosure的一个特殊节点
+         * --*>: 经过多步跳转
+         * -->: 经过一步跳转
+         *
+         *                                  Inner.S ───────*> Inner.E(1)
+         *                                     ├───────────*> Inner.E(2)
+         *                                     ┃       ...
+         *                                     └───────────*> Inner.E(n)
+         *
+         *                                             ||
+         *                                             ||
+         *                                             ||
+         *                                            \  /
+         *                                             \/
+         *
+         *                    ┌───────────────────────── 2 ──────────────────────────┐
+         *                    ┃                                                      ┃
+         *                    ┃                                                      V
+         *                    ┃             Outer.S  ───────────── 1 ────────────> Outer.E
+         *                    ┃                ┃
+         *                    ┃                3
+         *                    ┃                ┃
+         *                    ┃                V
+         *                Outer.M ─── 4 ──> Inner.S ───────*> Inner.E(1) ─────────┐
+         *                    Λ                ├───────────*> Inner.E(2) ─────┐   ┃
+         *                    ┃                ┃       ...                    ┃   ┃
+         *                    ┃                └───────────*> Inner.E(n) ──┐  ┃   ┃
+         *                    ┃                                            ┃  ┃   ┃
+         *                    ┃                                            ┃  ┃   ┃
+         *                    ├───────────────────── 5 ────────────────────┘  ┃   ┃
+         *                    ┃                                               ┃   ┃
+         *                    ├───────────────────── 5 ───────────────────────┘   ┃
+         *                    ┃                                                   ┃
+         *                    └───────────────────── 5 ───────────────────────────┘
+         *
+         */
+
         NfaClosure wrapNfaClosure = buildWrapNfaClosure();
 
-        NfaState startNfaStateOfWrapNfaClosure = wrapNfaClosure.getStartNfaState();
-        NfaState secondStartNfaStateOfWrapNfaClosure = new NfaState();
-        NfaState endNfaStateOfWrapNfaClosure = wrapNfaClosure.getEndNfaStates().get(0);
+        NfaState _OUTER_S = wrapNfaClosure.getStartNfaState();
+        NfaState _OUTER_M = new NfaState();
+        NfaState _OUTER_E = wrapNfaClosure.getEndNfaStates().get(0);
 
-        // 外层开始节点连接到外层终止节点
-        startNfaStateOfWrapNfaClosure.addInputSymbolAndNextNfaState(Symbol.EPSILON, endNfaStateOfWrapNfaClosure);
+        // (1)
+        _OUTER_S.addInputSymbolAndNextNfaState(Symbol.EPSILON, _OUTER_E);
 
-        // 外层第二个节点连接到外层终止节点
-        secondStartNfaStateOfWrapNfaClosure.addInputSymbolAndNextNfaState(Symbol.EPSILON, endNfaStateOfWrapNfaClosure);
+        // (2)
+        _OUTER_M.addInputSymbolAndNextNfaState(Symbol.EPSILON, _OUTER_E);
 
         assertNotNull(curNfaClosure);
-        NfaState startNfaStateOfCurNfaClosure = curNfaClosure.getStartNfaState();
+        NfaState _INNER_S = curNfaClosure.getStartNfaState();
 
-        // 外层开始节点连接到内层开始节点
-        startNfaStateOfWrapNfaClosure.addInputSymbolAndNextNfaState(Symbol.EPSILON, startNfaStateOfCurNfaClosure);
+        // (3)
+        _OUTER_S.addInputSymbolAndNextNfaState(Symbol.EPSILON, _INNER_S);
 
-        // 外层第二个节点连接到内层开始节点
-        secondStartNfaStateOfWrapNfaClosure.addInputSymbolAndNextNfaState(Symbol.EPSILON, startNfaStateOfCurNfaClosure);
+        // (4)
+        _OUTER_M.addInputSymbolAndNextNfaState(Symbol.EPSILON, _INNER_S);
 
-        for (NfaState endNfaState : curNfaClosure.getEndNfaStates()) {
-            // 内层结束节点连接到外层第二个节点
-            endNfaState.addInputSymbolAndNextNfaState(Symbol.EPSILON, secondStartNfaStateOfWrapNfaClosure);
+        for (NfaState _INNER_E : curNfaClosure.getEndNfaStates()) {
+            // (5)
+            _INNER_E.addInputSymbolAndNextNfaState(Symbol.EPSILON, _OUTER_M);
         }
 
         curNfaClosure = wrapNfaClosure;
