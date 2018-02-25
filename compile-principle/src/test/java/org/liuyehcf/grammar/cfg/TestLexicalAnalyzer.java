@@ -9,8 +9,8 @@ import static org.junit.Assert.assertEquals;
 
 public class TestLexicalAnalyzer {
     public static String getIdRegex() {
-        String digit = "[0123456789]";
-        String letter = "[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_]";
+        String digit = "[0-9]";
+        String letter = "[a-zA-Z_]";
         String id = letter + "(" + letter + "|" + digit + ")*";
         return id;
     }

@@ -27,6 +27,7 @@ public abstract class SymbolUtils {
     public static final Symbol _rightSmallParenthesis = getAlphabetSymbolWithChar(')');
     public static final Symbol _leftBigParenthesis = getAlphabetSymbolWithChar('{');
     public static final Symbol _rightBigParenthesis = getAlphabetSymbolWithChar('}');
+    public static final Symbol _to = getAlphabetSymbolWithChar('-');
 
     public static Symbol getAlphabetSymbolWithChar(char symbol) {
         if (alphabetSymbols == null) {
@@ -56,10 +57,7 @@ public abstract class SymbolUtils {
     }
 
     public static Set<Symbol> getOppositeSymbols(Set<Symbol> excludedSymbols) {
-        Set<Symbol> oppositeSymbols = new HashSet<>();
-        for (Symbol symbol : getAlphabetSymbols()) {
-            oppositeSymbols.add(symbol);
-        }
+        Set<Symbol> oppositeSymbols = new HashSet<>(getAlphabetSymbols());
         oppositeSymbols.removeAll(excludedSymbols);
         return oppositeSymbols;
     }

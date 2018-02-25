@@ -1,6 +1,7 @@
 package org.liuyehcf.grammar.rg.utils;
 
 import org.liuyehcf.grammar.core.definition.Symbol;
+import org.liuyehcf.grammar.utils.ListUtils;
 
 import java.util.*;
 
@@ -91,6 +92,8 @@ public abstract class EscapedUtil {
                 return escaped_s;
             case 'S':
                 return escaped_S;
+            case '-':
+                return ListUtils.of(SymbolUtils._to);
             default:
                 throw new RuntimeException();
         }

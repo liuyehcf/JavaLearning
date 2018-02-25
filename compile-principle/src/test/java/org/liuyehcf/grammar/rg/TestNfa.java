@@ -258,4 +258,24 @@ public class TestNfa {
                 matcher.group(1)
         );
     }
+
+    @Test
+    public void test1() {
+        RGParser parser = RGBuilder.compile("[a-zA-Z_]").buildNfa();
+
+        Matcher matcher = parser.matcher("B");
+
+        assertTrue(matcher.matches());
+
+    }
+
+    @Test
+    public void test() {
+        Pattern parser = Pattern.compile("[\\d-z]");
+
+        java.util.regex.Matcher matcher=parser.matcher("-");
+
+        assertTrue(matcher.matches());
+
+    }
 }

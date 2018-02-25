@@ -13,7 +13,7 @@ import static org.liuyehcf.grammar.utils.AssertUtils.*;
 
 /**
  * Created by Liuye on 2017/10/23.
- * todo 目前还不支持：1. 匹配模式的选择 2. [a-z]，即'-'符号
+ * todo 目前还不支持：1. 匹配模式的选择
  * ┐ ┘ └ ┌   ┴ ├ ┬ ┤  ┼   ─  │
  *
  * ┓ ┛ ┗ ┏   ┻ ┣ ┳ ┫  ╋   ━  ┃
@@ -498,16 +498,15 @@ class NfaBuildIterator {
 
         Integer leftNumber = null, rightNumber = null;
 
-        char c;
         StringBuilder sb = new StringBuilder();
-        while ((c = SymbolUtils.getChar(getCurSymbol())) != '}') {
+        while (!getCurSymbol().equals(SymbolUtils._rightBigParenthesis)) {
 
-            if (c == ',') {
+            if (SymbolUtils.getChar(getCurSymbol()) == ',') {
                 assertNull(leftNumber);
                 leftNumber = Integer.parseInt(sb.toString());
                 sb = new StringBuilder();
             } else {
-                sb.append(c);
+                sb.append(SymbolUtils.getChar(getCurSymbol()));
             }
 
             moveForward();
@@ -563,9 +562,14 @@ class NfaBuildIterator {
     private Set<Symbol> getOptionalSymbols() {
         moveForward();
         boolean isNot = getCurSymbol().equals(SymbolUtils._middleParenthesisNot);
+        if (isNot) {
+            moveForward();
+        }
 
         Set<Symbol> optionalSymbols = new HashSet<>();
-        if (isNot) moveForward();
+
+        int pre = -1;
+        boolean hasTo = false;
 
         do {
             if (getCurSymbol().equals(SymbolUtils._escaped)) {
@@ -573,11 +577,34 @@ class NfaBuildIterator {
                 optionalSymbols.addAll(
                         EscapedUtil.getSymbolsOfEscapedCharInMiddleParenthesis(
                                 SymbolUtils.getChar(getCurSymbol())));
+                pre = -1;
+            }
+            // '-'前面存在有效字符时
+            else if (pre != -1 && getCurSymbol().equals(SymbolUtils._to)) {
+                assertFalse(hasTo);
+                hasTo = true;
             } else {
-                optionalSymbols.add(getCurSymbol());
+                if (hasTo) {
+                    assertTrue(pre != -1);
+                    assertTrue(pre <= SymbolUtils.getChar(getCurSymbol()));
+                    // pre在上一次已经添加过了，本次从pre+1开始
+                    for (char c = (char) (pre + 1); c <= SymbolUtils.getChar(getCurSymbol()); c++) {
+                        optionalSymbols.add(SymbolUtils.getAlphabetSymbolWithChar(c));
+                    }
+                    pre = -1;
+                    hasTo = false;
+                } else {
+                    pre = SymbolUtils.getChar(getCurSymbol());
+                    optionalSymbols.add(getCurSymbol());
+                }
             }
             moveForward();
         } while (!getCurSymbol().equals(SymbolUtils._rightMiddleParenthesis));
+
+        // 最后一个'-'当做普通字符
+        if (hasTo) {
+            optionalSymbols.add(SymbolUtils._to);
+        }
 
         moveForward();
 

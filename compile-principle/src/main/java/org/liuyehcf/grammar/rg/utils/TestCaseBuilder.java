@@ -7,8 +7,7 @@ import org.liuyehcf.grammar.utils.Pair;
 
 import java.util.*;
 
-import static org.liuyehcf.grammar.utils.AssertUtils.assertNull;
-import static org.liuyehcf.grammar.utils.AssertUtils.assertTrue;
+import static org.liuyehcf.grammar.utils.AssertUtils.*;
 
 /**
  * Created by Liuye on 2017/10/24.
@@ -245,10 +244,16 @@ public abstract class TestCaseBuilder {
 
     List<Character> getAllOptionalChars() {
         index++;
+
         boolean isNot = (getCurChar() == '^');
+        if (isNot) {
+            index++;
+        }
 
         Set<Character> optionalChars = new HashSet<>();
-        if (isNot) index++;
+
+        int pre = -1;
+        boolean hasTo = false;
 
         do {
             if (getCurChar() == '\\') {
@@ -256,11 +261,35 @@ public abstract class TestCaseBuilder {
                 for (Symbol symbol : EscapedUtil.getSymbolsOfEscapedCharInMiddleParenthesis(getCurChar())) {
                     optionalChars.add(symbol.getValue().charAt(0));
                 }
+                pre = -1;
+            }
+            // '-'前面存在有效字符时
+            else if (pre != -1 && getCurChar() == '-') {
+                assertFalse(hasTo);
+                hasTo = true;
             } else {
-                optionalChars.add(getCurChar());
+                if (hasTo) {
+                    assertTrue(pre != -1);
+                    assertTrue(pre <= getCurChar());
+                    // pre在上一次已经添加过了，本次从pre+1开始
+                    for (char c = (char) (pre + 1); c <= getCurChar(); c++) {
+                        optionalChars.add(c);
+                    }
+                    pre = -1;
+                    hasTo = false;
+                } else {
+                    pre = getCurChar();
+                    optionalChars.add(getCurChar());
+                }
+
             }
             index++;
         } while (getCurChar() != ']');
+
+        // 最后一个'-'当做普通字符
+        if (hasTo) {
+            optionalChars.add('-');
+        }
 
         index++;
 
