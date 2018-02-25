@@ -647,8 +647,6 @@ class NfaBuildIterator {
     }
 
     private void parallel(NfaClosure _PRE, NfaClosure _NEXT) {
-        // parallel不能用一个新的单入单出的NfaClosure包裹起来，这样会导致"(a)|(b)|(ab)"只有一个出口
-
         /*
          *
          * Pre: 左侧NfaClosure
@@ -679,6 +677,12 @@ class NfaBuildIterator {
          *            │                                 │
          *            └──────────────────────── 1 ──────┘
          *
+         *   ******************************************************************************************
+         *   **                                                                                      **
+         *   **   parallel不能用一个新的单入单出的NfaClosure包裹起来，这样会导致"(a)|(b)|(ab)"只有一个出口   **
+         *   **       必须保证多出的特性("NfaMatcher.initMatchIntervals"方法会利用该特性实现贪婪find)      **
+         *   **                                                                                      **
+         *   ******************************************************************************************
          */
 
         NfaState _PRE_S = _PRE.getStartNfaState();
