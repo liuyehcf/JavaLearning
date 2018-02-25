@@ -155,6 +155,14 @@ public class TestDfa {
     }
 
     @Test
+    public void testGroup9() {
+        testRegexGroup(REGEX_GROUP_9,
+                false,
+                1000,
+                false);
+    }
+
+    @Test
     public void testGroupSpecial() {
         testRegexGroup(REGEX_GROUP_SPECIAL,
                 false,

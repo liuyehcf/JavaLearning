@@ -3,9 +3,11 @@ package org.liuyehcf.grammar.rg.utils;
 
 import org.liuyehcf.grammar.core.definition.Symbol;
 import org.liuyehcf.grammar.utils.ListUtils;
+import org.liuyehcf.grammar.utils.Pair;
 
 import java.util.*;
 
+import static org.liuyehcf.grammar.utils.AssertUtils.assertNull;
 import static org.liuyehcf.grammar.utils.AssertUtils.assertTrue;
 
 /**
@@ -78,6 +80,9 @@ public abstract class TestCaseBuilder {
             case '+':
                 processWhenEncounteredAdd();
                 break;
+            case '{':
+                processWhenEncounteredLeftBigParenthesis();
+                break;
             case '\\':
                 processWhenEncounteredEscaped();
                 break;
@@ -124,6 +129,8 @@ public abstract class TestCaseBuilder {
     protected abstract void processWhenEncounteredStar();
 
     protected abstract void processWhenEncounteredAdd();
+
+    protected abstract void processWhenEncounteredLeftBigParenthesis();
 
     protected abstract void processWhenEncounteredEscaped();
 
@@ -195,6 +202,45 @@ public abstract class TestCaseBuilder {
             sb.append(origin);
         }
         return sb.toString();
+    }
+
+    Pair<Integer, Integer> getRepeatInterval() {
+        index++;
+
+        Integer leftNumber = null, rightNumber = null;
+
+        char c;
+        StringBuilder sb = new StringBuilder();
+        while ((c = getCurChar()) != '}') {
+
+            if (c == ',') {
+                assertNull(leftNumber);
+                leftNumber = Integer.parseInt(sb.toString());
+                sb = new StringBuilder();
+            } else {
+                sb.append(c);
+            }
+
+            index++;
+        }
+
+
+        if (leftNumber == null) {
+            leftNumber = Integer.parseInt(sb.toString());
+            rightNumber = leftNumber;
+        } else {
+            if (sb.length() > 0) {
+                rightNumber = Integer.parseInt(sb.toString());
+            }
+        }
+
+        if (rightNumber != null) {
+            assertTrue(rightNumber >= leftNumber);
+        }
+
+        index++;
+
+        return new Pair<>(leftNumber, rightNumber);
     }
 
     List<Character> getAllOptionalChars() {
@@ -294,15 +340,15 @@ public abstract class TestCaseBuilder {
 
         @Override
         protected void processWhenEncounteredUnKnow() {
-            makeDifferentRepeatCases(0, 1);
+            makeDifferentRepeatCases(ListUtils.of(0, 1));
         }
 
         @Override
         protected void processWhenEncounteredStar() {
-            makeDifferentRepeatCases(0, 1, 2, 4, 8);
+            makeDifferentRepeatCases(ListUtils.of(0, 1, 2, 4, 8));
         }
 
-        private void makeDifferentRepeatCases(int... repeatTimes) {
+        private void makeDifferentRepeatCases(List<Integer> repeatTimes) {
             String tempCurStackUnion = curContent;
             for (int repeatTime : repeatTimes) {
                 makeSpecificRepeatCase(repeatTime, tempCurStackUnion);
@@ -320,7 +366,26 @@ public abstract class TestCaseBuilder {
 
         @Override
         protected void processWhenEncounteredAdd() {
-            makeDifferentRepeatCases(1, 2, 4, 8);
+            makeDifferentRepeatCases(ListUtils.of(1, 2, 4, 8));
+        }
+
+        @Override
+        protected void processWhenEncounteredLeftBigParenthesis() {
+            int tempIndex = index;
+            Pair<Integer, Integer> repeatInterval = getRepeatInterval();
+
+            if (repeatInterval.getSecond() == null) {
+                repeatInterval = new Pair<>(repeatInterval.getFirst(), repeatInterval.getFirst() + 8);
+            }
+
+            List<Integer> repeatTimes = new ArrayList<>();
+            for (int i = repeatInterval.getFirst(); i <= repeatInterval.getSecond(); i++) {
+                repeatTimes.add(i);
+            }
+
+            makeDifferentRepeatCases(repeatTimes);
+
+            index = tempIndex;
         }
 
         @Override
@@ -465,6 +530,19 @@ public abstract class TestCaseBuilder {
             index++;
 
             curContent = copy(curContent, random.nextInt(8) + 1);
+
+            backtracking();
+        }
+
+        @Override
+        protected void processWhenEncounteredLeftBigParenthesis() {
+            Pair<Integer, Integer> repeatInterval = getRepeatInterval();
+
+            if (repeatInterval.getSecond() == null) {
+                repeatInterval = new Pair<>(repeatInterval.getFirst(), repeatInterval.getFirst() + 8);
+            }
+
+            curContent = copy(curContent, random.nextInt(repeatInterval.getSecond() - repeatInterval.getFirst() + 1) + +repeatInterval.getFirst());
 
             backtracking();
         }

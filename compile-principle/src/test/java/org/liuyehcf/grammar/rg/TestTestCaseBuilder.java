@@ -103,7 +103,7 @@ public class TestTestCaseBuilder {
     @Test
     public void testRegexGroup6() {
         testRegexGroup(REGEX_GROUP_6,
-                false,
+                true,
                 true,
                 1000);
     }
@@ -111,6 +111,22 @@ public class TestTestCaseBuilder {
     @Test
     public void testRegexGroup7() {
         testRegexGroup(REGEX_GROUP_7,
+                true,
+                true,
+                1000);
+    }
+
+    @Test
+    public void testRegexGroup8() {
+        testRegexGroup(REGEX_GROUP_8,
+                false,
+                true,
+                1000);
+    }
+
+    @Test
+    public void testRegexGroup9() {
+        testRegexGroup(REGEX_GROUP_9,
                 false,
                 true,
                 1000);

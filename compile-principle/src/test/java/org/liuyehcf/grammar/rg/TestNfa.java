@@ -1,6 +1,7 @@
 package org.liuyehcf.grammar.rg;
 
 import org.junit.Test;
+import org.liuyehcf.grammar.rg.nfa.Nfa;
 import org.liuyehcf.grammar.rg.utils.TestCaseBuilder;
 import org.liuyehcf.grammar.utils.ListUtils;
 
@@ -129,13 +130,20 @@ public class TestNfa {
     @Test
     public void testGroup7() {
         testRegexGroup(REGEX_GROUP_7,
-                false,
+                true,
                 1000);
     }
 
     @Test
     public void testGroup8() {
         testRegexGroup(REGEX_GROUP_8,
+                false,
+                1000);
+    }
+
+    @Test
+    public void testGroup9() {
+        testRegexGroup(REGEX_GROUP_9,
                 false,
                 1000);
     }
@@ -241,19 +249,6 @@ public class TestNfa {
     @Test
     public void testGreedyMode() {
         RGParser parser = RGBuilder.compile("a((Ba)*)B(a(Ba)*)").buildNfa();
-
-        Matcher matcher = parser.matcher("aBaBaBa");
-
-        assertTrue(matcher.matches());
-        assertEquals(
-                "BaBa",
-                matcher.group(1)
-        );
-    }
-
-    //@Test
-    public void test() {
-        RGParser parser = RGBuilder.compile("a{100}").buildNfa();
 
         Matcher matcher = parser.matcher("aBaBaBa");
 

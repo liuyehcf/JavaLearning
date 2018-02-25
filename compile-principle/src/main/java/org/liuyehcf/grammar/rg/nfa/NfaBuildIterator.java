@@ -195,6 +195,10 @@ class NfaBuildIterator {
     }
 
     private void wrapCurNfaClosureForUnKnow() {
+        curNfaClosure = createUnKnowWrappedNfaClosureFor(curNfaClosure);
+    }
+
+    private NfaClosure createUnKnowWrappedNfaClosureFor(NfaClosure __INNER) {
         /*
          * Inner: 内层NfaClosure
          * Outer: 外层NfaClosure
@@ -238,8 +242,8 @@ class NfaBuildIterator {
         NfaState _OUTER_Q = new NfaState();
         NfaState _OUTER_E = wrapNfaClosure.getEndNfaStates().get(0);
 
-        assertNotNull(curNfaClosure);
-        NfaState _INNER_S = curNfaClosure.getStartNfaState();
+        assertNotNull(__INNER);
+        NfaState _INNER_S = __INNER.getStartNfaState();
 
         // (1)
         _OUTER_S.addInputSymbolAndNextNfaState(Symbol.EPSILON, _INNER_S);
@@ -250,12 +254,19 @@ class NfaBuildIterator {
         // (3)
         _OUTER_Q.addInputSymbolAndNextNfaState(Symbol.EPSILON, _OUTER_E);
 
-        for (NfaState _INNER_E : curNfaClosure.getEndNfaStates()) {
+        for (NfaState _INNER_E : __INNER.getEndNfaStates()) {
             // (4)
             _INNER_E.addInputSymbolAndNextNfaState(Symbol.EPSILON, _OUTER_Q);
         }
 
-        curNfaClosure = wrapNfaClosure;
+        return wrapNfaClosure;
+    }
+
+    private NfaClosure buildWrapNfaClosure() {
+        NfaState startNfaState = new NfaState();
+        NfaState endNfaState = new NfaState();
+
+        return new NfaClosure(startNfaState, ListUtils.of(endNfaState), getCurGroup());
     }
 
     private void processWhenEncounteredStar() {
@@ -268,6 +279,10 @@ class NfaBuildIterator {
     }
 
     private void wrapCurNfaClosureForStar() {
+        curNfaClosure = createStarWrappedNfaClosureFor(curNfaClosure);
+    }
+
+    private NfaClosure createStarWrappedNfaClosureFor(NfaClosure _INNER) {
         /*
          * Inner: 内层NfaClosure
          * Outer: 外层NfaClosure
@@ -308,15 +323,15 @@ class NfaBuildIterator {
          */
 
 
-        NfaClosure wrapNfaClosure = buildWrapNfaClosure();
+        NfaClosure _OUTER = buildWrapNfaClosure();
 
         // 必须保证wrapNfaClosure单入单出，否则group匹配会出现边界问题（ "(a)*" 与 "(a*)" ）
-        NfaState _OUTER_S = wrapNfaClosure.getStartNfaState();
+        NfaState _OUTER_S = _OUTER.getStartNfaState();
         NfaState _OUTER_P = new NfaState();
-        NfaState _OUTER_E = wrapNfaClosure.getEndNfaStates().get(0);
+        NfaState _OUTER_E = _OUTER.getEndNfaStates().get(0);
 
-        assertNotNull(curNfaClosure);
-        NfaState _INNER_S = curNfaClosure.getStartNfaState();
+        assertNotNull(_INNER);
+        NfaState _INNER_S = _INNER.getStartNfaState();
 
         // (1)
         _OUTER_S.addInputSymbolAndNextNfaState(Symbol.EPSILON, _OUTER_P);
@@ -327,19 +342,12 @@ class NfaBuildIterator {
         // (3)
         _OUTER_P.addInputSymbolAndNextNfaState(Symbol.EPSILON, _OUTER_E);
 
-        for (NfaState _INNER_E : curNfaClosure.getEndNfaStates()) {
+        for (NfaState _INNER_E : _INNER.getEndNfaStates()) {
             // (4)
             _INNER_E.addInputSymbolAndNextNfaState(Symbol.EPSILON, _OUTER_P);
         }
 
-        curNfaClosure = wrapNfaClosure;
-    }
-
-    private NfaClosure buildWrapNfaClosure() {
-        NfaState startNfaState = new NfaState();
-        NfaState endNfaState = new NfaState();
-
-        return new NfaClosure(startNfaState, ListUtils.of(endNfaState), getCurGroup());
+        return _OUTER;
     }
 
     private void processWhenEncounteredAdd() {
@@ -352,6 +360,10 @@ class NfaBuildIterator {
     }
 
     private void wrapCurNfaClosureForAdd() {
+        curNfaClosure = createAddWrappedNfaClosureFor(curNfaClosure);
+    }
+
+    private NfaClosure createAddWrappedNfaClosureFor(NfaClosure _INNER) {
         /*
          * Inner: 内层NfaClosure
          * Outer: 外层NfaClosure
@@ -401,8 +413,8 @@ class NfaBuildIterator {
         NfaState _OUTER_Q = new NfaState();
         NfaState _OUTER_E = wrapNfaClosure.getEndNfaStates().get(0);
 
-        assertNotNull(curNfaClosure);
-        NfaState _INNER_S = curNfaClosure.getStartNfaState();
+        assertNotNull(_INNER);
+        NfaState _INNER_S = _INNER.getStartNfaState();
 
         // (1)
         _OUTER_S.addInputSymbolAndNextNfaState(Symbol.EPSILON, _OUTER_P);
@@ -413,7 +425,7 @@ class NfaBuildIterator {
         // (3)
         _OUTER_Q.addInputSymbolAndNextNfaState(Symbol.EPSILON, _OUTER_E);
 
-        for (NfaState _INNER_E : curNfaClosure.getEndNfaStates()) {
+        for (NfaState _INNER_E : _INNER.getEndNfaStates()) {
             // (4)
             _INNER_E.addInputSymbolAndNextNfaState(Symbol.EPSILON, _OUTER_P);
 
@@ -421,28 +433,64 @@ class NfaBuildIterator {
             _INNER_E.addInputSymbolAndNextNfaState(Symbol.EPSILON, _OUTER_Q);
         }
 
-        curNfaClosure = wrapNfaClosure;
+        return wrapNfaClosure;
     }
 
     private void processWhenEncounteredLeftBigParenthesis() {
         // 用一个新的NfaClosure封装当前NfaClosure
-        wrapCurNfaClosureForLeftBigParenthesis(getRepeatInterval());
+        wrapCurNfaClosureForLeftBigParenthesis();
+
+        pushCurNfaClosure();
     }
 
-    private void wrapCurNfaClosureForLeftBigParenthesis(Pair<Integer, Integer> repeatInterval) {
-        // // 用一个新的NfaClosure封装指定的NfaClosure组
-        wrapForNfaClosureGroup(
-                // 依据指定的重复区间，构建NfaClosure组
-                buildNfaClosureGroupForRepeatInterval(repeatInterval)
-        );
+    private void wrapCurNfaClosureForLeftBigParenthesis() {
+        curNfaClosure = createLeftBigParenthesisWrappedNfaClosureFor(getRepeatInterval());
     }
 
-    private void wrapForNfaClosureGroup(List<NfaClosure> nfaClosures) {
-
+    private NfaClosure createLeftBigParenthesisWrappedNfaClosureFor(Pair<Integer, Integer> repeatInterval) {
+        // 依据指定的重复区间，构建NfaClosure
+        return buildNfaClosureForRepeatInterval(repeatInterval);
     }
 
-    private List<NfaClosure> buildNfaClosureGroupForRepeatInterval(Pair<Integer, Integer> repeatInterval) {
-        return null;
+    private NfaClosure buildNfaClosureForRepeatInterval(Pair<Integer, Integer> repeatInterval) {
+        assertNotNull(repeatInterval.getFirst());
+
+        NfaClosure newNfaClosure;
+
+        // a{1,}
+        if (repeatInterval.getSecond() == null) {
+            newNfaClosure = buildRepeatedNfaClosureFor(curNfaClosure, repeatInterval.getFirst());
+
+            combineTwoClosure(
+                    newNfaClosure,
+                    createStarWrappedNfaClosureFor(curNfaClosure)
+            );
+            return newNfaClosure;
+        } else {
+            newNfaClosure = buildRepeatedNfaClosureFor(curNfaClosure, repeatInterval.getFirst());
+            for (int repeatTime = repeatInterval.getFirst() + 1; repeatTime <= repeatInterval.getSecond(); repeatTime++) {
+                parallel(
+                        newNfaClosure,
+                        buildRepeatedNfaClosureFor(curNfaClosure, repeatTime)
+                );
+            }
+        }
+
+        return newNfaClosure;
+    }
+
+    private NfaClosure buildRepeatedNfaClosureFor(NfaClosure originalNfaClosure, int repeatTime) {
+        int count = 1;
+
+        NfaClosure repeatedNfaClosure = originalNfaClosure.clone();
+
+        while (count < repeatTime) {
+            NfaClosure newClosure = originalNfaClosure.clone();
+            combineTwoClosure(repeatedNfaClosure, newClosure);
+            count++;
+        }
+
+        return repeatedNfaClosure;
     }
 
     private Pair<Integer, Integer> getRepeatInterval() {
@@ -473,6 +521,10 @@ class NfaBuildIterator {
             if (sb.length() > 0) {
                 rightNumber = Integer.parseInt(sb.toString());
             }
+        }
+
+        if (rightNumber != null) {
+            assertTrue(rightNumber >= leftNumber);
         }
 
         moveForward();
