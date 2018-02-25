@@ -10,8 +10,11 @@ import static org.liuyehcf.grammar.utils.AssertUtils.assertNotNull;
  * Created by Liuye on 2017/10/24.
  */
 public class DfaStateDescription {
+
+    // hash值
     private final int hash;
 
+    // DfaState包含的所有NfaState的id集合
     private final Set<Integer> nfaStateIds;
 
     public DfaStateDescription(Set<Integer> nfaStateIds) {

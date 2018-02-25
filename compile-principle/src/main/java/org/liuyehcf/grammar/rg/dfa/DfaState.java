@@ -7,23 +7,30 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.liuyehcf.grammar.utils.AssertUtils.assertFalse;
+import static org.liuyehcf.grammar.utils.AssertUtils.assertNotNull;
 
 /**
  * Created by Liuye on 2017/10/24.
  */
 public class DfaState {
+
     private static int count = 1;
 
     private final int id = count++;
 
+    // DfaState描述符，与当前DfaState包含的所有NfaState的id集合相关
     private DfaStateDescription description = new DfaStateDescription(new HashSet<>());
 
+    // 当前DfaState是否被标记过
     private boolean isMarked = false;
 
+    // 当前DfaState包含的所有NfaState
     private Set<NfaState> nfaStates = new HashSet<>();
 
+    // 当前DfaState包含的所有NfaState的所有下一跳输入符号，构建时会用到
     private Set<Symbol> inputSymbols = new HashSet<>();
 
+    // 邻接节点映射表
     private Map<Symbol, DfaState> nextDfaStateMap = new HashMap<>();
 
     // 当前节点作为 group i 的起始节点，那么i位于groupStart中
@@ -166,6 +173,8 @@ public class DfaState {
 
             for (Symbol inputSymbol : curDfaState.getAllInputSymbols()) {
                 DfaState nextDfaState = curDfaState.getNextDfaStateWithSymbol(inputSymbol);
+
+                assertNotNull(nextDfaState);
 
                 System.out.println(curDfaState + " (" + inputSymbol + ")-> " + nextDfaState);
 
