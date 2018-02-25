@@ -1,7 +1,6 @@
 package org.liuyehcf.grammar.rg;
 
 import org.junit.Test;
-import org.liuyehcf.grammar.rg.nfa.Nfa;
 import org.liuyehcf.grammar.rg.utils.TestCaseBuilder;
 import org.liuyehcf.grammar.utils.ListUtils;
 
@@ -257,25 +256,5 @@ public class TestNfa {
                 "BaBa",
                 matcher.group(1)
         );
-    }
-
-    @Test
-    public void test1() {
-        RGParser parser = RGBuilder.compile("[a-zA-Z_]").buildNfa();
-
-        Matcher matcher = parser.matcher("B");
-
-        assertTrue(matcher.matches());
-
-    }
-
-    @Test
-    public void test() {
-        Pattern parser = Pattern.compile("[\\d-z]");
-
-        java.util.regex.Matcher matcher=parser.matcher("-");
-
-        assertTrue(matcher.matches());
-
     }
 }

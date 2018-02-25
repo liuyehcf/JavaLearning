@@ -15,7 +15,7 @@ import static org.liuyehcf.grammar.utils.AssertUtils.*;
  * Created by Liuye on 2017/10/23.
  * todo 目前还不支持：1. 匹配模式的选择
  * ┐ ┘ └ ┌   ┴ ├ ┬ ┤  ┼   ─  │
- *
+ * <p>
  * ┓ ┛ ┗ ┏   ┻ ┣ ┳ ┫  ╋   ━  ┃
  */
 class NfaBuildIterator {
