@@ -70,6 +70,65 @@ public class NfaClosure {
         }
     }
 
+    public NfaClosure clone() {
+        Map<NfaState, NfaState> oldAndNewNfaStateMap = new HashMap<>();
+
+        // 镜像创建NfaState节点，属性值先不拷贝
+        dfsMirrorCopy(getStartNfaState(), oldAndNewNfaStateMap);
+
+        // 这里拷贝所有NfaState的属性值，并创建NfaClosure
+        return mirrorCopyStatus(oldAndNewNfaStateMap);
+    }
+
+    private void dfsMirrorCopy(NfaState curNfaState, Map<NfaState, NfaState> oldAndNewNfaStateMap) {
+        if (oldAndNewNfaStateMap.containsKey(curNfaState)) return;
+        oldAndNewNfaStateMap.put(curNfaState, new NfaState());
+
+        for (Symbol inputSymbol : curNfaState.getAllInputSymbol()) {
+            for (NfaState nextNfaState : curNfaState.getNextNfaStatesWithInputSymbol(inputSymbol)) {
+                dfsMirrorCopy(nextNfaState, oldAndNewNfaStateMap);
+            }
+        }
+    }
+
+    private NfaClosure mirrorCopyStatus(Map<NfaState, NfaState> oldAndNewNfaStateMap) {
+        for (Map.Entry<NfaState, NfaState> entry : oldAndNewNfaStateMap.entrySet()) {
+
+            NfaState curNfaState = entry.getKey();
+            NfaState clonedCurNfaState = entry.getValue();
+
+            // 复制 nextNfaStatesMap
+            for (Symbol inputSymbol : curNfaState.getAllInputSymbol()) {
+                for (NfaState nextNfaState : curNfaState.getNextNfaStatesWithInputSymbol(inputSymbol)) {
+                    NfaState clonedNextNfaState = oldAndNewNfaStateMap.get(nextNfaState);
+                    assert clonedCurNfaState != null;
+                    clonedCurNfaState.addInputSymbolAndNextNfaState(inputSymbol, clonedNextNfaState);
+                }
+            }
+
+
+            // 复制 groupStart以及groupReceive
+            for (int group : curNfaState.getGroupStart()) {
+                clonedCurNfaState.setStart(group);
+            }
+
+            for (int group : curNfaState.getGroupReceive()) {
+                clonedCurNfaState.setReceive(group);
+            }
+        }
+
+
+        NfaState clonedStartNfaState = oldAndNewNfaStateMap.get(startNfaState);
+        List<NfaState> clonedEndNfaStates = new ArrayList<>();
+
+        for (NfaState endNfaState : endNfaStates) {
+            NfaState copiedEndNfaState = oldAndNewNfaStateMap.get(endNfaState);
+            clonedEndNfaStates.add(copiedEndNfaState);
+        }
+
+        return new NfaClosure(clonedStartNfaState, clonedEndNfaStates, group);
+    }
+
     public void print() {
         Set<NfaState> visited = new HashSet<>();
 

@@ -5,6 +5,7 @@ import org.liuyehcf.grammar.core.definition.Symbol;
 import org.liuyehcf.grammar.rg.utils.EscapedUtil;
 import org.liuyehcf.grammar.rg.utils.SymbolUtils;
 import org.liuyehcf.grammar.utils.ListUtils;
+import org.liuyehcf.grammar.utils.Pair;
 
 import java.util.*;
 
@@ -144,6 +145,8 @@ class NfaBuildIterator {
             processWhenEncounteredStar();
         } else if (curSymbol.equals(SymbolUtils._add)) {
             processWhenEncounteredAdd();
+        } else if (curSymbol.equals(SymbolUtils._leftBigParenthesis)) {
+            processWhenEncounteredLeftBigParenthesis();
         } else if (curSymbol.equals(SymbolUtils._escaped)) {
             processWhenEncounteredEscaped();
         } else if (curSymbol.equals(SymbolUtils._leftMiddleParenthesis)) {
@@ -419,6 +422,62 @@ class NfaBuildIterator {
         }
 
         curNfaClosure = wrapNfaClosure;
+    }
+
+    private void processWhenEncounteredLeftBigParenthesis() {
+        // 用一个新的NfaClosure封装当前NfaClosure
+        wrapCurNfaClosureForLeftBigParenthesis(getRepeatInterval());
+    }
+
+    private void wrapCurNfaClosureForLeftBigParenthesis(Pair<Integer, Integer> repeatInterval) {
+        // // 用一个新的NfaClosure封装指定的NfaClosure组
+        wrapForNfaClosureGroup(
+                // 依据指定的重复区间，构建NfaClosure组
+                buildNfaClosureGroupForRepeatInterval(repeatInterval)
+        );
+    }
+
+    private void wrapForNfaClosureGroup(List<NfaClosure> nfaClosures) {
+
+    }
+
+    private List<NfaClosure> buildNfaClosureGroupForRepeatInterval(Pair<Integer, Integer> repeatInterval) {
+        return null;
+    }
+
+    private Pair<Integer, Integer> getRepeatInterval() {
+        moveForward();
+
+        Integer leftNumber = null, rightNumber = null;
+
+        char c;
+        StringBuilder sb = new StringBuilder();
+        while ((c = SymbolUtils.getChar(getCurSymbol())) != '}') {
+
+            if (c == ',') {
+                assertNull(leftNumber);
+                leftNumber = Integer.parseInt(sb.toString());
+                sb = new StringBuilder();
+            } else {
+                sb.append(c);
+            }
+
+            moveForward();
+        }
+
+
+        if (leftNumber == null) {
+            leftNumber = Integer.parseInt(sb.toString());
+            rightNumber = leftNumber;
+        } else {
+            if (sb.length() > 0) {
+                rightNumber = Integer.parseInt(sb.toString());
+            }
+        }
+
+        moveForward();
+
+        return new Pair<>(leftNumber, rightNumber);
     }
 
     private void processWhenEncounteredEscaped() {

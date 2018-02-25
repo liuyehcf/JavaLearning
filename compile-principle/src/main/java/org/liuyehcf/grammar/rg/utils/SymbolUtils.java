@@ -25,7 +25,8 @@ public abstract class SymbolUtils {
     public static final Symbol _middleParenthesisNot = getAlphabetSymbolWithChar('^');
     public static final Symbol _leftSmallParenthesis = getAlphabetSymbolWithChar('(');
     public static final Symbol _rightSmallParenthesis = getAlphabetSymbolWithChar(')');
-
+    public static final Symbol _leftBigParenthesis = getAlphabetSymbolWithChar('{');
+    public static final Symbol _rightBigParenthesis = getAlphabetSymbolWithChar('}');
 
     public static Symbol getAlphabetSymbolWithChar(char symbol) {
         if (alphabetSymbols == null) {

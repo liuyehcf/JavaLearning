@@ -250,4 +250,17 @@ public class TestNfa {
                 matcher.group(1)
         );
     }
+
+    //@Test
+    public void test() {
+        RGParser parser = RGBuilder.compile("a{100}").buildNfa();
+
+        Matcher matcher = parser.matcher("aBaBaBa");
+
+        assertTrue(matcher.matches());
+        assertEquals(
+                "BaBa",
+                matcher.group(1)
+        );
+    }
 }
