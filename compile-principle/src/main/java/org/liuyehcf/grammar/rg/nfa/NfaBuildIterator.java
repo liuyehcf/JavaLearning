@@ -13,6 +13,9 @@ import static org.liuyehcf.grammar.utils.AssertUtils.*;
 /**
  * Created by Liuye on 2017/10/23.
  * todo 目前还不支持：1. 匹配模式的选择 2. [a-z]，即'-'符号
+ * ┐ ┘ └ ┌   ┴ ├ ┬ ┤  ┼   ─  │
+ *
+ * ┓ ┛ ┗ ┏   ┻ ┣ ┳ ┫  ╋   ━  ┃
  */
 class NfaBuildIterator {
 
@@ -157,6 +160,7 @@ class NfaBuildIterator {
     private void processWhenEncounteredAny() {
         pushCurNfaClosure();
 
+        // 创建一个新的NfaClosure
         buildNfaClosureForAnyAsCurNfaClosure();
 
         moveForward();
@@ -167,16 +171,19 @@ class NfaBuildIterator {
     }
 
     private void processWhenEncounteredOr() {
+        // 合并左侧的NfaClosure
         combineNfaClosuresOfCurGroup();
 
         pushCurNfaClosure();
 
+        // 插入一个parallel操作的占位符
         pushParallel();
 
         moveForward();
     }
 
     private void processWhenEncounteredUnKnow() {
+        // 用一个新的NfaClosure封装当前NfaClosure
         wrapCurNfaClosureForUnKnow();
 
         pushCurNfaClosure();
@@ -190,12 +197,13 @@ class NfaBuildIterator {
          * Outer: 外层NfaClosure
          * S: 开始节点
          * E(i): 第i个终止节点
+         * P,Q: 外层NfaClosure的特殊节点
          * --*>: 经过多步跳转
          * -->: 经过一步跳转
          *
          *                                  Inner.S ───────*> Inner.E(1)
          *                                     ├───────────*> Inner.E(2)
-         *                                     ┃       ...
+         *                                     │       ...
          *                                     └───────────*> Inner.E(n)
          *
          *                                             ||
@@ -209,20 +217,20 @@ class NfaBuildIterator {
          *
          *
          *                ┌────────────────────────────────────────── 2 ───────────────────────────────────────────────┐
-         *                ┃                                                                                            ┃
-         *                ┃                                                                                            V
+         *                │                                                                                            │
+         *                │                                                                                            V
          *             Outer.S ──── 1 ───> Inner.S ───────*> Inner.E(1) ──────── 4 ─────> Outer.Q ──────── 3 ─────> Outer.E
-         *                                    ┃                                             Λ
-         *                                    ┃                                             ┃
+         *                                    │                                             Λ
+         *                                    │                                             │
          *                                    ├───────────*> Inner.E(2) ──────── 4 ─────────┤
-         *                                    ┃                 ...                         ┃
+         *                                    │                 ...                         │
          *                                    └───────────*> Inner.E(n) ──────── 4 ─────────┘
          *
          */
 
         NfaClosure wrapNfaClosure = buildWrapNfaClosure();
 
-        // 必须保证wrapNfaClosure单入单出，否则group匹配会出现边界问题
+        // 必须保证wrapNfaClosure单入单出，否则group匹配会出现边界问题（ "(a)?" 与 "(a?)" ）
         NfaState _OUTER_S = wrapNfaClosure.getStartNfaState();
         NfaState _OUTER_Q = new NfaState();
         NfaState _OUTER_E = wrapNfaClosure.getEndNfaStates().get(0);
@@ -248,6 +256,7 @@ class NfaBuildIterator {
     }
 
     private void processWhenEncounteredStar() {
+        // 用一个新的NfaClosure封装当前NfaClosure
         wrapCurNfaClosureForStar();
 
         pushCurNfaClosure();
@@ -267,7 +276,7 @@ class NfaBuildIterator {
          *
          *                                  Inner.S ───────*> Inner.E(1)
          *                                     ├───────────*> Inner.E(2)
-         *                                     ┃       ...
+         *                                     │       ...
          *                                     └───────────*> Inner.E(n)
          *
          *                                             ||
@@ -279,18 +288,18 @@ class NfaBuildIterator {
          *                   请注意，步骤2，3的相对顺序不可乱，步骤的次序即匹配的策略（贪婪or勉强or占有），这里的连线都是ε边
          *
          *                           ┌───────────────────────────────── 3 ──────────────────────────────┐
-         *                           ┃                                                                  ┃
-         *                           ┃                                                                  V
+         *                           │                                                                  │
+         *                           │                                                                  V
          *    Outer.S ─── 1 ───> Outer.P ───── 2 ───> Inner.S ───────*> Inner.E(1) ─────────┐        Outer.E
-         *                           Λ                   ├───────────*> Inner.E(2) ─────┐   ┃
-         *                           ┃                   ┃       ...                    ┃   ┃
-         *                           ┃                   └───────────*> Inner.E(n) ──┐  ┃   ┃
-         *                           ┃                                               ┃  ┃   ┃
-         *                           ┃                                               ┃  ┃   ┃
-         *                           ├───────────────────── 4 ───────────────────────┘  ┃   ┃
-         *                           ┃                                                  ┃   ┃
-         *                           ├───────────────────── 4 ──────────────────────────┘   ┃
-         *                           ┃                                                      ┃
+         *                           Λ                   ├───────────*> Inner.E(2) ─────┐   │
+         *                           │                   │       ...                    │   │
+         *                           │                   └───────────*> Inner.E(n) ──┐  │   │
+         *                           │                                               │  │   │
+         *                           │                                               │  │   │
+         *                           ├───────────────────── 4 ───────────────────────┘  │   │
+         *                           │                                                  │   │
+         *                           ├───────────────────── 4 ──────────────────────────┘   │
+         *                           │                                                      │
          *                           └───────────────────── 4 ──────────────────────────────┘
          *
          */
@@ -298,7 +307,7 @@ class NfaBuildIterator {
 
         NfaClosure wrapNfaClosure = buildWrapNfaClosure();
 
-        // 必须保证wrapNfaClosure单入单出，否则group匹配会出现边界问题
+        // 必须保证wrapNfaClosure单入单出，否则group匹配会出现边界问题（ "(a)*" 与 "(a*)" ）
         NfaState _OUTER_S = wrapNfaClosure.getStartNfaState();
         NfaState _OUTER_P = new NfaState();
         NfaState _OUTER_E = wrapNfaClosure.getEndNfaStates().get(0);
@@ -331,6 +340,7 @@ class NfaBuildIterator {
     }
 
     private void processWhenEncounteredAdd() {
+        // 用一个新的NfaClosure封装当前NfaClosure
         wrapCurNfaClosureForAdd();
 
         pushCurNfaClosure();
@@ -350,7 +360,7 @@ class NfaBuildIterator {
          *
          *                                  Inner.S ───────*> Inner.E(1)
          *                                     ├───────────*> Inner.E(2)
-         *                                     ┃       ...
+         *                                     │       ...
          *                                     └───────────*> Inner.E(n)
          *
          *                                             ||
@@ -364,17 +374,17 @@ class NfaBuildIterator {
          *
          *
          *    Outer.S ─── 1 ───> Outer.P ──── 2 ───> Inner.S ───────*> Inner.E(1) ─────────┬──────── 5 ──────> Outer.Q ───── 3 ───> Outer.E
-         *                           Λ                  ┃                                  ┃                     Λ
-         *                           ┃                  ┃                                  ┃                     ┃
-         *                           ┃                  ├───────────*> Inner.E(2) ─────┬───┼──────── 5 ──────────┤
-         *                           ┃                  ┃       ...                    ┃   ┃                     ┃
-         *                           ┃                  └───────────*> Inner.E(n) ──┬──┼───┼──────── 5 ──────────┘
-         *                           ┃                                              ┃  ┃   ┃
-         *                           ┃                                              ┃  ┃   ┃
-         *                           ├───────────────────── 4 ──────────────────────┘  ┃   ┃
-         *                           ┃                                                 ┃   ┃
-         *                           ├───────────────────── 4 ─────────────────────────┘   ┃
-         *                           ┃                                                     ┃
+         *                           Λ                  │                                  │                     Λ
+         *                           │                  │                                  │                     │
+         *                           │                  ├───────────*> Inner.E(2) ─────┬───┼──────── 5 ──────────┤
+         *                           │                  │       ...                    │   │                     │
+         *                           │                  └───────────*> Inner.E(n) ──┬──┼───┼──────── 5 ──────────┘
+         *                           │                                              │  │   │
+         *                           │                                              │  │   │
+         *                           ├───────────────────── 4 ──────────────────────┘  │   │
+         *                           │                                                 │   │
+         *                           ├───────────────────── 4 ─────────────────────────┘   │
+         *                           │                                                     │
          *                           └───────────────────── 4 ─────────────────────────────┘
          *
          *
@@ -382,7 +392,7 @@ class NfaBuildIterator {
 
         NfaClosure wrapNfaClosure = buildWrapNfaClosure();
 
-        // 必须保证wrapNfaClosure单入单出，否则group匹配会出现边界问题
+        // 必须保证wrapNfaClosure单入单出，否则group匹配会出现边界问题（ "(a)+" 与 "(a+)" ）
         NfaState _OUTER_S = wrapNfaClosure.getStartNfaState();
         NfaState _OUTER_P = new NfaState();
         NfaState _OUTER_Q = new NfaState();
@@ -414,6 +424,7 @@ class NfaBuildIterator {
     private void processWhenEncounteredEscaped() {
         pushCurNfaClosure();
 
+        // 创建一个新的NfaClosure
         buildNfaClosureForEscapedAsCurNfaClosure();
 
         moveForward();
@@ -430,6 +441,7 @@ class NfaBuildIterator {
     private void processWhenEncounteredLeftMiddleParenthesis() {
         pushCurNfaClosure();
 
+        // 创建一个新的NfaClosure
         buildNfaClosureForMiddleParenthesisAsCurNfaClosure();
     }
 
@@ -478,12 +490,15 @@ class NfaBuildIterator {
     }
 
     private void processWhenEncounteredRightSmallParenthesis() {
+        // 合并NfaClosure
         combineNfaClosuresOfCurGroup();
 
+        // 为当前组设置接受以及起始状态标记
         setStartAndReceiveOfCurNfaClosure();
 
         exitGroup();
 
+        // 修改当前NfaClosure的组
         changeGroupOfCurNfaClosure();
 
         moveForward();
@@ -552,6 +567,7 @@ class NfaBuildIterator {
     private void processWhenEncounteredNormalSymbol() {
         pushCurNfaClosure();
 
+        // 创建一个新的NfaClosure
         buildNfaClosureForNormalSymbol();
 
         moveForward();
@@ -590,52 +606,50 @@ class NfaBuildIterator {
     private void combineTwoClosure(NfaClosure preNfaClosure, NfaClosure nextNfaClosure) {
         assertTrue(preNfaClosure.getGroup() == nextNfaClosure.getGroup());
 
-        // 符号说明:
-        //      S: 开始节点
-        //      E(i): 第i个终止节点
-        //      S.N(i): 开始节点的第i个后继节点
-        //      --*>: 经过多步跳转
-        //      -->: 经过一步跳转
-        //
-        // 连接前:
-        //      pre.S --*> Pre.E(1)              next.S --> next.N(1)
-        //      pre.S --*> Pre.E(2)              next.S --> next.N(2)
-        //            ...                               ...
-        //      Pre.S --*> Pre.E(n)              next.S --> next.N(m)
-        //
-        //
-        // 连接后: 将前一个NfaClosure的每一个终止节点，连接到下一个NfaClosure的起始节点的所有后继节点
-        //      pre.S --*> Pre.E(1) --> next.N(1)   pre.S --*> Pre.E(2) --> next.N(1)            pre.S --*> Pre.E(n) --> next.N(1)
-        //      pre.S --*> Pre.E(1) --> next.N(2)   pre.S --*> Pre.E(2) --> next.N(2)     ...    pre.S --*> Pre.E(n) --> next.N(2)
-        //                   ...                                 ...                                          ...
-        //      pre.S --*> Pre.E(1) --> next.N(m)   pre.S --*> Pre.E(2) --> next.N(m)            pre.S --*> Pre.E(n) --> next.N(m)
-        //
-        // next.S节点，在连接后被移除了
+        /*
+         *
+         * Pre: 左侧NfaClosure
+         * Next: 右侧NfaClosure
+         * S: 开始节点
+         * E(i): 第i个终止节点
+         * S.N(i): 开始节点的第i个后继节点
+         * --*>: 经过多步跳转
+         * -->: 经过一步跳转
+         *
+         *            ┌──────────*> Pre.E(1)                            ┌───────────*> Next.E(1)
+         *            │                                                 │
+         *          Pre.S────────*> Pre.E(2)                        Next.S ─────────*> Next.E(2)
+         *            │       ...                                       │       ...
+         *            └──────────*> Pre.E(n)                            └───────────*> Next.E(m)
+         *
+         *                                             ||
+         *                                             ||
+         *                                             ||
+         *                                            \  /
+         *                                             \/
+         *
+         *            ┌──────────*> Pre.E(1) ────────── 1 ──────────┐   ┌───────────*> Next.E(1)
+         *            │                                             V   │
+         *          Pre.S────────*> Pre.E(2) ────────── 1 ────────> Next.S ─────────*> Next.E(2)
+         *            │               ...                           Λ   │       ...
+         *            └──────────*> Pre.E(n) ────────── 1 ──────────┘   └───────────*> Next.E(m)
+         *
+         *   Next.S在合并后被移除了
+         *
+         */
 
-        for (NfaState endNfaStateOfPreNfaClosure : preNfaClosure.getEndNfaStates()) {
-            NfaState startNfaStateOfNextNfaClosure = nextNfaClosure.getStartNfaState();
+        NfaState _NEXT_S = nextNfaClosure.getStartNfaState();
 
-            // 以下两行循环需要保留被移除的startNfaStateOfNextNfaClosure节点的状态信息，保留在每个endNfaStateOfPreNfaClosure中
-            for (int group : startNfaStateOfNextNfaClosure.getGroupStart()) {
-                endNfaStateOfPreNfaClosure.setStart(group);
-            }
-
-            for (int group : startNfaStateOfNextNfaClosure.getGroupReceive()) {
-                endNfaStateOfPreNfaClosure.setReceive(group);
-            }
-
-            // 以下循环用于连接两个NfaClosure
-            for (Symbol inputSymbol : startNfaStateOfNextNfaClosure.getAllInputSymbol()) {
-                for (NfaState nextNfaState : startNfaStateOfNextNfaClosure.getNextNfaStatesWithInputSymbol(inputSymbol)) {
-                    endNfaStateOfPreNfaClosure.addInputSymbolAndNextNfaState(inputSymbol, nextNfaState);
-                }
-            }
+        for (NfaState _PRE_E : preNfaClosure.getEndNfaStates()) {
+            // (1)
+            _PRE_E.addInputSymbolAndNextNfaState(Symbol.EPSILON, _NEXT_S);
         }
 
         preNfaClosure.setEndNfaStates(nextNfaClosure.getEndNfaStates());
     }
 
     private void parallel(NfaClosure preNfaClosure, NfaClosure nextNfaClosure) {
+        // parallel不能用一个新的单入单出的NfaClosure包裹起来，这样会导致"(a)|(b)|(ab)"只有一个出口
 
         // 符号说明:
         //      S: 开始节点

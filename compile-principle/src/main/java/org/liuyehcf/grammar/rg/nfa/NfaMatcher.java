@@ -173,7 +173,16 @@ public class NfaMatcher implements Matcher {
     }
 
     private void initMatchIntervals() {
-        // 该映射表用来解决"(a)|(b)|(ab)" 匹配 "ab" 的问题
+        /*
+         * 该映射表用来解决"(a)|(b)|(ab)" 匹配 "ab" 的问题
+         * 以 regex="(a)|(b)|(ab)" 为例解释一下，这个正则表达式构造成NfaClosure之后，有三个终止节点
+         * 字符串"ab"会有三个匹配子串 "a"[0,1)  "b"[1,2)  "ab"[0,2)，虽然"ab"完全包含了"a"和"b"，
+         * 但是由于"a"先出现，且"ab"并不是"a"的贪婪子串（这两个子串在不同的状态被接受），因此优先选取"a"，因此"ab"子串就被丢弃了
+         *
+         * 对于"a+"匹配"aa"的问题
+         * 字符串"aa"会有三个匹配子串 "a"[0,1)  "a"[1,2)  "aa"[0,2)，此时，这三个子串在相同的状态被接受，即
+         * "aa"[0,2) 是 "a"[0,1)  "a"[1,2) 的贪婪子串，故而"aa"被选取，其余两个"a"被丢弃
+         */
         Map<Pair<Integer, Integer>, NfaState> intervalNfaStateMap = new HashMap<>();
 
         matchIntervals = new ArrayList<>();
