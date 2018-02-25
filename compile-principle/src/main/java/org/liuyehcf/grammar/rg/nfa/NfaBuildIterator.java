@@ -247,9 +247,9 @@ class NfaBuildIterator {
         // (3)
         _OUTER_Q.addInputSymbolAndNextNfaState(Symbol.EPSILON, _OUTER_E);
 
-        for (NfaState INNER_E : curNfaClosure.getEndNfaStates()) {
+        for (NfaState _INNER_E : curNfaClosure.getEndNfaStates()) {
             // (4)
-            INNER_E.addInputSymbolAndNextNfaState(Symbol.EPSILON, _OUTER_Q);
+            _INNER_E.addInputSymbolAndNextNfaState(Symbol.EPSILON, _OUTER_Q);
         }
 
         curNfaClosure = wrapNfaClosure;
@@ -324,9 +324,9 @@ class NfaBuildIterator {
         // (3)
         _OUTER_P.addInputSymbolAndNextNfaState(Symbol.EPSILON, _OUTER_E);
 
-        for (NfaState INNER_E : curNfaClosure.getEndNfaStates()) {
+        for (NfaState _INNER_E : curNfaClosure.getEndNfaStates()) {
             // (4)
-            INNER_E.addInputSymbolAndNextNfaState(Symbol.EPSILON, _OUTER_P);
+            _INNER_E.addInputSymbolAndNextNfaState(Symbol.EPSILON, _OUTER_P);
         }
 
         curNfaClosure = wrapNfaClosure;
@@ -603,8 +603,8 @@ class NfaBuildIterator {
         return new NfaClosure(startNfaState, endNfaStates, getCurGroup());
     }
 
-    private void combineTwoClosure(NfaClosure preNfaClosure, NfaClosure nextNfaClosure) {
-        assertTrue(preNfaClosure.getGroup() == nextNfaClosure.getGroup());
+    private void combineTwoClosure(NfaClosure _PRE, NfaClosure _NEXT) {
+        assertTrue(_PRE.getGroup() == _NEXT.getGroup());
 
         /*
          *
@@ -634,69 +634,65 @@ class NfaBuildIterator {
          *            │               ...                           Λ   │       ...
          *            └──────────*> Pre.E(n) ────────── 1 ──────────┘   └───────────*> Next.E(m)
          *
-         *   Next.S在合并后被移除了
-         *
          */
 
-        NfaState _NEXT_S = nextNfaClosure.getStartNfaState();
+        NfaState _NEXT_S = _NEXT.getStartNfaState();
 
-        for (NfaState _PRE_E : preNfaClosure.getEndNfaStates()) {
+        for (NfaState _PRE_E : _PRE.getEndNfaStates()) {
             // (1)
             _PRE_E.addInputSymbolAndNextNfaState(Symbol.EPSILON, _NEXT_S);
         }
 
-        preNfaClosure.setEndNfaStates(nextNfaClosure.getEndNfaStates());
+        _PRE.setEndNfaStates(_NEXT.getEndNfaStates());
     }
 
-    private void parallel(NfaClosure preNfaClosure, NfaClosure nextNfaClosure) {
+    private void parallel(NfaClosure _PRE, NfaClosure _NEXT) {
         // parallel不能用一个新的单入单出的NfaClosure包裹起来，这样会导致"(a)|(b)|(ab)"只有一个出口
 
-        // 符号说明:
-        //      S: 开始节点
-        //      S.N(i): 开始节点的第i个后继节点
-        //      -->: 经过一步跳转
-        //
-        // 连接前:
-        //      pre.S --> Pre.N(1)              next.S --> next.N(1)
-        //      pre.S --> Pre.N(2)              next.S --> next.N(2)
-        //            ...                              ...
-        //      Pre.S --> Pre.N(n)              next.S --> next.N(m)
-        //
-        //
-        // 连接后: 将前一个NfaClosure的起始节点，连接到后一个NfaClosure的起始节点的所有后继节点
-        //      pre.S --> Pre.N(1)
-        //      pre.S --> Pre.N(2)
-        //            ...
-        //      Pre.S --> Pre.N(n)
-        //
-        //      pre.S --> next.N(1)
-        //      pre.S --> next.N(2)
-        //            ...
-        //      pre.S --> next.N(m)
-        //
-        // next.S节点，在连接后被移除了
+        /*
+         *
+         * Pre: 左侧NfaClosure
+         * Next: 右侧NfaClosure
+         * S: 开始节点
+         * E(i): 第i个终止节点
+         * S.N(i): 开始节点的第i个后继节点
+         * --*>: 经过多步跳转
+         * -->: 经过一步跳转
+         *
+         *            ┌──────────*> Pre.E(1)                            ┌───────────*> Next.E(1)
+         *            │                                                 │
+         *          Pre.S────────*> Pre.E(2)                        Next.S ─────────*> Next.E(2)
+         *            │       ...                                       │       ...
+         *            └──────────*> Pre.E(n)                            └───────────*> Next.E(m)
+         *
+         *                                             ||
+         *                                             ||
+         *                                             ||
+         *                                            \  /
+         *                                             \/
+         *
+         *            ┌──────────*> Pre.E(1)                            ┌───────────*> Next.E(1)
+         *            │                                                 │
+         *          Pre.S────────*> Pre.E(2)            ┌─────────> Next.S ─────────*> Next.E(2)
+         *            │       ...                       │               │       ...
+         *            ├──────────*> Pre.E(n)            │               └───────────*> Next.E(m)
+         *            │                                 │
+         *            └──────────────────────── 1 ──────┘
+         *
+         */
 
-        NfaState startNfaStateOfPreNfaClosure = preNfaClosure.getStartNfaState();
-        NfaState startNfaStateOfNextNfaClosure = nextNfaClosure.getStartNfaState();
+        NfaState _PRE_S = _PRE.getStartNfaState();
+        NfaState _NEXT_S = _NEXT.getStartNfaState();
 
-        // 以下两行循环需要保留被移除的startNfaStateOfNextNfaClosure节点的状态信息，保留在每个endNfaStateOfPreNfaClosure中
-        for (int group : startNfaStateOfNextNfaClosure.getGroupStart()) {
-            startNfaStateOfPreNfaClosure.setStart(group);
-        }
+        /*
+         * (1)
+         * NfaState中的邻接节点用的是LinkedHashMap，且对于同一个输入符号的不同后继邻接节点用的是LinkedHashSet，保证了邻接节点的相对顺序
+         * 结合"NfaMatcher.isMatchDfs"方法的实现，就可以保证 "(a)|(a*)" 匹配"a"时，group(1)="a", group(2)=null
+         */
+        _PRE_S.addInputSymbolAndNextNfaState(Symbol.EPSILON, _NEXT_S);
 
-        for (int group : startNfaStateOfNextNfaClosure.getGroupReceive()) {
-            startNfaStateOfPreNfaClosure.setReceive(group);
-        }
-
-        // 以下循环用于连接两个NfaClosure
-        for (Symbol inputSymbol : startNfaStateOfNextNfaClosure.getAllInputSymbol()) {
-            for (NfaState nextNfaState : startNfaStateOfNextNfaClosure.getNextNfaStatesWithInputSymbol(inputSymbol)) {
-                startNfaStateOfPreNfaClosure.addInputSymbolAndNextNfaState(inputSymbol, nextNfaState);
-            }
-        }
-
-        // NfaClosure中的邻接节点Map用的是LinkedHashMap，这就保证了nextNfaClosure的邻接节点优先级低于preNfaClosure的邻接节点
-        preNfaClosure.getEndNfaStates().addAll(nextNfaClosure.getEndNfaStates());
+        // 更新Pre的终止节点
+        _PRE.getEndNfaStates().addAll(_NEXT.getEndNfaStates());
     }
 
     private static class GroupUtil {
