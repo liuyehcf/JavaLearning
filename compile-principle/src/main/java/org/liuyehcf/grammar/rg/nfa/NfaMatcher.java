@@ -4,10 +4,8 @@ import org.liuyehcf.grammar.core.definition.Symbol;
 import org.liuyehcf.grammar.rg.Matcher;
 import org.liuyehcf.grammar.rg.utils.SymbolUtils;
 import org.liuyehcf.grammar.utils.Pair;
-import org.liuyehcf.grammar.utils.Tuple;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.liuyehcf.grammar.utils.AssertUtils.assertNull;
 
@@ -20,14 +18,17 @@ public class NfaMatcher implements Matcher {
     private final String input;
 
     // group i --> 起始索引 的映射表，闭
-    private Map<Integer, Integer> groupStartIndexes = null;
+    private int[] groupStartIndexes = null;
+    private int[] tempGroupStartIndexes = null;
 
     // group i --> 接收索引 的映射表，开
-    private Map<Integer, Integer> groupEndIndexes = null;
+    private int[] groupEndIndexes = null;
+    private int[] tempGroupEndIndexes = null;
 
     // 当前位于的group信息集合（某个时刻可以位于多个group中），groupId -> (groupStartIndex, groupEndIndex) 的映射表
     // 这个数据结构为了解决"(a*)+"匹配"a"时，捕获组的问题（正确情况下应该返回""）
-    private Map<Integer, Pair<Integer, Integer>> curGroupInfoMap = null;
+    private Pair<Integer, Integer>[] curGroupInfos = null;
+    private Pair<Integer, Integer>[] tempCurGroupInfos = null;
 
     // 匹配的区间集合
     private List<Pair<Integer, Integer>> matchIntervals;
@@ -62,16 +63,19 @@ public class NfaMatcher implements Matcher {
         return result;
     }
 
+    @SuppressWarnings("unchecked")
     private void beforeMatch(String curInput) {
         this.subInput = curInput;
 
-        groupStartIndexes = new HashMap<>();
-        groupEndIndexes = new HashMap<>();
-        curGroupInfoMap = new HashMap<>();
-        for (int group = 0; group <= groupCount(); group++) {
-            groupStartIndexes.put(group, -1);
-            groupEndIndexes.put(group, -1);
-        }
+        groupStartIndexes = new int[groupCount() + 1];
+        tempGroupStartIndexes = new int[groupCount() + 1];
+        groupEndIndexes = new int[groupCount() + 1];
+        tempGroupEndIndexes = new int[groupCount() + 1];
+        curGroupInfos = new Pair[groupCount() + 1];
+        tempCurGroupInfos = new Pair[groupCount() + 1];
+
+        Arrays.fill(groupStartIndexes, -1);
+        Arrays.fill(groupEndIndexes, -1);
     }
 
     private void afterMatch(NfaState result) {
@@ -79,17 +83,21 @@ public class NfaMatcher implements Matcher {
             groupStartIndexes = null;
             groupEndIndexes = null;
         } else {
-            Set<Integer> keySets = groupStartIndexes.keySet();
-            for (int group : keySets.toArray(new Integer[0])) {
-                if (groupEndIndexes.get(group) == -1) {
-                    groupStartIndexes.put(group, -1);
+            for (int group = 0; group <= groupCount(); group++) {
+                if (groupEndIndexes[group] == -1) {
+                    groupStartIndexes[group] = -1;
                 }
             }
         }
+
+        curGroupInfos = null;
+        tempGroupStartIndexes = null;
+        tempGroupEndIndexes = null;
+        tempCurGroupInfos = null;
     }
 
     private NfaState isMatchDfs(NfaState curNfaState, int index, Set<String> visitedNfaState) {
-        Tuple<Map<Integer, Integer>, Map<Integer, Integer>, Map<Integer, Pair<Integer, Integer>>> tuple = setGroupIndex(curNfaState, index);
+        dfsStatusMark(curNfaState, index);
 
         // 首先走非ε边，贪婪模式
         if (index != subInput.length()) {
@@ -117,7 +125,7 @@ public class NfaMatcher implements Matcher {
             for (NfaState nextState : epsilonNextStates) {
                 // 为了避免重复经过相同的 ε边，每次访问ε边，给一个标记
                 // 在匹配目标字符串的不同位置时，允许经过相同的ε边
-                String curStateString = visitInfo(nextState, index);
+                String curStateString = StatusInfo(nextState, index);
 
                 if (visitedNfaState.add(curStateString)) {
                     NfaState result;
@@ -129,56 +137,52 @@ public class NfaMatcher implements Matcher {
             }
 
             // 仅仅失败时需要回溯
-            dfsStatusBackTrace(tuple);
+            dfsStatusBackTrace();
             return null;
         }
     }
 
-    private Tuple<Map<Integer, Integer>, Map<Integer, Integer>, Map<Integer, Pair<Integer, Integer>>> setGroupIndex(NfaState curNfaState, int index) {
+    private void dfsStatusMark(NfaState curNfaState, int index) {
         // 由于需要回溯，因此保留一下原始状态
-        Tuple<Map<Integer, Integer>, Map<Integer, Integer>, Map<Integer, Pair<Integer, Integer>>> tuple = new Tuple<>(
-                new HashMap<>(groupStartIndexes),
-                new HashMap<>(groupEndIndexes),
-                new HashMap<>(curGroupInfoMap)
-        );
+        System.arraycopy(groupStartIndexes, 0, tempGroupStartIndexes, 0, groupCount() + 1);
+        System.arraycopy(groupEndIndexes, 0, tempGroupEndIndexes, 0, groupCount() + 1);
+        System.arraycopy(curGroupInfos, 0, tempCurGroupInfos, 0, groupCount() + 1);
+
 
         if (!curNfaState.getGroupStart().isEmpty()) {
             for (int group : curNfaState.getGroupStart()) {
-                groupStartIndexes.put(group, index);
+                groupStartIndexes[group] = index;
             }
         }
 
         if (!curNfaState.getGroupReceive().isEmpty()) {
             for (int group : curNfaState.getGroupReceive()) {
-                groupEndIndexes.put(group, index);
+                groupEndIndexes[group] = index;
             }
         }
 
-        curGroupInfoMap = new HashMap<>();
+        Arrays.fill(curGroupInfos, null);
 
-        for (int group : groupStartIndexes.keySet()) {
-            int startIndex = groupStartIndexes.get(group);
-            int endIndex = groupEndIndexes.get(group);
+        for (int group = 0; group <= groupCount(); group++) {
+            int startIndex = groupStartIndexes[group];
+            int endIndex = groupEndIndexes[group];
 
             if (startIndex != -1) {
-                curGroupInfoMap.put(group, new Pair<>(startIndex, endIndex));
+                curGroupInfos[group] = new Pair<>(startIndex, endIndex);
             }
         }
-
-        return tuple;
     }
 
-    private void dfsStatusBackTrace(Tuple<Map<Integer, Integer>, Map<Integer, Integer>, Map<Integer, Pair<Integer, Integer>>> tuple) {
-        groupStartIndexes = tuple.getFirst();
-        groupEndIndexes = tuple.getSecond();
-        curGroupInfoMap = tuple.getThird();
+    private void dfsStatusBackTrace() {
+        System.arraycopy(tempGroupStartIndexes, 0, groupStartIndexes, 0, groupCount() + 1);
+        System.arraycopy(tempGroupEndIndexes, 0, groupEndIndexes, 0, groupCount() + 1);
+        System.arraycopy(tempCurGroupInfos, 0, curGroupInfos, 0, groupCount() + 1);
     }
 
-    private String visitInfo(NfaState nfaState, int index) {
+    private String StatusInfo(NfaState nfaState, int index) {
         StringBuilder sb = new StringBuilder();
 
-        // 这里构造的访问信息包含了当前所在的NfaState，目标串的位置，当前所在的group以及其起始和终止索引
-        List<Integer> sortedGroupIds = curGroupInfoMap.keySet().stream().sorted().collect(Collectors.toList());
+        // 这里构造的节点状态信息包含了当前所在的NfaState，目标串的位置，当前所在的group以及其起始和终止索引
 
         sb.append(nfaState.toString())
                 .append(',')
@@ -187,9 +191,14 @@ public class NfaMatcher implements Matcher {
 
 
         sb.append('[');
-        for (int group : sortedGroupIds) {
-            int startIndex = groupStartIndexes.get(group);
-            int endIndex = groupEndIndexes.get(group);
+        for (int group = 0; group <= groupCount(); group++) {
+            if (curGroupInfos[group] == null) {
+                continue;
+            }
+
+            int startIndex = curGroupInfos[group].getFirst();
+            int endIndex = curGroupInfos[group].getSecond();
+
             sb.append('(')
                     .append(group)
                     .append(',')
@@ -321,13 +330,13 @@ public class NfaMatcher implements Matcher {
         }
         if (group < 0 || group > groupCount())
             throw new IndexOutOfBoundsException("No group " + group);
-        if (groupStartIndexes.get(group) == -1
-                || groupEndIndexes.get(group) == -1) {
+        if (groupStartIndexes[group] == -1
+                || groupEndIndexes[group] == -1) {
             return null;
         }
         return subInput.substring(
-                groupStartIndexes.get(group),
-                groupEndIndexes.get(group)
+                groupStartIndexes[group],
+                groupEndIndexes[group]
         );
     }
 
@@ -346,7 +355,7 @@ public class NfaMatcher implements Matcher {
         if (group < 0 || group > groupCount()) {
             throw new IndexOutOfBoundsException("No group " + group);
         }
-        return groupStartIndexes.get(group);
+        return groupStartIndexes[group];
     }
 
     @Override
@@ -358,6 +367,6 @@ public class NfaMatcher implements Matcher {
         if (group < 0 || group > groupCount()) {
             throw new IndexOutOfBoundsException("No group " + group);
         }
-        return groupEndIndexes.get(group);
+        return groupEndIndexes[group];
     }
 }
