@@ -27,7 +27,6 @@ public class Pair<FIRST, SECOND> {
         if (second != null) {
             hash += second.hashCode();
         }
-
         return hash;
     }
 
@@ -40,11 +39,13 @@ public class Pair<FIRST, SECOND> {
                 return other.first.equals(this.first)
                         && other.second.equals(this.second);
             } else if (other.first != null) {
-                return other.first.equals(this.first);
+                return this.second == null
+                        && other.first.equals(this.first);
             } else if (other.second != null) {
-                return other.second.equals(this.second);
+                return this.first == null
+                        && other.second.equals(this.second);
             } else {
-                return true;
+                return this.first == null && this.second == null;
             }
         }
         return false;

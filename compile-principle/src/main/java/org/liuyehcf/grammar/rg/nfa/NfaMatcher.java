@@ -4,8 +4,10 @@ import org.liuyehcf.grammar.core.definition.Symbol;
 import org.liuyehcf.grammar.rg.Matcher;
 import org.liuyehcf.grammar.rg.utils.SymbolUtils;
 import org.liuyehcf.grammar.utils.Pair;
+import org.liuyehcf.grammar.utils.Tuple;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.liuyehcf.grammar.utils.AssertUtils.assertNull;
 
@@ -22,6 +24,10 @@ public class NfaMatcher implements Matcher {
 
     // group i --> 接收索引 的映射表，开
     private Map<Integer, Integer> groupEndIndexes = null;
+
+    // 当前位于的group信息集合（某个时刻可以位于多个group中），groupId -> (groupStartIndex, groupEndIndex) 的映射表
+    // 这个数据结构为了解决"(a*)+"匹配"a"时，捕获组的问题（正确情况下应该返回""）
+    private Map<Integer, Pair<Integer, Integer>> curGroupInfoMap = null;
 
     // 匹配的区间集合
     private List<Pair<Integer, Integer>> matchIntervals;
@@ -50,6 +56,7 @@ public class NfaMatcher implements Matcher {
 
         groupStartIndexes = new HashMap<>();
         groupEndIndexes = new HashMap<>();
+        curGroupInfoMap = new HashMap<>();
         for (int group = 0; group <= groupCount(); group++) {
             groupStartIndexes.put(group, -1);
             groupEndIndexes.put(group, -1);
@@ -77,22 +84,23 @@ public class NfaMatcher implements Matcher {
     }
 
     private NfaState isMatchDfsProxy(NfaState curNfaState, int index, Set<String> visitedNfaState) {
-        Pair<Map<Integer, Integer>, Map<Integer, Integer>> pair = setGroupIndex(curNfaState, index);
+        Tuple<Map<Integer, Integer>, Map<Integer, Integer>, Map<Integer, Pair<Integer, Integer>>> tuple = setGroupIndex(curNfaState, index);
 
         NfaState result = isMatchDfs(curNfaState, index, visitedNfaState);
 
         if (result == null) {
-            groupBackTrack(pair);
+            groupBackTrack(tuple);
         }
 
         return result;
     }
 
-    private Pair<Map<Integer, Integer>, Map<Integer, Integer>> setGroupIndex(NfaState curNfaState, int index) {
+    private Tuple<Map<Integer, Integer>, Map<Integer, Integer>, Map<Integer, Pair<Integer, Integer>>> setGroupIndex(NfaState curNfaState, int index) {
         // 由于需要回溯，因此保留一下原始状态
-        Pair<Map<Integer, Integer>, Map<Integer, Integer>> pair = new Pair<>(
+        Tuple<Map<Integer, Integer>, Map<Integer, Integer>, Map<Integer, Pair<Integer, Integer>>> tuple = new Tuple<>(
                 new HashMap<>(groupStartIndexes),
-                new HashMap<>(groupEndIndexes)
+                new HashMap<>(groupEndIndexes),
+                new HashMap<>(curGroupInfoMap)
         );
 
         if (!curNfaState.getGroupStart().isEmpty()) {
@@ -107,12 +115,24 @@ public class NfaMatcher implements Matcher {
             }
         }
 
-        return pair;
+        curGroupInfoMap = new HashMap<>();
+
+        for (int group : groupStartIndexes.keySet()) {
+            int startIndex = groupStartIndexes.get(group);
+            int endIndex = groupEndIndexes.get(group);
+
+            if (startIndex != -1) {
+                curGroupInfoMap.put(group, new Pair<>(startIndex, endIndex));
+            }
+        }
+
+        return tuple;
     }
 
-    private void groupBackTrack(Pair<Map<Integer, Integer>, Map<Integer, Integer>> pair) {
-        groupStartIndexes = pair.getFirst();
-        groupEndIndexes = pair.getSecond();
+    private void groupBackTrack(Tuple<Map<Integer, Integer>, Map<Integer, Integer>, Map<Integer, Pair<Integer, Integer>>> tuple) {
+        groupStartIndexes = tuple.getFirst();
+        groupEndIndexes = tuple.getSecond();
+        curGroupInfoMap = tuple.getThird();
     }
 
     private NfaState isMatchDfs(NfaState curNfaState, int index, Set<String> visitedNfaState) {
@@ -143,7 +163,7 @@ public class NfaMatcher implements Matcher {
         for (NfaState nextState : epsilonNextStates) {
             // 为了避免重复经过相同的 ε边，每次访问ε边，给一个标记
             // 在匹配目标字符串的不同位置时，允许经过相同的ε边
-            String curStateString = nextState.toString() + index;
+            String curStateString = visitInfo(nextState, index);
 
             if (visitedNfaState.add(curStateString)) {
                 NfaState result;
@@ -155,6 +175,37 @@ public class NfaMatcher implements Matcher {
         }
 
         return null;
+    }
+
+    private String visitInfo(NfaState nfaState, int index) {
+        StringBuilder sb = new StringBuilder();
+
+        // 这里构造的访问信息包含了当前所在的NfaState，目标串的位置，当前所在的group以及其起始和终止索引
+        List<Integer> sortedGroupIds = curGroupInfoMap.keySet().stream().sorted().collect(Collectors.toList());
+
+        sb.append(nfaState.toString())
+                .append(',')
+                .append(index)
+                .append(',');
+
+
+        sb.append('[');
+        for (int group : sortedGroupIds) {
+            int startIndex = groupStartIndexes.get(group);
+            int endIndex = groupEndIndexes.get(group);
+            sb.append('(')
+                    .append(group)
+                    .append(',')
+                    .append(startIndex)
+                    .append(',')
+                    .append(endIndex)
+                    .append(',')
+                    .append(')')
+                    .append(',');
+        }
+        sb.append(']');
+
+        return sb.toString();
     }
 
     @Override
