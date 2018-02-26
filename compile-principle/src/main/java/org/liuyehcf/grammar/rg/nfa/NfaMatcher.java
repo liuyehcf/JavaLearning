@@ -48,7 +48,12 @@ public class NfaMatcher implements Matcher {
     private NfaState doMatch(String curInput) {
         this.subInput = curInput;
 
-        reset();
+        groupStartIndexes = new HashMap<>();
+        groupEndIndexes = new HashMap<>();
+        for (int group = 0; group <= groupCount(); group++) {
+            groupStartIndexes.put(group, -1);
+            groupEndIndexes.put(group, -1);
+        }
 
         NfaState curNfaState = nfa.getNfaClosure().getStartNfaState();
 
@@ -56,23 +61,19 @@ public class NfaMatcher implements Matcher {
 
         NfaState result = isMatchDfsProxy(curNfaState, 0, visitedNfaState);
 
-        Set<Integer> keySets = groupStartIndexes.keySet();
-        for (int group : keySets.toArray(new Integer[0])) {
-            if (groupEndIndexes.get(group) == -1) {
-                groupStartIndexes.put(group, -1);
+        if (result == null) {
+            groupStartIndexes = null;
+            groupEndIndexes = null;
+        } else {
+            Set<Integer> keySets = groupStartIndexes.keySet();
+            for (int group : keySets.toArray(new Integer[0])) {
+                if (groupEndIndexes.get(group) == -1) {
+                    groupStartIndexes.put(group, -1);
+                }
             }
         }
 
         return result;
-    }
-
-    private void reset() {
-        groupStartIndexes = new HashMap<>();
-        groupEndIndexes = new HashMap<>();
-        for (int i = 0; i <= groupCount(); i++) {
-            groupStartIndexes.put(i, -1);
-            groupEndIndexes.put(i, -1);
-        }
     }
 
     private NfaState isMatchDfsProxy(NfaState curNfaState, int index, Set<String> visitedNfaState) {

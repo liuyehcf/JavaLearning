@@ -71,11 +71,6 @@ public class TestNfa {
                 if (jdkMatcher.start(group) != nfaMatcher.start(group)
                         || jdkMatcher.end(group) != nfaMatcher.end(group)) {
                     unPassedCases.add(matchedCase);
-                    int i1,i2,i3,i4;
-                    i1=jdkMatcher.start(group);
-                    i2=nfaMatcher.start(group);
-                    i3=jdkMatcher.end(group);
-                    i4=nfaMatcher.end(group);
                     break;
                 }
                 if (jdkGroup == null) {
@@ -265,20 +260,6 @@ public class TestNfa {
         assertTrue(matcher.matches());
         assertEquals(
                 "BaBa",
-                matcher.group(1)
-        );
-    }
-
-
-    @Test
-    public void test() {
-        RGParser parser = RGBuilder.compile("(a*)+").buildNfa();
-
-        Matcher matcher = parser.matcher("aaaaa");
-
-        assertTrue(matcher.matches());
-        assertEquals(
-                "aaaaa",
                 matcher.group(1)
         );
     }
