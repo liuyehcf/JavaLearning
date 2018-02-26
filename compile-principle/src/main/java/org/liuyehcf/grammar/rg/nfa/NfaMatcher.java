@@ -52,6 +52,17 @@ public class NfaMatcher implements Matcher {
     }
 
     private NfaState doMatch(String curInput) {
+
+        beforeMatch(curInput);
+
+        NfaState result = isMatchDfs(nfa.getNfaClosure().getStartNfaState(), 0, new HashSet<>());
+
+        afterMatch(result);
+
+        return result;
+    }
+
+    private void beforeMatch(String curInput) {
         this.subInput = curInput;
 
         groupStartIndexes = new HashMap<>();
@@ -61,13 +72,9 @@ public class NfaMatcher implements Matcher {
             groupStartIndexes.put(group, -1);
             groupEndIndexes.put(group, -1);
         }
+    }
 
-        NfaState curNfaState = nfa.getNfaClosure().getStartNfaState();
-
-        Set<String> visitedNfaState = new HashSet<>();
-
-        NfaState result = isMatchDfsProxy(curNfaState, 0, visitedNfaState);
-
+    private void afterMatch(NfaState result) {
         if (result == null) {
             groupStartIndexes = null;
             groupEndIndexes = null;
@@ -79,20 +86,52 @@ public class NfaMatcher implements Matcher {
                 }
             }
         }
-
-        return result;
     }
 
-    private NfaState isMatchDfsProxy(NfaState curNfaState, int index, Set<String> visitedNfaState) {
+    private NfaState isMatchDfs(NfaState curNfaState, int index, Set<String> visitedNfaState) {
         Tuple<Map<Integer, Integer>, Map<Integer, Integer>, Map<Integer, Pair<Integer, Integer>>> tuple = setGroupIndex(curNfaState, index);
 
-        NfaState result = isMatchDfs(curNfaState, index, visitedNfaState);
+        // 首先走非ε边，贪婪模式
+        if (index != subInput.length()) {
+            // 从当前节点出发，经过非ε边的next节点集合
+            Set<NfaState> nextStates = curNfaState.getNextNfaStatesWithInputSymbol(
+                    SymbolUtils.getAlphabetSymbolWithChar(subInput.charAt(index)));
 
-        if (result == null) {
-            groupBackTrack(tuple);
+            for (NfaState nextState : nextStates) {
+
+                NfaState result;
+                if ((result = isMatchDfs(nextState, index + 1, visitedNfaState)) != null) {
+                    return result;
+                }
+            }
         }
 
-        return result;
+        if (index == subInput.length() && curNfaState.canReceive()) {
+            return curNfaState;
+        } else {
+
+            // 从当前节点出发，经过ε边的后继节点集合
+            Set<NfaState> epsilonNextStates = curNfaState.getNextNfaStatesWithInputSymbol(
+                    Symbol.EPSILON
+            );
+            for (NfaState nextState : epsilonNextStates) {
+                // 为了避免重复经过相同的 ε边，每次访问ε边，给一个标记
+                // 在匹配目标字符串的不同位置时，允许经过相同的ε边
+                String curStateString = visitInfo(nextState, index);
+
+                if (visitedNfaState.add(curStateString)) {
+                    NfaState result;
+                    if ((result = isMatchDfs(nextState, index, visitedNfaState)) != null) {
+                        return result;
+                    }
+                    visitedNfaState.remove(curStateString);
+                }
+            }
+
+            // 仅仅失败时需要回溯
+            dfsStatusBackTrace(tuple);
+            return null;
+        }
     }
 
     private Tuple<Map<Integer, Integer>, Map<Integer, Integer>, Map<Integer, Pair<Integer, Integer>>> setGroupIndex(NfaState curNfaState, int index) {
@@ -129,52 +168,10 @@ public class NfaMatcher implements Matcher {
         return tuple;
     }
 
-    private void groupBackTrack(Tuple<Map<Integer, Integer>, Map<Integer, Integer>, Map<Integer, Pair<Integer, Integer>>> tuple) {
+    private void dfsStatusBackTrace(Tuple<Map<Integer, Integer>, Map<Integer, Integer>, Map<Integer, Pair<Integer, Integer>>> tuple) {
         groupStartIndexes = tuple.getFirst();
         groupEndIndexes = tuple.getSecond();
         curGroupInfoMap = tuple.getThird();
-    }
-
-    private NfaState isMatchDfs(NfaState curNfaState, int index, Set<String> visitedNfaState) {
-
-        // 首先走非ε边，贪婪模式
-        if (index != subInput.length()) {
-            // 从当前节点出发，经过非ε边的next节点集合
-            Set<NfaState> nextStates = curNfaState.getNextNfaStatesWithInputSymbol(
-                    SymbolUtils.getAlphabetSymbolWithChar(subInput.charAt(index)));
-
-            for (NfaState nextState : nextStates) {
-
-                NfaState result;
-                if ((result = isMatchDfsProxy(nextState, index + 1, visitedNfaState)) != null) {
-                    return result;
-                }
-            }
-        }
-
-        if (index == subInput.length() && curNfaState.canReceive()) {
-            return curNfaState;
-        }
-
-        // 从当前节点出发，经过ε边的后继节点集合
-        Set<NfaState> epsilonNextStates = curNfaState.getNextNfaStatesWithInputSymbol(
-                Symbol.EPSILON
-        );
-        for (NfaState nextState : epsilonNextStates) {
-            // 为了避免重复经过相同的 ε边，每次访问ε边，给一个标记
-            // 在匹配目标字符串的不同位置时，允许经过相同的ε边
-            String curStateString = visitInfo(nextState, index);
-
-            if (visitedNfaState.add(curStateString)) {
-                NfaState result;
-                if ((result = isMatchDfsProxy(nextState, index, visitedNfaState)) != null) {
-                    return result;
-                }
-                visitedNfaState.remove(curStateString);
-            }
-        }
-
-        return null;
     }
 
     private String visitInfo(NfaState nfaState, int index) {
