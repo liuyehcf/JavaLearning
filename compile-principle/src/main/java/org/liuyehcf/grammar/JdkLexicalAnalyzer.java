@@ -61,6 +61,21 @@ public class JdkLexicalAnalyzer extends AbstractLexicalAnalyzer {
         public String group(int group) {
             return target.group(group);
         }
+
+        @Override
+        public int groupCount() {
+            return target.groupCount();
+        }
+
+        @Override
+        public int start(int group) {
+            return target.start(group);
+        }
+
+        @Override
+        public int end(int group) {
+            return target.end(group);
+        }
     }
 
 

@@ -17,10 +17,10 @@ public class NfaMatcher implements Matcher {
     // 待匹配的输入字符串
     private final String input;
 
-    // group i --> 起始索引 的映射表，闭集
+    // group i --> 起始索引 的映射表，闭
     private Map<Integer, Integer> groupStartIndexes = null;
 
-    // group i --> 接收索引 的映射表，闭集
+    // group i --> 接收索引 的映射表，开
     private Map<Integer, Integer> groupEndIndexes = null;
 
     // 匹配的区间集合
@@ -48,8 +48,7 @@ public class NfaMatcher implements Matcher {
     private NfaState doMatch(String curInput) {
         this.subInput = curInput;
 
-        groupStartIndexes = new HashMap<>();
-        groupEndIndexes = new HashMap<>();
+        reset();
 
         NfaState curNfaState = nfa.getNfaClosure().getStartNfaState();
 
@@ -59,12 +58,21 @@ public class NfaMatcher implements Matcher {
 
         Set<Integer> keySets = groupStartIndexes.keySet();
         for (int group : keySets.toArray(new Integer[0])) {
-            if (!groupEndIndexes.containsKey(group)) {
-                groupStartIndexes.remove(group);
+            if (groupEndIndexes.get(group) == -1) {
+                groupStartIndexes.put(group, -1);
             }
         }
 
         return result;
+    }
+
+    private void reset() {
+        groupStartIndexes = new HashMap<>();
+        groupEndIndexes = new HashMap<>();
+        for (int i = 0; i <= groupCount(); i++) {
+            groupStartIndexes.put(i, -1);
+            groupEndIndexes.put(i, -1);
+        }
     }
 
     private NfaState isMatchDfsProxy(NfaState curNfaState, int index, Set<String> visitedNfaState) {
@@ -262,14 +270,45 @@ public class NfaMatcher implements Matcher {
             assertNull(groupEndIndexes);
             throw new IllegalStateException("No match found");
         }
-
-        if (!groupStartIndexes.containsKey(group)
-                || !groupEndIndexes.containsKey(group)) {
+        if (group < 0 || group > groupCount())
+            throw new IndexOutOfBoundsException("No group " + group);
+        if (groupStartIndexes.get(group) == -1
+                || groupEndIndexes.get(group) == -1) {
             return null;
         }
         return subInput.substring(
                 groupStartIndexes.get(group),
                 groupEndIndexes.get(group)
         );
+    }
+
+
+    @Override
+    public int groupCount() {
+        return nfa.groupCount();
+    }
+
+    @Override
+    public int start(int group) {
+        if (groupStartIndexes == null) {
+            assertNull(groupEndIndexes);
+            throw new IllegalStateException("No match available");
+        }
+        if (group < 0 || group > groupCount()) {
+            throw new IndexOutOfBoundsException("No group " + group);
+        }
+        return groupStartIndexes.get(group);
+    }
+
+    @Override
+    public int end(int group) {
+        if (groupStartIndexes == null) {
+            assertNull(groupEndIndexes);
+            throw new IllegalStateException("No match available");
+        }
+        if (group < 0 || group > groupCount()) {
+            throw new IndexOutOfBoundsException("No group " + group);
+        }
+        return groupEndIndexes.get(group);
     }
 }

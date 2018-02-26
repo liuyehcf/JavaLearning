@@ -46,7 +46,7 @@ class NfaBuildIterator {
         groupUtil = new GroupUtil();
     }
 
-    static NfaClosure createNfaClosure(List<Symbol> symbols) {
+    static Pair<NfaClosure, Integer> createNfaClosure(List<Symbol> symbols) {
         NfaBuildIterator buildIterator = new NfaBuildIterator(symbols);
 
         while (buildIterator.hasNext()) {
@@ -55,7 +55,7 @@ class NfaBuildIterator {
 
         buildIterator.finishWork();
 
-        return buildIterator.nfaClosure;
+        return new Pair<>(buildIterator.nfaClosure, buildIterator.groupUtil.getMaxGroup());
     }
 
     private StackUnion createStackUnitWithNfaClosure(NfaClosure nfaClosure) {
@@ -839,6 +839,7 @@ class NfaBuildIterator {
 
     private static class GroupUtil {
         private int groupCount = 0;
+        private int maxGroup = 0;
         private LinkedList<Integer> groupStack;
 
         private GroupUtil() {
@@ -850,8 +851,14 @@ class NfaBuildIterator {
             return groupStack.peek();
         }
 
+        private int getMaxGroup() {
+            return maxGroup;
+        }
+
         private void enterGroup() {
-            groupStack.push(++groupCount);
+            groupCount++;
+            maxGroup = Math.max(maxGroup, groupCount);
+            groupStack.push(groupCount);
         }
 
         private void exitGroup() {

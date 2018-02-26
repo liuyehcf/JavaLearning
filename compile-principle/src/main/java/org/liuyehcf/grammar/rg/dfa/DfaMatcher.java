@@ -84,4 +84,19 @@ public class DfaMatcher implements Matcher {
                 groupEndIndexes.get(group)
         );
     }
+
+    @Override
+    public int groupCount() {
+        return 0;
+    }
+
+    @Override
+    public int start(int group) {
+        return 0;
+    }
+
+    @Override
+    public int end(int group) {
+        return 0;
+    }
 }

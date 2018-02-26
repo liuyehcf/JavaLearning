@@ -27,7 +27,7 @@ public class DfaState {
     // 当前DfaState包含的所有NfaState
     private Set<NfaState> nfaStates = new HashSet<>();
 
-    // 当前DfaState包含的所有NfaState的所有下一跳输入符号，构建时会用到
+    // 当前DfaState包含的所有NfaState的所有下一跳输入符号，构建时会用到。当构建完成时，与"nextDfaStateMap.keySet()"一致
     private Set<Symbol> inputSymbols = new HashSet<>();
 
     // 邻接节点映射表

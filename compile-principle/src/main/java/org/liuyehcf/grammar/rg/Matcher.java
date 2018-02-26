@@ -15,4 +15,19 @@ public interface Matcher {
      * 返回第i组匹配的内容
      */
     String group(int group);
+
+    /**
+     * 返回捕获组的数量
+     */
+    int groupCount();
+
+    /**
+     * 指定捕获组的起始索引，闭
+     */
+    int start(int group);
+
+    /**
+     * 指定不获取的终止索引，开
+     */
+    int end(int group);
 }

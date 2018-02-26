@@ -60,22 +60,33 @@ public class TestNfa {
 
             assertTrue(jdkMatcher.matches());
 
-            if (!nfaMatcher.matches()) {
+            if (!nfaMatcher.matches() || jdkMatcher.groupCount() != nfaMatcher.groupCount()) {
                 unPassedCases.add(matchedCase);
                 continue;
             }
 
-
-            for (int group = 0; group < jdkMatcher.groupCount(); group++) {
+            for (int group = 0; group <= jdkMatcher.groupCount(); group++) {
                 String jdkGroup = jdkMatcher.group(group);
                 String nfaGroup = nfaMatcher.group(group);
+                if (jdkMatcher.start(group) != nfaMatcher.start(group)
+                        || jdkMatcher.end(group) != nfaMatcher.end(group)) {
+                    unPassedCases.add(matchedCase);
+                    int i1,i2,i3,i4;
+                    i1=jdkMatcher.start(group);
+                    i2=nfaMatcher.start(group);
+                    i3=jdkMatcher.end(group);
+                    i4=nfaMatcher.end(group);
+                    break;
+                }
                 if (jdkGroup == null) {
                     if (nfaGroup != null) {
                         unPassedCases.add(matchedCase);
+                        break;
                     }
                 } else {
                     if (!jdkGroup.equals(nfaGroup)) {
                         unPassedCases.add(matchedCase);
+                        break;
                     }
                 }
             }
@@ -254,6 +265,20 @@ public class TestNfa {
         assertTrue(matcher.matches());
         assertEquals(
                 "BaBa",
+                matcher.group(1)
+        );
+    }
+
+
+    @Test
+    public void test() {
+        RGParser parser = RGBuilder.compile("(a*)+").buildNfa();
+
+        Matcher matcher = parser.matcher("aaaaa");
+
+        assertTrue(matcher.matches());
+        assertEquals(
+                "aaaaa",
                 matcher.group(1)
         );
     }
