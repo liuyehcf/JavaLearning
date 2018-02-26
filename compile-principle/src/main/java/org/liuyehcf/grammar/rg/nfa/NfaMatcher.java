@@ -212,7 +212,7 @@ public class NfaMatcher implements Matcher {
 
     @Override
     public boolean find() {
-        // todo 解决了 "(a)|(b)|(ab)" 匹配 "ab" 的问题，不知道还有没有其他find贪婪匹配问题
+        // todo 解决了 "(a)|(b)|(ab)" 匹配 "ab" 的问题，不知道还有没有其他find贪婪匹配问题。"(a)|(b)|(ab)a*" 匹配"ab"仍存在问题
 
         if (matchIntervals == null) {
             initMatchIntervals();
