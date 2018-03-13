@@ -1,10 +1,7 @@
 package org.liuyehcf.grammar.cfg.lr;
 
 import org.liuyehcf.grammar.core.definition.Grammar;
-import org.liuyehcf.grammar.core.definition.converter.GrammarConverterPipeline;
-import org.liuyehcf.grammar.core.definition.converter.GrammarConverterPipelineImpl;
-import org.liuyehcf.grammar.core.definition.converter.MergeGrammarConverter;
-import org.liuyehcf.grammar.core.definition.converter.StatusExpandGrammarConverter;
+import org.liuyehcf.grammar.core.definition.converter.*;
 
 public class LR0 implements LRParser {
 
@@ -21,6 +18,7 @@ public class LR0 implements LRParser {
         this.originalGrammar = grammar;
         this.grammarConverterPipeline = GrammarConverterPipelineImpl
                 .builder()
+                .registerGrammarConverter(AugmentedGrammarConverter.class)
                 .registerGrammarConverter(MergeGrammarConverter.class)
                 .registerGrammarConverter(StatusExpandGrammarConverter.class)
                 .build();

@@ -9,9 +9,11 @@ import org.liuyehcf.grammar.core.MorphemeType;
  */
 public class Symbol {
 
+    public static final Symbol START = new Symbol(false, "__START__", 0, MorphemeType.NORMAL);
     public static final Symbol EPSILON = new Symbol(true, "__EPSILON__", 0, MorphemeType.NORMAL);
     public static final Symbol DOLLAR = new Symbol(true, "__DOLLAR__", 0, MorphemeType.NORMAL);
     public static final Symbol DOT = new Symbol(true, "__DOT__", 0, MorphemeType.NORMAL);
+
 
     private static final String SPECIAL_PREFIX = "__";
     private static final String SPECIAL_SUFFIX = "__";

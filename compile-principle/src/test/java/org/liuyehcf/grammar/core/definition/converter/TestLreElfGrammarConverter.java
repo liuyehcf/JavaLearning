@@ -1,6 +1,7 @@
 package org.liuyehcf.grammar.core.definition.converter;
 
 import org.junit.Test;
+import org.liuyehcf.grammar.GrammarCase;
 import org.liuyehcf.grammar.core.definition.Grammar;
 import org.liuyehcf.grammar.core.definition.PrimaryProduction;
 import org.liuyehcf.grammar.core.definition.Production;
@@ -12,41 +13,8 @@ import static org.liuyehcf.grammar.core.definition.Symbol.createTerminator;
 public class TestLreElfGrammarConverter {
     @Test
     public void convertCase1() {
-        Grammar grammar = Grammar.create(
-                createNonTerminator("E"),
-                Production.create(
-                        createNonTerminator("E"),
-                        PrimaryProduction.create(
-                                createNonTerminator("E"),
-                                createTerminator("+"),
-                                createNonTerminator("E")
-                        )
-                ),
-                Production.create(
-                        createNonTerminator("E"),
-                        PrimaryProduction.create(
-                                createNonTerminator("E"),
-                                createTerminator("*"),
-                                createNonTerminator("E")
-                        )
-                ),
-                Production.create(
-                        createNonTerminator("E"),
-                        PrimaryProduction.create(
-                                createTerminator("("),
-                                createNonTerminator("E"),
-                                createTerminator(")")
-                        )
-                ),
-                Production.create(
-                        createNonTerminator("E"),
-                        PrimaryProduction.create(
-                                createTerminator("id")
-                        )
-                )
-        );
 
-        Grammar convertedGrammar = getGrammarConverterPipeline().convert(grammar);
+        Grammar convertedGrammar = getGrammarConverterPipeline().convert(GrammarCase.GRAMMAR_CASE_1);
 
         assertEquals(
                 "{\"productions\":[\"E → ( E ) (E)′ | id (E)′\",\"(E)′ → + E (E)′ | * E (E)′ | __EPSILON__\"]}",

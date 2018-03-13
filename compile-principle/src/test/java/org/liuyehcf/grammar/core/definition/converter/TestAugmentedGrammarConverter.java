@@ -10,8 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.liuyehcf.grammar.core.definition.Symbol.createNonTerminator;
 import static org.liuyehcf.grammar.core.definition.Symbol.createTerminator;
 
-public class TestStatusExpandGrammarConverter {
-
+public class TestAugmentedGrammarConverter {
     @Test
     public void convertCase1() {
         Grammar grammar = Grammar.create(
@@ -26,10 +25,10 @@ public class TestStatusExpandGrammarConverter {
                 )
         );
 
-        Grammar convertedGrammar = getGrammarConverterPipeline().convert(grammar);
+        Grammar convertedGrammar = new AugmentedGrammarConverter(grammar).getConvertedGrammar();
 
         assertEquals(
-                "{\"productions\":[\"S → __DOT__ b B B\",\"S → b __DOT__ B B\",\"S → b B __DOT__ B\",\"S → b B B __DOT__\"]}",
+                "{\"productions\":[\"__START__ → S\",\"S → b B B\"]}",
                 convertedGrammar.toReadableJSONString()
         );
     }
@@ -37,19 +36,12 @@ public class TestStatusExpandGrammarConverter {
     @Test
     public void convertCase2() {
 
-        Grammar convertedGrammar = getGrammarConverterPipeline().convert(GrammarCase.GRAMMAR_CASE_1);
+        Grammar convertedGrammar = new AugmentedGrammarConverter(GrammarCase.GRAMMAR_CASE_1).getConvertedGrammar();
 
         assertEquals(
-                "{\"productions\":[\"E → __DOT__ E + E\",\"E → E __DOT__ + E\",\"E → E + __DOT__ E\",\"E → E + E __DOT__\",\"E → __DOT__ E * E\",\"E → E __DOT__ * E\",\"E → E * __DOT__ E\",\"E → E * E __DOT__\",\"E → __DOT__ ( E )\",\"E → ( __DOT__ E )\",\"E → ( E __DOT__ )\",\"E → ( E ) __DOT__\",\"E → __DOT__ id\",\"E → id __DOT__\"]}",
+                "{\"productions\":[\"__START__ → E\",\"E → E + E\",\"E → E * E\",\"E → ( E )\",\"E → id\"]}",
                 convertedGrammar.toReadableJSONString()
         );
     }
 
-    private GrammarConverterPipeline getGrammarConverterPipeline() {
-        return GrammarConverterPipelineImpl
-                .builder()
-                .registerGrammarConverter(MergeGrammarConverter.class)
-                .registerGrammarConverter(StatusExpandGrammarConverter.class)
-                .build();
-    }
 }
