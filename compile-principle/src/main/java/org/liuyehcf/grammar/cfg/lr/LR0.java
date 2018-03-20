@@ -250,10 +250,10 @@ public class LR0 implements LRParser {
         @Override
         public boolean equals(Object obj) {
             if (obj instanceof Closure) {
-                Closure other = (Closure) obj;
+                Closure that = (Closure) obj;
 
-                return other.coreProduction.getLeft().equals(this.coreProduction.getLeft())
-                        && other.coreProduction.getPrimaryProductions().get(0).getRight().getSymbols().equals(
+                return that.coreProduction.getLeft().equals(this.coreProduction.getLeft())
+                        && that.coreProduction.getPrimaryProductions().get(0).getRight().getSymbols().equals(
                         this.coreProduction.getPrimaryProductions().get(0).getRight().getSymbols());
 
             }

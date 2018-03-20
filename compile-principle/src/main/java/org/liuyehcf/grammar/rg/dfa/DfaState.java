@@ -199,8 +199,8 @@ public class DfaState {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof DfaState) {
-            DfaState other = (DfaState) obj;
-            return other.description.equals(this.description);
+            DfaState that = (DfaState) obj;
+            return that.description.equals(this.description);
         }
         return false;
     }

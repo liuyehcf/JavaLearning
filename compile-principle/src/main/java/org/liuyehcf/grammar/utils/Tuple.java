@@ -45,36 +45,36 @@ public class Tuple<FIRST, SECOND, THIRD> {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Tuple) {
-            Tuple other = (Tuple) obj;
+            Tuple that = (Tuple) obj;
 
-            if (other.first != null && other.second != null && other.third != null) {
-                return other.first.equals(this.first)
-                        && other.second.equals(this.second)
-                        && other.third.equals(this.third);
-            } else if (other.first != null && other.second != null) {
+            if (that.first != null && that.second != null && that.third != null) {
+                return that.first.equals(this.first)
+                        && that.second.equals(this.second)
+                        && that.third.equals(this.third);
+            } else if (that.first != null && that.second != null) {
                 return this.third == null
-                        && other.first.equals(this.first)
-                        && other.second.equals(this.second);
-            } else if (other.first != null && other.third != null) {
+                        && that.first.equals(this.first)
+                        && that.second.equals(this.second);
+            } else if (that.first != null && that.third != null) {
                 return this.second == null
-                        && other.first.equals(this.first)
-                        && other.third.equals(this.third);
-            } else if (other.second != null && other.third != null) {
+                        && that.first.equals(this.first)
+                        && that.third.equals(this.third);
+            } else if (that.second != null && that.third != null) {
                 return this.first == null
-                        && other.second.equals(this.second)
-                        && other.third.equals(this.third);
-            } else if (other.first != null) {
+                        && that.second.equals(this.second)
+                        && that.third.equals(this.third);
+            } else if (that.first != null) {
                 return this.second == null
                         && this.third == null
-                        && other.first.equals(this.first);
-            } else if (other.second != null) {
+                        && that.first.equals(this.first);
+            } else if (that.second != null) {
                 return this.first == null
                         && this.third == null
-                        && other.second.equals(this.second);
-            } else if (other.third != null) {
+                        && that.second.equals(this.second);
+            } else if (that.third != null) {
                 return this.first == null
                         && this.second == null
-                        && other.third.equals(this.third);
+                        && that.third.equals(this.third);
             } else {
                 return this.first == null && this.second == null && this.third == null;
             }

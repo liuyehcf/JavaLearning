@@ -66,10 +66,10 @@ public class SymbolString {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof SymbolString) {
-            SymbolString other = (SymbolString) obj;
-            if (other.symbols.size() == this.symbols.size()) {
+            SymbolString that = (SymbolString) obj;
+            if (that.symbols.size() == this.symbols.size()) {
                 for (int i = 0; i < this.symbols.size(); i++) {
-                    if (!other.symbols.get(i).equals(this.symbols.get(i))) {
+                    if (!that.symbols.get(i).equals(this.symbols.get(i))) {
                         return false;
                     }
                 }

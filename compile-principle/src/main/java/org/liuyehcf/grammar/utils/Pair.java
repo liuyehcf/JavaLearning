@@ -33,17 +33,17 @@ public class Pair<FIRST, SECOND> {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Pair) {
-            Pair other = (Pair) obj;
+            Pair that = (Pair) obj;
 
-            if (other.first != null && other.second != null) {
-                return other.first.equals(this.first)
-                        && other.second.equals(this.second);
-            } else if (other.first != null) {
+            if (that.first != null && that.second != null) {
+                return that.first.equals(this.first)
+                        && that.second.equals(this.second);
+            } else if (that.first != null) {
                 return this.second == null
-                        && other.first.equals(this.first);
-            } else if (other.second != null) {
+                        && that.first.equals(this.first);
+            } else if (that.second != null) {
                 return this.first == null
-                        && other.second.equals(this.second);
+                        && that.second.equals(this.second);
             } else {
                 return this.first == null && this.second == null;
             }

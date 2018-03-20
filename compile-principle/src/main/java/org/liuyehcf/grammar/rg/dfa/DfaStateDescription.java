@@ -46,9 +46,9 @@ public class DfaStateDescription {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof DfaStateDescription) {
-            DfaStateDescription other = (DfaStateDescription) obj;
-            return other.hash == this.hash
-                    && other.nfaStateIds.equals(this.nfaStateIds);
+            DfaStateDescription that = (DfaStateDescription) obj;
+            return that.hash == this.hash
+                    && that.nfaStateIds.equals(this.nfaStateIds);
 
         }
         return false;

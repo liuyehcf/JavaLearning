@@ -122,11 +122,11 @@ public class Symbol {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Symbol) {
-            Symbol other = (Symbol) obj;
-            return other.isTerminator == this.isTerminator
-                    && other.value.equals(this.value)
-                    && other.primeCount == this.primeCount
-                    && other.type.equals(this.type);
+            Symbol that = (Symbol) obj;
+            return that.isTerminator == this.isTerminator
+                    && that.value.equals(this.value)
+                    && that.primeCount == this.primeCount
+                    && that.type.equals(this.type);
         }
         return false;
     }
