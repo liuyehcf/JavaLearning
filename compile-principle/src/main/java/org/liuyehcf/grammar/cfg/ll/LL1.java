@@ -395,43 +395,43 @@ public class LL1 implements LLParser {
         sb.append("FIRST");
         sb.append('\"');
         sb.append(':');
-        sb.append(getFirstReadableJSONString());
+        sb.append(getFirstJSONString());
 
         sb.append(',');
         sb.append('\"');
         sb.append("FOLLOW");
         sb.append('\"');
         sb.append(':');
-        sb.append(getFollowReadableJSONString());
+        sb.append(getFollowJSONString());
 
         sb.append(',');
         sb.append('\"');
         sb.append("SELECT");
         sb.append('\"');
         sb.append(':');
-        sb.append(getSelectReadableJSONString());
+        sb.append(getSelectJSONString());
 
         sb.append('}');
 
         return sb.toString();
     }
 
-    private String getFirstReadableJSONString() {
-        return getReadableJSONStringFor(this.firsts, true, true);
+    private String getFirstJSONString() {
+        return getJSONStringFor(this.firsts, true, true);
     }
 
-    private String getFollowReadableJSONString() {
-        return getReadableJSONStringFor(this.follows, false, true);
+    private String getFollowJSONString() {
+        return getJSONStringFor(this.follows, false, true);
     }
 
-    private String getSelectReadableJSONString() {
+    private String getSelectJSONString() {
         StringBuilder sb = new StringBuilder();
 
         sb.append('{');
 
         for (Map.Entry<Symbol, Map<PrimaryProduction, Set<Symbol>>> outerEntry : selects.entrySet()) {
             sb.append('\"');
-            sb.append(outerEntry.getKey().toReadableJSONString());
+            sb.append(outerEntry.getKey().toJSONString());
             sb.append('\"');
             sb.append(':');
 
@@ -439,9 +439,9 @@ public class LL1 implements LLParser {
 
             for (Map.Entry<PrimaryProduction, Set<Symbol>> innerEntry : outerEntry.getValue().entrySet()) {
                 sb.append('\"');
-                sb.append(outerEntry.getKey().toReadableJSONString())
+                sb.append(outerEntry.getKey().toJSONString())
                         .append(" → ")
-                        .append(innerEntry.getKey().getRight().toReadableJSONString());
+                        .append(innerEntry.getKey().getRight().toJSONString());
                 sb.append('\"');
                 sb.append(':');
 
@@ -471,7 +471,7 @@ public class LL1 implements LLParser {
         return sb.toString();
     }
 
-    private String getReadableJSONStringFor(Map<Symbol, Set<Symbol>> map, boolean containsTerminator, boolean containsNonTerminator) {
+    private String getJSONStringFor(Map<Symbol, Set<Symbol>> map, boolean containsTerminator, boolean containsNonTerminator) {
         StringBuilder sb = new StringBuilder();
 
         sb.append('{');
@@ -481,7 +481,7 @@ public class LL1 implements LLParser {
             sb.append('{');
 
             for (Symbol terminator : this.grammar.getTerminators()) {
-                sb.append('\"').append(terminator.toReadableJSONString()).append("\":");
+                sb.append('\"').append(terminator.toJSONString()).append("\":");
                 sb.append('\"');
 
                 assertFalse(map.get(terminator).isEmpty());
@@ -511,7 +511,7 @@ public class LL1 implements LLParser {
             sb.append('{');
 
             for (Symbol nonTerminator : this.grammar.getNonTerminators()) {
-                sb.append('\"').append(nonTerminator.toReadableJSONString()).append("\":");
+                sb.append('\"').append(nonTerminator.toJSONString()).append("\":");
                 sb.append('\"');
 
                 assertFalse(map.get(nonTerminator).isEmpty());
@@ -552,7 +552,7 @@ public class LL1 implements LLParser {
         for (Symbol terminator : this.grammar.getTerminators()) {
             sb.append(separator)
                     .append(' ')
-                    .append(terminator.toReadableJSONString())
+                    .append(terminator.toJSONString())
                     .append(' ');
         }
 
@@ -576,7 +576,7 @@ public class LL1 implements LLParser {
             // 第一列，产生式
             sb.append(separator)
                     .append(' ')
-                    .append(_A.toReadableJSONString())
+                    .append(_A.toJSONString())
                     .append(' ');
 
             for (Symbol terminator : this.grammar.getTerminators()) {
@@ -596,9 +596,9 @@ public class LL1 implements LLParser {
                 if (_PPA != null) {
                     sb.append(separator)
                             .append(' ')
-                            .append(_A.toReadableJSONString())
+                            .append(_A.toJSONString())
                             .append(" → ")
-                            .append(_PPA.getRight().toReadableJSONString())
+                            .append(_PPA.getRight().toJSONString())
                             .append(' ');
                 } else {
                     sb.append(separator)

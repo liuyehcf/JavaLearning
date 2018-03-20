@@ -43,34 +43,17 @@ public class LR0 implements LRParser {
 
     private static PrimaryProduction successor(PrimaryProduction _PP) {
 
-        List<Symbol> symbols = _PP.getRight().getSymbols();
+        assertTrue(_PP.getRight().getIndexOfDot() != -1);
 
-        int indexOfDot = symbols.indexOf(Symbol.DOT);
-
-        assertFalse(indexOfDot == -1);
-
-        if (indexOfDot == symbols.size() - 1) {
+        if (_PP.getRight().getIndexOfDot() == _PP.getRight().getSymbols().size()) {
             return null;
-        }
-
-        List<Symbol> successorSymbols = new ArrayList<>();
-
-        if (indexOfDot > 0) {
-            successorSymbols.addAll(symbols.subList(0, indexOfDot));
-        }
-
-        successorSymbols.add(symbols.get(indexOfDot + 1));
-
-        successorSymbols.add(Symbol.DOT);
-
-        if (indexOfDot + 2 < symbols.size()) {
-            successorSymbols.addAll(symbols.subList(indexOfDot + 2, symbols.size()));
         }
 
         return PrimaryProduction.create(
                 _PP.getLeft(),
                 SymbolString.create(
-                        successorSymbols
+                        _PP.getRight().getSymbols(),
+                        _PP.getRight().getIndexOfDot() + 1
                 )
 
         );
@@ -78,17 +61,14 @@ public class LR0 implements LRParser {
 
     private static Symbol nextSymbol(PrimaryProduction _PP) {
 
-        List<Symbol> symbols = _PP.getRight().getSymbols();
+        assertTrue(_PP.getRight().getIndexOfDot() != -1);
 
-        int indexOfDot = symbols.indexOf(Symbol.DOT);
 
-        assertFalse(indexOfDot == -1);
-
-        if (indexOfDot == symbols.size() - 1) {
+        if (_PP.getRight().getIndexOfDot() == _PP.getRight().getSymbols().size()) {
             return null;
         }
 
-        return symbols.get(indexOfDot + 1);
+        return _PP.getRight().getSymbols().get(_PP.getRight().getIndexOfDot());
     }
 
     private void init() {
@@ -101,7 +81,7 @@ public class LR0 implements LRParser {
         // 初始化分析表
         initAnalysisTable();
 
-        System.out.println(closures);
+        System.out.println(analysisTable);
     }
 
     private void convertGrammar() {
@@ -135,6 +115,30 @@ public class LR0 implements LRParser {
         return false;
     }
 
+    @Override
+    public String getForecastAnalysisTable() {
+        StringBuilder sb = new StringBuilder();
+
+        String separator = "|";
+
+        // 第一行：表头，各个终结符符号以及非终结符号
+        sb.append(separator)
+                .append(' ')
+                .append("非终结符\\终结符")
+                .append(' ');
+
+        for (Symbol terminator : this.grammar.getTerminators()) {
+            sb.append(separator)
+                    .append(' ')
+                    .append(terminator.toJSONString())
+                    .append(' ');
+        }
+
+        sb.append(separator).append('\n');
+
+        return sb.toString();
+    }
+
     private void moveIn() {
 
     }
@@ -162,23 +166,10 @@ public class LR0 implements LRParser {
         assertTrue(symbolProductionMap.get(Symbol.START).getPrimaryProductions().size() == 2);
 
         if (symbolProductionMap.get(Symbol.START).getPrimaryProductions().get(0) // 第一个子产生式
-                .getRight().getSymbols().get(0).equals(Symbol.DOT) // 第一个符号
-                ) {
-            _PPOrigin = PrimaryProduction.create(
-                    Symbol.START,
-                    SymbolString.create(
-                            symbolProductionMap.get(Symbol.START).getPrimaryProductions().get(0).getRight().getSymbols()
-                    )
-
-            );
+                .getRight().getIndexOfDot() == 0) {
+            _PPOrigin = symbolProductionMap.get(Symbol.START).getPrimaryProductions().get(0);
         } else {
-            _PPOrigin = PrimaryProduction.create(
-                    Symbol.START,
-                    SymbolString.create(
-                            symbolProductionMap.get(Symbol.START).getPrimaryProductions().get(1).getRight().getSymbols()
-                    )
-
-            );
+            _PPOrigin = symbolProductionMap.get(Symbol.START).getPrimaryProductions().get(1);
         }
 
         boolean canBreak = false;
@@ -244,14 +235,13 @@ public class LR0 implements LRParser {
             List<PrimaryProduction> newAddedPrimaryProductions = new ArrayList<>();
             for (PrimaryProduction _PP : primaryProductions) {
 
-                int indexOfDot = _PP.getRight().getSymbols().indexOf(Symbol.DOT);
-                Symbol symbol;
+                Symbol nextSymbol = nextSymbol(_PP);
 
                 // '·'后面跟的是非终结符
-                if (indexOfDot < _PP.getRight().getSymbols().size() - 1
-                        && !(symbol = _PP.getRight().getSymbols().get(indexOfDot + 1)).isTerminator()) {
+                if (nextSymbol != null
+                        && !nextSymbol.isTerminator()) {
 
-                    newAddedPrimaryProductions.addAll(findOriginalStatusPrimaryProductions(symbol));
+                    newAddedPrimaryProductions.addAll(findOriginalStatusPrimaryProductions(nextSymbol));
                 }
             }
 
@@ -280,7 +270,7 @@ public class LR0 implements LRParser {
         Production _P = symbolProductionMap.get(symbol);
 
         for (PrimaryProduction _PP : _P.getPrimaryProductions()) {
-            if (Symbol.DOT.equals(_PP.getRight().getSymbols().get(0))) {
+            if (_PP.getRight().getIndexOfDot() == 0) {
                 result.add(_PP);
             }
         }
@@ -289,20 +279,68 @@ public class LR0 implements LRParser {
     }
 
     private void initAnalysisTable() {
+        // 初始化
+        for (int i = 0; i < closures.size(); i++) {
+            analysisTable.put(i, new HashMap<>());
+        }
+
         for (Production _P : symbolProductionMap.values()) {
             for (PrimaryProduction _PP : _P.getPrimaryProductions()) {
                 for (Closure closure : closures) {
                     if (closure.getPrimaryProductions().contains(_PP)) {
                         Symbol nextSymbol = nextSymbol(_PP);
-
                         if (nextSymbol == null) {
 
+                            if ((Symbol.START.equals(_PP.getLeft()))) {
+                                analysisTable.get(closure.getId()).put(
+                                        Symbol.DOLLAR,
+                                        new Operation(
+                                                -1,
+                                                _PP,
+                                                Operation.OperationCode.ACCEPT
+                                        )
+                                );
+                            } else {
+
+                                for (Symbol terminator : this.grammar.getTerminators()) {
+                                    analysisTable.get(closure.getId()).put(
+                                            terminator,
+                                            new Operation(
+                                                    -1,
+                                                    _PP,
+                                                    Operation.OperationCode.REDUCTION
+                                            )
+                                    );
+                                }
+
+                                analysisTable.get(closure.getId()).put(
+                                        Symbol.DOLLAR,
+                                        new Operation(
+                                                -1,
+                                                _PP,
+                                                Operation.OperationCode.REDUCTION
+                                        )
+                                );
+                            }
                         } else if (nextSymbol.isTerminator()) {
-
+                            analysisTable.get(closure.getId()).put(
+                                    nextSymbol,
+                                    new Operation(
+                                            -1,
+                                            _PP,
+                                            Operation.OperationCode.MOVE_IN
+                                    )
+                            );
                         } else {
-
+                            analysisTable.get(closure.getId()).put(
+                                    nextSymbol,
+                                    new Operation(
+                                            closureTransferTable.get(closure.getId()).get(nextSymbol),
+                                            null,
+                                            Operation.OperationCode.JUMP
+                                    )
+                            );
                         }
-
                     }
                 }
             }

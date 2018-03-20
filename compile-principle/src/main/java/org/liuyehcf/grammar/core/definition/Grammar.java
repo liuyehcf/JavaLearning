@@ -86,12 +86,6 @@ public class Grammar {
     }
 
     public String toJSONString() {
-        return '{' +
-                "\"productions\":" + productions +
-                '}';
-    }
-
-    public String toReadableJSONString() {
         StringBuilder sb = new StringBuilder();
 
         sb.append('{')
@@ -99,7 +93,7 @@ public class Grammar {
                 .append('[');
 
         for (Production _P : productions) {
-            sb.append(_P.toReadableJSONString())
+            sb.append(_P.toJSONString())
                     .append(",");
         }
 
@@ -114,6 +108,6 @@ public class Grammar {
 
     @Override
     public String toString() {
-        return toReadableJSONString();
+        return toJSONString();
     }
 }

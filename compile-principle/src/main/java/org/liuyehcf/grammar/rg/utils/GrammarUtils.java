@@ -5,16 +5,20 @@ import org.liuyehcf.grammar.core.definition.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.liuyehcf.grammar.core.definition.Symbol.createNonTerminator;
 import static org.liuyehcf.grammar.utils.AssertUtils.assertFalse;
 import static org.liuyehcf.grammar.utils.AssertUtils.assertTrue;
 
 public abstract class GrammarUtils {
+    private static Symbol DEFAULT_NON_TERMINATOR = createNonTerminator("DEFAULT_NON_TERMINATOR");
+
+
     public static Grammar createGrammarWithRegex(String regex) {
         return Grammar.create(
-                Symbol.START,
+                DEFAULT_NON_TERMINATOR,
                 Production.create(
                         PrimaryProduction.create(
-                                Symbol.START,
+                                DEFAULT_NON_TERMINATOR,
                                 createPrimaryProduction(regex)
                         )
                 )

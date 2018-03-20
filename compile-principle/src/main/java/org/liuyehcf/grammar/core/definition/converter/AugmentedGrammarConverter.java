@@ -8,6 +8,9 @@ import java.util.List;
 
 import static org.liuyehcf.grammar.utils.AssertUtils.assertFalse;
 
+/**
+ * 增广文法
+ */
 public class AugmentedGrammarConverter extends AbstractGrammarConverter {
 
     public AugmentedGrammarConverter(Grammar originalGrammar) {

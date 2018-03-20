@@ -29,24 +29,21 @@ public class StatusExpandGrammarConverter extends AbstractGrammarConverter {
             Symbol _A = _P.getLeft();
 
             for (PrimaryProduction _PP : _P.getPrimaryProductions()) {
-                List<Symbol> symbols = _PP.getRight().getSymbols();
-                int length = symbols.size();
+                int length = _PP.getRight().getSymbols().size();
 
                 // 构造新的  length+1个 PrimaryProduction
                 for (int i = 0; i < length + 1; i++) {
-                    List<Symbol> newSymbols = new ArrayList<>(symbols);
-                    newSymbols.add(i, Symbol.DOT);
                     newProductions.add(
                             Production.create(
                                     PrimaryProduction.create(
                                             _A,
                                             SymbolString.create(
-                                                    newSymbols
+                                                    _PP.getRight().getSymbols(),
+                                                    i
                                             )
                                     )
 
                             )
-
                     );
                 }
             }

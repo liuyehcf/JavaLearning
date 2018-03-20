@@ -12,8 +12,8 @@ public class TestLR0 {
         Grammar convertedGrammar = new LR0(GrammarCase.GRAMMAR_CASE_2).getGrammar();
 
         assertEquals(
-                "{\"productions\":[\"__START__ → __DOT__ S | S __DOT__\",\"B → __DOT__ a B | a __DOT__ B | a B __DOT__ | __DOT__ b | b __DOT__\",\"S → __DOT__ B B | B __DOT__ B | B B __DOT__\"]}",
-                convertedGrammar.toReadableJSONString()
+                "{\"productions\":[\"__START__ → · S | S ·\",\"B → · a B | a · B | a B · | · b | b ·\",\"S → · B B | B · B | B B ·\"]}",
+                convertedGrammar.toJSONString()
         );
     }
 }

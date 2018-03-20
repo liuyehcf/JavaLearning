@@ -32,8 +32,8 @@ public class TestStatusExpandGrammarConverter {
         Grammar convertedGrammar = getGrammarConverterPipeline().convert(grammar);
 
         assertEquals(
-                "{\"productions\":[\"S → __DOT__ b B B\",\"S → b __DOT__ B B\",\"S → b B __DOT__ B\",\"S → b B B __DOT__\"]}",
-                convertedGrammar.toReadableJSONString()
+                "{\"productions\":[\"S → · b B B\",\"S → b · B B\",\"S → b B · B\",\"S → b B B ·\"]}",
+                convertedGrammar.toJSONString()
         );
     }
 
@@ -43,8 +43,8 @@ public class TestStatusExpandGrammarConverter {
         Grammar convertedGrammar = getGrammarConverterPipeline().convert(GrammarCase.GRAMMAR_CASE_1);
 
         assertEquals(
-                "{\"productions\":[\"E → __DOT__ E + E\",\"E → E __DOT__ + E\",\"E → E + __DOT__ E\",\"E → E + E __DOT__\",\"E → __DOT__ E * E\",\"E → E __DOT__ * E\",\"E → E * __DOT__ E\",\"E → E * E __DOT__\",\"E → __DOT__ ( E )\",\"E → ( __DOT__ E )\",\"E → ( E __DOT__ )\",\"E → ( E ) __DOT__\",\"E → __DOT__ id\",\"E → id __DOT__\"]}",
-                convertedGrammar.toReadableJSONString()
+                "{\"productions\":[\"E → · E + E\",\"E → E · + E\",\"E → E + · E\",\"E → E + E ·\",\"E → · E * E\",\"E → E · * E\",\"E → E * · E\",\"E → E * E ·\",\"E → · ( E )\",\"E → ( · E )\",\"E → ( E · )\",\"E → ( E ) ·\",\"E → · id\",\"E → id ·\"]}",
+                convertedGrammar.toJSONString()
         );
     }
 

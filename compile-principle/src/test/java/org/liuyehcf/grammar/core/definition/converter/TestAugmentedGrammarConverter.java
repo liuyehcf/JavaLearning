@@ -32,7 +32,7 @@ public class TestAugmentedGrammarConverter {
 
         assertEquals(
                 "{\"productions\":[\"__START__ → S\",\"S → b B B\"]}",
-                convertedGrammar.toReadableJSONString()
+                convertedGrammar.toJSONString()
         );
     }
 
@@ -43,7 +43,7 @@ public class TestAugmentedGrammarConverter {
 
         assertEquals(
                 "{\"productions\":[\"__START__ → E\",\"E → E + E\",\"E → E * E\",\"E → ( E )\",\"E → id\"]}",
-                convertedGrammar.toReadableJSONString()
+                convertedGrammar.toJSONString()
         );
     }
 

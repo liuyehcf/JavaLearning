@@ -12,7 +12,6 @@ public class Symbol {
     public static final Symbol START = new Symbol(false, "__START__", 0, MorphemeType.NORMAL);
     public static final Symbol EPSILON = new Symbol(true, "__EPSILON__", 0, MorphemeType.NORMAL);
     public static final Symbol DOLLAR = new Symbol(true, "__DOLLAR__", 0, MorphemeType.NORMAL);
-    public static final Symbol DOT = new Symbol(true, "__DOT__", 0, MorphemeType.NORMAL);
 
 
     private static final String SPECIAL_PREFIX = "__";
@@ -145,18 +144,11 @@ public class Symbol {
     }
 
     public String toJSONString() {
-        return '{' +
-                "\"isTerminator\":" + '\"' + isTerminator + '\"' +
-                ", \"value\":" + '\"' + getPrimedValue() + '\"' +
-                '}';
-    }
-
-    public String toReadableJSONString() {
         return getPrimedValue();
     }
 
     @Override
     public String toString() {
-        return toReadableJSONString();
+        return toJSONString();
     }
 }

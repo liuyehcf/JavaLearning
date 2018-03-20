@@ -19,7 +19,7 @@ public class Production {
 
     private final List<PrimaryProduction> primaryProductions;
 
-    public Production(List<PrimaryProduction> primaryProductions) {
+    private Production(List<PrimaryProduction> primaryProductions) {
         this.primaryProductions = Collections.unmodifiableList(primaryProductions);
 
         Symbol left = null;
@@ -50,21 +50,14 @@ public class Production {
     }
 
     public String toJSONString() {
-        return '{' +
-                "\"left\":" + left +
-                ", \"right\":" + primaryProductions +
-                '}';
-    }
-
-    public String toReadableJSONString() {
         StringBuilder sb = new StringBuilder();
 
         sb.append('\"');
-        sb.append(left.toReadableJSONString())
+        sb.append(left.toJSONString())
                 .append(" → ");
 
         for (PrimaryProduction _PP : primaryProductions) {
-            sb.append(_PP.getRight().toReadableJSONString())
+            sb.append(_PP.getRight().toJSONString())
                     .append(' ')
                     .append(OR)
                     .append(' ');
@@ -80,7 +73,7 @@ public class Production {
 
     @Override
     public String toString() {
-        return toReadableJSONString();
+        return toJSONString();
     }
 
     @Override
