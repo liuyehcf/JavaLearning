@@ -12,7 +12,7 @@ public class TestLR0 {
         Grammar convertedGrammar = new LR0(GrammarCase.GRAMMAR_CASE_1).getGrammar();
 
         assertEquals(
-                "{\"productions\":[\"__START__ → __DOT__ E\",\"__START__ → E __DOT__\",\"E → __DOT__ E + E\",\"E → E __DOT__ + E\",\"E → E + __DOT__ E\",\"E → E + E __DOT__\",\"E → __DOT__ E * E\",\"E → E __DOT__ * E\",\"E → E * __DOT__ E\",\"E → E * E __DOT__\",\"E → __DOT__ ( E )\",\"E → ( __DOT__ E )\",\"E → ( E __DOT__ )\",\"E → ( E ) __DOT__\",\"E → __DOT__ id\",\"E → id __DOT__\"]}",
+                "{\"productions\":[\"__START__ → __DOT__ E | E __DOT__\",\"E → __DOT__ E + E | E __DOT__ + E | E + __DOT__ E | E + E __DOT__ | __DOT__ E * E | E __DOT__ * E | E * __DOT__ E | E * E __DOT__ | __DOT__ ( E ) | ( __DOT__ E ) | ( E __DOT__ ) | ( E ) __DOT__ | __DOT__ id | id __DOT__\"]}",
                 convertedGrammar.toReadableJSONString()
         );
     }

@@ -1,10 +1,11 @@
 package org.liuyehcf.grammar.core.definition;
 
-import org.liuyehcf.grammar.utils.AssertUtils;
 import org.liuyehcf.grammar.utils.ListUtils;
 
 import java.util.Collections;
 import java.util.List;
+
+import static org.liuyehcf.grammar.utils.AssertUtils.assertFalse;
 
 /**
  * 文法定义
@@ -56,7 +57,7 @@ public class Grammar {
                     .append(",");
         }
 
-        AssertUtils.assertFalse(productions.isEmpty());
+        assertFalse(productions.isEmpty());
         sb.setLength(sb.length() - 1);
 
         sb.append(']')

@@ -5,6 +5,7 @@ import org.liuyehcf.grammar.utils.ListUtils;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 文法产生式
@@ -73,5 +74,20 @@ public class Production {
     @Override
     public String toString() {
         return toReadableJSONString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Production that = (Production) o;
+        return Objects.equals(left, that.left) &&
+                Objects.equals(right, that.right);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(left, right);
     }
 }

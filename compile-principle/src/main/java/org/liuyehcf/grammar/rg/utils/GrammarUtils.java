@@ -8,18 +8,15 @@ import org.liuyehcf.grammar.core.definition.Symbol;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.liuyehcf.grammar.core.definition.Symbol.createNonTerminator;
 import static org.liuyehcf.grammar.utils.AssertUtils.assertFalse;
 import static org.liuyehcf.grammar.utils.AssertUtils.assertTrue;
 
 public abstract class GrammarUtils {
-    private static Symbol DEFAULT_NON_TERMINATOR = createNonTerminator("DEFAULT_NON_TERMINATOR");
-
     public static Grammar createGrammarWithRegex(String regex) {
         return Grammar.create(
-                DEFAULT_NON_TERMINATOR,
+                Symbol.START,
                 Production.create(
-                        DEFAULT_NON_TERMINATOR,
+                        Symbol.START,
                         createPrimaryProduction(regex)
                 )
         );
