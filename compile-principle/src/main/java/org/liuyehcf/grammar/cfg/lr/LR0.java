@@ -2,12 +2,10 @@ package org.liuyehcf.grammar.cfg.lr;
 
 import org.liuyehcf.grammar.core.definition.*;
 import org.liuyehcf.grammar.core.definition.converter.*;
-import org.liuyehcf.grammar.utils.Tuple;
 
 import java.util.*;
 
-import static org.liuyehcf.grammar.utils.AssertUtils.assertFalse;
-import static org.liuyehcf.grammar.utils.AssertUtils.assertTrue;
+import static org.liuyehcf.grammar.utils.AssertUtils.*;
 
 public class LR0 implements LRParser {
 
@@ -24,10 +22,12 @@ public class LR0 implements LRParser {
     private Map<Symbol, Production> symbolProductionMap = new HashMap<>();
 
     // 项目集闭包
-    private Map<PrimaryProduction, Closure> closureMap = new HashMap<>();
+    private List<Closure> closures = new ArrayList<>();
 
-    // 闭包有向边，Tuple存的就是closures中的索引号，以及转移输入符号。
-    private List<Tuple<Closure, Closure, Symbol>> closureEdges = new ArrayList<>();
+    // 状态转移表 [ClosureId, Symbol] -> ClosureId
+    private Map<Integer, Map<Symbol, Integer>> closureTransferTable = new HashMap<>();
+
+    private Map<Integer, Map<Symbol, Operation>> analysisTable = new HashMap<>();
 
     public LR0(Grammar grammar) {
         this.originalGrammar = grammar;
@@ -84,7 +84,9 @@ public class LR0 implements LRParser {
 
         assertFalse(indexOfDot == -1);
 
-        assertTrue(indexOfDot < symbols.size() - 1);
+        if (indexOfDot == symbols.size() - 1) {
+            return null;
+        }
 
         return symbols.get(indexOfDot + 1);
     }
@@ -96,7 +98,10 @@ public class LR0 implements LRParser {
         // 初始化项目集闭包
         initClosure();
 
-        System.out.println(closureMap);
+        // 初始化分析表
+        initAnalysisTable();
+
+        System.out.println(closures);
     }
 
     private void convertGrammar() {
@@ -112,6 +117,21 @@ public class LR0 implements LRParser {
 
     @Override
     public boolean matches(String input) {
+        LinkedList<Integer> statusStack = new LinkedList<>();
+        LinkedList<Symbol> symbolStack = new LinkedList<>();
+        Queue<Symbol> remainSymbols = new LinkedList<>();
+
+        statusStack.push(0);
+        symbolStack.push(Symbol.DOLLAR);
+        for (char c : input.toCharArray()) {
+            remainSymbols.offer(Symbol.createTerminator(c));
+        }
+        remainSymbols.offer(Symbol.DOLLAR);
+
+//        while (true) {
+//
+//        }
+
         return false;
     }
 
@@ -164,14 +184,15 @@ public class LR0 implements LRParser {
         boolean canBreak = false;
 
         // 初始化，添加闭包0
-        closureMap.put(_PPOrigin, closure(_PPOrigin));
+        closures.add(closure(_PPOrigin));
 
         while (!canBreak) {
-            int preSize = closureMap.size();
-            // 避免遍历时修改容器
-            Map<PrimaryProduction, Closure> newAddedClosureMap = new HashMap<>();
+            canBreak = true;
 
-            for (Closure preClosure : closureMap.values()) {
+            int preSize = closures.size();
+            // 避免遍历时修改容器
+            for (int i = 0; i < preSize; i++) {
+                Closure preClosure = closures.get(i);
 
                 // 遍历闭包中的产生式
                 for (PrimaryProduction _PPre : preClosure.getPrimaryProductions()) {
@@ -181,24 +202,32 @@ public class LR0 implements LRParser {
                     // 有后继
                     if (_PPNext != null) {
                         Symbol nextSymbol = nextSymbol(_PPre);
+                        assertNotNull(nextSymbol);
+
                         Closure nextClosure;
 
-                        if (!closureMap.containsKey(_PPNext)) {
-                            newAddedClosureMap.put(_PPNext, closure(_PPNext));
-                            nextClosure = newAddedClosureMap.get(_PPNext);
+                        int existsClosureId;
+
+                        if ((existsClosureId = indexOf(_PPNext)) == -1) {
+                            closures.add(closure(_PPNext));
+                            nextClosure = closures.get(closures.size() - 1);
                         } else {
-                            nextClosure = closureMap.get(_PPNext);
+                            nextClosure = closures.get(existsClosureId);
                         }
 
-                        // closureEdges.add(new Tuple<>(preClosure, nextClosure, nextSymbol));
+                        if (!closureTransferTable.containsKey(preClosure.getId())) {
+                            closureTransferTable.put(preClosure.getId(), new HashMap<>());
+                        }
+
+                        assertTrue(!closureTransferTable.get(preClosure.getId()).containsKey(nextSymbol)
+                                || closureTransferTable.get(preClosure.getId()).get(nextSymbol).equals(nextClosure.getId()));
+
+                        if (!closureTransferTable.get(preClosure.getId()).containsKey(nextSymbol)) {
+                            closureTransferTable.get(preClosure.getId()).put(nextSymbol, nextClosure.getId());
+                            canBreak = false;
+                        }
                     }
                 }
-            }
-
-            closureMap.putAll(newAddedClosureMap);
-
-            if (preSize == closureMap.size()) {
-                canBreak = true;
             }
         }
     }
@@ -236,6 +265,15 @@ public class LR0 implements LRParser {
         return new Closure(_PPOrigin, new ArrayList<>(primaryProductions));
     }
 
+    private int indexOf(PrimaryProduction _PP) {
+        for (int i = 0; i < closures.size(); i++) {
+            if (closures.get(i).isCorePrimaryProduction(_PP)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     private List<PrimaryProduction> findOriginalStatusPrimaryProductions(Symbol symbol) {
         List<PrimaryProduction> result = new ArrayList<>();
 
@@ -250,48 +288,24 @@ public class LR0 implements LRParser {
         return result;
     }
 
-    // 项目集闭包
-    private static final class Closure {
-        private static int count=0;
+    private void initAnalysisTable() {
+        for (Production _P : symbolProductionMap.values()) {
+            for (PrimaryProduction _PP : _P.getPrimaryProductions()) {
+                for (Closure closure : closures) {
+                    if (closure.getPrimaryProductions().contains(_PP)) {
+                        Symbol nextSymbol = nextSymbol(_PP);
 
-        private final int id =count++;
+                        if (nextSymbol == null) {
 
-        private final PrimaryProduction corePrimaryProduction;
+                        } else if (nextSymbol.isTerminator()) {
 
-        private final List<PrimaryProduction> primaryProductions;
+                        } else {
 
-        Closure(PrimaryProduction corePrimaryProduction, List<PrimaryProduction> primaryProductions) {
-            this.corePrimaryProduction = corePrimaryProduction;
-            this.primaryProductions = primaryProductions;
-        }
+                        }
 
-        public PrimaryProduction getCorePrimaryProduction() {
-            return corePrimaryProduction;
-        }
-
-        public List<PrimaryProduction> getPrimaryProductions() {
-            return primaryProductions;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj instanceof Closure) {
-                Closure that = (Closure) obj;
-
-                return that.corePrimaryProduction.getRight().getSymbols().equals(
-                        this.corePrimaryProduction.getRight().getSymbols());
-
+                    }
+                }
             }
-            return false;
-        }
-
-        @Override
-        public String toString() {
-            return "Closure{" +
-                    "id=" + id +
-                    ", corePrimaryProduction=" + corePrimaryProduction +
-                    ", primaryProductions=" + primaryProductions +
-                    '}';
         }
     }
 }

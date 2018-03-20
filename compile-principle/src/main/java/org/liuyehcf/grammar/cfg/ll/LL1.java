@@ -37,18 +37,6 @@ public class LL1 implements LLParser {
     // 转换后的文法
     private Grammar grammar;
 
-    // 文法开始符号
-    private Symbol start;
-
-    // 文法符号集合
-    private Set<Symbol> symbols;
-
-    // 非终结符集合
-    private Set<Symbol> nonTerminatorSymbols;
-
-    // 终结符集合
-    private Set<Symbol> terminatorSymbols;
-
     // 非终结符->产生式的映射
     private Map<Symbol, Production> productionMap;
 
@@ -72,9 +60,6 @@ public class LL1 implements LLParser {
                 .registerGrammarConverter(LreElfGrammarConverter.class)
                 .build();
         this.lexicalAnalyzer = lexicalAnalyzer;
-        symbols = new HashSet<>();
-        nonTerminatorSymbols = new HashSet<>();
-        terminatorSymbols = new HashSet<>();
         productionMap = new HashMap<>();
         firsts = new HashMap<>();
         follows = new HashMap<>();
@@ -103,32 +88,16 @@ public class LL1 implements LLParser {
     private void convertGrammar() {
         this.grammar = grammarConverterPipeline.convert(originalGrammar);
 
-        this.start = this.grammar.getStart();
-
         for (Production _P : grammar.getProductions()) {
-            nonTerminatorSymbols.add(_P.getLeft());
-
-            for (PrimaryProduction _PP : _P.getPrimaryProductions()) {
-                for (Symbol symbol : _PP.getRight().getSymbols()) {
-                    if (symbol.isTerminator()) {
-                        terminatorSymbols.add(symbol);
-                    } else {
-                        nonTerminatorSymbols.add(symbol);
-                    }
-                }
-            }
-
             assertFalse(productionMap.containsKey(_P.getLeft()));
             productionMap.put(_P.getLeft(), _P);
         }
 
-        symbols.addAll(nonTerminatorSymbols);
-        symbols.addAll(terminatorSymbols);
     }
 
     private void calculateFirst() {
         // 首先，处理所有的终结符
-        for (Symbol symbol : terminatorSymbols) {
+        for (Symbol symbol : this.grammar.getTerminators()) {
             firsts.put(symbol, SetUtils.of(symbol));
         }
 
@@ -137,7 +106,7 @@ public class LL1 implements LLParser {
         while (!canBreak) {
             Map<Symbol, Set<Symbol>> newFirsts = new HashMap<>(this.firsts);
 
-            for (Symbol _X : nonTerminatorSymbols) {
+            for (Symbol _X : this.grammar.getNonTerminators()) {
                 Production _PX = productionMap.get(_X);
 
                 assertNotNull(_PX);
@@ -193,13 +162,13 @@ public class LL1 implements LLParser {
 
     private void calculateFollow() {
         // 将$放入FOLLOW(S)中，其中S是开始符号，$是输入右端的结束标记
-        follows.put(start, SetUtils.of(Symbol.DOLLAR));
+        follows.put(this.grammar.getStart(), SetUtils.of(Symbol.DOLLAR));
 
         boolean canBreak = false;
         while (!canBreak) {
             Map<Symbol, Set<Symbol>> newFollows = new HashMap<>(this.follows);
 
-            for (Symbol _A : nonTerminatorSymbols) {
+            for (Symbol _A : this.grammar.getNonTerminators()) {
                 Production _PA = productionMap.get(_A);
 
                 assertNotNull(_PA);
@@ -260,7 +229,7 @@ public class LL1 implements LLParser {
         }
 
         // 检查一下是否所有的非终结符都有了follow集
-        for (Symbol nonTerminator : nonTerminatorSymbols) {
+        for (Symbol nonTerminator : this.grammar.getNonTerminators()) {
             assertFalse(follows.get(nonTerminator).isEmpty());
         }
     }
@@ -268,7 +237,7 @@ public class LL1 implements LLParser {
     @SuppressWarnings("unchecked")
     private void calculateSelect() {
 
-        for (Symbol _A : nonTerminatorSymbols) {
+        for (Symbol _A : this.grammar.getNonTerminators()) {
             Production _PA = productionMap.get(_A);
 
             for (PrimaryProduction _PPA : _PA.getPrimaryProductions()) {
@@ -302,7 +271,7 @@ public class LL1 implements LLParser {
 
 
         // 检查select集的唯一性：具有相同左部的产生式其SELECT集不相交
-        for (Symbol _A : nonTerminatorSymbols) {
+        for (Symbol _A : this.grammar.getNonTerminators()) {
             Map<PrimaryProduction, Set<Symbol>> map = selects.get(_A);
             assertNotNull(map);
 
@@ -322,7 +291,7 @@ public class LL1 implements LLParser {
 
         LinkedList<Symbol> symbolStack = new LinkedList<>();
         symbolStack.push(Symbol.DOLLAR);
-        symbolStack.push(start);
+        symbolStack.push(this.grammar.getStart());
 
         Token token = null;
         Symbol symbol;
@@ -511,7 +480,7 @@ public class LL1 implements LLParser {
             sb.append("\"terminator\":");
             sb.append('{');
 
-            for (Symbol terminator : terminatorSymbols) {
+            for (Symbol terminator : this.grammar.getTerminators()) {
                 sb.append('\"').append(terminator.toReadableJSONString()).append("\":");
                 sb.append('\"');
 
@@ -527,7 +496,7 @@ public class LL1 implements LLParser {
                 sb.append(',');
             }
 
-            assertFalse(terminatorSymbols.isEmpty());
+            assertFalse(this.grammar.getTerminators().isEmpty());
             sb.setLength(sb.length() - 1);
 
             sb.append('}');
@@ -541,7 +510,7 @@ public class LL1 implements LLParser {
             sb.append("\"nonTerminator\":");
             sb.append('{');
 
-            for (Symbol nonTerminator : nonTerminatorSymbols) {
+            for (Symbol nonTerminator : this.grammar.getNonTerminators()) {
                 sb.append('\"').append(nonTerminator.toReadableJSONString()).append("\":");
                 sb.append('\"');
 
@@ -557,7 +526,7 @@ public class LL1 implements LLParser {
                 sb.append(',');
             }
 
-            assertFalse(nonTerminatorSymbols.isEmpty());
+            assertFalse(this.grammar.getNonTerminators().isEmpty());
             sb.setLength(sb.length() - 1);
 
 
@@ -580,7 +549,7 @@ public class LL1 implements LLParser {
                 .append("非终结符\\终结符")
                 .append(' ');
 
-        for (Symbol terminator : terminatorSymbols) {
+        for (Symbol terminator : this.grammar.getTerminators()) {
             sb.append(separator)
                     .append(' ')
                     .append(terminator.toReadableJSONString())
@@ -592,7 +561,7 @@ public class LL1 implements LLParser {
         // 第二行：对齐格式
         sb.append(separator);
 
-        for (int i = 0; i < terminatorSymbols.size(); i++) {
+        for (int i = 0; i < this.grammar.getTerminators().size(); i++) {
             sb.append(":--")
                     .append(separator);
         }
@@ -603,14 +572,14 @@ public class LL1 implements LLParser {
 
         // 其余行：每一行代表某个非终结符在不同终结符下的产生式
         // A → α
-        for (Symbol _A : nonTerminatorSymbols) {
+        for (Symbol _A : this.grammar.getNonTerminators()) {
             // 第一列，产生式
             sb.append(separator)
                     .append(' ')
                     .append(_A.toReadableJSONString())
                     .append(' ');
 
-            for (Symbol terminator : terminatorSymbols) {
+            for (Symbol terminator : this.grammar.getTerminators()) {
 
                 PrimaryProduction _PPA = null;
 

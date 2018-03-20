@@ -45,6 +45,10 @@ public class Symbol {
         this.type = type;
     }
 
+    public static Symbol createTerminator(char c) {
+        return createTerminator("" + c);
+    }
+
     public static Symbol createTerminator(String value) {
         return createSymbol(true, value, MorphemeType.NORMAL);
     }
