@@ -225,16 +225,15 @@ public class LR0 implements LRParser {
                             .append(' ');
                 } else {
                     if (operation.getOperator() == Operation.OperationCode.ACCEPT
-                            || operation.getOperator() == Operation.OperationCode.MOVE_IN
                             || operation.getOperator() == Operation.OperationCode.REDUCTION) {
                         sb.append(separator)
                                 .append(' ')
-                                .append(operation.getOperator()).append(" -- ").append(operation.getPrimaryProduction())
+                                .append(operation.getOperator()).append(" \"").append(operation.getPrimaryProduction()).append('\"')
                                 .append(' ');
                     } else {
                         sb.append(separator)
                                 .append(' ')
-                                .append(operation.getOperator()).append(" -- ").append(operation.getNextClosureId())
+                                .append(operation.getOperator()).append(" \"").append(operation.getNextClosureId()).append('\"')
                                 .append(' ');
                     }
 
@@ -439,8 +438,8 @@ public class LR0 implements LRParser {
                             analysisTable.get(closure.getId()).put(
                                     nextSymbol,
                                     new Operation(
-                                            -1,
-                                            _PPRaw,
+                                            closureTransferTable.get(closure.getId()).get(nextSymbol),
+                                            null,
                                             Operation.OperationCode.MOVE_IN
                                     )
                             );
