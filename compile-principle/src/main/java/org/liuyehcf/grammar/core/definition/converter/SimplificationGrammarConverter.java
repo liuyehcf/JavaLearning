@@ -13,7 +13,7 @@ import static org.liuyehcf.grammar.utils.AssertUtils.*;
 public class SimplificationGrammarConverter extends AbstractGrammarConverter {
 
     // 从非终结符 -> PrimaryProduction 的映射表
-    private Map<Symbol, SymbolString> primaryProductionMap = new HashMap<>();
+    private Map<Symbol, SymbolString> symbolStringMap = new HashMap<>();
 
     // 按依赖关系排序的非终结符集合
     private List<Symbol> sortedNonTerminators = new ArrayList<>();
@@ -40,7 +40,7 @@ public class SimplificationGrammarConverter extends AbstractGrammarConverter {
                 Production.create(
                         PrimaryProduction.create(
                                 lastNonTerminator,
-                                primaryProductionMap.get(lastNonTerminator)
+                                symbolStringMap.get(lastNonTerminator)
                         )
                 )
         );
@@ -152,9 +152,9 @@ public class SimplificationGrammarConverter extends AbstractGrammarConverter {
                     modifiedSymbols.add(SymbolUtils._leftSmallParenthesis);
 
                     // 当前产生式包含的非终结符必定在之前循环中已经出现过
-                    assertNotNull(primaryProductionMap.get(symbol));
+                    assertNotNull(symbolStringMap.get(symbol));
 
-                    modifiedSymbols.addAll(primaryProductionMap.get(symbol).getSymbols());
+                    modifiedSymbols.addAll(symbolStringMap.get(symbol).getSymbols());
 
                     modifiedSymbols.add(SymbolUtils._rightSmallParenthesis);
                 } else {
@@ -162,7 +162,7 @@ public class SimplificationGrammarConverter extends AbstractGrammarConverter {
                 }
             }
 
-            primaryProductionMap.put(nonTerminator, SymbolString.create(modifiedSymbols));
+            symbolStringMap.put(nonTerminator, SymbolString.create(modifiedSymbols));
         }
     }
 }

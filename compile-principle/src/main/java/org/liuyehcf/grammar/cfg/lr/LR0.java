@@ -4,10 +4,7 @@ import org.liuyehcf.grammar.core.definition.*;
 import org.liuyehcf.grammar.core.definition.converter.*;
 import org.liuyehcf.grammar.utils.Tuple;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.liuyehcf.grammar.utils.AssertUtils.assertFalse;
 import static org.liuyehcf.grammar.utils.AssertUtils.assertTrue;
@@ -27,7 +24,7 @@ public class LR0 implements LRParser {
     private Map<Symbol, Production> symbolProductionMap = new HashMap<>();
 
     // 项目集闭包
-    private Map<Production, Closure> closureMap = new HashMap<>();
+    private Map<PrimaryProduction, Closure> closureMap = new HashMap<>();
 
     // 闭包有向边，Tuple存的就是closures中的索引号，以及转移输入符号。
     private List<Tuple<Closure, Closure, Symbol>> closureEdges = new ArrayList<>();
@@ -44,10 +41,9 @@ public class LR0 implements LRParser {
         init();
     }
 
-    private static Production successor(Production _P) {
-        assertTrue(_P.getPrimaryProductions().size() == 1);
+    private static PrimaryProduction successor(PrimaryProduction _PP) {
 
-        List<Symbol> symbols = _P.getPrimaryProductions().get(0).getRight().getSymbols();
+        List<Symbol> symbols = _PP.getRight().getSymbols();
 
         int indexOfDot = symbols.indexOf(Symbol.DOT);
 
@@ -71,20 +67,18 @@ public class LR0 implements LRParser {
             successorSymbols.addAll(symbols.subList(indexOfDot + 2, symbols.size()));
         }
 
-        return Production.create(
-                PrimaryProduction.create(
-                        _P.getLeft(),
-                        SymbolString.create(
-                                successorSymbols
-                        )
+        return PrimaryProduction.create(
+                _PP.getLeft(),
+                SymbolString.create(
+                        successorSymbols
                 )
+
         );
     }
 
-    private static Symbol nextSymbol(Production _P) {
-        assertTrue(_P.getPrimaryProductions().size() == 1);
+    private static Symbol nextSymbol(PrimaryProduction _PP) {
 
-        List<Symbol> symbols = _P.getPrimaryProductions().get(0).getRight().getSymbols();
+        List<Symbol> symbols = _PP.getRight().getSymbols();
 
         int indexOfDot = symbols.indexOf(Symbol.DOT);
 
@@ -101,6 +95,8 @@ public class LR0 implements LRParser {
 
         // 初始化项目集闭包
         initClosure();
+
+        System.out.println(closureMap);
     }
 
     private void convertGrammar() {
@@ -141,110 +137,140 @@ public class LR0 implements LRParser {
     }
 
     private void initClosure() {
-        Production _originP; // origin production
+        PrimaryProduction _PPOrigin; // origin production
 
         assertTrue(symbolProductionMap.get(Symbol.START).getPrimaryProductions().size() == 2);
 
         if (symbolProductionMap.get(Symbol.START).getPrimaryProductions().get(0) // 第一个子产生式
                 .getRight().getSymbols().get(0).equals(Symbol.DOT) // 第一个符号
                 ) {
-            _originP = Production.create(
-                    PrimaryProduction.create(
-                            Symbol.START,
-                            SymbolString.create(
-                                    symbolProductionMap.get(Symbol.START).getPrimaryProductions().get(0).getRight().getSymbols()
-                            )
+            _PPOrigin = PrimaryProduction.create(
+                    Symbol.START,
+                    SymbolString.create(
+                            symbolProductionMap.get(Symbol.START).getPrimaryProductions().get(0).getRight().getSymbols()
                     )
+
             );
         } else {
-            _originP = Production.create(
-                    PrimaryProduction.create(
-                            Symbol.START,
-                            SymbolString.create(
-                                    symbolProductionMap.get(Symbol.START).getPrimaryProductions().get(1).getRight().getSymbols()
-                            )
+            _PPOrigin = PrimaryProduction.create(
+                    Symbol.START,
+                    SymbolString.create(
+                            symbolProductionMap.get(Symbol.START).getPrimaryProductions().get(1).getRight().getSymbols()
                     )
+
             );
         }
 
         boolean canBreak = false;
 
         // 初始化，添加闭包0
-        closureMap.put(_originP, closure(_originP));
+        closureMap.put(_PPOrigin, closure(_PPOrigin));
 
         while (!canBreak) {
-            int preSize = closureEdges.size();
+            int preSize = closureMap.size();
+            // 避免遍历时修改容器
+            Map<PrimaryProduction, Closure> newAddedClosureMap = new HashMap<>();
 
             for (Closure preClosure : closureMap.values()) {
 
                 // 遍历闭包中的产生式
-                for (Production preP : preClosure.getProductions()) {
-                    // 只能有一个产生式
-                    assertTrue(preP.getPrimaryProductions().size() == 1);
+                for (PrimaryProduction _PPre : preClosure.getPrimaryProductions()) {
 
-                    Production nextP = successor(preP);
+                    PrimaryProduction _PPNext = successor(_PPre);
 
                     // 有后继
-                    if (nextP != null) {
-                        Symbol nextSymbol = nextSymbol(preP);
+                    if (_PPNext != null) {
+                        Symbol nextSymbol = nextSymbol(_PPre);
+                        Closure nextClosure;
 
-                        if (!closureMap.containsKey(nextP)) {
-                            closureMap.put(nextP, closure(nextP));
+                        if (!closureMap.containsKey(_PPNext)) {
+                            newAddedClosureMap.put(_PPNext, closure(_PPNext));
+                            nextClosure = newAddedClosureMap.get(_PPNext);
+                        } else {
+                            nextClosure = closureMap.get(_PPNext);
                         }
 
-                        Closure nextClosure = closureMap.get(nextP);
-                        closureEdges.add(new Tuple<>(preClosure, nextClosure, nextSymbol));
+                        // closureEdges.add(new Tuple<>(preClosure, nextClosure, nextSymbol));
                     }
                 }
             }
 
+            closureMap.putAll(newAddedClosureMap);
 
-            if (preSize == closureEdges.size()) {
+            if (preSize == closureMap.size()) {
                 canBreak = true;
             }
         }
     }
 
-    private Closure closure(Production _OP) {
-        List<Production> productions = new ArrayList<>();
+    private Closure closure(PrimaryProduction _PPOrigin) {
+        Set<PrimaryProduction> primaryProductions = new HashSet<>();
 
-        productions.add(_OP);
+        primaryProductions.add(_PPOrigin);
 
         boolean canBreak = false;
 
         while (!canBreak) {
-            for (Production _P : productions) {
-                assertTrue(_P.getPrimaryProductions().size() == 1);
+            int preSize = primaryProductions.size();
+            List<PrimaryProduction> newAddedPrimaryProductions = new ArrayList<>();
+            for (PrimaryProduction _PP : primaryProductions) {
 
-                for (Symbol symbol : _P.getPrimaryProductions().get(0).getRight().getSymbols()) {
-                    if (!symbol.isTerminator()) {
+                int indexOfDot = _PP.getRight().getSymbols().indexOf(Symbol.DOT);
+                Symbol symbol;
 
-                    }
+                // '·'后面跟的是非终结符
+                if (indexOfDot < _PP.getRight().getSymbols().size() - 1
+                        && !(symbol = _PP.getRight().getSymbols().get(indexOfDot + 1)).isTerminator()) {
+
+                    newAddedPrimaryProductions.addAll(findOriginalStatusPrimaryProductions(symbol));
                 }
+            }
+
+            primaryProductions.addAll(newAddedPrimaryProductions);
+
+            if (preSize == primaryProductions.size()) {
+                canBreak = true;
             }
         }
 
-        return new Closure(_OP, productions);
+        return new Closure(_PPOrigin, new ArrayList<>(primaryProductions));
+    }
+
+    private List<PrimaryProduction> findOriginalStatusPrimaryProductions(Symbol symbol) {
+        List<PrimaryProduction> result = new ArrayList<>();
+
+        Production _P = symbolProductionMap.get(symbol);
+
+        for (PrimaryProduction _PP : _P.getPrimaryProductions()) {
+            if (Symbol.DOT.equals(_PP.getRight().getSymbols().get(0))) {
+                result.add(_PP);
+            }
+        }
+
+        return result;
     }
 
     // 项目集闭包
     private static final class Closure {
-        private final Production coreProduction;
+        private static int count=0;
 
-        private final List<Production> productions;
+        private final int id =count++;
 
-        Closure(Production coreProduction, List<Production> productions) {
-            assertTrue(coreProduction.getPrimaryProductions().size() == 1);
-            this.coreProduction = coreProduction;
-            this.productions = productions;
+        private final PrimaryProduction corePrimaryProduction;
+
+        private final List<PrimaryProduction> primaryProductions;
+
+        Closure(PrimaryProduction corePrimaryProduction, List<PrimaryProduction> primaryProductions) {
+            this.corePrimaryProduction = corePrimaryProduction;
+            this.primaryProductions = primaryProductions;
         }
 
-        public Production getCoreProduction() {
-            return coreProduction;
+        public PrimaryProduction getCorePrimaryProduction() {
+            return corePrimaryProduction;
         }
 
-        public List<Production> getProductions() {
-            return productions;
+        public List<PrimaryProduction> getPrimaryProductions() {
+            return primaryProductions;
         }
 
         @Override
@@ -252,12 +278,20 @@ public class LR0 implements LRParser {
             if (obj instanceof Closure) {
                 Closure that = (Closure) obj;
 
-                return that.coreProduction.getLeft().equals(this.coreProduction.getLeft())
-                        && that.coreProduction.getPrimaryProductions().get(0).getRight().getSymbols().equals(
-                        this.coreProduction.getPrimaryProductions().get(0).getRight().getSymbols());
+                return that.corePrimaryProduction.getRight().getSymbols().equals(
+                        this.corePrimaryProduction.getRight().getSymbols());
 
             }
             return false;
+        }
+
+        @Override
+        public String toString() {
+            return "Closure{" +
+                    "id=" + id +
+                    ", corePrimaryProduction=" + corePrimaryProduction +
+                    ", primaryProductions=" + primaryProductions +
+                    '}';
         }
     }
 }

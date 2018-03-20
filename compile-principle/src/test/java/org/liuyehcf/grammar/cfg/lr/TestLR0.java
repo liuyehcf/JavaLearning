@@ -9,11 +9,11 @@ import static org.junit.Assert.assertEquals;
 public class TestLR0 {
     @Test
     public void testGrammarConvertCase1() {
-//        Grammar convertedGrammar = new LR0(GrammarCase.GRAMMAR_CASE_1).getGrammar();
-//
-//        assertEquals(
-//                "{\"productions\":[\"__START__ → __DOT__ E | E __DOT__\",\"E → __DOT__ E + E | E __DOT__ + E | E + __DOT__ E | E + E __DOT__ | __DOT__ E * E | E __DOT__ * E | E * __DOT__ E | E * E __DOT__ | __DOT__ ( E ) | ( __DOT__ E ) | ( E __DOT__ ) | ( E ) __DOT__ | __DOT__ id | id __DOT__\"]}",
-//                convertedGrammar.toReadableJSONString()
-//        );
+        Grammar convertedGrammar = new LR0(GrammarCase.GRAMMAR_CASE_2).getGrammar();
+
+        assertEquals(
+                "{\"productions\":[\"__START__ → __DOT__ S | S __DOT__\",\"B → __DOT__ a B | a __DOT__ B | a B __DOT__ | __DOT__ b | b __DOT__\",\"S → __DOT__ B B | B __DOT__ B | B B __DOT__\"]}",
+                convertedGrammar.toReadableJSONString()
+        );
     }
 }

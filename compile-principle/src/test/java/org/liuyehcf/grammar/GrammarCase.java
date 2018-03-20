@@ -50,4 +50,35 @@ public abstract class GrammarCase {
                     )
             )
     );
+
+
+    public static Grammar GRAMMAR_CASE_2 = Grammar.create(
+            createNonTerminator("S"),
+            Production.create(
+                    PrimaryProduction.create(
+                            createNonTerminator("S"),
+                            SymbolString.create(
+                                    createNonTerminator("B"),
+                                    createNonTerminator("B")
+                            )
+                    )
+            ),
+            Production.create(
+                    PrimaryProduction.create(
+                            createNonTerminator("B"),
+                            SymbolString.create(
+                                    createTerminator("a"),
+                                    createNonTerminator("B")
+                            )
+                    )
+            ),
+            Production.create(
+                    PrimaryProduction.create(
+                            createNonTerminator("B"),
+                            SymbolString.create(
+                                    createTerminator("b")
+                            )
+                    )
+            )
+    );
 }
