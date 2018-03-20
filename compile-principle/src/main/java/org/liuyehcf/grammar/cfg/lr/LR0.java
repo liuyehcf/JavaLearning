@@ -82,6 +82,8 @@ public class LR0 implements LRParser {
         initAnalysisTable();
 
         System.out.println(analysisTable);
+
+        System.out.println(getForecastAnalysisTable());
     }
 
     private void convertGrammar() {
@@ -117,24 +119,93 @@ public class LR0 implements LRParser {
 
     @Override
     public String getForecastAnalysisTable() {
+        List<Symbol> symbols = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
 
         String separator = "|";
 
         // 第一行：表头，各个终结符符号以及非终结符号
+
         sb.append(separator)
                 .append(' ')
-                .append("非终结符\\终结符")
+                .append("状态\\文法符号")
                 .append(' ');
 
-        for (Symbol terminator : this.grammar.getTerminators()) {
+        for (Symbol symbol : this.grammar.getTerminators()) {
             sb.append(separator)
                     .append(' ')
-                    .append(terminator.toJSONString())
+                    .append(symbol.toJSONString())
                     .append(' ');
+            symbols.add(symbol);
+        }
+
+        sb.append(separator)
+                .append(' ')
+                .append(Symbol.DOLLAR.toJSONString())
+                .append(' ');
+        symbols.add(Symbol.DOLLAR);
+
+
+        for (Symbol symbol : this.grammar.getNonTerminators()) {
+            if (Symbol.START.equals(symbol)) {
+                continue;
+            }
+            sb.append(separator)
+                    .append(' ')
+                    .append(symbol.toJSONString())
+                    .append(' ');
+            symbols.add(symbol);
         }
 
         sb.append(separator).append('\n');
+
+        // 第二行：对齐格式
+        sb.append(separator);
+
+        for (int i = 0; i < symbols.size(); i++) {
+            sb.append(":--")
+                    .append(separator);
+        }
+        sb.append(":--")
+                .append(separator);
+
+        sb.append('\n');
+
+        // 其余行：转义表
+        for (int i = 0; i < closures.size(); i++) {
+            sb.append(separator)
+                    .append(' ')
+                    .append(i)
+                    .append(' ');
+
+            for (Symbol symbol : symbols) {
+                Operation operation = analysisTable.get(i).get(symbol);
+                if (operation == null) {
+                    sb.append(separator)
+                            .append(' ')
+                            .append("\\")
+                            .append(' ');
+                } else {
+                    if (operation.getOperator() == Operation.OperationCode.ACCEPT
+                            || operation.getOperator() == Operation.OperationCode.MOVE_IN
+                            || operation.getOperator() == Operation.OperationCode.REDUCTION) {
+                        sb.append(separator)
+                                .append(' ')
+                                .append(operation.getOperator() + "(\'" + operation.getPrimaryProduction() + "\')")
+                                .append(' ');
+                    } else {
+                        sb.append(separator)
+                                .append(' ')
+                                .append(operation.getOperator() + "(\'" + operation.getNextClosureId() + "\')")
+                                .append(' ');
+                    }
+
+                }
+            }
+
+            sb.append(separator).append('\n');
+        }
+
 
         return sb.toString();
     }
