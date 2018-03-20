@@ -323,7 +323,7 @@ public class LR0 implements LRParser {
     }
 
     private Closure closure(PrimaryProduction _PPOrigin) {
-        Set<PrimaryProduction> primaryProductions = new HashSet<>();
+        Set<PrimaryProduction> primaryProductions = new LinkedHashSet<>();
 
         primaryProductions.add(_PPOrigin);
 
@@ -331,6 +331,8 @@ public class LR0 implements LRParser {
 
         while (!canBreak) {
             int preSize = primaryProductions.size();
+
+            // 遍历Set的时候不能进行写操作
             List<PrimaryProduction> newAddedPrimaryProductions = new ArrayList<>();
             for (PrimaryProduction _PP : primaryProductions) {
 
