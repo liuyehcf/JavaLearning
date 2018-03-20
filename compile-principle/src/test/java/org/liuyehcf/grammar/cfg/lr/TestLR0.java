@@ -26,13 +26,13 @@ public class TestLR0 {
         assertEquals(
                 "| 状态\\文法符号 | a | b | __DOLLAR__ | B | S |\n" +
                         "|:--|:--|:--|:--|:--|:--|\n" +
-                        "| 0 | MOVE_IN -- B → · a B | MOVE_IN -- B → · b | \\ | JUMP -- 2 | JUMP -- 1 |\n" +
-                        "| 1 | \\ | \\ | ACCEPT -- __START__ → S · | \\ | \\ |\n" +
-                        "| 2 | MOVE_IN -- B → · a B | MOVE_IN -- B → · b | \\ | JUMP -- 5 | \\ |\n" +
-                        "| 3 | MOVE_IN -- B → · a B | MOVE_IN -- B → · b | \\ | JUMP -- 6 | \\ |\n" +
-                        "| 4 | REDUCTION -- B → b · | REDUCTION -- B → b · | REDUCTION -- B → b · | \\ | \\ |\n" +
-                        "| 5 | REDUCTION -- S → B B · | REDUCTION -- S → B B · | REDUCTION -- S → B B · | \\ | \\ |\n" +
-                        "| 6 | REDUCTION -- B → a B · | REDUCTION -- B → a B · | REDUCTION -- B → a B · | \\ | \\ |\n",
+                        "| 0 | MOVE_IN -- B → a B | MOVE_IN -- B → b | \\ | JUMP -- 2 | JUMP -- 1 |\n" +
+                        "| 1 | \\ | \\ | ACCEPT -- __START__ → S | \\ | \\ |\n" +
+                        "| 2 | MOVE_IN -- B → a B | MOVE_IN -- B → b | \\ | JUMP -- 5 | \\ |\n" +
+                        "| 3 | MOVE_IN -- B → a B | MOVE_IN -- B → b | \\ | JUMP -- 6 | \\ |\n" +
+                        "| 4 | REDUCTION -- B → b | REDUCTION -- B → b | REDUCTION -- B → b | \\ | \\ |\n" +
+                        "| 5 | REDUCTION -- S → B B | REDUCTION -- S → B B | REDUCTION -- S → B B | \\ | \\ |\n" +
+                        "| 6 | REDUCTION -- B → a B | REDUCTION -- B → a B | REDUCTION -- B → a B | \\ | \\ |\n",
                 parser.getForecastAnalysisTable()
         );
     }

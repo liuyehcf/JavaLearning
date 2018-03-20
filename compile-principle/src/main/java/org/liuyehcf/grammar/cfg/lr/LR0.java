@@ -63,12 +63,22 @@ public class LR0 implements LRParser {
 
         assertTrue(_PP.getRight().getIndexOfDot() != -1);
 
-
         if (_PP.getRight().getIndexOfDot() == _PP.getRight().getSymbols().size()) {
             return null;
         }
 
         return _PP.getRight().getSymbols().get(_PP.getRight().getIndexOfDot());
+    }
+
+    private static PrimaryProduction removeDot(PrimaryProduction _PP) {
+        assertTrue(_PP.getRight().getIndexOfDot() != -1);
+
+        return PrimaryProduction.create(
+                _PP.getLeft(),
+                SymbolString.create(
+                        _PP.getRight().getSymbols()
+                )
+        );
     }
 
     private void init() {
@@ -390,6 +400,8 @@ public class LR0 implements LRParser {
                 for (Closure closure : closures) {
                     if (closure.getPrimaryProductions().contains(_PP)) {
                         Symbol nextSymbol = nextSymbol(_PP);
+                        PrimaryProduction _PPRaw = removeDot(_PP);
+
                         if (nextSymbol == null) {
 
                             if ((Symbol.START.equals(_PP.getLeft()))) {
@@ -397,7 +409,7 @@ public class LR0 implements LRParser {
                                         Symbol.DOLLAR,
                                         new Operation(
                                                 -1,
-                                                _PP,
+                                                _PPRaw,
                                                 Operation.OperationCode.ACCEPT
                                         )
                                 );
@@ -408,7 +420,7 @@ public class LR0 implements LRParser {
                                             terminator,
                                             new Operation(
                                                     -1,
-                                                    _PP,
+                                                    _PPRaw,
                                                     Operation.OperationCode.REDUCTION
                                             )
                                     );
@@ -418,7 +430,7 @@ public class LR0 implements LRParser {
                                         Symbol.DOLLAR,
                                         new Operation(
                                                 -1,
-                                                _PP,
+                                                _PPRaw,
                                                 Operation.OperationCode.REDUCTION
                                         )
                                 );
@@ -428,7 +440,7 @@ public class LR0 implements LRParser {
                                     nextSymbol,
                                     new Operation(
                                             -1,
-                                            _PP,
+                                            _PPRaw,
                                             Operation.OperationCode.MOVE_IN
                                     )
                             );
