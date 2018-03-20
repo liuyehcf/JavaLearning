@@ -349,7 +349,7 @@ public class LreElfGrammarConverter extends AbstractGrammarConverter {
                                         _APrimed, // A′
                                         SymbolString.create(
                                                 ListUtils.subListExceptFirstElement(_PP1.getRight().getSymbols())
-                                )
+                                        )
                                 )
                         );
                     } else {

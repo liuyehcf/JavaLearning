@@ -80,10 +80,6 @@ public class LR0 implements LRParser {
 
         // 初始化分析表
         initAnalysisTable();
-
-        System.out.println(analysisTable);
-
-        System.out.println(getForecastAnalysisTable());
     }
 
     private void convertGrammar() {
@@ -115,6 +111,38 @@ public class LR0 implements LRParser {
 //        }
 
         return false;
+    }
+
+    @Override
+    public String getClosureStatus() {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append('{');
+
+        for (int i = 0; i < closures.size(); i++) {
+            sb.append('\"')
+                    .append(i)
+                    .append('\"')
+                    .append(':')
+                    .append('[');
+
+            for (int j = 0; j < closures.get(i).getPrimaryProductions().size(); j++) {
+                sb.append('\"')
+                        .append(closures.get(i).getPrimaryProductions().get(j).toJSONString())
+                        .append('\"')
+                        .append(',');
+            }
+
+            sb.setLength(sb.length() - 1);
+
+            sb.append(']')
+                    .append(',');
+        }
+        sb.setLength(sb.length() - 1);
+
+        sb.append('}');
+
+        return sb.toString();
     }
 
     @Override
@@ -191,12 +219,12 @@ public class LR0 implements LRParser {
                             || operation.getOperator() == Operation.OperationCode.REDUCTION) {
                         sb.append(separator)
                                 .append(' ')
-                                .append(operation.getOperator() + "(\'" + operation.getPrimaryProduction() + "\')")
+                                .append(operation.getOperator()).append(" -- ").append(operation.getPrimaryProduction())
                                 .append(' ');
                     } else {
                         sb.append(separator)
                                 .append(' ')
-                                .append(operation.getOperator() + "(\'" + operation.getNextClosureId() + "\')")
+                                .append(operation.getOperator()).append(" -- ").append(operation.getNextClosureId())
                                 .append(' ');
                     }
 
