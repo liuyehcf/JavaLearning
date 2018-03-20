@@ -1,9 +1,6 @@
 package org.liuyehcf.grammar.cfg.lr;
 
-import org.liuyehcf.grammar.core.definition.Grammar;
-import org.liuyehcf.grammar.core.definition.PrimaryProduction;
-import org.liuyehcf.grammar.core.definition.Production;
-import org.liuyehcf.grammar.core.definition.Symbol;
+import org.liuyehcf.grammar.core.definition.*;
 import org.liuyehcf.grammar.core.definition.converter.*;
 import org.liuyehcf.grammar.utils.Tuple;
 
@@ -48,9 +45,9 @@ public class LR0 implements LRParser {
     }
 
     private static Production successor(Production _P) {
-        assertTrue(_P.getRight().size() == 1);
+        assertTrue(_P.getPrimaryProductions().size() == 1);
 
-        List<Symbol> symbols = _P.getRight().get(0).getSymbols();
+        List<Symbol> symbols = _P.getPrimaryProductions().get(0).getRight().getSymbols();
 
         int indexOfDot = symbols.indexOf(Symbol.DOT);
 
@@ -75,17 +72,19 @@ public class LR0 implements LRParser {
         }
 
         return Production.create(
-                _P.getLeft(),
                 PrimaryProduction.create(
-                        successorSymbols
+                        _P.getLeft(),
+                        SymbolString.create(
+                                successorSymbols
+                        )
                 )
         );
     }
 
     private static Symbol nextSymbol(Production _P) {
-        assertTrue(_P.getRight().size() == 1);
+        assertTrue(_P.getPrimaryProductions().size() == 1);
 
-        List<Symbol> symbols = _P.getRight().get(0).getSymbols();
+        List<Symbol> symbols = _P.getPrimaryProductions().get(0).getRight().getSymbols();
 
         int indexOfDot = symbols.indexOf(Symbol.DOT);
 
@@ -144,22 +143,26 @@ public class LR0 implements LRParser {
     private void initClosure() {
         Production _originP; // origin production
 
-        assertTrue(symbolProductionMap.get(Symbol.START).getRight().size() == 2);
+        assertTrue(symbolProductionMap.get(Symbol.START).getPrimaryProductions().size() == 2);
 
-        if (symbolProductionMap.get(Symbol.START).getRight().get(0) // 第一个子产生式
-                .getSymbols().get(0).equals(Symbol.DOT) // 第一个符号
+        if (symbolProductionMap.get(Symbol.START).getPrimaryProductions().get(0) // 第一个子产生式
+                .getRight().getSymbols().get(0).equals(Symbol.DOT) // 第一个符号
                 ) {
             _originP = Production.create(
-                    Symbol.START,
                     PrimaryProduction.create(
-                            symbolProductionMap.get(Symbol.START).getRight().get(0).getSymbols()
+                            Symbol.START,
+                            SymbolString.create(
+                                    symbolProductionMap.get(Symbol.START).getPrimaryProductions().get(0).getRight().getSymbols()
+                            )
                     )
             );
         } else {
             _originP = Production.create(
-                    Symbol.START,
                     PrimaryProduction.create(
-                            symbolProductionMap.get(Symbol.START).getRight().get(1).getSymbols()
+                            Symbol.START,
+                            SymbolString.create(
+                                    symbolProductionMap.get(Symbol.START).getPrimaryProductions().get(1).getRight().getSymbols()
+                            )
                     )
             );
         }
@@ -177,7 +180,7 @@ public class LR0 implements LRParser {
                 // 遍历闭包中的产生式
                 for (Production preP : preClosure.getProductions()) {
                     // 只能有一个产生式
-                    assertTrue(preP.getRight().size() == 1);
+                    assertTrue(preP.getPrimaryProductions().size() == 1);
 
                     Production nextP = successor(preP);
 
@@ -211,9 +214,9 @@ public class LR0 implements LRParser {
 
         while (!canBreak) {
             for (Production _P : productions) {
-                assertTrue(_P.getRight().size() == 1);
+                assertTrue(_P.getPrimaryProductions().size() == 1);
 
-                for (Symbol symbol : _P.getRight().get(0).getSymbols()) {
+                for (Symbol symbol : _P.getPrimaryProductions().get(0).getRight().getSymbols()) {
                     if (!symbol.isTerminator()) {
 
                     }
@@ -231,7 +234,7 @@ public class LR0 implements LRParser {
         private final List<Production> productions;
 
         Closure(Production coreProduction, List<Production> productions) {
-            assertTrue(coreProduction.getRight().size() == 1);
+            assertTrue(coreProduction.getPrimaryProductions().size() == 1);
             this.coreProduction = coreProduction;
             this.productions = productions;
         }
@@ -250,17 +253,8 @@ public class LR0 implements LRParser {
                 Closure other = (Closure) obj;
 
                 return other.coreProduction.getLeft().equals(this.coreProduction.getLeft())
-                        && other.coreProduction.getRight().get(0).getSymbols().equals(this.coreProduction.getRight().get(0).getSymbols());
-
-            }
-            // 这个分支用于判断Closure是否已经存在
-            else if (obj instanceof Production) {
-
-                Production _P = (Production) obj;
-
-                return _P.getRight().size() == 1
-                        && _P.getLeft().equals(this.coreProduction.getLeft())
-                        && _P.getRight().get(0).getSymbols().equals(this.coreProduction.getRight().get(0).getSymbols());
+                        && other.coreProduction.getPrimaryProductions().get(0).getRight().getSymbols().equals(
+                        this.coreProduction.getPrimaryProductions().get(0).getRight().getSymbols());
 
             }
             return false;

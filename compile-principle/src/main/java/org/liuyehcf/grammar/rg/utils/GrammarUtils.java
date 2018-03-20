@@ -1,9 +1,6 @@
 package org.liuyehcf.grammar.rg.utils;
 
-import org.liuyehcf.grammar.core.definition.Grammar;
-import org.liuyehcf.grammar.core.definition.PrimaryProduction;
-import org.liuyehcf.grammar.core.definition.Production;
-import org.liuyehcf.grammar.core.definition.Symbol;
+import org.liuyehcf.grammar.core.definition.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,13 +13,15 @@ public abstract class GrammarUtils {
         return Grammar.create(
                 Symbol.START,
                 Production.create(
-                        Symbol.START,
-                        createPrimaryProduction(regex)
+                        PrimaryProduction.create(
+                                Symbol.START,
+                                createPrimaryProduction(regex)
+                        )
                 )
         );
     }
 
-    public static PrimaryProduction createPrimaryProduction(Object... objects) {
+    public static SymbolString createPrimaryProduction(Object... objects) {
         List<Symbol> symbols = new ArrayList<>();
         for (Object obj : objects) {
             if (obj instanceof Character) {
@@ -38,7 +37,7 @@ public abstract class GrammarUtils {
                 symbols.add(symbol);
             }
         }
-        return PrimaryProduction.create(
+        return SymbolString.create(
                 symbols
         );
     }
@@ -48,8 +47,8 @@ public abstract class GrammarUtils {
 
         Production _P = grammar.getProductions().get(0);
 
-        assertTrue(_P.getRight().size() == 1);
+        assertTrue(_P.getPrimaryProductions().size() == 1);
 
-        return _P.getRight().get(0).getSymbols();
+        return _P.getPrimaryProductions().get(0).getRight().getSymbols();
     }
 }

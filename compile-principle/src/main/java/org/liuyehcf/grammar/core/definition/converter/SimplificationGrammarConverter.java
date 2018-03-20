@@ -1,9 +1,6 @@
 package org.liuyehcf.grammar.core.definition.converter;
 
-import org.liuyehcf.grammar.core.definition.Grammar;
-import org.liuyehcf.grammar.core.definition.PrimaryProduction;
-import org.liuyehcf.grammar.core.definition.Production;
-import org.liuyehcf.grammar.core.definition.Symbol;
+import org.liuyehcf.grammar.core.definition.*;
 import org.liuyehcf.grammar.rg.utils.SymbolUtils;
 
 import java.util.*;
@@ -16,7 +13,7 @@ import static org.liuyehcf.grammar.utils.AssertUtils.*;
 public class SimplificationGrammarConverter extends AbstractGrammarConverter {
 
     // 从非终结符 -> PrimaryProduction 的映射表
-    private Map<Symbol, PrimaryProduction> primaryProductionMap = new HashMap<>();
+    private Map<Symbol, SymbolString> primaryProductionMap = new HashMap<>();
 
     // 按依赖关系排序的非终结符集合
     private List<Symbol> sortedNonTerminators = new ArrayList<>();
@@ -41,8 +38,10 @@ public class SimplificationGrammarConverter extends AbstractGrammarConverter {
         return Grammar.create(
                 lastNonTerminator,
                 Production.create(
-                        lastNonTerminator,
-                        primaryProductionMap.get(lastNonTerminator)
+                        PrimaryProduction.create(
+                                lastNonTerminator,
+                                primaryProductionMap.get(lastNonTerminator)
+                        )
                 )
         );
     }
@@ -79,8 +78,8 @@ public class SimplificationGrammarConverter extends AbstractGrammarConverter {
         for (Map.Entry<Symbol, Production> entry : productionMap.entrySet()) {
             Symbol toSymbol = entry.getKey();
 
-            for (PrimaryProduction _PP : entry.getValue().getRight()) {
-                for (Symbol fromSymbol : _PP.getSymbols()) {
+            for (PrimaryProduction _PP : entry.getValue().getPrimaryProductions()) {
+                for (Symbol fromSymbol : _PP.getRight().getSymbols()) {
                     if (!fromSymbol.isTerminator()) {
                         edges.get(fromSymbol).add(toSymbol);
 
@@ -127,10 +126,10 @@ public class SimplificationGrammarConverter extends AbstractGrammarConverter {
     private void checkIfFirstProductionContainsNonTerminator() {
         Production _P = productionMap.get(sortedNonTerminators.get(0));
 
-        assertTrue(_P.getRight().size() == 1);
-        PrimaryProduction _PP = _P.getRight().get(0);
+        assertTrue(_P.getPrimaryProductions().size() == 1);
+        PrimaryProduction _PP = _P.getPrimaryProductions().get(0);
 
-        for (Symbol symbol : _PP.getSymbols()) {
+        for (Symbol symbol : _PP.getRight().getSymbols()) {
             // 正则语法第一条产生式不能包含非终结符
             assertTrue(symbol.isTerminator());
         }
@@ -145,10 +144,10 @@ public class SimplificationGrammarConverter extends AbstractGrammarConverter {
             List<Symbol> modifiedSymbols = new ArrayList<>();
 
             Production _P = productionMap.get(nonTerminator);
-            assertTrue(_P.getRight().size() == 1);
-            PrimaryProduction _PP = _P.getRight().get(0);
+            assertTrue(_P.getPrimaryProductions().size() == 1);
+            PrimaryProduction _PP = _P.getPrimaryProductions().get(0);
 
-            for (Symbol symbol : _PP.getSymbols()) {
+            for (Symbol symbol : _PP.getRight().getSymbols()) {
                 if (!symbol.isTerminator()) {
                     modifiedSymbols.add(SymbolUtils._leftSmallParenthesis);
 
@@ -163,7 +162,7 @@ public class SimplificationGrammarConverter extends AbstractGrammarConverter {
                 }
             }
 
-            primaryProductionMap.put(nonTerminator, PrimaryProduction.create(modifiedSymbols));
+            primaryProductionMap.put(nonTerminator, SymbolString.create(modifiedSymbols));
         }
     }
 }

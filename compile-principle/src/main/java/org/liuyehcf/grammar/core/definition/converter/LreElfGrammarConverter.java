@@ -1,9 +1,6 @@
 package org.liuyehcf.grammar.core.definition.converter;
 
-import org.liuyehcf.grammar.core.definition.Grammar;
-import org.liuyehcf.grammar.core.definition.PrimaryProduction;
-import org.liuyehcf.grammar.core.definition.Production;
-import org.liuyehcf.grammar.core.definition.Symbol;
+import org.liuyehcf.grammar.core.definition.*;
 import org.liuyehcf.grammar.utils.ListUtils;
 
 import java.util.*;
@@ -94,8 +91,8 @@ public class LreElfGrammarConverter extends AbstractGrammarConverter {
         for (Map.Entry<Symbol, Production> entry : productionMap.entrySet()) {
             Symbol toSymbol = entry.getKey();
 
-            for (PrimaryProduction _PP : entry.getValue().getRight()) {
-                List<Symbol> symbols = _PP.getSymbols();
+            for (PrimaryProduction _PP : entry.getValue().getPrimaryProductions()) {
+                List<Symbol> symbols = _PP.getRight().getSymbols();
 
                 assertFalse(symbols.isEmpty());
 
@@ -144,7 +141,7 @@ public class LreElfGrammarConverter extends AbstractGrammarConverter {
     }
 
     /**
-     * 将已消除直接/间接左递归的非终结符_AJ的产生式，代入左部为非终结符_AI的产生式中
+     * 将已消除直接/间接左递归的非终结符_B的产生式，代入左部为非终结符_A的产生式中
      * A → Bα
      *
      * @param _A 被替换的非终结符
@@ -161,8 +158,8 @@ public class LreElfGrammarConverter extends AbstractGrammarConverter {
         List<PrimaryProduction> _PPAsModified = new ArrayList<>();
 
         // 遍历产生式I的每一个子产生式
-        for (PrimaryProduction _PPA : _PA.getRight()) {
-            List<Symbol> symbolsOfPPA = _PPA.getSymbols();
+        for (PrimaryProduction _PPA : _PA.getPrimaryProductions()) {
+            List<Symbol> symbolsOfPPA = _PPA.getRight().getSymbols();
 
             assertFalse(symbolsOfPPA.isEmpty());
 
@@ -171,13 +168,16 @@ public class LreElfGrammarConverter extends AbstractGrammarConverter {
                 isSubstituted = true;
 
                 // 遍历终结符J的每个子产生式
-                for (PrimaryProduction _PPB : _PB.getRight()) {
+                for (PrimaryProduction _PPB : _PB.getPrimaryProductions()) {
 
                     _PPAsModified.add(
                             PrimaryProduction.create(
-                                    ListUtils.of(
-                                            _PPB.getSymbols(),
-                                            ListUtils.subListExceptFirstElement(symbolsOfPPA)
+                                    _A,
+                                    SymbolString.create(
+                                            ListUtils.of(
+                                                    _PPB.getRight().getSymbols(),
+                                                    ListUtils.subListExceptFirstElement(symbolsOfPPA)
+                                            )
                                     )
                             )
                     );
@@ -191,8 +191,8 @@ public class LreElfGrammarConverter extends AbstractGrammarConverter {
         if (isSubstituted) {
             productionMap.put(_A,
                     Production.create(
-                            _A,
-                            _PPAsModified));
+                            _PPAsModified)
+            );
         }
     }
 
@@ -213,8 +213,8 @@ public class LreElfGrammarConverter extends AbstractGrammarConverter {
         // Aα1|Aα2|...|Aαn
         List<PrimaryProduction> _Alphas = new ArrayList<>();
 
-        for (PrimaryProduction _PP1 : _P1.getRight()) {
-            List<Symbol> symbols = _PP1.getSymbols();
+        for (PrimaryProduction _PP1 : _P1.getPrimaryProductions()) {
+            List<Symbol> symbols = _PP1.getRight().getSymbols();
 
             assertFalse(symbols.isEmpty());
 
@@ -238,11 +238,14 @@ public class LreElfGrammarConverter extends AbstractGrammarConverter {
             pp3.add(
                     // αiA′
                     PrimaryProduction.create(
-                            ListUtils.of(
-                                    // αi
-                                    ListUtils.subListExceptFirstElement(_PPAlpha.getSymbols()),
-                                    // A′
-                                    _APrimed
+                            _APrimed,
+                            SymbolString.create(
+                                    ListUtils.of(
+                                            // αi
+                                            ListUtils.subListExceptFirstElement(_PPAlpha.getRight().getSymbols()),
+                                            // A′
+                                            _APrimed
+                                    )
                             )
                     )
             );
@@ -250,11 +253,13 @@ public class LreElfGrammarConverter extends AbstractGrammarConverter {
 
         // ε
         pp3.add(
-                PrimaryProduction.create(Symbol.EPSILON)
+                PrimaryProduction.create(
+                        _APrimed,
+                        SymbolString.create(Symbol.EPSILON)
+                )
         );
 
         Production _P3 = Production.create(
-                _APrimed,
                 pp3
         );
 
@@ -265,20 +270,23 @@ public class LreElfGrammarConverter extends AbstractGrammarConverter {
             // 构造βmA′
             pp2.add(
                     PrimaryProduction.create(
-                            ListUtils.of(
-                                    // βm
-                                    _PPBeta.getSymbols(),
-                                    // A′
-                                    _APrimed
+                            _A,
+                            SymbolString.create(
+                                    ListUtils.of(
+                                            // βm
+                                            _PPBeta.getRight().getSymbols(),
+                                            // A′
+                                            _APrimed
+                                    )
                             )
                     )
+
             );
         }
 
         productionMap.put(_APrimed, _P3);
 
         Production _P2 = Production.create(
-                _A,
                 pp2
         );
 
@@ -301,8 +309,8 @@ public class LreElfGrammarConverter extends AbstractGrammarConverter {
         Map<Symbol, Integer> commonPrefixes = new HashMap<>();
 
         // 初始化commonPrefixes
-        for (PrimaryProduction _PP1 : _P1.getRight()) {
-            List<Symbol> symbols = _PP1.getSymbols();
+        for (PrimaryProduction _PP1 : _P1.getPrimaryProductions()) {
+            List<Symbol> symbols = _PP1.getRight().getSymbols();
 
             assertTrue(!symbols.isEmpty() && symbols.get(0).isTerminator());
 
@@ -333,18 +341,24 @@ public class LreElfGrammarConverter extends AbstractGrammarConverter {
             List<PrimaryProduction> _Betas = new ArrayList<>();
             List<PrimaryProduction> _Gammas = new ArrayList<>();
 
-            for (PrimaryProduction _PP1 : _P1.getRight()) {
-                if (_PP1.getSymbols().get(0).equals(prefixSymbol)) {
-                    if (_PP1.getSymbols().size() > 1) {
+            for (PrimaryProduction _PP1 : _P1.getPrimaryProductions()) {
+                if (_PP1.getRight().getSymbols().get(0).equals(prefixSymbol)) {
+                    if (_PP1.getRight().getSymbols().size() > 1) {
                         _Betas.add(
                                 PrimaryProduction.create(
-                                        ListUtils.subListExceptFirstElement(_PP1.getSymbols())
+                                        _APrimed, // A′
+                                        SymbolString.create(
+                                                ListUtils.subListExceptFirstElement(_PP1.getRight().getSymbols())
+                                )
                                 )
                         );
                     } else {
                         _Betas.add(
                                 PrimaryProduction.create(
-                                        Symbol.EPSILON
+                                        _APrimed, // A′
+                                        SymbolString.create(
+                                                Symbol.EPSILON
+                                        )
                                 )
                         );
                     }
@@ -354,7 +368,6 @@ public class LreElfGrammarConverter extends AbstractGrammarConverter {
             }
 
             Production _P3 = Production.create(
-                    _APrimed, // A′
                     _Betas // β1|β2|...|βn
             );
 
@@ -362,12 +375,14 @@ public class LreElfGrammarConverter extends AbstractGrammarConverter {
             productionMap.put(_APrimed, _P3);
 
             Production _P2 = Production.create(
-                    _A, // A
                     ListUtils.of(
-                            // aA′
                             PrimaryProduction.create(
-                                    prefixSymbol,
-                                    _APrimed
+                                    _A, // A
+                                    // aA′
+                                    SymbolString.create(
+                                            prefixSymbol,
+                                            _APrimed
+                                    )
                             ),
                             // γ1|γ2|...|γm
                             _Gammas

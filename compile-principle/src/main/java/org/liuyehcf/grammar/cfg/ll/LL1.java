@@ -108,8 +108,8 @@ public class LL1 implements LLParser {
         for (Production _P : grammar.getProductions()) {
             nonTerminatorSymbols.add(_P.getLeft());
 
-            for (PrimaryProduction _PP : _P.getRight()) {
-                for (Symbol symbol : _PP.getSymbols()) {
+            for (PrimaryProduction _PP : _P.getPrimaryProductions()) {
+                for (Symbol symbol : _PP.getRight().getSymbols()) {
                     if (symbol.isTerminator()) {
                         terminatorSymbols.add(symbol);
                     } else {
@@ -147,11 +147,11 @@ public class LL1 implements LLParser {
                 // 如果对于所有的j=1,2,...,k，ε在FIRST(Yj)中，那么将ε加入到FIRST(X)
 
                 // 这里需要遍历每个子产生式
-                for (PrimaryProduction _PPX : _PX.getRight()) {
+                for (PrimaryProduction _PPX : _PX.getPrimaryProductions()) {
                     boolean canReachEpsilon = true;
 
-                    for (int i = 0; i < _PPX.getSymbols().size(); i++) {
-                        Symbol _YI = _PPX.getSymbols().get(i);
+                    for (int i = 0; i < _PPX.getRight().getSymbols().size(); i++) {
+                        Symbol _YI = _PPX.getRight().getSymbols().get(i);
                         if (!newFirsts.containsKey(_YI)) {
                             // 说明该符号的first集尚未计算，因此跳过当前子表达式
                             canReachEpsilon = false;
@@ -204,17 +204,17 @@ public class LL1 implements LLParser {
 
                 assertNotNull(_PA);
 
-                for (PrimaryProduction _PPA : _PA.getRight()) {
-                    for (int i = 0; i < _PPA.getSymbols().size(); i++) {
-                        Symbol _B = _PPA.getSymbols().get(i);
+                for (PrimaryProduction _PPA : _PA.getPrimaryProductions()) {
+                    for (int i = 0; i < _PPA.getRight().getSymbols().size(); i++) {
+                        Symbol _B = _PPA.getRight().getSymbols().get(i);
                         Symbol _BetaFirst = null;
 
                         if (_B.isTerminator()) {
                             continue;
                         }
 
-                        if (i < _PPA.getSymbols().size() - 1) {
-                            _BetaFirst = _PPA.getSymbols().get(i + 1);
+                        if (i < _PPA.getRight().getSymbols().size() - 1) {
+                            _BetaFirst = _PPA.getRight().getSymbols().get(i + 1);
                         }
 
                         // 如果存在一个产生式A→αBβ，那么FIRST(β)中除ε之外的所有符号都在FOLLOW(B)中
@@ -271,8 +271,8 @@ public class LL1 implements LLParser {
         for (Symbol _A : nonTerminatorSymbols) {
             Production _PA = productionMap.get(_A);
 
-            for (PrimaryProduction _PPA : _PA.getRight()) {
-                Symbol firstAlpha = _PPA.getSymbols().get(0);
+            for (PrimaryProduction _PPA : _PA.getPrimaryProductions()) {
+                Symbol firstAlpha = _PPA.getRight().getSymbols().get(0);
 
                 if (!selects.containsKey(_A)) {
                     selects.put(_A, new HashMap<>());
@@ -373,7 +373,7 @@ public class LL1 implements LLParser {
 
                     // System.out.println(symbol.getStatus() + " → " + _PP.getStatus());
 
-                    List<Symbol> reversedSymbols = new ArrayList<>(_PP.getSymbols());
+                    List<Symbol> reversedSymbols = new ArrayList<>(_PP.getRight().getSymbols());
 
                     Collections.reverse(reversedSymbols);
 
@@ -472,7 +472,7 @@ public class LL1 implements LLParser {
                 sb.append('\"');
                 sb.append(outerEntry.getKey().toReadableJSONString())
                         .append(" → ")
-                        .append(innerEntry.getKey().toReadableJSONString());
+                        .append(innerEntry.getKey().getRight().toReadableJSONString());
                 sb.append('\"');
                 sb.append(':');
 
@@ -629,7 +629,7 @@ public class LL1 implements LLParser {
                             .append(' ')
                             .append(_A.toReadableJSONString())
                             .append(" → ")
-                            .append(_PPA.toReadableJSONString())
+                            .append(_PPA.getRight().toReadableJSONString())
                             .append(' ');
                 } else {
                     sb.append(separator)

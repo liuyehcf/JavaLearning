@@ -1,10 +1,7 @@
 package org.liuyehcf.grammar.core.definition.converter;
 
 import org.junit.Test;
-import org.liuyehcf.grammar.core.definition.Grammar;
-import org.liuyehcf.grammar.core.definition.PrimaryProduction;
-import org.liuyehcf.grammar.core.definition.Production;
-import org.liuyehcf.grammar.core.definition.Symbol;
+import org.liuyehcf.grammar.core.definition.*;
 import org.liuyehcf.grammar.rg.RGBuilder;
 import org.liuyehcf.grammar.rg.utils.GrammarUtils;
 
@@ -22,23 +19,29 @@ public class TestSimplificationGrammarConverter {
         Grammar grammar = Grammar.create(
                 id,
                 Production.create(
-                        digit,
-                        GrammarUtils.createPrimaryProduction("[0123456789]")
+                        PrimaryProduction.create(
+                                digit,
+                                GrammarUtils.createPrimaryProduction("[0123456789]")
+                        )
                 ),
                 Production.create(
-                        letter_,
-                        GrammarUtils.createPrimaryProduction("[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_]")
-                ),
-                Production.create(
-                        id,
                         PrimaryProduction.create(
                                 letter_,
-                                createTerminator("("),
-                                letter_,
-                                createTerminator("|"),
-                                digit,
-                                createTerminator(")"),
-                                createTerminator("*")
+                                GrammarUtils.createPrimaryProduction("[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_]")
+                        )
+                ),
+                Production.create(
+                        PrimaryProduction.create(
+                                id,
+                                SymbolString.create(
+                                        letter_,
+                                        createTerminator("("),
+                                        letter_,
+                                        createTerminator("|"),
+                                        digit,
+                                        createTerminator(")"),
+                                        createTerminator("*")
+                                )
                         )
                 )
         );
@@ -60,24 +63,30 @@ public class TestSimplificationGrammarConverter {
         Grammar grammar = Grammar.create(
                 id,
                 Production.create(
-                        id,
                         PrimaryProduction.create(
-                                letter_,
-                                createTerminator("("),
-                                letter_,
-                                createTerminator("|"),
-                                digit,
-                                createTerminator(")"),
-                                createTerminator("*")
+                                id,
+                                SymbolString.create(
+                                        letter_,
+                                        createTerminator("("),
+                                        letter_,
+                                        createTerminator("|"),
+                                        digit,
+                                        createTerminator(")"),
+                                        createTerminator("*")
+                                )
                         )
                 ),
                 Production.create(
-                        letter_,
-                        GrammarUtils.createPrimaryProduction("[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_]")
+                        PrimaryProduction.create(
+                                letter_,
+                                GrammarUtils.createPrimaryProduction("[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_]")
+                        )
                 ),
                 Production.create(
-                        digit,
-                        GrammarUtils.createPrimaryProduction("[0123456789]")
+                        PrimaryProduction.create(
+                                digit,
+                                GrammarUtils.createPrimaryProduction("[0123456789]")
+                        )
                 )
         );
 
@@ -98,24 +107,30 @@ public class TestSimplificationGrammarConverter {
         Grammar grammar = Grammar.create(
                 id,
                 Production.create(
-                        id,
                         PrimaryProduction.create(
-                                letter_,
-                                createTerminator("("),
-                                letter_,
-                                createTerminator("|"),
-                                digit,
-                                createTerminator(")"),
-                                createTerminator("*")
+                                id,
+                                SymbolString.create(
+                                        letter_,
+                                        createTerminator("("),
+                                        letter_,
+                                        createTerminator("|"),
+                                        digit,
+                                        createTerminator(")"),
+                                        createTerminator("*")
+                                )
                         )
                 ),
                 Production.create(
-                        digit,
-                        GrammarUtils.createPrimaryProduction("[0123456789]")
+                        PrimaryProduction.create(
+                                digit,
+                                GrammarUtils.createPrimaryProduction("[0123456789]")
+                        )
                 ),
                 Production.create(
-                        letter_,
-                        GrammarUtils.createPrimaryProduction("[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_]")
+                        PrimaryProduction.create(
+                                letter_,
+                                GrammarUtils.createPrimaryProduction("[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_]")
+                        )
                 )
         );
 

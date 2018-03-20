@@ -5,6 +5,7 @@ import org.liuyehcf.grammar.GrammarCase;
 import org.liuyehcf.grammar.core.definition.Grammar;
 import org.liuyehcf.grammar.core.definition.PrimaryProduction;
 import org.liuyehcf.grammar.core.definition.Production;
+import org.liuyehcf.grammar.core.definition.SymbolString;
 
 import static org.junit.Assert.assertEquals;
 import static org.liuyehcf.grammar.core.definition.Symbol.createNonTerminator;
@@ -16,11 +17,13 @@ public class TestAugmentedGrammarConverter {
         Grammar grammar = Grammar.create(
                 createNonTerminator("S"),
                 Production.create(
-                        createNonTerminator("S"),
                         PrimaryProduction.create(
-                                createTerminator("b"),
-                                createNonTerminator("B"),
-                                createNonTerminator("B")
+                                createNonTerminator("S"),
+                                SymbolString.create(
+                                        createTerminator("b"),
+                                        createNonTerminator("B"),
+                                        createNonTerminator("B")
+                                )
                         )
                 )
         );

@@ -5,6 +5,7 @@ import org.liuyehcf.grammar.GrammarCase;
 import org.liuyehcf.grammar.core.definition.Grammar;
 import org.liuyehcf.grammar.core.definition.PrimaryProduction;
 import org.liuyehcf.grammar.core.definition.Production;
+import org.liuyehcf.grammar.core.definition.SymbolString;
 
 import static org.junit.Assert.assertEquals;
 import static org.liuyehcf.grammar.core.definition.Symbol.createNonTerminator;
@@ -27,39 +28,49 @@ public class TestLreElfGrammarConverter {
         Grammar grammar = Grammar.create(
                 createNonTerminator("D"),
                 Production.create(
-                        createNonTerminator("D"),
                         PrimaryProduction.create(
-                                createNonTerminator("E")
+                                createNonTerminator("D"),
+                                SymbolString.create(
+                                        createNonTerminator("E")
+                                )
                         )
                 ),
                 Production.create(
-                        createNonTerminator("E"),
                         PrimaryProduction.create(
                                 createNonTerminator("E"),
-                                createTerminator("+"),
-                                createNonTerminator("E")
+                                SymbolString.create(
+                                        createNonTerminator("E"),
+                                        createTerminator("+"),
+                                        createNonTerminator("E")
+                                )
                         )
                 ),
                 Production.create(
-                        createNonTerminator("E"),
                         PrimaryProduction.create(
                                 createNonTerminator("E"),
-                                createTerminator("*"),
-                                createNonTerminator("E")
+                                SymbolString.create(
+                                        createNonTerminator("E"),
+                                        createTerminator("*"),
+                                        createNonTerminator("E")
+                                )
                         )
                 ),
                 Production.create(
-                        createNonTerminator("E"),
                         PrimaryProduction.create(
-                                createTerminator("("),
                                 createNonTerminator("E"),
-                                createTerminator(")")
+                                SymbolString.create(
+                                        createTerminator("("),
+                                        createNonTerminator("E"),
+                                        createTerminator(")")
+                                )
                         )
                 ),
                 Production.create(
-                        createNonTerminator("E"),
                         PrimaryProduction.create(
-                                createTerminator("id")
+                                createNonTerminator("E"),
+                                SymbolString.create(
+                                        createTerminator("id")
+                                )
                         )
                 )
         );
@@ -77,47 +88,59 @@ public class TestLreElfGrammarConverter {
         Grammar grammar = Grammar.create(
                 createNonTerminator("D"),
                 Production.create(
-                        createNonTerminator("D"),
+                        PrimaryProduction.create(
+                                createNonTerminator("D"),
+                                SymbolString.create(
+                                        createNonTerminator("E"),
+                                        createTerminator("e")
+                                )
+                        )
+                ),
+                Production.create(
+                        PrimaryProduction.create(
+                                createNonTerminator("D"),
+                                SymbolString.create(
+                                        createTerminator("e"),
+                                        createNonTerminator("E")
+                                )
+                        )
+                ),
+                Production.create(
                         PrimaryProduction.create(
                                 createNonTerminator("E"),
-                                createTerminator("e")
+                                SymbolString.create(
+                                        createNonTerminator("E"),
+                                        createTerminator("+"),
+                                        createNonTerminator("E")
+                                )
                         )
                 ),
                 Production.create(
-                        createNonTerminator("D"),
-                        PrimaryProduction.create(
-                                createTerminator("e"),
-                                createNonTerminator("E")
-                        )
-                ),
-                Production.create(
-                        createNonTerminator("E"),
                         PrimaryProduction.create(
                                 createNonTerminator("E"),
-                                createTerminator("+"),
-                                createNonTerminator("E")
+                                SymbolString.create(
+                                        createNonTerminator("E"),
+                                        createTerminator("*"),
+                                        createNonTerminator("E")
+                                )
                         )
                 ),
                 Production.create(
-                        createNonTerminator("E"),
                         PrimaryProduction.create(
                                 createNonTerminator("E"),
-                                createTerminator("*"),
-                                createNonTerminator("E")
+                                SymbolString.create(
+                                        createTerminator("("),
+                                        createNonTerminator("E"),
+                                        createTerminator(")")
+                                )
                         )
                 ),
                 Production.create(
-                        createNonTerminator("E"),
                         PrimaryProduction.create(
-                                createTerminator("("),
                                 createNonTerminator("E"),
-                                createTerminator(")")
-                        )
-                ),
-                Production.create(
-                        createNonTerminator("E"),
-                        PrimaryProduction.create(
-                                createTerminator("id")
+                                SymbolString.create(
+                                        createTerminator("id")
+                                )
                         )
                 )
         );
@@ -135,32 +158,40 @@ public class TestLreElfGrammarConverter {
         Grammar grammar = Grammar.create(
                 createNonTerminator("A"),
                 Production.create(
-                        createNonTerminator("A"),
                         PrimaryProduction.create(
-                                createTerminator("a"),
-                                createTerminator("b")
+                                createNonTerminator("A"),
+                                SymbolString.create(
+                                        createTerminator("a"),
+                                        createTerminator("b")
+                                )
                         )
                 ),
                 Production.create(
-                        createNonTerminator("A"),
                         PrimaryProduction.create(
-                                createTerminator("a"),
-                                createTerminator("b"),
-                                createTerminator("c")
+                                createNonTerminator("A"),
+                                SymbolString.create(
+                                        createTerminator("a"),
+                                        createTerminator("b"),
+                                        createTerminator("c")
+                                )
                         )
                 ),
                 Production.create(
-                        createNonTerminator("A"),
                         PrimaryProduction.create(
-                                createTerminator("b"),
-                                createTerminator("d")
+                                createNonTerminator("A"),
+                                SymbolString.create(
+                                        createTerminator("b"),
+                                        createTerminator("d")
+                                )
                         )
                 ),
                 Production.create(
-                        createNonTerminator("A"),
                         PrimaryProduction.create(
-                                createTerminator("b"),
-                                createTerminator("c")
+                                createNonTerminator("A"),
+                                SymbolString.create(
+                                        createTerminator("b"),
+                                        createTerminator("c")
+                                )
                         )
                 )
         );
@@ -178,42 +209,54 @@ public class TestLreElfGrammarConverter {
         Grammar grammar = Grammar.create(
                 createNonTerminator("A"),
                 Production.create(
-                        createNonTerminator("A"),
                         PrimaryProduction.create(
-                                createTerminator("a"),
-                                createTerminator("β1")
+                                createNonTerminator("A"),
+                                SymbolString.create(
+                                        createTerminator("a"),
+                                        createTerminator("β1")
+                                )
                         )
                 ),
                 Production.create(
-                        createNonTerminator("A"),
                         PrimaryProduction.create(
-                                createTerminator("a"),
-                                createTerminator("β2")
+                                createNonTerminator("A"),
+                                SymbolString.create(
+                                        createTerminator("a"),
+                                        createTerminator("β2")
+                                )
                         )
                 ),
                 Production.create(
-                        createNonTerminator("A"),
                         PrimaryProduction.create(
-                                createTerminator("a"),
-                                createTerminator("βn")
+                                createNonTerminator("A"),
+                                SymbolString.create(
+                                        createTerminator("a"),
+                                        createTerminator("βn")
+                                )
                         )
                 ),
                 Production.create(
-                        createNonTerminator("A"),
                         PrimaryProduction.create(
-                                createTerminator("γ1")
+                                createNonTerminator("A"),
+                                SymbolString.create(
+                                        createTerminator("γ1")
+                                )
                         )
                 ),
                 Production.create(
-                        createNonTerminator("A"),
                         PrimaryProduction.create(
-                                createTerminator("γ2")
+                                createNonTerminator("A"),
+                                SymbolString.create(
+                                        createTerminator("γ2")
+                                )
                         )
                 ),
                 Production.create(
-                        createNonTerminator("A"),
                         PrimaryProduction.create(
-                                createTerminator("γm")
+                                createNonTerminator("A"),
+                                SymbolString.create(
+                                        createTerminator("γm")
+                                )
                         )
                 )
         );
@@ -231,73 +274,93 @@ public class TestLreElfGrammarConverter {
         Grammar grammar = Grammar.create(
                 createNonTerminator("A"),
                 Production.create(
-                        createNonTerminator("A"),
                         PrimaryProduction.create(
-                                createTerminator("a")
+                                createNonTerminator("A"),
+                                SymbolString.create(
+                                        createTerminator("a")
+                                )
                         )
                 ),
                 Production.create(
-                        createNonTerminator("A"),
                         PrimaryProduction.create(
-                                createTerminator("a"),
-                                createTerminator("b")
+                                createNonTerminator("A"),
+                                SymbolString.create(
+                                        createTerminator("a"),
+                                        createTerminator("b")
+                                )
                         )
                 ),
                 Production.create(
-                        createNonTerminator("A"),
                         PrimaryProduction.create(
-                                createTerminator("a"),
-                                createTerminator("b"),
-                                createTerminator("c")
+                                createNonTerminator("A"),
+                                SymbolString.create(
+                                        createTerminator("a"),
+                                        createTerminator("b"),
+                                        createTerminator("c")
+                                )
                         )
                 ),
                 Production.create(
-                        createNonTerminator("A"),
                         PrimaryProduction.create(
-                                createTerminator("a"),
-                                createTerminator("b"),
-                                createTerminator("c"),
-                                createTerminator("d")
+                                createNonTerminator("A"),
+                                SymbolString.create(
+                                        createTerminator("a"),
+                                        createTerminator("b"),
+                                        createTerminator("c"),
+                                        createTerminator("d")
+                                )
                         )
                 ),
                 Production.create(
-                        createNonTerminator("A"),
                         PrimaryProduction.create(
-                                createTerminator("b")
+                                createNonTerminator("A"),
+                                SymbolString.create(
+                                        createTerminator("b")
+                                )
                         )
                 ),
                 Production.create(
-                        createNonTerminator("A"),
                         PrimaryProduction.create(
-                                createTerminator("b"),
-                                createTerminator("c")
+                                createNonTerminator("A"),
+                                SymbolString.create(
+                                        createTerminator("b"),
+                                        createTerminator("c")
+                                )
                         )
                 ),
                 Production.create(
-                        createNonTerminator("A"),
                         PrimaryProduction.create(
-                                createTerminator("b"),
-                                createTerminator("c"),
-                                createTerminator("d")
+                                createNonTerminator("A"),
+                                SymbolString.create(
+                                        createTerminator("b"),
+                                        createTerminator("c"),
+                                        createTerminator("d")
+                                )
                         )
                 ),
                 Production.create(
-                        createNonTerminator("A"),
                         PrimaryProduction.create(
-                                createTerminator("c")
+                                createNonTerminator("A"),
+                                SymbolString.create(
+                                        createTerminator("c")
+                                )
                         )
                 ),
                 Production.create(
-                        createNonTerminator("A"),
                         PrimaryProduction.create(
-                                createTerminator("c"),
-                                createTerminator("d")
+                                createNonTerminator("A"),
+                                SymbolString.create(
+                                        createTerminator("c"),
+                                        createTerminator("d")
+                                )
                         )
                 ),
                 Production.create(
-                        createNonTerminator("A"),
                         PrimaryProduction.create(
-                                createTerminator("d")
+                                createNonTerminator("A"),
+                                SymbolString.create(
+                                        createTerminator("d")
+                                )
                         )
                 )
         );

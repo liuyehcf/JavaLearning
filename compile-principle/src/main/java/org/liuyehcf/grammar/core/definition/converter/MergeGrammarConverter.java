@@ -23,12 +23,12 @@ public class MergeGrammarConverter extends AbstractGrammarConverter {
     private static Production parallelProduction(Production _P1, Production _P2) {
         AssertUtils.assertTrue(_P1.getLeft().equals(_P2.getLeft()));
 
-        List<PrimaryProduction> right = new ArrayList<>(_P1.getRight());
-        right.addAll(_P2.getRight());
+        List<PrimaryProduction> primaryProductions = new ArrayList<>(_P1.getPrimaryProductions());
+        primaryProductions.addAll(_P2.getPrimaryProductions());
 
         return Production.create(
-                _P1.getLeft(),
-                right);
+                primaryProductions
+        );
     }
 
     @Override

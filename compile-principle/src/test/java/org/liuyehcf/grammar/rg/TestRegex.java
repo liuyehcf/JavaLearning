@@ -2,6 +2,7 @@ package org.liuyehcf.grammar.rg;
 
 
 import org.liuyehcf.grammar.core.definition.Grammar;
+import org.liuyehcf.grammar.core.definition.PrimaryProduction;
 import org.liuyehcf.grammar.core.definition.Production;
 import org.liuyehcf.grammar.core.definition.Symbol;
 import org.liuyehcf.grammar.core.definition.converter.SimplificationGrammarConverter;
@@ -89,15 +90,22 @@ public class TestRegex {
                 Grammar.create(
                         id,
                         Production.create(
-                                digit,
-                                GrammarUtils.createPrimaryProduction("[0-9]")
+                                PrimaryProduction.create(
+                                        digit,
+                                        GrammarUtils.createPrimaryProduction("[0-9]")
+                                )
                         ),
                         Production.create(
-                                letter_,
-                                GrammarUtils.createPrimaryProduction("[a-zA-Z_]")),
+                                PrimaryProduction.create(
+                                        letter_,
+                                        GrammarUtils.createPrimaryProduction("[a-zA-Z_]")
+                                )
+                        ),
                         Production.create(
-                                id,
-                                GrammarUtils.createPrimaryProduction(letter_, '(', letter_, '|', digit, ')', '*')
+                                PrimaryProduction.create(
+                                        id,
+                                        GrammarUtils.createPrimaryProduction(letter_, '(', letter_, '|', digit, ')', '*')
+                                )
                         )
                 )
         ).getConvertedGrammar();

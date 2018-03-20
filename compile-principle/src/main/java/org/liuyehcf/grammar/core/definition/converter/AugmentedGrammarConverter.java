@@ -1,9 +1,6 @@
 package org.liuyehcf.grammar.core.definition.converter;
 
-import org.liuyehcf.grammar.core.definition.Grammar;
-import org.liuyehcf.grammar.core.definition.PrimaryProduction;
-import org.liuyehcf.grammar.core.definition.Production;
-import org.liuyehcf.grammar.core.definition.Symbol;
+import org.liuyehcf.grammar.core.definition.*;
 import org.liuyehcf.grammar.utils.ListUtils;
 
 import java.util.ArrayList;
@@ -26,9 +23,11 @@ public class AugmentedGrammarConverter extends AbstractGrammarConverter {
 
         newProductions.add(
                 Production.create(
-                        Symbol.START,
                         PrimaryProduction.create(
-                                ListUtils.of(originStartSymbol)
+                                Symbol.START,
+                                SymbolString.create(
+                                        ListUtils.of(originStartSymbol)
+                                )
                         )
                 )
         );

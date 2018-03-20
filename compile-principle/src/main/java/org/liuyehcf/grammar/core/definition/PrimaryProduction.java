@@ -1,83 +1,48 @@
 package org.liuyehcf.grammar.core.definition;
 
-import org.liuyehcf.grammar.utils.ListUtils;
-
-import java.util.Collections;
-import java.util.List;
+import java.util.Objects;
 
 /**
- * 文法符号串
+ * 文法产生式
+ * 只研究二型文法（包括三型文法）
+ * 等式左边是非终结符，等式右边是文法符号串
  */
 public class PrimaryProduction {
-    // 文法符号串
-    private final List<Symbol> symbols;
+    // 产生式左侧非终结符
+    private final Symbol left;
 
-    private PrimaryProduction(List<Symbol> symbols) {
-        this.symbols = Collections.unmodifiableList(symbols);
+    // 产生式右部的文法符号串
+    private final SymbolString right;
+
+    private PrimaryProduction(Symbol left, SymbolString right) {
+        this.left = left;
+        this.right = right;
     }
 
-    public static PrimaryProduction create(Symbol... symbols) {
-        return new PrimaryProduction(ListUtils.of(symbols));
+    public static PrimaryProduction create(Symbol left, SymbolString right) {
+        return new PrimaryProduction(left, right);
     }
 
-    public static PrimaryProduction create(List<Symbol> symbols) {
-        return new PrimaryProduction(symbols);
+    public Symbol getLeft() {
+        return left;
     }
 
-    public List<Symbol> getSymbols() {
-        return symbols;
-    }
-
-    public String toJSONString() {
-        return '{' +
-                "\"symbols\":" + symbols +
-                '}';
-    }
-
-    public String toReadableJSONString() {
-        StringBuilder sb = new StringBuilder();
-
-        for (int i = 0; i < symbols.size(); i++) {
-            if (i != 0) {
-                sb.append(' ');
-            }
-            sb.append(symbols.get(i).toReadableJSONString());
-        }
-
-        return sb.toString();
+    public SymbolString getRight() {
+        return right;
     }
 
     @Override
-    public String toString() {
-        return toReadableJSONString();
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PrimaryProduction that = (PrimaryProduction) o;
+        return Objects.equals(left, that.left) &&
+                Objects.equals(right, that.right);
     }
 
     @Override
     public int hashCode() {
-        int hash = 0;
 
-        for (Symbol symbol : symbols) {
-            hash += symbol.hashCode();
-        }
-
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof PrimaryProduction) {
-            PrimaryProduction other = (PrimaryProduction) obj;
-            if (other.symbols.size() == this.symbols.size()) {
-                for (int i = 0; i < this.symbols.size(); i++) {
-                    if (!other.symbols.get(i).equals(this.symbols.get(i))) {
-                        return false;
-                    }
-                }
-                return true;
-            } else {
-                return false;
-            }
-        }
-        return false;
+        return Objects.hash(left, right);
     }
 }

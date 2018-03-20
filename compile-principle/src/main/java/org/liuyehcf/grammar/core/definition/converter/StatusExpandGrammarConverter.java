@@ -1,9 +1,6 @@
 package org.liuyehcf.grammar.core.definition.converter;
 
-import org.liuyehcf.grammar.core.definition.Grammar;
-import org.liuyehcf.grammar.core.definition.PrimaryProduction;
-import org.liuyehcf.grammar.core.definition.Production;
-import org.liuyehcf.grammar.core.definition.Symbol;
+import org.liuyehcf.grammar.core.definition.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,8 +28,8 @@ public class StatusExpandGrammarConverter extends AbstractGrammarConverter {
         for (Production _P : originalGrammar.getProductions()) {
             Symbol _A = _P.getLeft();
 
-            for (PrimaryProduction _PP : _P.getRight()) {
-                List<Symbol> symbols = _PP.getSymbols();
+            for (PrimaryProduction _PP : _P.getPrimaryProductions()) {
+                List<Symbol> symbols = _PP.getRight().getSymbols();
                 int length = symbols.size();
 
                 // 构造新的  length+1个 PrimaryProduction
@@ -41,10 +38,13 @@ public class StatusExpandGrammarConverter extends AbstractGrammarConverter {
                     newSymbols.add(i, Symbol.DOT);
                     newProductions.add(
                             Production.create(
-                                    _A,
                                     PrimaryProduction.create(
-                                            newSymbols
+                                            _A,
+                                            SymbolString.create(
+                                                    newSymbols
+                                            )
                                     )
+
                             )
 
                     );
