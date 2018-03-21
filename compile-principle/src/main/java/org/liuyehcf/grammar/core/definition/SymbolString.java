@@ -9,6 +9,11 @@ import java.util.List;
  * 文法符号串
  */
 public class SymbolString {
+    // 会包含ε的文法符号串
+    public static final SymbolString EPSILON_RAW = create(Symbol.EPSILON);
+
+    public static final SymbolString EPSILON_END = create(ListUtils.of(Symbol.EPSILON), 1);
+
     // 文法符号串
     private final List<Symbol> symbols;
 

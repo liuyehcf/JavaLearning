@@ -378,6 +378,45 @@ public abstract class GrammarCase {
             )
     );
 
+
+    public static Grammar GRAMMAR_CASE_12 = Grammar.create(
+            createNonTerminator("T"),
+            Production.create(
+                    PrimaryProduction.create(
+                            createNonTerminator("T"),
+                            SymbolString.create(
+                                    createTerminator("a"),
+                                    createNonTerminator("B"),
+                                    createTerminator("d")
+                            )
+                    )
+            ), Production.create(
+                    PrimaryProduction.create(
+                            createNonTerminator("T"),
+                            SymbolString.create(
+                                    EPSILON
+                            )
+                    )
+            ),
+            Production.create(
+                    PrimaryProduction.create(
+                            createNonTerminator("B"),
+                            SymbolString.create(
+                                    createNonTerminator("T"),
+                                    createTerminator("b")
+                            )
+                    )
+            ),
+            Production.create(
+                    PrimaryProduction.create(
+                            createNonTerminator("B"),
+                            SymbolString.create(
+                                    EPSILON
+                            )
+                    )
+            )
+    );
+
     private static String PROGRAM = "PROGRAM";
     private static String DECLIST = "DECLIST";
     private static String DECLISTN = "DECLISTN";

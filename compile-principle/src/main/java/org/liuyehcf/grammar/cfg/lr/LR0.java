@@ -15,22 +15,19 @@ import java.util.stream.Collectors;
 import static org.liuyehcf.grammar.utils.AssertUtils.*;
 
 public class LR0 extends AbstractCfgParser implements LRParser {
-    private int closureCnt = 0;
-
     // 项目集闭包
-    private List<Closure> closures = new ArrayList<>();
-
+    protected List<Closure> closures = new ArrayList<>();
     // 状态转移表 [ClosureId, Symbol] -> ClosureId
-    private Map<Integer, Map<Symbol, Integer>> closureTransferTable = new HashMap<>();
-
+    protected Map<Integer, Map<Symbol, Integer>> closureTransferTable = new HashMap<>();
     // 预测分析表正常情况下，表项只有一个，若出现多个，则说明有冲突
     // [ClosureId, Symbol] -> Operation
-    private Map<Integer, Map<Symbol, LinkedHashSet<Operation>>> analysisTable = new HashMap<>();
-
+    protected Map<Integer, Map<Symbol, LinkedHashSet<Operation>>> analysisTable = new HashMap<>();
     // 预测分析表中的所有输入符号，与Grammar中的符号有些不一样
-    private List<Symbol> analysisSymbols = new ArrayList<>();
+    protected List<Symbol> analysisSymbols = new ArrayList<>();
+    protected List<Symbol> analysisTerminators = new ArrayList<>();
+    private int closureCnt = 0;
 
-    private LR0(LexicalAnalyzer lexicalAnalyzer, Grammar originalGrammar) {
+    protected LR0(LexicalAnalyzer lexicalAnalyzer, Grammar originalGrammar) {
         super(lexicalAnalyzer, originalGrammar, GrammarConverterPipelineImpl
                 .builder()
                 .registerGrammarConverter(AugmentedGrammarConverter.class)
@@ -65,7 +62,7 @@ public class LR0 extends AbstractCfgParser implements LRParser {
         );
     }
 
-    private static Symbol nextSymbol(PrimaryProduction _PP) {
+    protected static Symbol nextSymbol(PrimaryProduction _PP) {
 
         assertTrue(_PP.getRight().getIndexOfDot() != -1);
 
@@ -76,7 +73,7 @@ public class LR0 extends AbstractCfgParser implements LRParser {
         return _PP.getRight().getSymbols().get(_PP.getRight().getIndexOfDot());
     }
 
-    private static PrimaryProduction removeDot(PrimaryProduction _PP) {
+    protected static PrimaryProduction removeDot(PrimaryProduction _PP) {
         assertTrue(_PP.getRight().getIndexOfDot() != -1);
 
         return PrimaryProduction.create(
@@ -136,7 +133,6 @@ public class LR0 extends AbstractCfgParser implements LRParser {
 
     @Override
     public String getAnalysisTableMarkdownString() {
-        List<Symbol> symbols = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
 
         String separator = "|";
@@ -148,19 +144,17 @@ public class LR0 extends AbstractCfgParser implements LRParser {
                 .append("状态\\文法符号")
                 .append(' ');
 
-        for (Symbol symbol : this.grammar.getTerminators()) {
+        for (Symbol symbol : analysisTerminators) {
             sb.append(separator)
                     .append(' ')
                     .append(symbol.toJSONString())
                     .append(' ');
-            symbols.add(symbol);
         }
 
         sb.append(separator)
                 .append(' ')
                 .append(Symbol.DOLLAR.toJSONString())
                 .append(' ');
-        symbols.add(Symbol.DOLLAR);
 
 
         for (Symbol symbol : this.grammar.getNonTerminators()) {
@@ -171,7 +165,6 @@ public class LR0 extends AbstractCfgParser implements LRParser {
                     .append(' ')
                     .append(symbol.toJSONString())
                     .append(' ');
-            symbols.add(symbol);
         }
 
         sb.append(separator).append('\n');
@@ -179,7 +172,7 @@ public class LR0 extends AbstractCfgParser implements LRParser {
         // 第二行：对齐格式
         sb.append(separator);
 
-        for (int i = 0; i < symbols.size(); i++) {
+        for (int i = 0; i < analysisSymbols.size(); i++) {
             sb.append(":--")
                     .append(separator);
         }
@@ -197,7 +190,7 @@ public class LR0 extends AbstractCfgParser implements LRParser {
                     .append(i)
                     .append(' ');
 
-            for (Symbol symbol : symbols) {
+            for (Symbol symbol : analysisSymbols) {
                 LinkedHashSet<Operation> operations = analysisTable.get(closureId).get(symbol);
                 if (operations.isEmpty()) {
                     sb.append(separator)
@@ -232,6 +225,48 @@ public class LR0 extends AbstractCfgParser implements LRParser {
             sb.append(separator).append('\n');
         }
 
+
+        return sb.toString();
+    }
+
+    @Override
+    public String getClosureTransferTableJSONString() {
+        StringBuilder sb = new StringBuilder();
+        int cnt = 1;
+
+        sb.append('{');
+
+        for (int i = 0; i < closures.size(); i++) {
+            int closureId = closures.get(i).getId();
+
+            for (Symbol symbol : analysisSymbols) {
+                if (closureTransferTable.get(closureId) != null
+                        && closureTransferTable.get(closureId).get(symbol) != null) {
+                    sb.append('\"')
+                            .append(cnt++)
+                            .append("\"")
+                            .append(":")
+                            .append('\"')
+                            .append('[')
+                            .append(closureId)
+                            .append(", ")
+                            .append(symbol.toJSONString())
+                            .append(']')
+                            .append(" → ")
+                            .append(closureTransferTable.get(closureId).get(symbol))
+                            .append('\"')
+                            .append(',');
+                }
+            }
+
+            sb.setLength(sb.length() - 1);
+
+            sb.append(',');
+        }
+
+        sb.setLength(sb.length() - 1);
+
+        sb.append('}');
 
         return sb.toString();
     }
@@ -377,7 +412,8 @@ public class LR0 extends AbstractCfgParser implements LRParser {
         Production _P = getProductionMap().get(symbol);
 
         for (PrimaryProduction _PP : _P.getPrimaryProductions()) {
-            if (_PP.getRight().getIndexOfDot() == 0) {
+            if (_PP.getRight().getIndexOfDot() == 0
+                    || SymbolString.EPSILON_END.equals(_PP.getRight())) {
                 result.add(new Item(_PP, null));
             }
         }
@@ -385,8 +421,9 @@ public class LR0 extends AbstractCfgParser implements LRParser {
         return result;
     }
 
-    private void initAnalysisTable() {
-        analysisSymbols.addAll(this.grammar.getTerminators());
+    protected void initAnalysisTable() {
+        analysisTerminators.addAll(this.grammar.getTerminators().stream().filter(symbol -> !Symbol.EPSILON.equals(symbol)).collect(Collectors.toList()));
+        analysisSymbols.addAll(analysisTerminators);
         analysisSymbols.add(Symbol.DOLLAR);
         analysisSymbols.addAll(this.grammar.getNonTerminators().stream().filter((symbol -> !Symbol.START.equals(symbol))).collect(Collectors.toList()));
 
@@ -420,7 +457,7 @@ public class LR0 extends AbstractCfgParser implements LRParser {
                                                 Operation.OperationCode.ACCEPT));
                             } else {
 
-                                for (Symbol terminator : this.grammar.getTerminators()) {
+                                for (Symbol terminator : analysisTerminators) {
                                     analysisTable.get(closure.getId())
                                             .get(terminator)
                                             .add(new Operation(
@@ -443,7 +480,6 @@ public class LR0 extends AbstractCfgParser implements LRParser {
                                             null,
                                             Operation.OperationCode.MOVE_IN));
                         } else {
-                            assertTrue(analysisTable.containsKey(closure.getId()));
                             analysisTable.get(closure.getId())
                                     .get(nextSymbol)
                                     .add(new Operation(

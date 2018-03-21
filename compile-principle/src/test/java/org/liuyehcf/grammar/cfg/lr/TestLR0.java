@@ -5,13 +5,12 @@ import org.liuyehcf.grammar.GrammarCase;
 import org.liuyehcf.grammar.JdkLexicalAnalyzer;
 import org.liuyehcf.grammar.LexicalAnalyzer;
 import org.liuyehcf.grammar.core.definition.Grammar;
-import org.liuyehcf.grammar.core.definition.Symbol;
 
 import static org.junit.Assert.*;
 
 public class TestLR0 {
     @Test
-    public void testGrammarConvertCase1() {
+    public void testCase1() {
         LexicalAnalyzer analyzer = JdkLexicalAnalyzer.builder()
                 .addMorpheme("a")
                 .addMorpheme("b")
@@ -54,7 +53,7 @@ public class TestLR0 {
     }
 
     @Test
-    public void testGrammarConvertCase2() {
+    public void testCase2() {
         LexicalAnalyzer analyzer = JdkLexicalAnalyzer.builder()
                 .addMorpheme("(")
                 .addMorpheme(")")
