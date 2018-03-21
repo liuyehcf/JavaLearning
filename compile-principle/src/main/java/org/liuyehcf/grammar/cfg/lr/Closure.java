@@ -12,9 +12,9 @@ public class Closure {
     private final int id = count++;
 
     /**
-     * 核心项目
+     * 核心项目集
      */
-    private final Item coreItem;
+    private final List<Item> coreItems;
 
     /**
      * 包括核心项目在内的所有项目
@@ -22,8 +22,8 @@ public class Closure {
     private final List<Item> items;
 
 
-    Closure(Item coreItem, List<Item> items) {
-        this.coreItem = coreItem;
+    Closure(List<Item> coreItems, List<Item> items) {
+        this.coreItems = coreItems;
         this.items = items;
     }
 
@@ -31,23 +31,27 @@ public class Closure {
         return id;
     }
 
-    public Item getCoreItem() {
-        return coreItem;
-    }
-
     public List<Item> getItems() {
         return items;
     }
 
-    public boolean isCoreItem(Item item) {
-        return coreItem.equals(item);
+    public List<Item> getCoreItems() {
+        return coreItems;
+    }
+
+    /**
+     * 判断两个Closure是否相同，仅需要判断核心项目集合是否完全一致即可
+     */
+    public boolean isSame(List<Item> coreItems) {
+        return this.coreItems.containsAll(coreItems)
+                && coreItems.containsAll(this.coreItems);
     }
 
     @Override
     public String toString() {
         return "Closure{" +
                 "id=" + id +
-                ", coreItem=" + coreItem +
+                ", coreItems=" + coreItems +
                 ", items=" + items +
                 '}';
     }

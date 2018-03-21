@@ -55,7 +55,25 @@ public class TestLR0 {
     @Test
     public void testGrammarConvertCase2() {
 
-        //LRParser parser = new LR0(GrammarCase.GRAMMAR_CASE_11, null);
 
+        LRParser parser = new LR0(GrammarCase.GRAMMAR_CASE_11, null);
+
+        assertEquals(
+                "| 状态\\文法符号 | ( | ) | * | + | id | __DOLLAR__ | T | E | F |\n" +
+                        "|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|\n" +
+                        "| 0 |MOVE_IN \"4\" | \\ | \\ | \\ |MOVE_IN \"5\" | \\ |JUMP \"2\" |JUMP \"1\" |JUMP \"3\" |\n" +
+                        "| 1 | \\ | \\ | \\ |MOVE_IN \"6\" | \\ | ACCEPT \"__START__ → E\" | \\ | \\ | \\ |\n" +
+                        "| 2 | REDUCTION \"E → T\" | REDUCTION \"E → T\" |MOVE_IN \"7\" / REDUCTION \"E → T\" | REDUCTION \"E → T\" | REDUCTION \"E → T\" | REDUCTION \"E → T\" | \\ | \\ | \\ |\n" +
+                        "| 3 | REDUCTION \"T → F\" | REDUCTION \"T → F\" | REDUCTION \"T → F\" | REDUCTION \"T → F\" | REDUCTION \"T → F\" | REDUCTION \"T → F\" | \\ | \\ | \\ |\n" +
+                        "| 4 |MOVE_IN \"4\" | \\ | \\ | \\ |MOVE_IN \"5\" | \\ |JUMP \"2\" |JUMP \"8\" |JUMP \"3\" |\n" +
+                        "| 5 | REDUCTION \"F → id\" | REDUCTION \"F → id\" | REDUCTION \"F → id\" | REDUCTION \"F → id\" | REDUCTION \"F → id\" | REDUCTION \"F → id\" | \\ | \\ | \\ |\n" +
+                        "| 6 |MOVE_IN \"4\" | \\ | \\ | \\ |MOVE_IN \"5\" | \\ |JUMP \"9\" | \\ |JUMP \"3\" |\n" +
+                        "| 7 |MOVE_IN \"4\" | \\ | \\ | \\ |MOVE_IN \"5\" | \\ | \\ | \\ |JUMP \"10\" |\n" +
+                        "| 8 | \\ |MOVE_IN \"11\" | \\ |MOVE_IN \"6\" | \\ | \\ | \\ | \\ | \\ |\n" +
+                        "| 9 | REDUCTION \"E → E + T\" | REDUCTION \"E → E + T\" |MOVE_IN \"7\" / REDUCTION \"E → E + T\" | REDUCTION \"E → E + T\" | REDUCTION \"E → E + T\" | REDUCTION \"E → E + T\" | \\ | \\ | \\ |\n" +
+                        "| 10 | REDUCTION \"T → T * F\" | REDUCTION \"T → T * F\" | REDUCTION \"T → T * F\" | REDUCTION \"T → T * F\" | REDUCTION \"T → T * F\" | REDUCTION \"T → T * F\" | \\ | \\ | \\ |\n" +
+                        "| 11 | REDUCTION \"F → ( E )\" | REDUCTION \"F → ( E )\" | REDUCTION \"F → ( E )\" | REDUCTION \"F → ( E )\" | REDUCTION \"F → ( E )\" | REDUCTION \"F → ( E )\" | \\ | \\ | \\ |\n",
+                parser.getForecastAnalysisTable()
+        );
     }
 }

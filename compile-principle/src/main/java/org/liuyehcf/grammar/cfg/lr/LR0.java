@@ -3,8 +3,10 @@ package org.liuyehcf.grammar.cfg.lr;
 import org.liuyehcf.grammar.LexicalAnalyzer;
 import org.liuyehcf.grammar.core.definition.*;
 import org.liuyehcf.grammar.core.definition.converter.*;
+import org.liuyehcf.grammar.utils.ListUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.liuyehcf.grammar.utils.AssertUtils.*;
 
@@ -30,8 +32,10 @@ public class LR0 implements LRParser {
     // 状态转移表 [ClosureId, Symbol] -> ClosureId
     private Map<Integer, Map<Symbol, Integer>> closureTransferTable = new HashMap<>();
 
-    // 预测分析表
-    private Map<Integer, Map<Symbol, Operation>> analysisTable = new HashMap<>();
+    // 预测分析表正常情况下，表项只有一个，若出现多个，则说明有冲突
+    private Map<Integer, Map<Symbol, LinkedHashSet<Operation>>> analysisTable = new HashMap<>();
+
+    private List<Symbol> analysisSymbols = new ArrayList<>();
 
     public LR0(Grammar grammar, LexicalAnalyzer lexicalAnalyzer) {
         this.originalGrammar = grammar;
@@ -207,26 +211,33 @@ public class LR0 implements LRParser {
                     .append(' ');
 
             for (Symbol symbol : symbols) {
-                Operation operation = analysisTable.get(i).get(symbol);
-                if (operation == null) {
+                LinkedHashSet<Operation> operations = analysisTable.get(i).get(symbol);
+                if (operations.isEmpty()) {
                     sb.append(separator)
                             .append(' ')
                             .append("\\")
                             .append(' ');
                 } else {
-                    if (operation.getOperator() == Operation.OperationCode.ACCEPT
-                            || operation.getOperator() == Operation.OperationCode.REDUCTION) {
-                        sb.append(separator)
-                                .append(' ')
-                                .append(operation.getOperator()).append(" \"").append(operation.getPrimaryProduction()).append('\"')
-                                .append(' ');
-                    } else {
-                        sb.append(separator)
-                                .append(' ')
-                                .append(operation.getOperator()).append(" \"").append(operation.getNextClosureId()).append('\"')
-                                .append(' ');
+                    sb.append(separator);
+                    for (Operation operation : operations) {
+                        if (operation.getOperator() == Operation.OperationCode.ACCEPT
+                                || operation.getOperator() == Operation.OperationCode.REDUCTION) {
+                            sb.append(' ')
+                                    .append(operation.getOperator())
+                                    .append(" \"")
+                                    .append(operation.getPrimaryProduction())
+                                    .append('\"')
+                                    .append(" /");
+                        } else {
+                            sb.append(operation.getOperator())
+                                    .append(" \"")
+                                    .append(operation.getNextClosureId())
+                                    .append('\"')
+                                    .append(" /");
+                        }
                     }
-
+                    assertTrue(sb.charAt(sb.length() - 1) == '/');
+                    sb.setLength(sb.length() - 1);
                 }
             }
 
@@ -243,21 +254,21 @@ public class LR0 implements LRParser {
     }
 
     private void initClosure() {
-        PrimaryProduction _PPOrigin; // origin production
+        PrimaryProduction _PPStart; // origin production
 
         assertTrue(symbolProductionMap.get(Symbol.START).getPrimaryProductions().size() == 2);
 
         if (symbolProductionMap.get(Symbol.START).getPrimaryProductions().get(0) // 第一个子产生式
                 .getRight().getIndexOfDot() == 0) {
-            _PPOrigin = symbolProductionMap.get(Symbol.START).getPrimaryProductions().get(0);
+            _PPStart = symbolProductionMap.get(Symbol.START).getPrimaryProductions().get(0);
         } else {
-            _PPOrigin = symbolProductionMap.get(Symbol.START).getPrimaryProductions().get(1);
+            _PPStart = symbolProductionMap.get(Symbol.START).getPrimaryProductions().get(1);
         }
 
         boolean canBreak = false;
 
         // 初始化，添加闭包0
-        closures.add(closure(_PPOrigin));
+        closures.add(closure(ListUtils.of(_PPStart)));
 
         while (!canBreak) {
             canBreak = true;
@@ -267,50 +278,73 @@ public class LR0 implements LRParser {
             for (int i = 0; i < preSize; i++) {
                 Closure preClosure = closures.get(i);
 
-                // 遍历闭包中的产生式
+                // 同一个闭包下的不同项目，如果下一个符号相同，那么这些项目的后继项目作为下一个闭包的核心项目集合
+                // 这个Map就是用于保存: 输入符号 -> 后继闭包的核心项目集合 的映射关系
+                Map<Symbol, List<PrimaryProduction>> successorMap = new LinkedHashMap<>();
+
+                // 遍历闭包中的产生式，初始化successorMap
                 for (Item preItem : preClosure.getItems()) {
                     PrimaryProduction _PPre = preItem.getPrimaryProduction();
                     PrimaryProduction _PPNext = successor(_PPre);
-                    Item nextItem = new Item(_PPNext, null);
 
                     // 有后继
                     if (_PPNext != null) {
                         Symbol nextSymbol = nextSymbol(_PPre);
                         assertNotNull(nextSymbol);
 
-                        Closure nextClosure;
-
-                        int existsClosureId;
-
-                        if ((existsClosureId = indexOf(nextItem)) == -1) {
-                            closures.add(closure(_PPNext));
-                            nextClosure = closures.get(closures.size() - 1);
-                        } else {
-                            nextClosure = closures.get(existsClosureId);
+                        if (!successorMap.containsKey(nextSymbol)) {
+                            successorMap.put(nextSymbol, new ArrayList<>());
                         }
 
-                        if (!closureTransferTable.containsKey(preClosure.getId())) {
-                            closureTransferTable.put(preClosure.getId(), new HashMap<>());
-                        }
+                        successorMap.get(nextSymbol).add(_PPNext);
+                    }
+                }
 
-                        assertTrue(!closureTransferTable.get(preClosure.getId()).containsKey(nextSymbol)
-                                || closureTransferTable.get(preClosure.getId()).get(nextSymbol).equals(nextClosure.getId()));
+                // 创建Closure，维护状态转移表
+                for (Map.Entry<Symbol, List<PrimaryProduction>> entry : successorMap.entrySet()) {
+                    Symbol nextSymbol = entry.getKey();
+                    List<PrimaryProduction> _PPCores = entry.getValue();
 
-                        if (!closureTransferTable.get(preClosure.getId()).containsKey(nextSymbol)) {
-                            closureTransferTable.get(preClosure.getId()).put(nextSymbol, nextClosure.getId());
-                            canBreak = false;
-                        }
+                    List<Item> coreItemsOfNextClosure = new ArrayList<>();
+
+                    for (PrimaryProduction _PP : _PPCores) {
+                        coreItemsOfNextClosure.add(new Item(_PP, null));
+                    }
+
+                    Closure nextClosure;
+                    int existsClosureId;
+
+                    if ((existsClosureId = indexOf(coreItemsOfNextClosure)) == -1) {
+                        closures.add(closure(_PPCores));
+                        nextClosure = closures.get(closures.size() - 1);
+                    } else {
+                        nextClosure = closures.get(existsClosureId);
+                    }
+
+                    if (!closureTransferTable.containsKey(preClosure.getId())) {
+                        closureTransferTable.put(preClosure.getId(), new HashMap<>());
+                    }
+
+                    assertTrue(!closureTransferTable.get(preClosure.getId()).containsKey(nextSymbol)
+                            || closureTransferTable.get(preClosure.getId()).get(nextSymbol).equals(nextClosure.getId()));
+
+                    if (!closureTransferTable.get(preClosure.getId()).containsKey(nextSymbol)) {
+                        closureTransferTable.get(preClosure.getId()).put(nextSymbol, nextClosure.getId());
+                        canBreak = false;
                     }
                 }
             }
         }
     }
 
-    private Closure closure(PrimaryProduction _PPOrigin) {
-        Set<Item> items = new LinkedHashSet<>();
+    private Closure closure(List<PrimaryProduction> _PPs) {
+        List<Item> coreItems = new ArrayList<>();
 
-        Item coreItem = new Item(_PPOrigin, null);
-        items.add(coreItem);
+        for (PrimaryProduction _PP : _PPs) {
+            coreItems.add(new Item(_PP, null));
+        }
+
+        Set<Item> items = new LinkedHashSet<>(coreItems);
 
         boolean canBreak = false;
 
@@ -338,12 +372,12 @@ public class LR0 implements LRParser {
             }
         }
 
-        return new Closure(coreItem, new ArrayList<>(items));
+        return new Closure(coreItems, new ArrayList<>(items));
     }
 
-    private int indexOf(Item item) {
+    private int indexOf(List<Item> coreItems) {
         for (int i = 0; i < closures.size(); i++) {
-            if (closures.get(i).isCoreItem(item)) {
+            if (closures.get(i).isSame(coreItems)) {
                 return i;
             }
         }
@@ -368,9 +402,16 @@ public class LR0 implements LRParser {
     }
 
     private void initAnalysisTable() {
+        analysisSymbols.addAll(this.grammar.getTerminators());
+        analysisSymbols.add(Symbol.DOLLAR);
+        analysisSymbols.addAll(this.grammar.getNonTerminators().stream().filter((symbol -> !Symbol.START.equals(symbol))).collect(Collectors.toList()));
+
         // 初始化
         for (int i = 0; i < closures.size(); i++) {
             analysisTable.put(i, new HashMap<>());
+            for (Symbol symbol : analysisSymbols) {
+                analysisTable.get(i).put(symbol, new LinkedHashSet<>());
+            }
         }
 
         for (Production _P : symbolProductionMap.values()) {
@@ -386,60 +427,54 @@ public class LR0 implements LRParser {
                         if (nextSymbol == null) {
 
                             if ((Symbol.START.equals(_PP.getLeft()))) {
-                                assertNull(analysisTable.get(closure.getId()).get(Symbol.DOLLAR));
-                                analysisTable.get(closure.getId()).put(
-                                        Symbol.DOLLAR,
-                                        new Operation(
+                                analysisTable.get(closure.getId())
+                                        .get(Symbol.DOLLAR)
+                                        .add(new Operation(
                                                 -1,
                                                 _PPRaw,
-                                                Operation.OperationCode.ACCEPT
-                                        )
-                                );
+                                                Operation.OperationCode.ACCEPT));
                             } else {
 
                                 for (Symbol terminator : this.grammar.getTerminators()) {
-                                    assertNull(analysisTable.get(closure.getId()).get(terminator));
-                                    analysisTable.get(closure.getId()).put(
-                                            terminator,
-                                            new Operation(
+                                    analysisTable.get(closure.getId())
+                                            .get(terminator)
+                                            .add(new Operation(
                                                     -1,
                                                     _PPRaw,
-                                                    Operation.OperationCode.REDUCTION
-                                            )
-                                    );
+                                                    Operation.OperationCode.REDUCTION));
                                 }
-                                assertNull(analysisTable.get(closure.getId()).get(Symbol.DOLLAR));
-                                analysisTable.get(closure.getId()).put(
-                                        Symbol.DOLLAR,
-                                        new Operation(
+                                analysisTable.get(closure.getId())
+                                        .get(Symbol.DOLLAR)
+                                        .add(new Operation(
                                                 -1,
                                                 _PPRaw,
-                                                Operation.OperationCode.REDUCTION
-                                        )
-                                );
+                                                Operation.OperationCode.REDUCTION));
                             }
                         } else if (nextSymbol.isTerminator()) {
-                            assertNull(analysisTable.get(closure.getId()).get(nextSymbol));
-                            analysisTable.get(closure.getId()).put(
-                                    nextSymbol,
-                                    new Operation(
+                            analysisTable.get(closure.getId())
+                                    .get(nextSymbol)
+                                    .add(new Operation(
                                             closureTransferTable.get(closure.getId()).get(nextSymbol),
                                             null,
-                                            Operation.OperationCode.MOVE_IN
-                                    )
-                            );
+                                            Operation.OperationCode.MOVE_IN));
                         } else {
-                            assertNull(analysisTable.get(closure.getId()).get(nextSymbol));
-                            analysisTable.get(closure.getId()).put(
-                                    nextSymbol,
-                                    new Operation(
+                            analysisTable.get(closure.getId())
+                                    .get(nextSymbol)
+                                    .add(new Operation(
                                             closureTransferTable.get(closure.getId()).get(nextSymbol),
                                             null,
-                                            Operation.OperationCode.JUMP
-                                    )
-                            );
+                                            Operation.OperationCode.JUMP));
                         }
                     }
+                }
+            }
+        }
+
+        // 检查合法性，即检查表项动作是否唯一
+        for (int i = 0; i < closures.size(); i++) {
+            for (Symbol symbol : analysisSymbols) {
+                if (analysisTable.get(i).get(symbol).size() > 1) {
+                    System.err.println("Conflict");
                 }
             }
         }
@@ -541,7 +576,9 @@ public class LR0 implements LRParser {
         }
 
         private Operation lookUp(int closureId, Symbol symbol) {
-            return analysisTable.get(closureId).get(symbol);
+            if (analysisTable.get(closureId).get(symbol).isEmpty()) return null;
+            assertTrue(analysisTable.get(closureId).get(symbol).size() == 1);
+            return analysisTable.get(closureId).get(symbol).iterator().next();
         }
 
     }
