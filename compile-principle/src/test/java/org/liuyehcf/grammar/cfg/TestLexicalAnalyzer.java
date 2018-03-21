@@ -30,7 +30,7 @@ public class TestLexicalAnalyzer {
                 .addMorpheme("unsignedInteger", getUnsignedIntegerRegex(), MorphemeType.REGEX)
                 .build();
 
-        JdkLexicalAnalyzer.TokenIterator iterator = analyzer.iterator("1+2*3=7");
+        LexicalAnalyzer.TokenIterator iterator = analyzer.iterator("1+2*3=7");
 
 
         StringBuilder sb = new StringBuilder();

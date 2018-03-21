@@ -2,6 +2,8 @@ package org.liuyehcf.grammar.cfg.lr;
 
 import org.junit.Test;
 import org.liuyehcf.grammar.GrammarCase;
+import org.liuyehcf.grammar.JdkLexicalAnalyzer;
+import org.liuyehcf.grammar.LexicalAnalyzer;
 import org.liuyehcf.grammar.core.definition.Grammar;
 
 import static org.junit.Assert.assertEquals;
@@ -9,7 +11,12 @@ import static org.junit.Assert.assertEquals;
 public class TestLR0 {
     @Test
     public void testGrammarConvertCase1() {
-        LRParser parser = new LR0(GrammarCase.GRAMMAR_CASE_2);
+        LexicalAnalyzer analyzer = JdkLexicalAnalyzer.builder()
+                .addMorpheme("a")
+                .addMorpheme("b")
+                .build();
+
+        LRParser parser = new LR0(GrammarCase.GRAMMAR_CASE_10, analyzer);
 
         Grammar convertedGrammar = parser.getGrammar();
 
@@ -35,5 +42,7 @@ public class TestLR0 {
                         "| 6 | REDUCTION \"B → a B\" | REDUCTION \"B → a B\" | REDUCTION \"B → a B\" | \\ | \\ |\n",
                 parser.getForecastAnalysisTable()
         );
+
+        System.out.println(parser.matches("bab"));
     }
 }

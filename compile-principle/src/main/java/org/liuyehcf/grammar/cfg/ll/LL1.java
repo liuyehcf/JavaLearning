@@ -287,7 +287,7 @@ public class LL1 implements LLParser {
 
     @Override
     public boolean matches(String input) {
-        JdkLexicalAnalyzer.TokenIterator tokenIterator = lexicalAnalyzer.iterator(input);
+        LexicalAnalyzer.TokenIterator tokenIterator = lexicalAnalyzer.iterator(input);
 
         LinkedList<Symbol> symbolStack = new LinkedList<>();
         symbolStack.push(Symbol.DOLLAR);

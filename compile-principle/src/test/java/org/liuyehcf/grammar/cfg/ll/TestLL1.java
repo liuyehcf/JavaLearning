@@ -1,20 +1,20 @@
 package org.liuyehcf.grammar.cfg.ll;
 
 import org.junit.Test;
+import org.liuyehcf.grammar.GrammarCase;
 import org.liuyehcf.grammar.JdkLexicalAnalyzer;
 import org.liuyehcf.grammar.LexicalAnalyzer;
 import org.liuyehcf.grammar.NfaLexicalAnalyzer;
 import org.liuyehcf.grammar.core.MorphemeType;
-import org.liuyehcf.grammar.core.definition.*;
+import org.liuyehcf.grammar.core.definition.Grammar;
 
 import static org.junit.Assert.*;
 import static org.liuyehcf.grammar.cfg.TestLexicalAnalyzer.getIdRegex;
-import static org.liuyehcf.grammar.core.definition.Symbol.*;
 
 public class TestLL1 {
     @Test
     public void testFirstFollowSelectCase1() {
-        Grammar grammar = createGrammar2();
+        Grammar grammar = GrammarCase.GRAMMAR_CASE_3;
 
         LLParser parser = new LL1(grammar, getDefaultLexicalAnalyzer());
         Grammar convertedGrammar = parser.getGrammar();
@@ -41,7 +41,7 @@ public class TestLL1 {
 
     @Test
     public void testFirstFollowSelectCase2() {
-        Grammar grammar = createGrammar3();
+        Grammar grammar = GrammarCase.GRAMMAR_CASE_4;
 
         LLParser parser = new LL1(grammar, getDefaultLexicalAnalyzer());
         Grammar convertedGrammar = parser.getGrammar();
@@ -69,7 +69,7 @@ public class TestLL1 {
 
     @Test
     public void testParseCase1WithJdkLexicalAnalyzer() {
-        Grammar grammar = createGrammar2();
+        Grammar grammar = GrammarCase.GRAMMAR_CASE_3;
 
         LexicalAnalyzer analyzer = JdkLexicalAnalyzer.builder()
                 .addMorpheme("(")
@@ -89,7 +89,7 @@ public class TestLL1 {
 
     @Test
     public void testParseCase1WithNfaLexicalAnalyzer() {
-        Grammar grammar = createGrammar2();
+        Grammar grammar = GrammarCase.GRAMMAR_CASE_3;
 
         LexicalAnalyzer analyzer = NfaLexicalAnalyzer.builder()
                 .addMorpheme("(")
@@ -109,7 +109,7 @@ public class TestLL1 {
 
     @Test
     public void testParseCase2WithJdkLexicalAnalyzer() {
-        Grammar grammar = createGrammar3();
+        Grammar grammar = GrammarCase.GRAMMAR_CASE_4;
 
         LexicalAnalyzer analyzer = JdkLexicalAnalyzer.builder()
                 .addMorpheme("program")
@@ -138,7 +138,7 @@ public class TestLL1 {
 
     @Test
     public void testParseCase2WithNfaLexicalAnalyzer() {
-        Grammar grammar = createGrammar3();
+        Grammar grammar = GrammarCase.GRAMMAR_CASE_4;
 
         LexicalAnalyzer analyzer = NfaLexicalAnalyzer.builder()
                 .addMorpheme("program")
@@ -167,7 +167,7 @@ public class TestLL1 {
 
     @Test
     public void testParseCase3WithJdkLexicalAnalyzer() {
-        Grammar grammar = createGrammar1();
+        Grammar grammar = GrammarCase.GRAMMAR_CASE_2;
 
         LexicalAnalyzer analyzer = JdkLexicalAnalyzer.builder()
                 .addMorpheme("(")
@@ -189,7 +189,7 @@ public class TestLL1 {
 
     @Test
     public void testParseCase3WithNfaLexicalAnalyzer() {
-        Grammar grammar = createGrammar1();
+        Grammar grammar = GrammarCase.GRAMMAR_CASE_2;
 
         LexicalAnalyzer analyzer = NfaLexicalAnalyzer.builder()
                 .addMorpheme("(")
@@ -211,7 +211,7 @@ public class TestLL1 {
 
     @Test
     public void testParseCase4WithJdkLexicalAnalyzer() {
-        Grammar grammar = createGrammar4();
+        Grammar grammar = GrammarCase.GRAMMAR_CASE_5;
 
         LexicalAnalyzer analyzer = JdkLexicalAnalyzer.builder()
                 .addMorpheme("a")
@@ -248,7 +248,7 @@ public class TestLL1 {
 
     @Test
     public void testParseCase4WithNfaLexicalAnalyzer() {
-        Grammar grammar = createGrammar4();
+        Grammar grammar = GrammarCase.GRAMMAR_CASE_5;
 
         LexicalAnalyzer analyzer = NfaLexicalAnalyzer.builder()
                 .addMorpheme("a")
@@ -287,355 +287,6 @@ public class TestLL1 {
         return JdkLexicalAnalyzer.builder()
                 .addMorpheme("NULL")
                 .build();
-    }
-
-    private Grammar createGrammar1() {
-        return Grammar.create(
-                createNonTerminator("E"),
-                Production.create(
-                        PrimaryProduction.create(
-                                createNonTerminator("E"),
-                                SymbolString.create(
-                                        createNonTerminator("T"),
-                                        createNonTerminator("E′")
-                                )
-                        )
-                ),
-                Production.create(
-                        PrimaryProduction.create(
-                                createNonTerminator("E′"),
-                                SymbolString.create(
-                                        createTerminator("+"),
-                                        createNonTerminator("T"),
-                                        createNonTerminator("E′")
-                                )
-                        )
-                ),
-                Production.create(
-                        PrimaryProduction.create(
-                                createNonTerminator("E′"),
-                                SymbolString.create(
-                                        Symbol.EPSILON
-                                )
-                        )
-                ),
-                Production.create(
-                        PrimaryProduction.create(
-                                createNonTerminator("T"),
-                                SymbolString.create(
-                                        createNonTerminator("F"),
-                                        createNonTerminator("T′")
-                                )
-                        )
-                ),
-                Production.create(
-                        PrimaryProduction.create(
-                                createNonTerminator("T′"),
-                                SymbolString.create(
-                                        createTerminator("*"),
-                                        createNonTerminator("F"),
-                                        createNonTerminator("T′")
-                                )
-                        )
-                ),
-                Production.create(
-                        PrimaryProduction.create(
-                                createNonTerminator("T′"),
-                                SymbolString.create(
-                                        Symbol.EPSILON
-                                )
-                        )
-                ),
-                Production.create(
-                        PrimaryProduction.create(
-                                createNonTerminator("F"),
-                                SymbolString.create(
-                                        createTerminator("("),
-                                        createNonTerminator("E"),
-                                        createTerminator(")")
-                                )
-                        )
-                ),
-                Production.create(
-                        PrimaryProduction.create(
-                                createNonTerminator("F"),
-                                SymbolString.create(
-                                        createRegexTerminator("id")
-                                )
-                        )
-                )
-        );
-    }
-
-    private Grammar createGrammar2() {
-        return Grammar.create(
-                createNonTerminator("E"),
-                Production.create(
-                        PrimaryProduction.create(
-                                createNonTerminator("E"),
-                                SymbolString.create(
-                                        createNonTerminator("T"),
-                                        createNonTerminator("E′")
-                                )
-                        )
-                ),
-                Production.create(
-                        PrimaryProduction.create(
-                                createNonTerminator("E′"),
-                                SymbolString.create(
-                                        createTerminator("+"),
-                                        createNonTerminator("T"),
-                                        createNonTerminator("E′")
-                                )
-                        )
-                ),
-                Production.create(
-                        PrimaryProduction.create(
-                                createNonTerminator("E′"),
-                                SymbolString.create(
-                                        Symbol.EPSILON
-                                )
-                        )
-                ),
-                Production.create(
-                        PrimaryProduction.create(
-                                createNonTerminator("T"),
-                                SymbolString.create(
-                                        createNonTerminator("F"),
-                                        createNonTerminator("T′")
-                                )
-                        )
-                ),
-                Production.create(
-                        PrimaryProduction.create(
-                                createNonTerminator("T′"),
-                                SymbolString.create(
-                                        createTerminator("*"),
-                                        createNonTerminator("F"),
-                                        createNonTerminator("T′")
-                                )
-                        )
-                ),
-                Production.create(
-                        PrimaryProduction.create(
-                                createNonTerminator("T′"),
-                                SymbolString.create(
-                                        Symbol.EPSILON
-                                )
-                        )
-                ),
-                Production.create(
-                        PrimaryProduction.create(
-                                createNonTerminator("F"),
-                                SymbolString.create(
-                                        createTerminator("("),
-                                        createNonTerminator("E"),
-                                        createTerminator(")")
-                                )
-                        )
-                ),
-                Production.create(
-                        PrimaryProduction.create(
-                                createNonTerminator("F"),
-                                SymbolString.create(
-                                        createTerminator("id")
-                                )
-                        )
-                )
-        );
-    }
-
-    private Grammar createGrammar3() {
-        String PROGRAM = "PROGRAM";
-        String DECLIST = "DECLIST";
-        String DECLISTN = "DECLISTN";
-        String STLIST = "STLIST";
-        String STLISTN = "STLISTN";
-        String TYPE = "TYPE";
-
-        return Grammar.create(
-                createNonTerminator(PROGRAM),
-                Production.create(
-                        PrimaryProduction.create(
-                                createNonTerminator(PROGRAM),
-                                SymbolString.create(
-                                        createTerminator("program"),
-                                        createNonTerminator(DECLIST),
-                                        createTerminator(":"),
-                                        createNonTerminator(TYPE),
-                                        createTerminator(";"),
-                                        createNonTerminator(STLIST),
-                                        createTerminator("end")
-                                )
-                        )
-                ),
-                Production.create(
-                        PrimaryProduction.create(
-                                createNonTerminator(DECLIST),
-                                SymbolString.create(
-                                        createTerminator("id"),
-                                        createNonTerminator(DECLISTN)
-                                )
-                        )
-                ),
-                Production.create(
-                        PrimaryProduction.create(
-                                createNonTerminator(DECLISTN),
-                                SymbolString.create(
-                                        createTerminator(","),
-                                        createTerminator("id"),
-                                        createNonTerminator(DECLISTN)
-                                )
-                        )
-                ),
-                Production.create(
-                        PrimaryProduction.create(
-                                createNonTerminator(DECLISTN),
-                                SymbolString.create(
-                                        Symbol.EPSILON
-                                )
-                        )
-                ),
-                Production.create(
-                        PrimaryProduction.create(
-                                createNonTerminator(STLIST),
-                                SymbolString.create(
-                                        createTerminator("s"),
-                                        createNonTerminator(STLISTN)
-                                )
-                        )
-                ),
-                Production.create(
-                        PrimaryProduction.create(
-                                createNonTerminator(STLISTN),
-                                SymbolString.create(
-                                        createTerminator(";"),
-                                        createTerminator("s"),
-                                        createNonTerminator(STLISTN)
-                                )
-                        )
-                ),
-                Production.create(
-                        PrimaryProduction.create(
-                                createNonTerminator(STLISTN),
-                                SymbolString.create(
-                                        Symbol.EPSILON
-                                )
-                        )
-                ),
-                Production.create(
-                        PrimaryProduction.create(
-                                createNonTerminator(TYPE),
-                                SymbolString.create(
-                                        createTerminator("real")
-                                )
-                        )
-                ),
-                Production.create(
-                        PrimaryProduction.create(
-                                createNonTerminator(TYPE),
-                                SymbolString.create(
-                                        createTerminator("int")
-                                )
-                        )
-                )
-        );
-    }
-
-    private Grammar createGrammar4() {
-        return Grammar.create(
-                createNonTerminator("A"),
-                Production.create(
-                        PrimaryProduction.create(
-                                createNonTerminator("A"),
-                                SymbolString.create(
-                                        createTerminator("a")
-                                )
-                        )
-                ),
-                Production.create(
-                        PrimaryProduction.create(
-                                createNonTerminator("A"),
-                                SymbolString.create(
-                                        createTerminator("a"),
-                                        createTerminator("b")
-                                )
-                        )
-                ),
-                Production.create(
-                        PrimaryProduction.create(
-                                createNonTerminator("A"),
-                                SymbolString.create(
-                                        createTerminator("a"),
-                                        createTerminator("b"),
-                                        createTerminator("c")
-                                )
-                        )
-                ),
-                Production.create(
-                        PrimaryProduction.create(
-                                createNonTerminator("A"),
-                                SymbolString.create(
-                                        createTerminator("a"),
-                                        createTerminator("b"),
-                                        createTerminator("c"),
-                                        createTerminator("d")
-                                )
-                        )
-                ),
-                Production.create(
-                        PrimaryProduction.create(
-                                createNonTerminator("A"),
-                                SymbolString.create(
-                                        createTerminator("b")
-                                )
-                        )
-                ),
-                Production.create(
-                        PrimaryProduction.create(
-                                createNonTerminator("A"),
-                                SymbolString.create(
-                                        createTerminator("b"),
-                                        createTerminator("c")
-                                )
-                        )
-                ),
-                Production.create(
-                        PrimaryProduction.create(
-                                createNonTerminator("A"),
-                                SymbolString.create(
-                                        createTerminator("b"),
-                                        createTerminator("c"),
-                                        createTerminator("d")
-                                )
-                        )
-                ),
-                Production.create(
-                        PrimaryProduction.create(
-                                createNonTerminator("A"),
-                                SymbolString.create(
-                                        createTerminator("c")
-                                )
-                        )
-                ),
-                Production.create(
-                        PrimaryProduction.create(
-                                createNonTerminator("A"),
-                                SymbolString.create(
-                                        createTerminator("c"),
-                                        createTerminator("d")
-                                )
-                        )
-                ),
-                Production.create(
-                        PrimaryProduction.create(
-                                createNonTerminator("A"),
-                                SymbolString.create(
-                                        createTerminator("d")
-                                )
-                        )
-                )
-        );
     }
 }
 
