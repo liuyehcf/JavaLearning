@@ -528,8 +528,6 @@ public class LR0 implements LRParser {
         }
 
         private Operation lookUp(int closureId, Symbol symbol) {
-            System.out.println("[" + closureId + ", " + symbol.toJSONString() + "]");
-
             return analysisTable.get(closureId).get(symbol);
         }
 

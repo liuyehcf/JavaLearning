@@ -7,6 +7,8 @@ import org.liuyehcf.grammar.LexicalAnalyzer;
 import org.liuyehcf.grammar.core.definition.Grammar;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class TestLR0 {
     @Test
@@ -43,6 +45,12 @@ public class TestLR0 {
                 parser.getForecastAnalysisTable()
         );
 
-        System.out.println(parser.matches("bab"));
+        assertTrue(parser.matches("bab"));
+        assertTrue(parser.matches("bb"));
+        assertTrue(parser.matches("aaaabab"));
+
+        assertFalse(parser.matches("a"));
+        assertFalse(parser.matches("b"));
+        assertFalse(parser.matches("aba"));
     }
 }
