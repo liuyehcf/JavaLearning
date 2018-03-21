@@ -55,8 +55,6 @@ public class TestLR0 {
 
     @Test
     public void testGrammarConvertCase2() {
-        Symbol.createTerminator("asdfasdf");
-
         LexicalAnalyzer analyzer = JdkLexicalAnalyzer.builder()
                 .addMorpheme("(")
                 .addMorpheme(")")

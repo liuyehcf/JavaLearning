@@ -105,7 +105,7 @@ public abstract class AbstractCfgParser implements CfgParser {
         // 处理非终结符
         boolean canBreak = false;
         while (!canBreak) {
-            Map<Symbol, Set<Symbol>> newFirsts = new HashMap<>(this.firsts);
+            Map<Symbol, Set<Symbol>> newFirsts = copyFirst();
 
             for (Symbol _X : this.grammar.getNonTerminators()) {
                 Production _PX = productionMap.get(_X);
@@ -167,7 +167,7 @@ public abstract class AbstractCfgParser implements CfgParser {
 
         boolean canBreak = false;
         while (!canBreak) {
-            Map<Symbol, Set<Symbol>> newFollows = new HashMap<>(this.follows);
+            Map<Symbol, Set<Symbol>> newFollows = copyFollow();
 
             for (Symbol _A : this.grammar.getNonTerminators()) {
                 Production _PA = productionMap.get(_A);
@@ -234,6 +234,23 @@ public abstract class AbstractCfgParser implements CfgParser {
             assertFalse(follows.get(nonTerminator).isEmpty());
         }
     }
+
+    private Map<Symbol, Set<Symbol>> copyFirst() {
+        Map<Symbol, Set<Symbol>> copy = new HashMap<>();
+        for (Map.Entry<Symbol, Set<Symbol>> entry : firsts.entrySet()) {
+            copy.put(entry.getKey(), new HashSet<>(entry.getValue()));
+        }
+        return copy;
+    }
+
+    private Map<Symbol, Set<Symbol>> copyFollow() {
+        Map<Symbol, Set<Symbol>> copy = new HashMap<>();
+        for (Map.Entry<Symbol, Set<Symbol>> entry : follows.entrySet()) {
+            copy.put(entry.getKey(), new HashSet<>(entry.getValue()));
+        }
+        return copy;
+    }
+
 
     @Override
     public final String getFirstJSONString() {
