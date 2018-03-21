@@ -386,6 +386,7 @@ public class LR0 implements LRParser {
                         if (nextSymbol == null) {
 
                             if ((Symbol.START.equals(_PP.getLeft()))) {
+                                assertNull(analysisTable.get(closure.getId()).get(Symbol.DOLLAR));
                                 analysisTable.get(closure.getId()).put(
                                         Symbol.DOLLAR,
                                         new Operation(
@@ -397,6 +398,7 @@ public class LR0 implements LRParser {
                             } else {
 
                                 for (Symbol terminator : this.grammar.getTerminators()) {
+                                    assertNull(analysisTable.get(closure.getId()).get(terminator));
                                     analysisTable.get(closure.getId()).put(
                                             terminator,
                                             new Operation(
@@ -406,7 +408,7 @@ public class LR0 implements LRParser {
                                             )
                                     );
                                 }
-
+                                assertNull(analysisTable.get(closure.getId()).get(Symbol.DOLLAR));
                                 analysisTable.get(closure.getId()).put(
                                         Symbol.DOLLAR,
                                         new Operation(
@@ -417,6 +419,7 @@ public class LR0 implements LRParser {
                                 );
                             }
                         } else if (nextSymbol.isTerminator()) {
+                            assertNull(analysisTable.get(closure.getId()).get(nextSymbol));
                             analysisTable.get(closure.getId()).put(
                                     nextSymbol,
                                     new Operation(
@@ -426,6 +429,7 @@ public class LR0 implements LRParser {
                                     )
                             );
                         } else {
+                            assertNull(analysisTable.get(closure.getId()).get(nextSymbol));
                             analysisTable.get(closure.getId()).put(
                                     nextSymbol,
                                     new Operation(

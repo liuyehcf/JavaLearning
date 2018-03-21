@@ -319,6 +319,65 @@ public abstract class GrammarCase {
                     )
             )
     );
+
+    public static Grammar GRAMMAR_CASE_11 = Grammar.create(
+            createNonTerminator("E"),
+            Production.create(
+                    PrimaryProduction.create(
+                            createNonTerminator("E"),
+                            SymbolString.create(
+                                    createNonTerminator("E"),
+                                    createTerminator("+"),
+                                    createNonTerminator("T")
+                            )
+                    )
+            ),
+            Production.create(
+                    PrimaryProduction.create(
+                            createNonTerminator("E"),
+                            SymbolString.create(
+                                    createNonTerminator("T")
+                            )
+                    )
+            ),
+            Production.create(
+                    PrimaryProduction.create(
+                            createNonTerminator("T"),
+                            SymbolString.create(
+                                    createNonTerminator("T"),
+                                    createTerminator("*"),
+                                    createNonTerminator("F")
+                            )
+                    )
+            ),
+            Production.create(
+                    PrimaryProduction.create(
+                            createNonTerminator("T"),
+                            SymbolString.create(
+                                    createNonTerminator("F")
+                            )
+                    )
+            ),
+            Production.create(
+                    PrimaryProduction.create(
+                            createNonTerminator("F"),
+                            SymbolString.create(
+                                    createTerminator("("),
+                                    createNonTerminator("E"),
+                                    createTerminator(")")
+                            )
+                    )
+            ),
+            Production.create(
+                    PrimaryProduction.create(
+                            createNonTerminator("F"),
+                            SymbolString.create(
+                                    createTerminator("id")
+                            )
+                    )
+            )
+    );
+
     private static String PROGRAM = "PROGRAM";
     private static String DECLIST = "DECLIST";
     private static String DECLISTN = "DECLISTN";

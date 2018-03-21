@@ -51,4 +51,11 @@ public class TestLR0 {
         assertFalse(parser.matches("b"));
         assertFalse(parser.matches("aba"));
     }
+
+    @Test
+    public void testGrammarConvertCase2() {
+
+        //LRParser parser = new LR0(GrammarCase.GRAMMAR_CASE_11, null);
+
+    }
 }

@@ -8,7 +8,14 @@ import java.util.Objects;
 import java.util.Set;
 
 public class Item {
+    /**
+     * 产生式
+     */
     private final PrimaryProduction primaryProduction;
+
+    /**
+     * 展望符
+     */
     private final Set<Symbol> lookAHeads;
 
     public Item(PrimaryProduction primaryProduction, Set<Symbol> lookAHeads) {
