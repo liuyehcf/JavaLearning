@@ -47,11 +47,14 @@ public class PrimaryProduction {
     }
 
     public String toJSONString() {
-        return left + " → " + right;
+        return left.toJSONString() + " → " + right.toJSONString();
     }
 
     @Override
     public String toString() {
-        return toJSONString();
+        return "PrimaryProduction{" +
+                "left=" + left +
+                ", right=" + right +
+                '}';
     }
 }

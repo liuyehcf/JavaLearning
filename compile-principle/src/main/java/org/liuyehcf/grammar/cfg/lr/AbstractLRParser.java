@@ -107,18 +107,26 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
                 if (closures.get(i).getItems().get(j).getLookAHeads() == null) {
                     sb.append('\"')
                             .append(closures.get(i).getItems().get(j).getPrimaryProduction().toJSONString())
-                            .append('\"')
-                            .append(',');
+                            .append('\"');
                 } else {
                     assertFalse(closures.get(i).getItems().get(j).getLookAHeads().isEmpty());
                     sb.append('\"')
                             .append(closures.get(i).getItems().get(j).getPrimaryProduction().toJSONString())
                             .append(", ")
-                            .append(closures.get(i).getItems().get(j).getLookAHeads())
-                            .append('\"')
-                            .append(',');
+                            .append('[');
+
+                    for (Symbol symbol : closures.get(i).getItems().get(j).getLookAHeads()) {
+                        sb.append(symbol.toJSONString())
+                                .append(", ");
+                    }
+                    sb.setLength(sb.length() - 2);
+
+                    sb.append(']')
+                            .append('\"');
+
                 }
 
+                sb.append(',');
             }
 
             sb.setLength(sb.length() - 1);
@@ -207,7 +215,7 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
                             sb.append(' ')
                                     .append(operation.getOperator())
                                     .append(" \"")
-                                    .append(operation.getPrimaryProduction())
+                                    .append(operation.getPrimaryProduction().toJSONString())
                                     .append('\"')
                                     .append(" /");
                         } else {

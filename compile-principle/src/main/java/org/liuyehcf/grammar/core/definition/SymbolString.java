@@ -68,7 +68,10 @@ public class SymbolString {
 
     @Override
     public String toString() {
-        return toJSONString();
+        return "SymbolString{" +
+                "symbols=" + symbols +
+                ", indexOfDot=" + indexOfDot +
+                '}';
     }
 
     @Override

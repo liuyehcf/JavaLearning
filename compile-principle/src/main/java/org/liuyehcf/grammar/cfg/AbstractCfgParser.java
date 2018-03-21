@@ -278,7 +278,7 @@ public abstract class AbstractCfgParser implements CfgParser {
                 assertFalse(map.get(terminator).isEmpty());
 
                 for (Symbol firstSymbol : map.get(terminator)) {
-                    sb.append(firstSymbol).append(',');
+                    sb.append(firstSymbol.toJSONString()).append(',');
                 }
 
                 sb.setLength(sb.length() - 1);
@@ -307,7 +307,7 @@ public abstract class AbstractCfgParser implements CfgParser {
             assertFalse(map.get(nonTerminator).isEmpty());
 
             for (Symbol firstSymbol : map.get(nonTerminator)) {
-                sb.append(firstSymbol).append(',');
+                sb.append(firstSymbol.toJSONString()).append(',');
             }
 
             sb.setLength(sb.length() - 1);

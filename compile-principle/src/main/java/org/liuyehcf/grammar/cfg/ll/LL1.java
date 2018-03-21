@@ -226,7 +226,7 @@ public class LL1 extends AbstractCfgParser implements LLParser {
                 sb.append('\"');
 
                 for (Symbol firstSymbol : innerEntry.getValue()) {
-                    sb.append(firstSymbol).append(',');
+                    sb.append(firstSymbol.toJSONString()).append(',');
                 }
 
                 assertFalse(innerEntry.getValue().isEmpty());

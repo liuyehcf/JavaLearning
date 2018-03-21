@@ -73,7 +73,10 @@ public class Production {
 
     @Override
     public String toString() {
-        return toJSONString();
+        return "Production{" +
+                "left=" + left +
+                ", primaryProductions=" + primaryProductions +
+                '}';
     }
 
     @Override

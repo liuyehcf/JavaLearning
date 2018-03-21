@@ -153,6 +153,11 @@ public class Symbol {
 
     @Override
     public String toString() {
-        return toJSONString();
+        return "Symbol{" +
+                "isTerminator=" + isTerminator +
+                ", value='" + value + '\'' +
+                ", primeCount=" + primeCount +
+                ", type=" + type +
+                '}';
     }
 }

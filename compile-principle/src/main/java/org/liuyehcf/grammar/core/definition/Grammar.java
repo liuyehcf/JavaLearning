@@ -108,6 +108,12 @@ public class Grammar {
 
     @Override
     public String toString() {
-        return toJSONString();
+        return "Grammar{" +
+                "start=" + start +
+                ", productions=" + productions +
+                ", terminators=" + terminators +
+                ", nonTerminators=" + nonTerminators +
+                ", symbols=" + symbols +
+                '}';
     }
 }
