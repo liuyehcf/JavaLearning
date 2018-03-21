@@ -421,7 +421,7 @@ public class LR0 extends AbstractCfgParser implements LRParser {
         return result;
     }
 
-    protected void initAnalysisTable() {
+    private void initAnalysisTable() {
         analysisTerminators.addAll(this.grammar.getTerminators().stream().filter(symbol -> !Symbol.EPSILON.equals(symbol)).collect(Collectors.toList()));
         analysisSymbols.addAll(analysisTerminators);
         analysisSymbols.add(Symbol.DOLLAR);
@@ -444,48 +444,13 @@ public class LR0 extends AbstractCfgParser implements LRParser {
                 for (Closure closure : closures) {
                     if (closure.getItems().contains(item)) {
                         Symbol nextSymbol = nextSymbol(_PP);
-                        PrimaryProduction _PPRaw = removeDot(_PP);
 
                         if (nextSymbol == null) {
-
-                            if ((Symbol.START.equals(_PP.getLeft()))) {
-                                analysisTable.get(closure.getId())
-                                        .get(Symbol.DOLLAR)
-                                        .add(new Operation(
-                                                -1,
-                                                _PPRaw,
-                                                Operation.OperationCode.ACCEPT));
-                            } else {
-
-                                for (Symbol terminator : analysisTerminators) {
-                                    analysisTable.get(closure.getId())
-                                            .get(terminator)
-                                            .add(new Operation(
-                                                    -1,
-                                                    _PPRaw,
-                                                    Operation.OperationCode.REDUCTION));
-                                }
-                                analysisTable.get(closure.getId())
-                                        .get(Symbol.DOLLAR)
-                                        .add(new Operation(
-                                                -1,
-                                                _PPRaw,
-                                                Operation.OperationCode.REDUCTION));
-                            }
+                            initAnalysisTableWithReduction(closure, _PP);
                         } else if (nextSymbol.isTerminator()) {
-                            analysisTable.get(closure.getId())
-                                    .get(nextSymbol)
-                                    .add(new Operation(
-                                            closureTransferTable.get(closure.getId()).get(nextSymbol),
-                                            null,
-                                            Operation.OperationCode.MOVE_IN));
+                            initAnalysisTableWithMoveIn(closure, nextSymbol);
                         } else {
-                            analysisTable.get(closure.getId())
-                                    .get(nextSymbol)
-                                    .add(new Operation(
-                                            closureTransferTable.get(closure.getId()).get(nextSymbol),
-                                            null,
-                                            Operation.OperationCode.JUMP));
+                            initAnalysisTableWithJump(closure, nextSymbol);
                         }
                     }
                 }
@@ -493,15 +458,62 @@ public class LR0 extends AbstractCfgParser implements LRParser {
         }
 
         // 检查合法性，即检查表项动作是否唯一
-        for (int i = 0; i < closures.size(); i++) {
-            int closureId = closures.get(i).getId();
+        for (Closure closure : closures) {
             for (Symbol symbol : analysisSymbols) {
-                if (analysisTable.get(closureId).get(symbol).size() > 1) {
+                if (analysisTable.get(closure.getId()).get(symbol).size() > 1) {
                     System.err.println("Conflict");
                 }
             }
         }
     }
+
+    protected void initAnalysisTableWithReduction(Closure closure, PrimaryProduction _PP) {
+        PrimaryProduction _PPRaw = removeDot(_PP);
+
+        if ((Symbol.START.equals(_PP.getLeft()))) {
+            analysisTable.get(closure.getId())
+                    .get(Symbol.DOLLAR)
+                    .add(new Operation(
+                            -1,
+                            _PPRaw,
+                            Operation.OperationCode.ACCEPT));
+        } else {
+            for (Symbol terminator : analysisTerminators) {
+                analysisTable.get(closure.getId())
+                        .get(terminator)
+                        .add(new Operation(
+                                -1,
+                                _PPRaw,
+                                Operation.OperationCode.REDUCTION));
+            }
+            analysisTable.get(closure.getId())
+                    .get(Symbol.DOLLAR)
+                    .add(new Operation(
+                            -1,
+                            _PPRaw,
+                            Operation.OperationCode.REDUCTION));
+        }
+    }
+
+    protected void initAnalysisTableWithMoveIn(Closure closure, Symbol nextSymbol) {
+        analysisTable.get(closure.getId())
+                .get(nextSymbol)
+                .add(new Operation(
+                        closureTransferTable.get(closure.getId()).get(nextSymbol),
+                        null,
+                        Operation.OperationCode.MOVE_IN));
+    }
+
+
+    protected void initAnalysisTableWithJump(Closure closure, Symbol nextSymbol) {
+        analysisTable.get(closure.getId())
+                .get(nextSymbol)
+                .add(new Operation(
+                        closureTransferTable.get(closure.getId()).get(nextSymbol),
+                        null,
+                        Operation.OperationCode.JUMP));
+    }
+
 
     private class Matcher {
         private LinkedList<Integer> statusStack;
