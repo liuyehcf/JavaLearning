@@ -18,7 +18,7 @@ public class Item {
      */
     private final Set<Symbol> lookAHeads;
 
-    public Item(PrimaryProduction primaryProduction, Set<Symbol> lookAHeads) {
+    Item(PrimaryProduction primaryProduction, Set<Symbol> lookAHeads) {
         this.primaryProduction = primaryProduction;
         if (lookAHeads == null) {
             this.lookAHeads = null;
@@ -34,6 +34,11 @@ public class Item {
     public Set<Symbol> getLookAHeads() {
         return lookAHeads;
     }
+
+    public boolean isOfSamePrimaryProduction(PrimaryProduction _PP) {
+        return primaryProduction.equals(_PP);
+    }
+
 
     @Override
     public boolean equals(Object o) {

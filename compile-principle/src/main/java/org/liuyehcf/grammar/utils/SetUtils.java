@@ -15,11 +15,11 @@ public abstract class SetUtils {
         return newSet;
     }
 
-    public static <T> Set<T> of(Set<T>... sets) {
-        Set<T> newSet = new HashSet<>();
-        for (Set<T> set : sets) {
-            newSet.addAll(set);
-        }
+    public static <T> Set<T> of(Set<T> set1, Set<T> set2) {
+        Set<T> newSet = new HashSet<>(set1);
+
+        newSet.addAll(set2);
+
         return newSet;
     }
 }

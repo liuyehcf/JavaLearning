@@ -11,7 +11,7 @@ public class Operation {
 
     private final OperationCode operator;
 
-    public Operation(int nextClosureId, PrimaryProduction primaryProduction, OperationCode operator) {
+    Operation(int nextClosureId, PrimaryProduction primaryProduction, OperationCode operator) {
         this.nextClosureId = nextClosureId;
         this.primaryProduction = primaryProduction;
         this.operator = operator;

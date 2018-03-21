@@ -5,7 +5,7 @@ import org.liuyehcf.grammar.core.definition.Grammar;
 import org.liuyehcf.grammar.core.definition.PrimaryProduction;
 import org.liuyehcf.grammar.core.definition.Symbol;
 
-public class SLR extends LR0 implements LRParser {
+public class SLR extends LR0 {
 
     private SLR(LexicalAnalyzer lexicalAnalyzer, Grammar originalGrammar) {
         super(lexicalAnalyzer, originalGrammar);
@@ -20,7 +20,8 @@ public class SLR extends LR0 implements LRParser {
     }
 
     @Override
-    protected void initAnalysisTableWithReduction(Closure closure, PrimaryProduction _PP) {
+    protected void initAnalysisTableWithReduction(Closure closure, Item item) {
+        PrimaryProduction _PP = item.getPrimaryProduction();
         PrimaryProduction _PPRaw = removeDot(_PP);
 
         if ((Symbol.START.equals(_PP.getLeft()))) {
@@ -52,10 +53,5 @@ public class SLR extends LR0 implements LRParser {
                                 Operation.OperationCode.REDUCTION));
             }
         }
-    }
-
-    @Override
-    public boolean matches(String input) {
-        return false;
     }
 }

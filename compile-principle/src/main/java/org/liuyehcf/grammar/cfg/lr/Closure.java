@@ -33,10 +33,6 @@ public class Closure {
         return items;
     }
 
-    public List<Item> getCoreItems() {
-        return coreItems;
-    }
-
     /**
      * 判断两个Closure是否相同，仅需要判断核心项目集合是否完全一致即可
      */
