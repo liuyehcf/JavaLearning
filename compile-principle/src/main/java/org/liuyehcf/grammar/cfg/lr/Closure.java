@@ -3,13 +3,10 @@ package org.liuyehcf.grammar.cfg.lr;
 import java.util.List;
 
 public class Closure {
-
-    private static int count = 0;
-
     /**
      * 项目集闭包id
      */
-    private final int id = count++;
+    private final int id;
 
     /**
      * 核心项目集
@@ -22,7 +19,8 @@ public class Closure {
     private final List<Item> items;
 
 
-    Closure(List<Item> coreItems, List<Item> items) {
+    Closure(int id, List<Item> coreItems, List<Item> items) {
+        this.id = id;
         this.coreItems = coreItems;
         this.items = items;
     }

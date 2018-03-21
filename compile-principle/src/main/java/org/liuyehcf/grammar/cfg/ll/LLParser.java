@@ -1,15 +1,10 @@
 package org.liuyehcf.grammar.cfg.ll;
 
-import org.liuyehcf.grammar.Parser;
+import org.liuyehcf.grammar.cfg.CfgParser;
 
-public interface LLParser extends Parser {
+public interface LLParser extends CfgParser {
     /**
      * 获取First、Follow、Select的JSON串
      */
-    String getStatus();
-
-    /**
-     * 获取预测分析表的markdown格式的字符串
-     */
-    String getForecastAnalysisTable();
+    String getSelectJSONString();
 }

@@ -1,8 +1,12 @@
 package org.liuyehcf.grammar.cfg.lr;
 
 import org.liuyehcf.grammar.LexicalAnalyzer;
+import org.liuyehcf.grammar.cfg.AbstractCfgParser;
 import org.liuyehcf.grammar.core.definition.*;
-import org.liuyehcf.grammar.core.definition.converter.*;
+import org.liuyehcf.grammar.core.definition.converter.AugmentedGrammarConverter;
+import org.liuyehcf.grammar.core.definition.converter.GrammarConverterPipelineImpl;
+import org.liuyehcf.grammar.core.definition.converter.MergeGrammarConverter;
+import org.liuyehcf.grammar.core.definition.converter.StatusExpandGrammarConverter;
 import org.liuyehcf.grammar.utils.ListUtils;
 
 import java.util.*;
@@ -10,21 +14,8 @@ import java.util.stream.Collectors;
 
 import static org.liuyehcf.grammar.utils.AssertUtils.*;
 
-public class LR0 implements LRParser {
-    // 词法分析器
-    private final LexicalAnalyzer lexicalAnalyzer;
-
-    // 原始文法
-    private final Grammar originalGrammar;
-
-    // 文法转换流水线
-    private final GrammarConverterPipeline grammarConverterPipeline;
-
-    // 转换后的文法
-    private Grammar grammar;
-
-    // 非终结符 -> 产生式的映射
-    private Map<Symbol, Production> symbolProductionMap = new HashMap<>();
+public class LR0 extends AbstractCfgParser implements LRParser {
+    private int closureCnt = 0;
 
     // 项目集闭包
     private List<Closure> closures = new ArrayList<>();
@@ -33,20 +24,27 @@ public class LR0 implements LRParser {
     private Map<Integer, Map<Symbol, Integer>> closureTransferTable = new HashMap<>();
 
     // 预测分析表正常情况下，表项只有一个，若出现多个，则说明有冲突
+    // [ClosureId, Symbol] -> Operation
     private Map<Integer, Map<Symbol, LinkedHashSet<Operation>>> analysisTable = new HashMap<>();
 
+    // 预测分析表中的所有输入符号，与Grammar中的符号有些不一样
     private List<Symbol> analysisSymbols = new ArrayList<>();
 
-    public LR0(Grammar grammar, LexicalAnalyzer lexicalAnalyzer) {
-        this.originalGrammar = grammar;
-        this.grammarConverterPipeline = GrammarConverterPipelineImpl
+    private LR0(LexicalAnalyzer lexicalAnalyzer, Grammar originalGrammar) {
+        super(lexicalAnalyzer, originalGrammar, GrammarConverterPipelineImpl
                 .builder()
                 .registerGrammarConverter(AugmentedGrammarConverter.class)
                 .registerGrammarConverter(StatusExpandGrammarConverter.class)
                 .registerGrammarConverter(MergeGrammarConverter.class)
-                .build();
-        this.lexicalAnalyzer = lexicalAnalyzer;
-        init();
+                .build());
+    }
+
+    public static LRParser create(LexicalAnalyzer lexicalAnalyzer, Grammar originalGrammar) {
+        LRParser parser = new LR0(lexicalAnalyzer, originalGrammar);
+
+        parser.init();
+
+        return parser;
     }
 
     private static PrimaryProduction successor(PrimaryProduction _PP) {
@@ -89,26 +87,13 @@ public class LR0 implements LRParser {
         );
     }
 
-    private void init() {
-        // 文法转换
-        convertGrammar();
-
+    @Override
+    protected void postInit() {
         // 初始化项目集闭包
         initClosure();
 
         // 初始化分析表
         initAnalysisTable();
-    }
-
-    private void convertGrammar() {
-        this.grammar = grammarConverterPipeline.convert(originalGrammar);
-
-        // 初始化symbolProductionMap
-        for (Production _P : grammar.getProductions()) {
-            Symbol left = _P.getLeft();
-            assertFalse(symbolProductionMap.containsKey(left));
-            symbolProductionMap.put(left, _P);
-        }
     }
 
     @Override
@@ -117,7 +102,7 @@ public class LR0 implements LRParser {
     }
 
     @Override
-    public String getClosureStatus() {
+    public String getClosureJSONString() {
         StringBuilder sb = new StringBuilder();
 
         sb.append('{');
@@ -150,7 +135,7 @@ public class LR0 implements LRParser {
     }
 
     @Override
-    public String getForecastAnalysisTable() {
+    public String getAnalysisTableMarkdownString() {
         List<Symbol> symbols = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
 
@@ -205,13 +190,15 @@ public class LR0 implements LRParser {
 
         // 其余行：转义表
         for (int i = 0; i < closures.size(); i++) {
+            int closureId = closures.get(i).getId();
+
             sb.append(separator)
                     .append(' ')
                     .append(i)
                     .append(' ');
 
             for (Symbol symbol : symbols) {
-                LinkedHashSet<Operation> operations = analysisTable.get(i).get(symbol);
+                LinkedHashSet<Operation> operations = analysisTable.get(closureId).get(symbol);
                 if (operations.isEmpty()) {
                     sb.append(separator)
                             .append(' ')
@@ -229,7 +216,8 @@ public class LR0 implements LRParser {
                                     .append('\"')
                                     .append(" /");
                         } else {
-                            sb.append(operation.getOperator())
+                            sb.append(' ')
+                                    .append(operation.getOperator())
                                     .append(" \"")
                                     .append(operation.getNextClosureId())
                                     .append('\"')
@@ -248,21 +236,16 @@ public class LR0 implements LRParser {
         return sb.toString();
     }
 
-    @Override
-    public Grammar getGrammar() {
-        return grammar;
-    }
-
     private void initClosure() {
         PrimaryProduction _PPStart; // origin production
 
-        assertTrue(symbolProductionMap.get(Symbol.START).getPrimaryProductions().size() == 2);
+        assertTrue(getProductionMap().get(Symbol.START).getPrimaryProductions().size() == 2);
 
-        if (symbolProductionMap.get(Symbol.START).getPrimaryProductions().get(0) // 第一个子产生式
+        if (getProductionMap().get(Symbol.START).getPrimaryProductions().get(0) // 第一个子产生式
                 .getRight().getIndexOfDot() == 0) {
-            _PPStart = symbolProductionMap.get(Symbol.START).getPrimaryProductions().get(0);
+            _PPStart = getProductionMap().get(Symbol.START).getPrimaryProductions().get(0);
         } else {
-            _PPStart = symbolProductionMap.get(Symbol.START).getPrimaryProductions().get(1);
+            _PPStart = getProductionMap().get(Symbol.START).getPrimaryProductions().get(1);
         }
 
         boolean canBreak = false;
@@ -274,7 +257,8 @@ public class LR0 implements LRParser {
             canBreak = true;
 
             int preSize = closures.size();
-            // 避免遍历时修改容器
+
+            // 避免遍历时修改容器，因此不用foreach
             for (int i = 0; i < preSize; i++) {
                 Closure preClosure = closures.get(i);
 
@@ -372,7 +356,7 @@ public class LR0 implements LRParser {
             }
         }
 
-        return new Closure(coreItems, new ArrayList<>(items));
+        return new Closure(closureCnt++, coreItems, new ArrayList<>(items));
     }
 
     private int indexOf(List<Item> coreItems) {
@@ -390,7 +374,7 @@ public class LR0 implements LRParser {
     private List<Item> findBeginItems(Symbol symbol) {
         List<Item> result = new ArrayList<>();
 
-        Production _P = symbolProductionMap.get(symbol);
+        Production _P = getProductionMap().get(symbol);
 
         for (PrimaryProduction _PP : _P.getPrimaryProductions()) {
             if (_PP.getRight().getIndexOfDot() == 0) {
@@ -408,13 +392,14 @@ public class LR0 implements LRParser {
 
         // 初始化
         for (int i = 0; i < closures.size(); i++) {
-            analysisTable.put(i, new HashMap<>());
+            int closureId = closures.get(i).getId();
+            analysisTable.put(closureId, new HashMap<>());
             for (Symbol symbol : analysisSymbols) {
-                analysisTable.get(i).put(symbol, new LinkedHashSet<>());
+                analysisTable.get(closureId).put(symbol, new LinkedHashSet<>());
             }
         }
 
-        for (Production _P : symbolProductionMap.values()) {
+        for (Production _P : getProductionMap().values()) {
             for (PrimaryProduction _PP : _P.getPrimaryProductions()) {
 
                 Item item = new Item(_PP, null);
@@ -458,6 +443,7 @@ public class LR0 implements LRParser {
                                             null,
                                             Operation.OperationCode.MOVE_IN));
                         } else {
+                            assertTrue(analysisTable.containsKey(closure.getId()));
                             analysisTable.get(closure.getId())
                                     .get(nextSymbol)
                                     .add(new Operation(
@@ -472,8 +458,9 @@ public class LR0 implements LRParser {
 
         // 检查合法性，即检查表项动作是否唯一
         for (int i = 0; i < closures.size(); i++) {
+            int closureId = closures.get(i).getId();
             for (Symbol symbol : analysisSymbols) {
-                if (analysisTable.get(i).get(symbol).size() > 1) {
+                if (analysisTable.get(closureId).get(symbol).size() > 1) {
                     System.err.println("Conflict");
                 }
             }

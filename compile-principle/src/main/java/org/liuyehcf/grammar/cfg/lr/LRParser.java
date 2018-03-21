@@ -1,15 +1,10 @@
 package org.liuyehcf.grammar.cfg.lr;
 
-import org.liuyehcf.grammar.Parser;
+import org.liuyehcf.grammar.cfg.CfgParser;
 
-public interface LRParser extends Parser {
+public interface LRParser extends CfgParser {
     /**
      * 获取Closure的JSON串
      */
-    String getClosureStatus();
-
-    /**
-     * 获取预测分析表的markdown格式的字符串
-     */
-    String getForecastAnalysisTable();
+    String getClosureJSONString();
 }

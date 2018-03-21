@@ -16,17 +16,29 @@ public class TestLL1 {
     public void testFirstFollowSelectCase1() {
         Grammar grammar = GrammarCase.GRAMMAR_CASE_3;
 
-        LLParser parser = new LL1(grammar, getDefaultLexicalAnalyzer());
+        LLParser parser = LL1.create(getDefaultLexicalAnalyzer(), grammar);
         Grammar convertedGrammar = parser.getGrammar();
 
         assertEquals(
                 "{\"productions\":[\"E′ → + T E′ | __EPSILON__\",\"T′ → * F T′ | __EPSILON__\",\"T → ( E ) T′ | id T′\",\"E → ( E ) T′ E′ | id T′ E′\",\"F → ( E ) | id\"]}",
                 convertedGrammar.toJSONString()
         );
+
         assertEquals(
-                "{\"FIRST\":{\"terminator\":{\"__EPSILON__\":\"__EPSILON__\",\"(\":\"(\",\")\":\")\",\"*\":\"*\",\"+\":\"+\",\"id\":\"id\"},\"nonTerminator\":{\"E′\":\"__EPSILON__,+\",\"T′\":\"__EPSILON__,*\",\"T\":\"(,id\",\"E\":\"(,id\",\"F\":\"(,id\"}},\"FOLLOW\":{\"nonTerminator\":{\"E′\":\"),__DOLLAR__\",\"T′\":\"),+,__DOLLAR__\",\"T\":\"),+,__DOLLAR__\",\"E\":\"),__DOLLAR__\",\"F\":\"),*,+,__DOLLAR__\"}},\"SELECT\":{\"E′\":{\"E′ → + T E′\":\"+\",\"E′ → __EPSILON__\":\"),__DOLLAR__\"},\"T′\":{\"T′ → * F T′\":\"*\",\"T′ → __EPSILON__\":\"),+,__DOLLAR__\"},\"T\":{\"T → id T′\":\"id\",\"T → ( E ) T′\":\"(\"},\"E\":{\"E → id T′ E′\":\"id\",\"E → ( E ) T′ E′\":\"(\"},\"F\":{\"F → ( E )\":\"(\",\"F → id\":\"id\"}}}",
-                parser.getStatus()
+                "{\"terminator\":{\"__EPSILON__\":\"__EPSILON__\",\"(\":\"(\",\")\":\")\",\"*\":\"*\",\"+\":\"+\",\"id\":\"id\"},\"nonTerminator\":{\"E′\":\"__EPSILON__,+\",\"T′\":\"__EPSILON__,*\",\"T\":\"(,id\",\"E\":\"(,id\",\"F\":\"(,id\"}}",
+                parser.getFirstJSONString()
         );
+
+        assertEquals(
+                "{\"nonTerminator\":{\"E′\":\"),__DOLLAR__\",\"T′\":\"),+,__DOLLAR__\",\"T\":\"),+,__DOLLAR__\",\"E\":\"),__DOLLAR__\",\"F\":\"),*,+,__DOLLAR__\"}}",
+                parser.getFollowJSONString()
+        );
+
+        assertEquals(
+                "{\"E′\":{\"E′ → + T E′\":\"+\",\"E′ → __EPSILON__\":\"),__DOLLAR__\"},\"T′\":{\"T′ → * F T′\":\"*\",\"T′ → __EPSILON__\":\"),+,__DOLLAR__\"},\"T\":{\"T → id T′\":\"id\",\"T → ( E ) T′\":\"(\"},\"E\":{\"E → id T′ E′\":\"id\",\"E → ( E ) T′ E′\":\"(\"},\"F\":{\"F → ( E )\":\"(\",\"F → id\":\"id\"}}",
+                parser.getSelectJSONString()
+        );
+
         assertEquals(
                 "| 非终结符\\终结符 | __EPSILON__ | ( | ) | * | + | id |\n" +
                         "|:--|:--|:--|:--|:--|:--|:--|\n" +
@@ -35,7 +47,7 @@ public class TestLL1 {
                         "| T | \\ | T → ( E ) T′ | \\ | \\ | \\ | T → id T′ |\n" +
                         "| E | \\ | E → ( E ) T′ E′ | \\ | \\ | \\ | E → id T′ E′ |\n" +
                         "| F | \\ | F → ( E ) | \\ | \\ | \\ | F → id |\n",
-                parser.getForecastAnalysisTable()
+                parser.getAnalysisTableMarkdownString()
         );
     }
 
@@ -43,17 +55,29 @@ public class TestLL1 {
     public void testFirstFollowSelectCase2() {
         Grammar grammar = GrammarCase.GRAMMAR_CASE_4;
 
-        LLParser parser = new LL1(grammar, getDefaultLexicalAnalyzer());
+        LLParser parser = LL1.create(getDefaultLexicalAnalyzer(), grammar);
         Grammar convertedGrammar = parser.getGrammar();
 
         assertEquals(
                 "{\"productions\":[\"PROGRAM → program DECLIST : TYPE ; STLIST end\",\"DECLISTN → , id DECLISTN | __EPSILON__\",\"STLIST → s STLISTN\",\"TYPE → real | int\",\"STLISTN → ; s STLISTN | __EPSILON__\",\"DECLIST → id DECLISTN\"]}",
                 convertedGrammar.toJSONString()
         );
+
         assertEquals(
-                "{\"FIRST\":{\"terminator\":{\"__EPSILON__\":\"__EPSILON__\",\"s\":\"s\",\":\":\":\",\"end\":\"end\",\"program\":\"program\",\";\":\";\",\"id\":\"id\",\"real\":\"real\",\",\":\",\",\"int\":\"int\"},\"nonTerminator\":{\"PROGRAM\":\"program\",\"STLIST\":\"s\",\"DECLISTN\":\"__EPSILON__,,\",\"TYPE\":\"real,int\",\"STLISTN\":\"__EPSILON__,;\",\"DECLIST\":\"id\"}},\"FOLLOW\":{\"nonTerminator\":{\"PROGRAM\":\"__DOLLAR__\",\"STLIST\":\"end\",\"DECLISTN\":\":\",\"TYPE\":\";\",\"STLISTN\":\"end\",\"DECLIST\":\":\"}},\"SELECT\":{\"PROGRAM\":{\"PROGRAM → program DECLIST : TYPE ; STLIST end\":\"program\"},\"STLIST\":{\"STLIST → s STLISTN\":\"s\"},\"DECLISTN\":{\"DECLISTN → __EPSILON__\":\":\",\"DECLISTN → , id DECLISTN\":\",\"},\"TYPE\":{\"TYPE → real\":\"real\",\"TYPE → int\":\"int\"},\"STLISTN\":{\"STLISTN → __EPSILON__\":\"end\",\"STLISTN → ; s STLISTN\":\";\"},\"DECLIST\":{\"DECLIST → id DECLISTN\":\"id\"}}}",
-                parser.getStatus()
+                "{\"terminator\":{\"__EPSILON__\":\"__EPSILON__\",\"s\":\"s\",\":\":\":\",\"end\":\"end\",\"program\":\"program\",\";\":\";\",\"id\":\"id\",\"real\":\"real\",\",\":\",\",\"int\":\"int\"},\"nonTerminator\":{\"PROGRAM\":\"program\",\"STLIST\":\"s\",\"DECLISTN\":\"__EPSILON__,,\",\"TYPE\":\"real,int\",\"STLISTN\":\"__EPSILON__,;\",\"DECLIST\":\"id\"}}",
+                parser.getFirstJSONString()
         );
+
+        assertEquals(
+                "{\"nonTerminator\":{\"PROGRAM\":\"__DOLLAR__\",\"STLIST\":\"end\",\"DECLISTN\":\":\",\"TYPE\":\";\",\"STLISTN\":\"end\",\"DECLIST\":\":\"}}",
+                parser.getFollowJSONString()
+        );
+
+        assertEquals(
+                "{\"PROGRAM\":{\"PROGRAM → program DECLIST : TYPE ; STLIST end\":\"program\"},\"STLIST\":{\"STLIST → s STLISTN\":\"s\"},\"DECLISTN\":{\"DECLISTN → __EPSILON__\":\":\",\"DECLISTN → , id DECLISTN\":\",\"},\"TYPE\":{\"TYPE → real\":\"real\",\"TYPE → int\":\"int\"},\"STLISTN\":{\"STLISTN → __EPSILON__\":\"end\",\"STLISTN → ; s STLISTN\":\";\"},\"DECLIST\":{\"DECLIST → id DECLISTN\":\"id\"}}",
+                parser.getSelectJSONString()
+        );
+
         assertEquals(
                 "| 非终结符\\终结符 | __EPSILON__ | s | : | end | program | ; | id | real | , | int |\n" +
                         "|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|\n" +
@@ -63,7 +87,7 @@ public class TestLL1 {
                         "| TYPE | \\ | \\ | \\ | \\ | \\ | \\ | \\ | TYPE → real | \\ | TYPE → int |\n" +
                         "| STLISTN | \\ | \\ | \\ | STLISTN → __EPSILON__ | \\ | STLISTN → ; s STLISTN | \\ | \\ | \\ | \\ |\n" +
                         "| DECLIST | \\ | \\ | \\ | \\ | \\ | \\ | DECLIST → id DECLISTN | \\ | \\ | \\ |\n",
-                parser.getForecastAnalysisTable()
+                parser.getAnalysisTableMarkdownString()
         );
     }
 
@@ -79,7 +103,7 @@ public class TestLL1 {
                 .addMorpheme("id")
                 .build();
 
-        LLParser parser = new LL1(grammar, analyzer);
+        LLParser parser = LL1.create(analyzer, grammar);
 
         assertTrue(parser.matches("id+id*id"));
         assertTrue(parser.matches("(id+id)*id"));
@@ -99,7 +123,7 @@ public class TestLL1 {
                 .addMorpheme("id")
                 .build();
 
-        LLParser parser = new LL1(grammar, analyzer);
+        LLParser parser = LL1.create(analyzer, grammar);
 
         assertTrue(parser.matches("id+id*id"));
         assertTrue(parser.matches("(id+id)*id"));
@@ -123,7 +147,7 @@ public class TestLL1 {
                 .addMorpheme("int")
                 .build();
 
-        LLParser parser = new LL1(grammar, analyzer);
+        LLParser parser = LL1.create(analyzer, grammar);
 
         assertTrue(parser.matches("program id, id, id: real; s; s end"));
         assertTrue(parser.matches("program id: int; s; s end"));
@@ -152,7 +176,7 @@ public class TestLL1 {
                 .addMorpheme("int")
                 .build();
 
-        LLParser parser = new LL1(grammar, analyzer);
+        LLParser parser = LL1.create(analyzer, grammar);
 
         assertTrue(parser.matches("program id, id, id: real; s; s end"));
         assertTrue(parser.matches("program id: int; s; s end"));
@@ -178,7 +202,7 @@ public class TestLL1 {
                 .build();
 
 
-        LLParser parser = new LL1(grammar, analyzer);
+        LLParser parser = LL1.create(analyzer, grammar);
 
         assertTrue(parser.matches("A12+B*D"));
         assertTrue(parser.matches("(a+b01)*d03"));
@@ -200,7 +224,7 @@ public class TestLL1 {
                 .build();
 
 
-        LLParser parser = new LL1(grammar, analyzer);
+        LLParser parser = LL1.create(analyzer, grammar);
 
         assertTrue(parser.matches("A12+B*D"));
         assertTrue(parser.matches("(a+b01)*d03"));
@@ -226,8 +250,7 @@ public class TestLL1 {
                 .addMorpheme("d")
                 .build();
 
-
-        LLParser parser = new LL1(grammar, analyzer);
+        LLParser parser = LL1.create(analyzer, grammar);
 
         assertTrue(parser.matches("a"));
         assertTrue(parser.matches("ab"));
@@ -263,8 +286,7 @@ public class TestLL1 {
                 .addMorpheme("d")
                 .build();
 
-
-        LLParser parser = new LL1(grammar, analyzer);
+        LLParser parser = LL1.create(analyzer, grammar);
 
         assertTrue(parser.matches("a"));
         assertTrue(parser.matches("ab"));
