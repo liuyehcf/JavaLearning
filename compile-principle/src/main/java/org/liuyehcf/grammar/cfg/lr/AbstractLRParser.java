@@ -2,7 +2,10 @@ package org.liuyehcf.grammar.cfg.lr;
 
 import org.liuyehcf.grammar.LexicalAnalyzer;
 import org.liuyehcf.grammar.cfg.AbstractCfgParser;
-import org.liuyehcf.grammar.core.definition.*;
+import org.liuyehcf.grammar.core.definition.Grammar;
+import org.liuyehcf.grammar.core.definition.PrimaryProduction;
+import org.liuyehcf.grammar.core.definition.Symbol;
+import org.liuyehcf.grammar.core.definition.SymbolString;
 import org.liuyehcf.grammar.core.definition.converter.AugmentedGrammarConverter;
 import org.liuyehcf.grammar.core.definition.converter.GrammarConverterPipelineImpl;
 import org.liuyehcf.grammar.core.definition.converter.MergeGrammarConverter;
@@ -437,30 +440,23 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
             }
         }
 
-        // 遍历每个产生式
-        for (Production _P : getProductionMap().values()) {
-            for (PrimaryProduction _PP : _P.getPrimaryProductions()) {
 
-                // 遍历每个Closure
-                for (Closure closure : closures) {
+        // 遍历每个Closure
+        for (Closure closure : closures) {
+            // 遍历Closure中的每个项目
+            for (Item item : closure.getItems()) {
+                Symbol nextSymbol = nextSymbol(item);
 
-                    for (Item item : closure.getItems()) {
-                        // 若某个产生式属于当前Closure
-                        if (item.isOfSamePrimaryProduction(_PP)) {
-                            Symbol nextSymbol = nextSymbol(item);
-
-                            if (nextSymbol == null) {
-                                initAnalysisTableWithReduction(closure, item);
-                            } else if (nextSymbol.isTerminator()) {
-                                initAnalysisTableWithMoveIn(closure, nextSymbol);
-                            } else {
-                                initAnalysisTableWithJump(closure, nextSymbol);
-                            }
-                        }
-                    }
+                if (nextSymbol == null) {
+                    initAnalysisTableWithReduction(closure, item);
+                } else if (nextSymbol.isTerminator()) {
+                    initAnalysisTableWithMoveIn(closure, nextSymbol);
+                } else {
+                    initAnalysisTableWithJump(closure, nextSymbol);
                 }
             }
         }
+
 
         // 检查合法性，即检查表项动作是否唯一
         for (Closure closure : closures) {

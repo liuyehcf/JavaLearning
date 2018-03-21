@@ -108,7 +108,7 @@ public class TestSLR {
                         "|:--|:--|:--|:--|:--|:--|:--|:--|\n" +
                         "| 0 | MOVE_IN \"4\" | MOVE_IN \"5\" | \\ | \\ | JUMP \"2\" | JUMP \"3\" | JUMP \"1\" |\n" +
                         "| 1 | \\ | \\ | \\ | ACCEPT \"__START__ → S\" | \\ | \\ | \\ |\n" +
-                        "| 2 | \\ | \\ | REDUCTION \"R → L\" / MOVE_IN \"6\" | REDUCTION \"R → L\" | \\ | \\ | \\ |\n" +
+                        "| 2 | \\ | \\ | MOVE_IN \"6\" / REDUCTION \"R → L\" | REDUCTION \"R → L\" | \\ | \\ | \\ |\n" +
                         "| 3 | \\ | \\ | \\ | REDUCTION \"S → R\" | \\ | \\ | \\ |\n" +
                         "| 4 | MOVE_IN \"4\" | MOVE_IN \"5\" | \\ | \\ | JUMP \"8\" | JUMP \"7\" | \\ |\n" +
                         "| 5 | \\ | \\ | REDUCTION \"L → id\" | REDUCTION \"L → id\" | \\ | \\ | \\ |\n" +
