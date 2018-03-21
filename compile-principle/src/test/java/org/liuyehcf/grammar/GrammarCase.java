@@ -390,7 +390,8 @@ public abstract class GrammarCase {
                                     createTerminator("d")
                             )
                     )
-            ), Production.create(
+            ),
+            Production.create(
                     PrimaryProduction.create(
                             createNonTerminator("T"),
                             SymbolString.create(
@@ -412,6 +413,54 @@ public abstract class GrammarCase {
                             createNonTerminator("B"),
                             SymbolString.create(
                                     EPSILON
+                            )
+                    )
+            )
+    );
+
+
+    public static Grammar GRAMMAR_CASE_13 = Grammar.create(
+            createNonTerminator("S"),
+            Production.create(
+                    PrimaryProduction.create(
+                            createNonTerminator("S"),
+                            SymbolString.create(
+                                    createNonTerminator("L"),
+                                    createTerminator("="),
+                                    createNonTerminator("R")
+                            )
+                    )
+            ),
+            Production.create(
+                    PrimaryProduction.create(
+                            createNonTerminator("S"),
+                            SymbolString.create(
+                                    createNonTerminator("R")
+                            )
+                    )
+            ),
+            Production.create(
+                    PrimaryProduction.create(
+                            createNonTerminator("L"),
+                            SymbolString.create(
+                                    createTerminator("*"),
+                                    createNonTerminator("R")
+                            )
+                    )
+            ),
+            Production.create(
+                    PrimaryProduction.create(
+                            createNonTerminator("L"),
+                            SymbolString.create(
+                                    createTerminator("id")
+                            )
+                    )
+            ),
+            Production.create(
+                    PrimaryProduction.create(
+                            createNonTerminator("R"),
+                            SymbolString.create(
+                                    createNonTerminator("L")
                             )
                     )
             )
