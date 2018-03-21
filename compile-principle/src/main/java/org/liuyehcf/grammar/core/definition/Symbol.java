@@ -49,7 +49,11 @@ public class Symbol {
     }
 
     public static Symbol createTerminator(String value) {
-        return createSymbol(true, value, MorphemeType.NORMAL);
+        return createTerminator(value, MorphemeType.NORMAL);
+    }
+
+    public static Symbol createTerminator(String value, MorphemeType type) {
+        return createSymbol(true, value, type);
     }
 
     public static Symbol createRegexTerminator(String value) {

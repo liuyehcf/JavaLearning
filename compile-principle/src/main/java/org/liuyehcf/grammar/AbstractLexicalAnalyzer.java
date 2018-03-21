@@ -1,6 +1,7 @@
 package org.liuyehcf.grammar;
 
 import org.liuyehcf.grammar.core.MorphemeType;
+import org.liuyehcf.grammar.core.definition.Symbol;
 import org.liuyehcf.grammar.core.parse.Token;
 import org.liuyehcf.grammar.rg.Matcher;
 import org.liuyehcf.grammar.utils.AssertUtils;
@@ -140,10 +141,10 @@ public abstract class AbstractLexicalAnalyzer implements LexicalAnalyzer {
 
                 String id = groups.get(groupIndex);
 
-                tokens.add(new Token(id, value, morphemes.get(id).getSecond()));
+                tokens.add(new Token(Symbol.createTerminator(id, morphemes.get(id).getSecond()), value, morphemes.get(id).getSecond()));
             }
 
-            tokens.add(new Token("__DOLLAR__", "__DOLLAR__", MorphemeType.NORMAL));
+            tokens.add(new Token(Symbol.DOLLAR, "__DOLLAR__", MorphemeType.NORMAL));
         }
 
         private int findGroup() {

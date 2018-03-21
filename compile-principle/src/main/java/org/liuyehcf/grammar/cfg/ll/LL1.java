@@ -1,6 +1,5 @@
 package org.liuyehcf.grammar.cfg.ll;
 
-import org.liuyehcf.grammar.JdkLexicalAnalyzer;
 import org.liuyehcf.grammar.LexicalAnalyzer;
 import org.liuyehcf.grammar.core.MorphemeType;
 import org.liuyehcf.grammar.core.ParserException;
@@ -330,7 +329,7 @@ public class LL1 implements LLParser {
                             }
                         }
 
-                        if (!token.getId().equals(symbol.getValue())) {
+                        if (!token.getId().equals(symbol)) {
                             throw new ParserException();
                         }
 
@@ -339,8 +338,6 @@ public class LL1 implements LLParser {
                     }
                 } else {
                     PrimaryProduction _PP = findProductionByToken(symbol, token);
-
-                    // System.out.println(symbol.getStatus() + " → " + _PP.getStatus());
 
                     List<Symbol> reversedSymbols = new ArrayList<>(_PP.getRight().getSymbols());
 
@@ -359,7 +356,7 @@ public class LL1 implements LLParser {
     }
 
     private PrimaryProduction findProductionByToken(Symbol symbol, Token token) throws ParserException {
-        String key = token.getId();
+        Symbol key = token.getId();
 
         Map<PrimaryProduction, Set<Symbol>> map = selects.get(symbol);
 
@@ -367,7 +364,7 @@ public class LL1 implements LLParser {
 
         for (Map.Entry<PrimaryProduction, Set<Symbol>> entry : map.entrySet()) {
             for (Symbol selectedSymbol : entry.getValue()) {
-                if (selectedSymbol.getValue().equals(key)) {
+                if (selectedSymbol.equals(key)) {
                     _PPSelected = entry.getKey();
                 }
             }

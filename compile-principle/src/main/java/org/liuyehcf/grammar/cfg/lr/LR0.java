@@ -112,109 +112,6 @@ public class LR0 implements LRParser {
         return new Matcher().matches(input);
     }
 
-    private class Matcher {
-        private LinkedList<Integer> statusStack;
-        private LinkedList<Symbol> symbolStack;
-        private Queue<Symbol> remainSymbols;
-        private boolean canReceive;
-        private Operation operation;
-
-        public boolean matches(String input) {
-            statusStack = new LinkedList<>();
-            symbolStack = new LinkedList<>();
-            remainSymbols = new LinkedList<>();
-
-            statusStack.push(0);
-            symbolStack.push(Symbol.DOLLAR);
-
-            LexicalAnalyzer.TokenIterator tokenIterator = lexicalAnalyzer.iterator(input);
-            while (tokenIterator.hasNext()) {
-                remainSymbols.offer(Symbol.createTerminator(tokenIterator.next().getId()));
-            }
-
-            boolean canBreak = false;
-            while (!canBreak) {
-                operation = lookUp(statusStack.peek(), remainSymbols.peek());
-
-                if (operation == null) {
-                    error();
-                    canBreak = true;
-                } else {
-                    switch (operation.getOperator()) {
-                        case MOVE_IN:
-                            moveIn();
-                            break;
-                        case REDUCTION:
-                            reduction();
-                            jump();
-                            break;
-                        case JUMP:
-                            error();
-                            break;
-                        case ACCEPT:
-                            accept();
-                            canBreak = true;
-                            break;
-                        default:
-                            error();
-                            canBreak = true;
-                            break;
-                    }
-                }
-            }
-
-            return canReceive;
-        }
-
-        private void moveIn() {
-            assertTrue(statusStack.size() == symbolStack.size());
-            assertFalse(operation.getNextClosureId() == -1);
-
-            statusStack.push(operation.getNextClosureId());
-            symbolStack.push(remainSymbols.poll());
-        }
-
-        private void reduction() {
-            assertTrue(statusStack.size() == symbolStack.size());
-
-            PrimaryProduction _PPReduction = operation.getPrimaryProduction();
-            assertNotNull(_PPReduction);
-
-            for (int i = 0; i < _PPReduction.getRight().getSymbols().size(); i++) {
-                statusStack.pop();
-                symbolStack.pop();
-            }
-
-            symbolStack.push(_PPReduction.getLeft());
-        }
-
-        private void jump() {
-            assertTrue(statusStack.size() + 1 == symbolStack.size());
-            assertTrue(!statusStack.isEmpty() && !symbolStack.isEmpty());
-
-            Operation nextOperation = lookUp(statusStack.peek(), symbolStack.peek());
-
-            assertFalse(nextOperation.getNextClosureId() == -1);
-
-            statusStack.push(nextOperation.getNextClosureId());
-        }
-
-        private void accept() {
-            canReceive = true;
-        }
-
-        private void error() {
-            canReceive = false;
-        }
-
-        private Operation lookUp(int closureId, Symbol symbol) {
-            System.out.println("[" + closureId + ", " + symbol.toJSONString() + "]");
-
-            return analysisTable.get(closureId).get(symbol);
-        }
-
-    }
-
     @Override
     public String getClosureStatus() {
         StringBuilder sb = new StringBuilder();
@@ -533,5 +430,108 @@ public class LR0 implements LRParser {
                 }
             }
         }
+    }
+
+    private class Matcher {
+        private LinkedList<Integer> statusStack;
+        private LinkedList<Symbol> symbolStack;
+        private Queue<Symbol> remainSymbols;
+        private boolean canReceive;
+        private Operation operation;
+
+        public boolean matches(String input) {
+            statusStack = new LinkedList<>();
+            symbolStack = new LinkedList<>();
+            remainSymbols = new LinkedList<>();
+
+            statusStack.push(0);
+            symbolStack.push(Symbol.DOLLAR);
+
+            LexicalAnalyzer.TokenIterator tokenIterator = lexicalAnalyzer.iterator(input);
+            while (tokenIterator.hasNext()) {
+                remainSymbols.offer(tokenIterator.next().getId());
+            }
+
+            boolean canBreak = false;
+            while (!canBreak) {
+                operation = lookUp(statusStack.peek(), remainSymbols.peek());
+
+                if (operation == null) {
+                    error();
+                    canBreak = true;
+                } else {
+                    switch (operation.getOperator()) {
+                        case MOVE_IN:
+                            moveIn();
+                            break;
+                        case REDUCTION:
+                            reduction();
+                            jump();
+                            break;
+                        case JUMP:
+                            error();
+                            break;
+                        case ACCEPT:
+                            accept();
+                            canBreak = true;
+                            break;
+                        default:
+                            error();
+                            canBreak = true;
+                            break;
+                    }
+                }
+            }
+
+            return canReceive;
+        }
+
+        private void moveIn() {
+            assertTrue(statusStack.size() == symbolStack.size());
+            assertFalse(operation.getNextClosureId() == -1);
+
+            statusStack.push(operation.getNextClosureId());
+            symbolStack.push(remainSymbols.poll());
+        }
+
+        private void reduction() {
+            assertTrue(statusStack.size() == symbolStack.size());
+
+            PrimaryProduction _PPReduction = operation.getPrimaryProduction();
+            assertNotNull(_PPReduction);
+
+            for (int i = 0; i < _PPReduction.getRight().getSymbols().size(); i++) {
+                statusStack.pop();
+                symbolStack.pop();
+            }
+
+            symbolStack.push(_PPReduction.getLeft());
+        }
+
+        private void jump() {
+            assertTrue(statusStack.size() + 1 == symbolStack.size());
+            assertTrue(!statusStack.isEmpty() && !symbolStack.isEmpty());
+
+            Operation nextOperation = lookUp(statusStack.peek(), symbolStack.peek());
+
+            assertFalse(nextOperation.getNextClosureId() == -1);
+
+            statusStack.push(nextOperation.getNextClosureId());
+        }
+
+        private void accept() {
+            canReceive = true;
+        }
+
+        private void error() {
+            canReceive = false;
+        }
+
+        private Operation lookUp(int closureId, Symbol symbol) {
+            System.out.println("[" + closureId + ", " + symbol.toJSONString() + "]");
+
+            return analysisTable.get(closureId).get(symbol);
+        }
+
     }
 }

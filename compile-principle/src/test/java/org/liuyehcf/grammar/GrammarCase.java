@@ -197,103 +197,7 @@ public abstract class GrammarCase {
                     )
             )
     );
-    private static String PROGRAM = "PROGRAM";
-    private static String DECLIST = "DECLIST";
-    private static String DECLISTN = "DECLISTN";
-    private static String STLIST = "STLIST";
-    private static String STLISTN = "STLISTN";
-    private static String TYPE = "TYPE";
-
-    public static Grammar GRAMMAR_CASE_4 = Grammar.create(
-            createNonTerminator(PROGRAM),
-            Production.create(
-                    PrimaryProduction.create(
-                            createNonTerminator(PROGRAM),
-                            SymbolString.create(
-                                    createTerminator("program"),
-                                    createNonTerminator(DECLIST),
-                                    createTerminator(":"),
-                                    createNonTerminator(TYPE),
-                                    createTerminator(";"),
-                                    createNonTerminator(STLIST),
-                                    createTerminator("end")
-                            )
-                    )
-            ),
-            Production.create(
-                    PrimaryProduction.create(
-                            createNonTerminator(DECLIST),
-                            SymbolString.create(
-                                    createTerminator("id"),
-                                    createNonTerminator(DECLISTN)
-                            )
-                    )
-            ),
-            Production.create(
-                    PrimaryProduction.create(
-                            createNonTerminator(DECLISTN),
-                            SymbolString.create(
-                                    createTerminator(","),
-                                    createTerminator("id"),
-                                    createNonTerminator(DECLISTN)
-                            )
-                    )
-            ),
-            Production.create(
-                    PrimaryProduction.create(
-                            createNonTerminator(DECLISTN),
-                            SymbolString.create(
-                                    Symbol.EPSILON
-                            )
-                    )
-            ),
-            Production.create(
-                    PrimaryProduction.create(
-                            createNonTerminator(STLIST),
-                            SymbolString.create(
-                                    createTerminator("s"),
-                                    createNonTerminator(STLISTN)
-                            )
-                    )
-            ),
-            Production.create(
-                    PrimaryProduction.create(
-                            createNonTerminator(STLISTN),
-                            SymbolString.create(
-                                    createTerminator(";"),
-                                    createTerminator("s"),
-                                    createNonTerminator(STLISTN)
-                            )
-                    )
-            ),
-            Production.create(
-                    PrimaryProduction.create(
-                            createNonTerminator(STLISTN),
-                            SymbolString.create(
-                                    Symbol.EPSILON
-                            )
-                    )
-            ),
-            Production.create(
-                    PrimaryProduction.create(
-                            createNonTerminator(TYPE),
-                            SymbolString.create(
-                                    createTerminator("real")
-                            )
-                    )
-            ),
-            Production.create(
-                    PrimaryProduction.create(
-                            createNonTerminator(TYPE),
-                            SymbolString.create(
-                                    createTerminator("int")
-                            )
-                    )
-            )
-    );
-
-
-    public static Grammar GRAMMAR_CASE_5 =Grammar.create(
+    public static Grammar GRAMMAR_CASE_5 = Grammar.create(
             createNonTerminator("A"),
             Production.create(
                     PrimaryProduction.create(
@@ -386,7 +290,6 @@ public abstract class GrammarCase {
                     )
             )
     );
-
     public static Grammar GRAMMAR_CASE_10 = Grammar.create(
             createNonTerminator("S"),
             Production.create(
@@ -412,6 +315,99 @@ public abstract class GrammarCase {
                             createNonTerminator("B"),
                             SymbolString.create(
                                     createTerminator("b")
+                            )
+                    )
+            )
+    );
+    private static String PROGRAM = "PROGRAM";
+    private static String DECLIST = "DECLIST";
+    private static String DECLISTN = "DECLISTN";
+    private static String STLIST = "STLIST";
+    private static String STLISTN = "STLISTN";
+    private static String TYPE = "TYPE";
+    public static Grammar GRAMMAR_CASE_4 = Grammar.create(
+            createNonTerminator(PROGRAM),
+            Production.create(
+                    PrimaryProduction.create(
+                            createNonTerminator(PROGRAM),
+                            SymbolString.create(
+                                    createTerminator("program"),
+                                    createNonTerminator(DECLIST),
+                                    createTerminator(":"),
+                                    createNonTerminator(TYPE),
+                                    createTerminator(";"),
+                                    createNonTerminator(STLIST),
+                                    createTerminator("end")
+                            )
+                    )
+            ),
+            Production.create(
+                    PrimaryProduction.create(
+                            createNonTerminator(DECLIST),
+                            SymbolString.create(
+                                    createTerminator("id"),
+                                    createNonTerminator(DECLISTN)
+                            )
+                    )
+            ),
+            Production.create(
+                    PrimaryProduction.create(
+                            createNonTerminator(DECLISTN),
+                            SymbolString.create(
+                                    createTerminator(","),
+                                    createTerminator("id"),
+                                    createNonTerminator(DECLISTN)
+                            )
+                    )
+            ),
+            Production.create(
+                    PrimaryProduction.create(
+                            createNonTerminator(DECLISTN),
+                            SymbolString.create(
+                                    Symbol.EPSILON
+                            )
+                    )
+            ),
+            Production.create(
+                    PrimaryProduction.create(
+                            createNonTerminator(STLIST),
+                            SymbolString.create(
+                                    createTerminator("s"),
+                                    createNonTerminator(STLISTN)
+                            )
+                    )
+            ),
+            Production.create(
+                    PrimaryProduction.create(
+                            createNonTerminator(STLISTN),
+                            SymbolString.create(
+                                    createTerminator(";"),
+                                    createTerminator("s"),
+                                    createNonTerminator(STLISTN)
+                            )
+                    )
+            ),
+            Production.create(
+                    PrimaryProduction.create(
+                            createNonTerminator(STLISTN),
+                            SymbolString.create(
+                                    Symbol.EPSILON
+                            )
+                    )
+            ),
+            Production.create(
+                    PrimaryProduction.create(
+                            createNonTerminator(TYPE),
+                            SymbolString.create(
+                                    createTerminator("real")
+                            )
+                    )
+            ),
+            Production.create(
+                    PrimaryProduction.create(
+                            createNonTerminator(TYPE),
+                            SymbolString.create(
+                                    createTerminator("int")
                             )
                     )
             )
