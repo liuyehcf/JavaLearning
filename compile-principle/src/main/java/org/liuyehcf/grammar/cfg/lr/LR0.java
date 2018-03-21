@@ -125,9 +125,10 @@ public class LR0 implements LRParser {
                     .append(':')
                     .append('[');
 
-            for (int j = 0; j < closures.get(i).getPrimaryProductions().size(); j++) {
+            for (int j = 0; j < closures.get(i).getItems().size(); j++) {
+                assertNull(closures.get(i).getItems().get(j).getLookAHeads());
                 sb.append('\"')
-                        .append(closures.get(i).getPrimaryProductions().get(j).toJSONString())
+                        .append(closures.get(i).getItems().get(j).getPrimaryProduction().toJSONString())
                         .append('\"')
                         .append(',');
             }
@@ -267,9 +268,10 @@ public class LR0 implements LRParser {
                 Closure preClosure = closures.get(i);
 
                 // 遍历闭包中的产生式
-                for (PrimaryProduction _PPre : preClosure.getPrimaryProductions()) {
-
+                for (Item preItem : preClosure.getItems()) {
+                    PrimaryProduction _PPre = preItem.getPrimaryProduction();
                     PrimaryProduction _PPNext = successor(_PPre);
+                    Item nextItem = new Item(_PPNext, null);
 
                     // 有后继
                     if (_PPNext != null) {
@@ -280,7 +282,7 @@ public class LR0 implements LRParser {
 
                         int existsClosureId;
 
-                        if ((existsClosureId = indexOf(_PPNext)) == -1) {
+                        if ((existsClosureId = indexOf(nextItem)) == -1) {
                             closures.add(closure(_PPNext));
                             nextClosure = closures.get(closures.size() - 1);
                         } else {
@@ -305,56 +307,60 @@ public class LR0 implements LRParser {
     }
 
     private Closure closure(PrimaryProduction _PPOrigin) {
-        Set<PrimaryProduction> primaryProductions = new LinkedHashSet<>();
+        Set<Item> items = new LinkedHashSet<>();
 
-        primaryProductions.add(_PPOrigin);
+        Item coreItem = new Item(_PPOrigin, null);
+        items.add(coreItem);
 
         boolean canBreak = false;
 
         while (!canBreak) {
-            int preSize = primaryProductions.size();
+            int preSize = items.size();
 
             // 遍历Set的时候不能进行写操作
-            List<PrimaryProduction> newAddedPrimaryProductions = new ArrayList<>();
-            for (PrimaryProduction _PP : primaryProductions) {
-
+            List<Item> newAddedItems = new ArrayList<>();
+            for (Item item : items) {
+                PrimaryProduction _PP = item.getPrimaryProduction();
                 Symbol nextSymbol = nextSymbol(_PP);
 
                 // '·'后面跟的是非终结符
                 if (nextSymbol != null
                         && !nextSymbol.isTerminator()) {
 
-                    newAddedPrimaryProductions.addAll(findOriginalStatusPrimaryProductions(nextSymbol));
+                    newAddedItems.addAll(findBeginItems(nextSymbol));
                 }
             }
 
-            primaryProductions.addAll(newAddedPrimaryProductions);
+            items.addAll(newAddedItems);
 
-            if (preSize == primaryProductions.size()) {
+            if (preSize == items.size()) {
                 canBreak = true;
             }
         }
 
-        return new Closure(_PPOrigin, new ArrayList<>(primaryProductions));
+        return new Closure(coreItem, new ArrayList<>(items));
     }
 
-    private int indexOf(PrimaryProduction _PP) {
+    private int indexOf(Item item) {
         for (int i = 0; i < closures.size(); i++) {
-            if (closures.get(i).isCorePrimaryProduction(_PP)) {
+            if (closures.get(i).isCoreItem(item)) {
                 return i;
             }
         }
         return -1;
     }
 
-    private List<PrimaryProduction> findOriginalStatusPrimaryProductions(Symbol symbol) {
-        List<PrimaryProduction> result = new ArrayList<>();
+    /**
+     * 找到形如 A → ·α 的产生式
+     */
+    private List<Item> findBeginItems(Symbol symbol) {
+        List<Item> result = new ArrayList<>();
 
         Production _P = symbolProductionMap.get(symbol);
 
         for (PrimaryProduction _PP : _P.getPrimaryProductions()) {
             if (_PP.getRight().getIndexOfDot() == 0) {
-                result.add(_PP);
+                result.add(new Item(_PP, null));
             }
         }
 
@@ -369,8 +375,11 @@ public class LR0 implements LRParser {
 
         for (Production _P : symbolProductionMap.values()) {
             for (PrimaryProduction _PP : _P.getPrimaryProductions()) {
+
+                Item item = new Item(_PP, null);
+
                 for (Closure closure : closures) {
-                    if (closure.getPrimaryProductions().contains(_PP)) {
+                    if (closure.getItems().contains(item)) {
                         Symbol nextSymbol = nextSymbol(_PP);
                         PrimaryProduction _PPRaw = removeDot(_PP);
 
