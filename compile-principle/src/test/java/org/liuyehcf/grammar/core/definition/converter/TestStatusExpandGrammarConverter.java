@@ -33,18 +33,18 @@ public class TestStatusExpandGrammarConverter {
 
         assertEquals(
                 "{\"productions\":[\"S → · b B B\",\"S → b · B B\",\"S → b B · B\",\"S → b B B ·\"]}",
-                convertedGrammar
+                convertedGrammar.toString()
         );
     }
 
     @Test
     public void convertCase2() {
 
-        Grammar convertedGrammar = getGrammarConverterPipeline().convert(GrammarCase.GRAMMAR_CASE_1);
+        Grammar convertedGrammar = getGrammarConverterPipeline().convert(GrammarCase.Ambiguity_CASE1.GRAMMAR);
 
         assertEquals(
                 "{\"productions\":[\"E → · E + E\",\"E → E · + E\",\"E → E + · E\",\"E → E + E ·\",\"E → · E * E\",\"E → E · * E\",\"E → E * · E\",\"E → E * E ·\",\"E → · ( E )\",\"E → ( · E )\",\"E → ( E · )\",\"E → ( E ) ·\",\"E → · id\",\"E → id ·\"]}",
-                convertedGrammar
+                convertedGrammar.toString()
         );
     }
 

@@ -9,19 +9,14 @@ import static org.junit.Assert.*;
 
 public class TestLR0 {
     @Test
-    public void testCase1() {
-        LexicalAnalyzer analyzer = JdkLexicalAnalyzer.builder()
-                .addMorpheme("a")
-                .addMorpheme("b")
-                .build();
-
-        LRParser parser = LR0.create(analyzer, GrammarCase.GRAMMAR_CASE_10);
+    public void testLR0Status1() {
+        LRParser parser = LR0.create(GrammarCase.LR0_CASE1.JDK_LEXICAL_ANALYZER, GrammarCase.LR0_CASE1.GRAMMAR);
 
         assertTrue(parser.isLegal());
 
         assertEquals(
                 "{\"productions\":[\"__START__ → · S | S ·\",\"B → · a B | a · B | a B · | · b | b ·\",\"S → · B B | B · B | B B ·\"]}",
-                parser.getGrammar()
+                parser.getGrammar().toString()
         );
 
         assertEquals(
@@ -41,46 +36,61 @@ public class TestLR0 {
                         "| 6 | REDUCTION \"B → a B\" | REDUCTION \"B → a B\" | REDUCTION \"B → a B\" | \\ | \\ |\n",
                 parser.getAnalysisTableMarkdownString()
         );
-
-        assertTrue(parser.matches("bab"));
-        assertTrue(parser.matches("bb"));
-        assertTrue(parser.matches("aaaabab"));
-
-        assertFalse(parser.matches("a"));
-        assertFalse(parser.matches("b"));
-        assertFalse(parser.matches("aba"));
     }
 
     @Test
-    public void testCase2() {
-        LexicalAnalyzer analyzer = JdkLexicalAnalyzer.builder()
-                .addMorpheme("(")
-                .addMorpheme(")")
-                .addMorpheme("*")
-                .addMorpheme("+")
-                .addMorpheme("id")
-                .build();
-
-        LRParser parser = LR0.create(analyzer, GrammarCase.GRAMMAR_CASE_11);
+    public void testSLRStatus1() {
+        LRParser parser = LR0.create(GrammarCase.SLR_CASE1.JDK_LEXICAL_ANALYZER, GrammarCase.SLR_CASE1.GRAMMAR);
 
         assertFalse(parser.isLegal());
 
         assertEquals(
-                "| 状态\\文法符号 | ( | ) | * | + | id | __DOLLAR__ | T | E | F |\n" +
+                "| 状态\\文法符号 | id | ( | ) | * | + | __DOLLAR__ | T | E | F |\n" +
                         "|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|\n" +
-                        "| 0 | MOVE_IN \"4\" | \\ | \\ | \\ | MOVE_IN \"5\" | \\ | JUMP \"2\" | JUMP \"1\" | JUMP \"3\" |\n" +
-                        "| 1 | \\ | \\ | \\ | MOVE_IN \"6\" | \\ | ACCEPT \"__START__ → E\" | \\ | \\ | \\ |\n" +
-                        "| 2 | REDUCTION \"E → T\" | REDUCTION \"E → T\" | REDUCTION \"E → T\" / MOVE_IN \"7\" | REDUCTION \"E → T\" | REDUCTION \"E → T\" | REDUCTION \"E → T\" | \\ | \\ | \\ |\n" +
+                        "| 0 | MOVE_IN \"5\" | MOVE_IN \"4\" | \\ | \\ | \\ | \\ | JUMP \"2\" | JUMP \"1\" | JUMP \"3\" |\n" +
+                        "| 1 | \\ | \\ | \\ | \\ | MOVE_IN \"6\" | ACCEPT \"__START__ → E\" | \\ | \\ | \\ |\n" +
+                        "| 2 | REDUCTION \"E → T\" | REDUCTION \"E → T\" | REDUCTION \"E → T\" | REDUCTION \"E → T\" / MOVE_IN \"7\" | REDUCTION \"E → T\" | REDUCTION \"E → T\" | \\ | \\ | \\ |\n" +
                         "| 3 | REDUCTION \"T → F\" | REDUCTION \"T → F\" | REDUCTION \"T → F\" | REDUCTION \"T → F\" | REDUCTION \"T → F\" | REDUCTION \"T → F\" | \\ | \\ | \\ |\n" +
-                        "| 4 | MOVE_IN \"4\" | \\ | \\ | \\ | MOVE_IN \"5\" | \\ | JUMP \"2\" | JUMP \"8\" | JUMP \"3\" |\n" +
+                        "| 4 | MOVE_IN \"5\" | MOVE_IN \"4\" | \\ | \\ | \\ | \\ | JUMP \"2\" | JUMP \"8\" | JUMP \"3\" |\n" +
                         "| 5 | REDUCTION \"F → id\" | REDUCTION \"F → id\" | REDUCTION \"F → id\" | REDUCTION \"F → id\" | REDUCTION \"F → id\" | REDUCTION \"F → id\" | \\ | \\ | \\ |\n" +
-                        "| 6 | MOVE_IN \"4\" | \\ | \\ | \\ | MOVE_IN \"5\" | \\ | JUMP \"9\" | \\ | JUMP \"3\" |\n" +
-                        "| 7 | MOVE_IN \"4\" | \\ | \\ | \\ | MOVE_IN \"5\" | \\ | \\ | \\ | JUMP \"10\" |\n" +
-                        "| 8 | \\ | MOVE_IN \"11\" | \\ | MOVE_IN \"6\" | \\ | \\ | \\ | \\ | \\ |\n" +
-                        "| 9 | REDUCTION \"E → E + T\" | REDUCTION \"E → E + T\" | REDUCTION \"E → E + T\" / MOVE_IN \"7\" | REDUCTION \"E → E + T\" | REDUCTION \"E → E + T\" | REDUCTION \"E → E + T\" | \\ | \\ | \\ |\n" +
+                        "| 6 | MOVE_IN \"5\" | MOVE_IN \"4\" | \\ | \\ | \\ | \\ | JUMP \"9\" | \\ | JUMP \"3\" |\n" +
+                        "| 7 | MOVE_IN \"5\" | MOVE_IN \"4\" | \\ | \\ | \\ | \\ | \\ | \\ | JUMP \"10\" |\n" +
+                        "| 8 | \\ | \\ | MOVE_IN \"11\" | \\ | MOVE_IN \"6\" | \\ | \\ | \\ | \\ |\n" +
+                        "| 9 | REDUCTION \"E → E + T\" | REDUCTION \"E → E + T\" | REDUCTION \"E → E + T\" | REDUCTION \"E → E + T\" / MOVE_IN \"7\" | REDUCTION \"E → E + T\" | REDUCTION \"E → E + T\" | \\ | \\ | \\ |\n" +
                         "| 10 | REDUCTION \"T → T * F\" | REDUCTION \"T → T * F\" | REDUCTION \"T → T * F\" | REDUCTION \"T → T * F\" | REDUCTION \"T → T * F\" | REDUCTION \"T → T * F\" | \\ | \\ | \\ |\n" +
                         "| 11 | REDUCTION \"F → ( E )\" | REDUCTION \"F → ( E )\" | REDUCTION \"F → ( E )\" | REDUCTION \"F → ( E )\" | REDUCTION \"F → ( E )\" | REDUCTION \"F → ( E )\" | \\ | \\ | \\ |\n",
                 parser.getAnalysisTableMarkdownString()
         );
     }
+
+    @Test
+    public void testLR0Case1() {
+
+        LRParser parser = LR0.create(GrammarCase.LR0_CASE1.JDK_LEXICAL_ANALYZER, GrammarCase.LR0_CASE1.GRAMMAR);
+
+        assertTrue(parser.isLegal());
+
+        for (String input : GrammarCase.LR0_CASE1.TRUE_CASES) {
+            assertTrue(parser.matches(input));
+        }
+
+        for (String input : GrammarCase.LR0_CASE1.FALSE_CASES) {
+            assertFalse(parser.matches(input));
+        }
+
+
+        parser = LR0.create(GrammarCase.LR0_CASE1.NFA_LEXICAL_ANALYZER, GrammarCase.LR0_CASE1.GRAMMAR);
+
+        assertTrue(parser.isLegal());
+
+        for (String input : GrammarCase.LR0_CASE1.TRUE_CASES) {
+            assertTrue(parser.matches(input));
+        }
+
+        for (String input : GrammarCase.LR0_CASE1.FALSE_CASES) {
+            assertFalse(parser.matches(input));
+        }
+    }
+
+
 }

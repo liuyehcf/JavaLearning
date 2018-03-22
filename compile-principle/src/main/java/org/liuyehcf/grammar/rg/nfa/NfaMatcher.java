@@ -35,6 +35,9 @@ public class NfaMatcher implements Matcher {
     // 目前进行匹配操作的子串
     private String subInput;
 
+    // subInput对于input的偏移量
+    private int offset;
+
     // 匹配子串索引
     private int indexOfMatchIntervals;
 
@@ -48,12 +51,12 @@ public class NfaMatcher implements Matcher {
 
     @Override
     public boolean matches() {
-        return doMatch(input) != null;
+        return doMatch(0, input.length()) != null;
     }
 
-    private NfaState doMatch(String curInput) {
+    private NfaState doMatch(int start, int end) {
 
-        beforeMatch(curInput);
+        beforeMatch(start, end);
 
         NfaState result = isMatchDfs(nfa.getNfaClosure().getStartNfaState(), 0, new HashSet<>());
 
@@ -63,8 +66,9 @@ public class NfaMatcher implements Matcher {
     }
 
     @SuppressWarnings("unchecked")
-    private void beforeMatch(String curInput) {
-        this.subInput = curInput;
+    private void beforeMatch(int start, int end) {
+        this.subInput = input.substring(start, end);
+        this.offset = start;
 
         groupStartIndexes = new int[groupCount() + 1];
         groupEndIndexes = new int[groupCount() + 1];
@@ -222,10 +226,9 @@ public class NfaMatcher implements Matcher {
 
             Pair<Integer, Integer> interval = matchIntervals.get(indexOfMatchIntervals);
 
-            doMatch(input.substring(
-                    interval.getFirst(),
+            doMatch(interval.getFirst(),
                     interval.getSecond()
-            ));
+            );
 
             indexOfMatchIntervals++;
 
@@ -258,7 +261,7 @@ public class NfaMatcher implements Matcher {
         for (int startIndex = 0; startIndex < input.length(); startIndex++) {
             for (int endIndex = startIndex + 1; endIndex <= input.length(); endIndex++) {
                 NfaState result;
-                if ((result = doMatch(input.substring(startIndex, endIndex))) != null) {
+                if ((result = doMatch(startIndex, endIndex)) != null) {
                     Pair<Integer, Integer> interval = new Pair<>(startIndex, endIndex);
                     matchIntervals.add(interval);
                     intervalNfaStateMap.put(interval, result);
@@ -351,7 +354,7 @@ public class NfaMatcher implements Matcher {
         if (group < 0 || group > groupCount()) {
             throw new IndexOutOfBoundsException("No group " + group);
         }
-        return groupStartIndexes[group];
+        return groupStartIndexes[group] + offset;
     }
 
     @Override
@@ -363,6 +366,6 @@ public class NfaMatcher implements Matcher {
         if (group < 0 || group > groupCount()) {
             throw new IndexOutOfBoundsException("No group " + group);
         }
-        return groupEndIndexes[group];
+        return groupEndIndexes[group] + offset;
     }
 }

@@ -11,13 +11,13 @@ import org.liuyehcf.grammar.utils.Pair;
 import java.util.*;
 
 public abstract class AbstractLexicalAnalyzer implements LexicalAnalyzer {
-    protected final Map<String, Pair<String, MorphemeType>> morphemes;
+    private final Map<String, Pair<String, MorphemeType>> morphemes;
 
-    protected final Map<Integer, String> groups;
+    private final Map<Integer, String> groups;
 
     protected final String regex;
 
-    protected AbstractLexicalAnalyzer(Map<String, Pair<String, MorphemeType>> morphemes, Map<Integer, String> groups, String regex) {
+    AbstractLexicalAnalyzer(Map<String, Pair<String, MorphemeType>> morphemes, Map<Integer, String> groups, String regex) {
         this.morphemes = Collections.unmodifiableMap(morphemes);
         this.groups = Collections.unmodifiableMap(groups);
         this.regex = regex;
@@ -26,17 +26,17 @@ public abstract class AbstractLexicalAnalyzer implements LexicalAnalyzer {
     public abstract static class Builder {
 
         // 词素id -> (词素,类型) 的映射表
-        protected Map<String, Pair<String, MorphemeType>> morphemes = new HashMap<>();
+        Map<String, Pair<String, MorphemeType>> morphemes = new HashMap<>();
 
         // 正则表达式group -> 词素id 的映射表
-        protected Map<Integer, String> groups = new HashMap<>();
+        Map<Integer, String> groups = new HashMap<>();
 
         // 词素类型 -> (词素id,词素) 的映射表（为了在构造正则表达式的时候按类型排序）
-        protected Map<MorphemeType, List<Pair<String, String>>> types = new HashMap<>();
+        Map<MorphemeType, List<Pair<String, String>>> types = new HashMap<>();
 
         protected String regex;
 
-        protected Builder() {
+        Builder() {
             for (MorphemeType type : MorphemeType.values()) {
                 types.put(type, new ArrayList<>());
             }

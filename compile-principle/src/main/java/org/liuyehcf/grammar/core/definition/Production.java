@@ -78,7 +78,7 @@ public class Production {
         if (o == null || getClass() != o.getClass()) return false;
         Production that = (Production) o;
         return Objects.equals(left, that.left) &&
-                Objects.equals(primaryProductions, that.primaryProductions); // todo 依赖PrimaryProduction的equals
+                Objects.equals(primaryProductions, that.primaryProductions);
     }
 
     @Override

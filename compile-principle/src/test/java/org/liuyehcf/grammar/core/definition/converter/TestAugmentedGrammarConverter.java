@@ -32,18 +32,18 @@ public class TestAugmentedGrammarConverter {
 
         assertEquals(
                 "{\"productions\":[\"__START__ → S\",\"S → b B B\"]}",
-                convertedGrammar
+                convertedGrammar.toString()
         );
     }
 
     @Test
     public void convertCase2() {
 
-        Grammar convertedGrammar = new AugmentedGrammarConverter(GrammarCase.GRAMMAR_CASE_1).getConvertedGrammar();
+        Grammar convertedGrammar = new AugmentedGrammarConverter(GrammarCase.Ambiguity_CASE1.GRAMMAR).getConvertedGrammar();
 
         assertEquals(
                 "{\"productions\":[\"__START__ → E\",\"E → E + E\",\"E → E * E\",\"E → ( E )\",\"E → id\"]}",
-                convertedGrammar
+                convertedGrammar.toString()
         );
     }
 
