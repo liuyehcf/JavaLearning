@@ -289,13 +289,13 @@ public abstract class AbstractCfgParser implements CfgParser {
             sb.append('{');
 
             for (Symbol terminator : this.grammar.getTerminators()) {
-                sb.append('\"').append(terminator.toJSONString()).append("\":");
+                sb.append('\"').append(terminator).append("\":");
                 sb.append('\"');
 
                 assertFalse(map.get(terminator).isEmpty());
 
                 for (Symbol firstSymbol : map.get(terminator)) {
-                    sb.append(firstSymbol.toJSONString()).append(',');
+                    sb.append(firstSymbol).append(',');
                 }
 
                 sb.setLength(sb.length() - 1);
@@ -318,13 +318,13 @@ public abstract class AbstractCfgParser implements CfgParser {
         sb.append('{');
 
         for (Symbol nonTerminator : this.grammar.getNonTerminators()) {
-            sb.append('\"').append(nonTerminator.toJSONString()).append("\":");
+            sb.append('\"').append(nonTerminator).append("\":");
             sb.append('\"');
 
             assertFalse(map.get(nonTerminator).isEmpty());
 
             for (Symbol firstSymbol : map.get(nonTerminator)) {
-                sb.append(firstSymbol.toJSONString()).append(',');
+                sb.append(firstSymbol).append(',');
             }
 
             sb.setLength(sb.length() - 1);

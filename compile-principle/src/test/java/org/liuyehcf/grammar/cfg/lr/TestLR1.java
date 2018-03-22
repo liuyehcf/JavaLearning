@@ -107,5 +107,17 @@ public class TestLR1 {
                         "| 13 | \\ | \\ | \\ | REDUCTION \"L → * R\" | \\ | \\ | \\ |\n",
                 parser.getAnalysisTableMarkdownString()
         );
+
+        assertTrue(parser.matches("id=id"));
+        assertTrue(parser.matches("id=*id"));
+        assertTrue(parser.matches("id=**id"));
+
+        assertTrue(parser.matches("*id=id"));
+        assertTrue(parser.matches("*id=*id"));
+        assertTrue(parser.matches("*id=**id"));
+
+        assertTrue(parser.matches("**id=id"));
+        assertTrue(parser.matches("**id=*id"));
+        assertTrue(parser.matches("**id=**id"));
     }
 }

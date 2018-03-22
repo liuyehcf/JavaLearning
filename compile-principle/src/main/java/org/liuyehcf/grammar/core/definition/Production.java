@@ -49,15 +49,16 @@ public class Production {
         return primaryProductions;
     }
 
-    public String toJSONString() {
+    @Override
+    public String toString() {
         StringBuilder sb = new StringBuilder();
 
         sb.append('\"');
-        sb.append(left.toJSONString())
+        sb.append(left)
                 .append(" → ");
 
         for (PrimaryProduction _PP : primaryProductions) {
-            sb.append(_PP.getRight().toJSONString())
+            sb.append(_PP.getRight())
                     .append(' ')
                     .append(OR)
                     .append(' ');
@@ -69,14 +70,6 @@ public class Production {
         sb.append('\"');
 
         return sb.toString();
-    }
-
-    @Override
-    public String toString() {
-        return "Production{" +
-                "left=" + left +
-                ", primaryProductions=" + primaryProductions +
-                '}';
     }
 
     @Override

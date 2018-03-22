@@ -263,4 +263,17 @@ public class TestNfa {
                 matcher.group(1)
         );
     }
+
+
+    @Test
+    //todo
+    public void test() {
+        RGParser parser = RGBuilder.compile("(\\()|(a)|(\\))").buildNfa();
+
+        Matcher matcher = parser.matcher("(a)");
+
+        while(matcher.find()){
+            System.out.println(matcher.group(0));
+        }
+    }
 }

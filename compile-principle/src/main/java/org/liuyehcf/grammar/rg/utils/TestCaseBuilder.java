@@ -119,6 +119,14 @@ public abstract class TestCaseBuilder {
         return regex.charAt(index);
     }
 
+    boolean isPreCharEscaped() {
+        if (index > 0) {
+            return regex.charAt(index - 1) == '\\';
+        } else {
+            return false;
+        }
+    }
+
     protected abstract void processWhenEncounteredAny();
 
     protected abstract void processWhenEncounteredOr();
@@ -184,7 +192,7 @@ public abstract class TestCaseBuilder {
     private void addAllAdjacentOrParts(List<List<String>> testCasesOfAllParts) {
         do {
             testCasesOfAllParts.add(getTestCasesOfNextPart());
-        } while (hasNext() && getCurChar() == '|');
+        } while (hasNext() && !isPreCharEscaped() && getCurChar() == '|');
     }
 
     void revokeCombinedStringOfCurGroup() {
@@ -305,9 +313,9 @@ public abstract class TestCaseBuilder {
         index++;
         int startIndex = index, endIndex;
         while (hasNext() && count > 0) {
-            if (getCurChar() == '(') {
+            if (!isPreCharEscaped() && getCurChar() == '(') {
                 count++;
-            } else if (getCurChar() == ')') {
+            } else if (!isPreCharEscaped() && getCurChar() == ')') {
                 count--;
             }
             index++;

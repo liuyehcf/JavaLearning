@@ -33,7 +33,7 @@ public class TestStatusExpandGrammarConverter {
 
         assertEquals(
                 "{\"productions\":[\"S → · b B B\",\"S → b · B B\",\"S → b B · B\",\"S → b B B ·\"]}",
-                convertedGrammar.toJSONString()
+                convertedGrammar
         );
     }
 
@@ -44,7 +44,7 @@ public class TestStatusExpandGrammarConverter {
 
         assertEquals(
                 "{\"productions\":[\"E → · E + E\",\"E → E · + E\",\"E → E + · E\",\"E → E + E ·\",\"E → · E * E\",\"E → E · * E\",\"E → E * · E\",\"E → E * E ·\",\"E → · ( E )\",\"E → ( · E )\",\"E → ( E · )\",\"E → ( E ) ·\",\"E → · id\",\"E → id ·\"]}",
-                convertedGrammar.toJSONString()
+                convertedGrammar
         );
     }
 

@@ -10,6 +10,7 @@ public abstract class EscapedUtil {
     private static List<Symbol> escaped_or;
     private static List<Symbol> escaped_star;
     private static List<Symbol> escaped_add;
+    private static List<Symbol> escaped_opposite;
     private static List<Symbol> escaped_leftMiddleParenthesis;
     private static List<Symbol> escaped_rightMiddleParenthesis;
     private static List<Symbol> escaped_leftSmallParenthesis;
@@ -27,6 +28,7 @@ public abstract class EscapedUtil {
         initializeEscaped_or();
         initializeEscaped_star();
         initializeEscaped_add();
+        initializeEscaped_opposite();
         initializeEscaped_leftMiddleParenthesis();
         initializeEscaped_rightMiddleParenthesis();
         initializeEscaped_leftSmallParenthesis();
@@ -76,6 +78,8 @@ public abstract class EscapedUtil {
 
     public static List<Symbol> getSymbolsOfEscapedCharInMiddleParenthesis(char c) {
         switch (c) {
+            case '^':
+                return escaped_opposite;
             case '[':
                 return escaped_leftMiddleParenthesis;
             case ']':
@@ -121,6 +125,12 @@ public abstract class EscapedUtil {
         escaped_add = Collections.unmodifiableList(
                 Arrays.asList(
                         SymbolUtils.getAlphabetSymbolWithChar('+')));
+    }
+
+    private static void initializeEscaped_opposite() {
+        escaped_opposite = Collections.unmodifiableList(
+                Arrays.asList(
+                        SymbolUtils.getAlphabetSymbolWithChar('^')));
     }
 
     private static void initializeEscaped_leftMiddleParenthesis() {

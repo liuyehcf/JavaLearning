@@ -114,7 +114,13 @@ public class LL1 extends AbstractCfgParser implements LLParser {
 
     @Override
     protected boolean doMatches(String input) {
-        LexicalAnalyzer.TokenIterator tokenIterator = lexicalAnalyzer.iterator(input);
+        LexicalAnalyzer.TokenIterator tokenIterator;
+        try {
+            tokenIterator = lexicalAnalyzer.iterator(input);
+        } catch (ParserException e) {
+            // 词法分析阶段发生了错误
+            return false;
+        }
 
         LinkedList<Symbol> symbolStack = new LinkedList<>();
         symbolStack.push(Symbol.DOLLAR);
@@ -214,7 +220,7 @@ public class LL1 extends AbstractCfgParser implements LLParser {
 
         for (Map.Entry<Symbol, Map<PrimaryProduction, Set<Symbol>>> outerEntry : selects.entrySet()) {
             sb.append('\"');
-            sb.append(outerEntry.getKey().toJSONString());
+            sb.append(outerEntry.getKey());
             sb.append('\"');
             sb.append(':');
 
@@ -222,16 +228,16 @@ public class LL1 extends AbstractCfgParser implements LLParser {
 
             for (Map.Entry<PrimaryProduction, Set<Symbol>> innerEntry : outerEntry.getValue().entrySet()) {
                 sb.append('\"');
-                sb.append(outerEntry.getKey().toJSONString())
+                sb.append(outerEntry.getKey())
                         .append(" → ")
-                        .append(innerEntry.getKey().getRight().toJSONString());
+                        .append(innerEntry.getKey().getRight());
                 sb.append('\"');
                 sb.append(':');
 
                 sb.append('\"');
 
                 for (Symbol firstSymbol : innerEntry.getValue()) {
-                    sb.append(firstSymbol.toJSONString()).append(',');
+                    sb.append(firstSymbol).append(',');
                 }
 
                 assertFalse(innerEntry.getValue().isEmpty());
@@ -269,7 +275,7 @@ public class LL1 extends AbstractCfgParser implements LLParser {
         for (Symbol terminator : this.grammar.getTerminators()) {
             sb.append(separator)
                     .append(' ')
-                    .append(terminator.toJSONString())
+                    .append(terminator)
                     .append(' ');
         }
 
@@ -293,7 +299,7 @@ public class LL1 extends AbstractCfgParser implements LLParser {
             // 第一列，产生式
             sb.append(separator)
                     .append(' ')
-                    .append(_A.toJSONString())
+                    .append(_A)
                     .append(' ');
 
             for (Symbol terminator : this.grammar.getTerminators()) {
@@ -313,9 +319,9 @@ public class LL1 extends AbstractCfgParser implements LLParser {
                 if (_PPA != null) {
                     sb.append(separator)
                             .append(' ')
-                            .append(_A.toJSONString())
+                            .append(_A)
                             .append(" → ")
-                            .append(_PPA.getRight().toJSONString())
+                            .append(_PPA.getRight())
                             .append(' ');
                 } else {
                     sb.append(separator)

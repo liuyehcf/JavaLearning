@@ -1,6 +1,7 @@
 package org.liuyehcf.grammar;
 
 import org.liuyehcf.grammar.core.MorphemeType;
+import org.liuyehcf.grammar.core.ParserException;
 import org.liuyehcf.grammar.core.definition.Symbol;
 import org.liuyehcf.grammar.core.parse.Token;
 import org.liuyehcf.grammar.rg.Matcher;
@@ -128,14 +129,24 @@ public abstract class AbstractLexicalAnalyzer implements LexicalAnalyzer {
 
         private int index = 0;
 
-        TokenIteratorImpl(Matcher matcher) {
+        TokenIteratorImpl(Matcher matcher) throws ParserException {
             this.matcher = matcher;
             init();
         }
 
-        private void init() {
+        private void init() throws ParserException {
+            int lastEndIndex = 0;
+
             while (matcher.find()) {
                 int groupIndex = findGroup();
+
+                int startIndex = matcher.start(groupIndex);
+
+                if (startIndex != lastEndIndex) {
+                    throw new ParserException();
+                }
+
+                lastEndIndex = matcher.end(groupIndex);
 
                 String value = matcher.group(groupIndex);
 

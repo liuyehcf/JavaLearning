@@ -39,6 +39,11 @@ public class TestSLR {
                         "| 11 | \\ | REDUCTION \"F → ( E )\" | REDUCTION \"F → ( E )\" | REDUCTION \"F → ( E )\" | \\ | REDUCTION \"F → ( E )\" | \\ | \\ | \\ |\n",
                 parser.getAnalysisTableMarkdownString()
         );
+
+        assertTrue(parser.matches("id+id*id+id"));
+        assertTrue(parser.matches("id+(id*id)+id"));
+        assertTrue(parser.matches("(id+id*id)+id"));
+        assertTrue(parser.matches("(id+id+id+id)"));
     }
 
     @Test
@@ -80,6 +85,10 @@ public class TestSLR {
                         "| 6 | \\ | \\ | REDUCTION \"B → T b\" | \\ | \\ | \\ |\n",
                 parser.getAnalysisTableMarkdownString()
         );
+
+        assertTrue(parser.matches("ad"));
+        assertTrue(parser.matches("aadbd"));
+        assertTrue(parser.matches("aaadbdbd"));
     }
 
     @Test

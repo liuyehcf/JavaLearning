@@ -147,17 +147,8 @@ public class Symbol {
                 this.type.getOrder();
     }
 
-    public String toJSONString() {
-        return getPrimedValue();
-    }
-
     @Override
     public String toString() {
-        return "Symbol{" +
-                "isTerminator=" + isTerminator +
-                ", value='" + value + '\'' +
-                ", primeCount=" + primeCount +
-                ", type=" + type +
-                '}';
+        return getPrimedValue();
     }
 }

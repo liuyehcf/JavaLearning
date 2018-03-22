@@ -13,7 +13,7 @@ import static org.liuyehcf.grammar.core.definition.Symbol.createNonTerminator;
 /**
  * Created by Liuye on 2017/10/24.
  */
-public class TestRegex {
+class TestRegex {
     static final String[] REGEX_GROUP_1 = {
             "", "a", "z", "A", "Z", "!", ".", "#", "\0", "\n",
             "azAZ01!#@",
@@ -23,7 +23,7 @@ public class TestRegex {
             "\\d", "\\D", "\\w", "\\W"
     };
     static final String[] REGEX_GROUP_3 = {
-            "[\\[]", "[\\]]", "[\\d]", "[\\D]", "[\\d]", "[\\D]",
+            "[\\[]", "[\\]]", "[\\d]", "[\\D]", "[\\d]", "[\\D]", "[\\^]",
             "[^\\[]", "[^\\]]", "[^\\d]", "[^\\D]", "[^\\d]", "[^\\D]",
             "[a-z]", "[-a-z]", "[a-z-]", "[a-a]", "[-a\\-z-]", "[0-9]", "[\0-A]"
     };
@@ -61,7 +61,7 @@ public class TestRegex {
     };
     static final String[] REGEX_GROUP_9 = {
             "()", "()()", "(())", "((()))()()(()((()(()))))()",
-            "(abc(cd)(ef(g)()))", "((a)|(b){3,})", "((a)+)", "a*", "((a(b|e))*)",
+            "(abc(cd)(ef(g)()))", "((a)|(b){3,})", "((a)+)", "a*", "((a(b|e))*)", "(\\()", "(\\()|(a)|(\\))",
             "(a*)+", "(a+)*", "(a+)*|(a*)+",
             "a(b(d(e|f)*)|((g(h|i)+)))+",
             "a(b(d(e+|f*))|((g(\\d|i)+)))+",
@@ -81,7 +81,7 @@ public class TestRegex {
             createIdentifierRegex(),
     };
 
-    static Grammar createIdentifierGrammar() {
+    private static Grammar createIdentifierGrammar() {
         Symbol digit = createNonTerminator("digit");
         Symbol letter_ = createNonTerminator("letter_");
         Symbol id = createNonTerminator("id");

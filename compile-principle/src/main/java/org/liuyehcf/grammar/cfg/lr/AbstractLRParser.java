@@ -2,6 +2,7 @@ package org.liuyehcf.grammar.cfg.lr;
 
 import org.liuyehcf.grammar.LexicalAnalyzer;
 import org.liuyehcf.grammar.cfg.AbstractCfgParser;
+import org.liuyehcf.grammar.core.ParserException;
 import org.liuyehcf.grammar.core.definition.Grammar;
 import org.liuyehcf.grammar.core.definition.PrimaryProduction;
 import org.liuyehcf.grammar.core.definition.Symbol;
@@ -113,17 +114,17 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
             for (int j = 0; j < closures.get(i).getItems().size(); j++) {
                 if (closures.get(i).getItems().get(j).getLookAHeads() == null) {
                     sb.append('\"')
-                            .append(closures.get(i).getItems().get(j).getPrimaryProduction().toJSONString())
+                            .append(closures.get(i).getItems().get(j).getPrimaryProduction())
                             .append('\"');
                 } else {
                     assertFalse(closures.get(i).getItems().get(j).getLookAHeads().isEmpty());
                     sb.append('\"')
-                            .append(closures.get(i).getItems().get(j).getPrimaryProduction().toJSONString())
+                            .append(closures.get(i).getItems().get(j).getPrimaryProduction())
                             .append(", ")
                             .append('[');
 
                     for (Symbol symbol : closures.get(i).getItems().get(j).getLookAHeads()) {
-                        sb.append(symbol.toJSONString())
+                        sb.append(symbol)
                                 .append(", ");
                     }
                     sb.setLength(sb.length() - 2);
@@ -164,13 +165,13 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
         for (Symbol symbol : analysisTerminators) {
             sb.append(separator)
                     .append(' ')
-                    .append(symbol.toJSONString())
+                    .append(symbol)
                     .append(' ');
         }
 
         sb.append(separator)
                 .append(' ')
-                .append(Symbol.DOLLAR.toJSONString())
+                .append(Symbol.DOLLAR)
                 .append(' ');
 
 
@@ -180,7 +181,7 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
             }
             sb.append(separator)
                     .append(' ')
-                    .append(symbol.toJSONString())
+                    .append(symbol)
                     .append(' ');
         }
 
@@ -222,7 +223,7 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
                             sb.append(' ')
                                     .append(operation.getOperator())
                                     .append(" \"")
-                                    .append(operation.getPrimaryProduction().toJSONString())
+                                    .append(operation.getPrimaryProduction())
                                     .append('\"')
                                     .append(" /");
                         } else {
@@ -266,7 +267,7 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
                             .append('[')
                             .append(closure.getId())
                             .append(", ")
-                            .append(symbol.toJSONString())
+                            .append(symbol)
                             .append(']')
                             .append(" → ")
                             .append(closureTransferTable.get(closure.getId()).get(symbol))
@@ -514,6 +515,14 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
         private Operation operation;
 
         public boolean matches(String input) {
+            LexicalAnalyzer.TokenIterator tokenIterator;
+            try {
+                tokenIterator = lexicalAnalyzer.iterator(input);
+            } catch (ParserException e) {
+                // 词法分析阶段出现了错误
+                return false;
+            }
+
             statusStack = new LinkedList<>();
             symbolStack = new LinkedList<>();
             remainSymbols = new LinkedList<>();
@@ -521,7 +530,6 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
             statusStack.push(0);
             symbolStack.push(Symbol.DOLLAR);
 
-            LexicalAnalyzer.TokenIterator tokenIterator = lexicalAnalyzer.iterator(input);
             while (tokenIterator.hasNext()) {
                 remainSymbols.offer(tokenIterator.next().getId());
             }
@@ -574,9 +582,12 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
             PrimaryProduction _PPReduction = operation.getPrimaryProduction();
             assertNotNull(_PPReduction);
 
-            for (int i = 0; i < _PPReduction.getRight().getSymbols().size(); i++) {
-                statusStack.pop();
-                symbolStack.pop();
+            // 如果是形如 "A → ε"这样的产生式，那么特殊处理一下（不进行出栈操作）
+            if (!_PPReduction.getRight().equals(SymbolString.EPSILON_RAW)) {
+                for (int i = 0; i < _PPReduction.getRight().getSymbols().size(); i++) {
+                    statusStack.pop();
+                    symbolStack.pop();
+                }
             }
 
             symbolStack.push(_PPReduction.getLeft());

@@ -1,6 +1,7 @@
 package org.liuyehcf.grammar;
 
 import org.liuyehcf.grammar.core.MorphemeType;
+import org.liuyehcf.grammar.core.ParserException;
 import org.liuyehcf.grammar.rg.RGBuilder;
 import org.liuyehcf.grammar.rg.RGParser;
 import org.liuyehcf.grammar.utils.Pair;
@@ -21,7 +22,7 @@ public class NfaLexicalAnalyzer extends AbstractLexicalAnalyzer {
     }
 
     @Override
-    public TokenIterator iterator(String input) {
+    public TokenIterator iterator(String input) throws ParserException {
         return new TokenIteratorImpl(parser.matcher(input));
     }
 

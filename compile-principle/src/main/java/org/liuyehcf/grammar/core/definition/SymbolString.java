@@ -12,6 +12,7 @@ public class SymbolString {
     // 会包含ε的文法符号串
     public static final SymbolString EPSILON_RAW = create(Symbol.EPSILON);
 
+    // "ε ·"
     public static final SymbolString EPSILON_END = create(ListUtils.of(Symbol.EPSILON), 1);
 
     // 文法符号串
@@ -45,7 +46,8 @@ public class SymbolString {
         return indexOfDot;
     }
 
-    public String toJSONString() {
+    @Override
+    public String toString() {
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < symbols.size(); i++) {
@@ -56,7 +58,7 @@ public class SymbolString {
             if (indexOfDot == i) {
                 sb.append("· ");
             }
-            sb.append(symbols.get(i).toJSONString());
+            sb.append(symbols.get(i));
         }
 
         if (indexOfDot == symbols.size()) {
@@ -64,14 +66,6 @@ public class SymbolString {
         }
 
         return sb.toString();
-    }
-
-    @Override
-    public String toString() {
-        return "SymbolString{" +
-                "symbols=" + symbols +
-                ", indexOfDot=" + indexOfDot +
-                '}';
     }
 
     @Override

@@ -85,7 +85,8 @@ public class Grammar {
         return symbols;
     }
 
-    public String toJSONString() {
+    @Override
+    public String toString() {
         StringBuilder sb = new StringBuilder();
 
         sb.append('{')
@@ -93,7 +94,7 @@ public class Grammar {
                 .append('[');
 
         for (Production _P : productions) {
-            sb.append(_P.toJSONString())
+            sb.append(_P)
                     .append(",");
         }
 
@@ -104,16 +105,5 @@ public class Grammar {
                 .append('}');
 
         return sb.toString();
-    }
-
-    @Override
-    public String toString() {
-        return "Grammar{" +
-                "start=" + start +
-                ", productions=" + productions +
-                ", terminators=" + terminators +
-                ", nonTerminators=" + nonTerminators +
-                ", symbols=" + symbols +
-                '}';
     }
 }

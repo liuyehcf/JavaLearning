@@ -1,10 +1,13 @@
 package org.liuyehcf.grammar;
 
+import org.liuyehcf.grammar.core.MorphemeType;
 import org.liuyehcf.grammar.core.definition.*;
 
+import static org.liuyehcf.grammar.cfg.TestLexicalAnalyzer.getIdRegex;
 import static org.liuyehcf.grammar.core.definition.Symbol.*;
 
 public abstract class GrammarCase {
+
     public static Grammar GRAMMAR_CASE_1 = Grammar.create(
             createNonTerminator("E"),
             Production.create(
@@ -47,81 +50,116 @@ public abstract class GrammarCase {
             )
     );
 
-    public static Grammar GRAMMAR_CASE_2 = Grammar.create(
-            createNonTerminator("E"),
-            Production.create(
-                    PrimaryProduction.create(
-                            createNonTerminator("E"),
-                            SymbolString.create(
-                                    createNonTerminator("T"),
-                                    createNonTerminator("E′")
-                            )
-                    )
-            ),
-            Production.create(
-                    PrimaryProduction.create(
-                            createNonTerminator("E′"),
-                            SymbolString.create(
-                                    createTerminator("+"),
-                                    createNonTerminator("T"),
-                                    createNonTerminator("E′")
-                            )
-                    )
-            ),
-            Production.create(
-                    PrimaryProduction.create(
-                            createNonTerminator("E′"),
-                            SymbolString.create(
-                                    Symbol.EPSILON
-                            )
-                    )
-            ),
-            Production.create(
-                    PrimaryProduction.create(
-                            createNonTerminator("T"),
-                            SymbolString.create(
-                                    createNonTerminator("F"),
-                                    createNonTerminator("T′")
-                            )
-                    )
-            ),
-            Production.create(
-                    PrimaryProduction.create(
-                            createNonTerminator("T′"),
-                            SymbolString.create(
-                                    createTerminator("*"),
-                                    createNonTerminator("F"),
-                                    createNonTerminator("T′")
-                            )
-                    )
-            ),
-            Production.create(
-                    PrimaryProduction.create(
-                            createNonTerminator("T′"),
-                            SymbolString.create(
-                                    Symbol.EPSILON
-                            )
-                    )
-            ),
-            Production.create(
-                    PrimaryProduction.create(
-                            createNonTerminator("F"),
-                            SymbolString.create(
-                                    createTerminator("("),
-                                    createNonTerminator("E"),
-                                    createTerminator(")")
-                            )
-                    )
-            ),
-            Production.create(
-                    PrimaryProduction.create(
-                            createNonTerminator("F"),
-                            SymbolString.create(
-                                    createRegexTerminator("id")
-                            )
-                    )
-            )
-    );
+    public static abstract class LL1_CASE1 {
+        public static Grammar GRAMMAR = Grammar.create(
+                createNonTerminator("E"),
+                Production.create(
+                        PrimaryProduction.create(
+                                createNonTerminator("E"),
+                                SymbolString.create(
+                                        createNonTerminator("T"),
+                                        createNonTerminator("E′")
+                                )
+                        )
+                ),
+                Production.create(
+                        PrimaryProduction.create(
+                                createNonTerminator("E′"),
+                                SymbolString.create(
+                                        createTerminator("+"),
+                                        createNonTerminator("T"),
+                                        createNonTerminator("E′")
+                                )
+                        )
+                ),
+                Production.create(
+                        PrimaryProduction.create(
+                                createNonTerminator("E′"),
+                                SymbolString.create(
+                                        Symbol.EPSILON
+                                )
+                        )
+                ),
+                Production.create(
+                        PrimaryProduction.create(
+                                createNonTerminator("T"),
+                                SymbolString.create(
+                                        createNonTerminator("F"),
+                                        createNonTerminator("T′")
+                                )
+                        )
+                ),
+                Production.create(
+                        PrimaryProduction.create(
+                                createNonTerminator("T′"),
+                                SymbolString.create(
+                                        createTerminator("*"),
+                                        createNonTerminator("F"),
+                                        createNonTerminator("T′")
+                                )
+                        )
+                ),
+                Production.create(
+                        PrimaryProduction.create(
+                                createNonTerminator("T′"),
+                                SymbolString.create(
+                                        Symbol.EPSILON
+                                )
+                        )
+                ),
+                Production.create(
+                        PrimaryProduction.create(
+                                createNonTerminator("F"),
+                                SymbolString.create(
+                                        createTerminator("("),
+                                        createNonTerminator("E"),
+                                        createTerminator(")")
+                                )
+                        )
+                ),
+                Production.create(
+                        PrimaryProduction.create(
+                                createNonTerminator("F"),
+                                SymbolString.create(
+                                        createRegexTerminator("id")
+                                )
+                        )
+                )
+        );
+
+        public static LexicalAnalyzer JDK_LEXICAL_ANALYZER = JdkLexicalAnalyzer.builder()
+                .addMorpheme("(")
+                .addMorpheme(")")
+                .addMorpheme("+")
+                .addMorpheme("*")
+                .addMorpheme("id", getIdRegex(), MorphemeType.REGEX)
+                .build();
+
+        public static LexicalAnalyzer NFA_LEXICAL_ANALYZER = NfaLexicalAnalyzer.builder()
+                .addMorpheme("(")
+                .addMorpheme(")")
+                .addMorpheme("+")
+                .addMorpheme("*")
+                .addMorpheme("id", getIdRegex(), MorphemeType.REGEX)
+                .build();
+
+        public static String[] TRUE_CASES = new String[]{
+                "(a)",
+                "a+b*c",
+                "(a+b)*c",
+                "(a+b*c+(d+e)*(f*g))",
+                "(a+b*cA+(name+e)*(age*hello))"
+        };
+
+        public static String[] FALSE_CASES = new String[]{
+                "a+0*c",
+                "(a+b)*1",
+                "(a+b*2B+(d+e)*(3*g))",
+                "(a+b*1A+(name+e)*(age*hello))",
+                "()"
+        };
+    }
+
     public static Grammar GRAMMAR_CASE_3 = Grammar.create(
             createNonTerminator("E"),
             Production.create(

@@ -46,15 +46,8 @@ public class PrimaryProduction {
         return Objects.hash(left, right);
     }
 
-    public String toJSONString() {
-        return left.toJSONString() + " → " + right.toJSONString();
-    }
-
     @Override
     public String toString() {
-        return "PrimaryProduction{" +
-                "left=" + left +
-                ", right=" + right +
-                '}';
+        return left + " → " + right;
     }
 }

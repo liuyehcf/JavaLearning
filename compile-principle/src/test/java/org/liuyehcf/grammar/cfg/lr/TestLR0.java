@@ -21,7 +21,7 @@ public class TestLR0 {
 
         assertEquals(
                 "{\"productions\":[\"__START__ → · S | S ·\",\"B → · a B | a · B | a B · | · b | b ·\",\"S → · B B | B · B | B B ·\"]}",
-                parser.getGrammar().toJSONString()
+                parser.getGrammar()
         );
 
         assertEquals(

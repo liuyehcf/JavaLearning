@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.liuyehcf.grammar.JdkLexicalAnalyzer;
 import org.liuyehcf.grammar.LexicalAnalyzer;
 import org.liuyehcf.grammar.core.MorphemeType;
+import org.liuyehcf.grammar.core.ParserException;
 
 import static org.junit.Assert.assertEquals;
 
@@ -11,16 +12,15 @@ public class TestLexicalAnalyzer {
     public static String getIdRegex() {
         String digit = "[0-9]";
         String letter = "[a-zA-Z_]";
-        String id = letter + "(" + letter + "|" + digit + ")*";
-        return id;
+        return letter + "(" + letter + "|" + digit + ")*";
     }
 
-    public static String getUnsignedIntegerRegex() {
+    private static String getUnsignedIntegerRegex() {
         return "[0-9]+";
     }
 
     @Test
-    public void testLexicalAnalyze1() {
+    public void testLexicalAnalyze1() throws ParserException {
         LexicalAnalyzer analyzer = JdkLexicalAnalyzer.builder()
                 .addMorpheme("int", "int", MorphemeType.NORMAL)
                 .addMorpheme("id", getIdRegex(), MorphemeType.REGEX)

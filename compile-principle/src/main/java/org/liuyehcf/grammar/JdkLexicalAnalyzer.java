@@ -1,6 +1,7 @@
 package org.liuyehcf.grammar;
 
 import org.liuyehcf.grammar.core.MorphemeType;
+import org.liuyehcf.grammar.core.ParserException;
 import org.liuyehcf.grammar.rg.Matcher;
 import org.liuyehcf.grammar.utils.Pair;
 
@@ -29,7 +30,8 @@ public class JdkLexicalAnalyzer extends AbstractLexicalAnalyzer {
         return new Builder();
     }
 
-    public TokenIteratorImpl iterator(String input) {
+    @Override
+    public TokenIteratorImpl iterator(String input) throws ParserException {
         return new TokenIteratorImpl(new JdkMatcherProxy(pattern.matcher(input)));
     }
 
