@@ -133,6 +133,7 @@ public abstract class GrammarCase {
                 .addMorpheme("real")
                 .addMorpheme("int")
                 .build();
+
         public static LexicalAnalyzer NFA_LEXICAL_ANALYZER = NfaLexicalAnalyzer.builder()
                 .addMorpheme("program ")
                 .addMorpheme(":")
@@ -144,11 +145,13 @@ public abstract class GrammarCase {
                 .addMorpheme("real")
                 .addMorpheme("int")
                 .build();
+
         public static String[] TRUE_CASES = new String[]{
                 "program id,id,id:real;s;s end",
                 "program id:int;s;s end",
                 "program id,id:int;s end",
         };
+
         public static String[] FALSE_CASES = new String[]{
                 "",
                 "id,id,id:real;s;s end",
@@ -157,12 +160,14 @@ public abstract class GrammarCase {
                 "program id,id,id:real;s;s",
                 "program id,id,id:real;s,s end",
         };
+
         private static String PROGRAM = "PROGRAM";
         private static String DECLIST = "DECLIST";
         private static String DECLISTN = "DECLISTN";
         private static String STLIST = "STLIST";
         private static String STLISTN = "STLISTN";
         private static String TYPE = "TYPE";
+
         public static Grammar GRAMMAR = Grammar.create(
                 createNonTerminator(PROGRAM),
                 Production.create(
@@ -250,6 +255,8 @@ public abstract class GrammarCase {
                         )
                 )
         );
+
+
     }
 
     public static abstract class LL1_CASE3 {
