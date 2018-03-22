@@ -39,6 +39,8 @@ public abstract class AbstractCfgParser implements CfgParser {
     // follow集
     private Map<Symbol, Set<Symbol>> follows;
 
+    private boolean isLegal;
+
     protected AbstractCfgParser(LexicalAnalyzer lexicalAnalyzer, Grammar originalGrammar, GrammarConverterPipeline grammarConverterPipeline) {
         if (originalGrammar == null || lexicalAnalyzer == null) {
             throw new NullPointerException();
@@ -46,31 +48,38 @@ public abstract class AbstractCfgParser implements CfgParser {
         this.lexicalAnalyzer = lexicalAnalyzer;
         this.originalGrammar = originalGrammar;
         this.grammarConverterPipeline = grammarConverterPipeline;
-
-        productionMap = new HashMap<>();
-        firsts = new HashMap<>();
-        follows = new HashMap<>();
     }
 
-    public Map<Symbol, Production> getProductionMap() {
+    protected Map<Symbol, Production> getProductionMap() {
         return productionMap;
     }
 
-    public Map<Symbol, Set<Symbol>> getFirsts() {
+    protected Map<Symbol, Set<Symbol>> getFirsts() {
         return firsts;
     }
 
-    public Map<Symbol, Set<Symbol>> getFollows() {
+    protected Map<Symbol, Set<Symbol>> getFollows() {
         return follows;
     }
+
+
+    @Override
+    public final boolean matches(String input) {
+        if (!isLegal) {
+            throw new RuntimeException(this.getClass().getSimpleName() + " can't support this Grammar");
+        }
+
+        return doMatches(input);
+    }
+
+    protected abstract boolean doMatches(String input);
 
     @Override
     public final Grammar getGrammar() {
         return grammar;
     }
 
-    @Override
-    public void init() {
+    protected final void init() {
         // 转换给定文法，包括消除直接/间接左递归；提取公因子
         convertGrammar();
 
@@ -82,12 +91,14 @@ public abstract class AbstractCfgParser implements CfgParser {
 
         // 后续初始化动作
         postInit();
-    }
 
-    protected abstract void postInit();
+        // 检查当前文法分析器是否支持该文法
+        checkIsLegal();
+    }
 
     private void convertGrammar() {
         this.grammar = grammarConverterPipeline.convert(originalGrammar);
+        this.productionMap = new HashMap<>();
 
         for (Production _P : grammar.getProductions()) {
             assertFalse(productionMap.containsKey(_P.getLeft()));
@@ -97,6 +108,8 @@ public abstract class AbstractCfgParser implements CfgParser {
     }
 
     private void calculateFirst() {
+        firsts = new HashMap<>();
+
         // 首先，处理所有的终结符
         for (Symbol symbol : this.grammar.getTerminators()) {
             firsts.put(symbol, SetUtils.of(symbol));
@@ -161,7 +174,18 @@ public abstract class AbstractCfgParser implements CfgParser {
         }
     }
 
+
+    private Map<Symbol, Set<Symbol>> copyFirst() {
+        Map<Symbol, Set<Symbol>> copy = new HashMap<>();
+        for (Map.Entry<Symbol, Set<Symbol>> entry : firsts.entrySet()) {
+            copy.put(entry.getKey(), new HashSet<>(entry.getValue()));
+        }
+        return copy;
+    }
+
     private void calculateFollow() {
+        follows = new HashMap<>();
+
         // 将$放入FOLLOW(S)中，其中S是开始符号，$是输入右端的结束标记
         follows.put(this.grammar.getStart(), SetUtils.of(Symbol.DOLLAR));
 
@@ -235,14 +259,6 @@ public abstract class AbstractCfgParser implements CfgParser {
         }
     }
 
-    private Map<Symbol, Set<Symbol>> copyFirst() {
-        Map<Symbol, Set<Symbol>> copy = new HashMap<>();
-        for (Map.Entry<Symbol, Set<Symbol>> entry : firsts.entrySet()) {
-            copy.put(entry.getKey(), new HashSet<>(entry.getValue()));
-        }
-        return copy;
-    }
-
     private Map<Symbol, Set<Symbol>> copyFollow() {
         Map<Symbol, Set<Symbol>> copy = new HashMap<>();
         for (Map.Entry<Symbol, Set<Symbol>> entry : follows.entrySet()) {
@@ -251,6 +267,7 @@ public abstract class AbstractCfgParser implements CfgParser {
         return copy;
     }
 
+    protected abstract void postInit();
 
     @Override
     public final String getFirstJSONString() {
@@ -325,4 +342,15 @@ public abstract class AbstractCfgParser implements CfgParser {
 
         return sb.toString();
     }
+
+    @Override
+    public boolean isLegal() {
+        return isLegal;
+    }
+
+    protected void setLegal(boolean isLegal) {
+        this.isLegal = isLegal;
+    }
+
+    protected abstract void checkIsLegal();
 }

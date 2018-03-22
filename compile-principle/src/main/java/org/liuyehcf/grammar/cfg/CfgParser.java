@@ -4,11 +4,6 @@ import org.liuyehcf.grammar.Parser;
 
 public interface CfgParser extends Parser {
     /**
-     * 初始化
-     */
-    void init();
-
-    /**
      * 获取First集的JSON串
      */
     String getFirstJSONString();
@@ -22,4 +17,9 @@ public interface CfgParser extends Parser {
      * 获取预测分析表的的Markdown格式的字符串
      */
     String getAnalysisTableMarkdownString();
+
+    /**
+     * 当前文法是否合法（是否是当前文法分析器支持的文法）
+     */
+    boolean isLegal();
 }

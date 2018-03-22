@@ -20,19 +20,19 @@ import static org.liuyehcf.grammar.utils.AssertUtils.*;
 
 abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
     // 项目集闭包
-    List<Closure> closures = new ArrayList<>();
+    private List<Closure> closures = new ArrayList<>();
 
     // 状态转移表 [ClosureId, Symbol] -> ClosureId
-    Map<Integer, Map<Symbol, Integer>> closureTransferTable = new HashMap<>();
+    private Map<Integer, Map<Symbol, Integer>> closureTransferTable = new HashMap<>();
 
     // 预测分析表正常情况下，表项只有一个，若出现多个，则说明有冲突
     // [ClosureId, Symbol] -> Operation
-    Map<Integer, Map<Symbol, LinkedHashSet<Operation>>> analysisTable = new HashMap<>();
+    private Map<Integer, Map<Symbol, LinkedHashSet<Operation>>> analysisTable = new HashMap<>();
 
     // 预测分析表中的所有输入符号，与Grammar中的符号有些不一样
-    List<Symbol> analysisSymbols = new ArrayList<>();
-    List<Symbol> analysisTerminators = new ArrayList<>();
-    int closureCnt = 0;
+    private List<Symbol> analysisSymbols = new ArrayList<>();
+    private List<Symbol> analysisTerminators = new ArrayList<>();
+    private int closureCnt = 0;
 
     AbstractLRParser(LexicalAnalyzer lexicalAnalyzer, Grammar originalGrammar) {
         super(lexicalAnalyzer, originalGrammar, GrammarConverterPipelineImpl
@@ -88,8 +88,12 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
         );
     }
 
+    List<Symbol> getAnalysisTerminators() {
+        return analysisTerminators;
+    }
+
     @Override
-    public final boolean matches(String input) {
+    protected final boolean doMatches(String input) {
         return new Matcher().matches(input);
     }
 
@@ -428,6 +432,7 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
 
     private void initAnalysisTable() {
         analysisTerminators.addAll(this.grammar.getTerminators().stream().filter(symbol -> !Symbol.EPSILON.equals(symbol)).collect(Collectors.toList()));
+        analysisTerminators = Collections.unmodifiableList(analysisTerminators);
         analysisSymbols.addAll(analysisTerminators);
         analysisSymbols.add(Symbol.DOLLAR);
         analysisSymbols.addAll(this.grammar.getNonTerminators().stream().filter((symbol -> !Symbol.START.equals(symbol))).collect(Collectors.toList()));
@@ -456,21 +461,25 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
                 }
             }
         }
+    }
 
-
+    @Override
+    protected void checkIsLegal() {
         // 检查合法性，即检查表项动作是否唯一
         for (Closure closure : closures) {
             for (Symbol symbol : analysisSymbols) {
                 if (analysisTable.get(closure.getId()).get(symbol).size() > 1) {
-                    System.err.println(this.getClass().getSimpleName() + ": Conflict");
+                    setLegal(false);
+                    return;
                 }
             }
         }
+        setLegal(true);
     }
 
     abstract void initAnalysisTableWithReduction(Closure closure, Item item);
 
-    void initAnalysisTableWithMoveIn(Closure closure, Symbol nextSymbol) {
+    private void initAnalysisTableWithMoveIn(Closure closure, Symbol nextSymbol) {
         analysisTable.get(closure.getId())
                 .get(nextSymbol)
                 .add(new Operation(
@@ -479,13 +488,23 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
                         Operation.OperationCode.MOVE_IN));
     }
 
-    void initAnalysisTableWithJump(Closure closure, Symbol nextSymbol) {
+    private void initAnalysisTableWithJump(Closure closure, Symbol nextSymbol) {
         analysisTable.get(closure.getId())
                 .get(nextSymbol)
                 .add(new Operation(
                         closureTransferTable.get(closure.getId()).get(nextSymbol),
                         null,
                         Operation.OperationCode.JUMP));
+    }
+
+    private Operation getOperationFromAnalysisTable(int closureId, Symbol symbol) {
+        if (analysisTable.get(closureId).get(symbol).isEmpty()) return null;
+        assertTrue(analysisTable.get(closureId).get(symbol).size() == 1);
+        return analysisTable.get(closureId).get(symbol).iterator().next();
+    }
+
+    void addOperationToAnalysisTable(int closureId, Symbol symbol, Operation operation) {
+        analysisTable.get(closureId).get(symbol).add(operation);
     }
 
     private class Matcher {
@@ -510,7 +529,7 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
 
             boolean canBreak = false;
             while (!canBreak) {
-                operation = lookUp(statusStack.peek(), remainSymbols.peek());
+                operation = getOperationFromAnalysisTable(statusStack.peek(), remainSymbols.peek());
 
                 if (operation == null) {
                     error();
@@ -568,7 +587,7 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
             assertTrue(statusStack.size() + 1 == symbolStack.size());
             assertTrue(!statusStack.isEmpty() && !symbolStack.isEmpty());
 
-            Operation nextOperation = lookUp(statusStack.peek(), symbolStack.peek());
+            Operation nextOperation = getOperationFromAnalysisTable(statusStack.peek(), symbolStack.peek());
             assertNotNull(nextOperation);
             assertFalse(nextOperation.getNextClosureId() == -1);
 
@@ -581,12 +600,6 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
 
         private void error() {
             canReceive = false;
-        }
-
-        private Operation lookUp(int closureId, Symbol symbol) {
-            if (analysisTable.get(closureId).get(symbol).isEmpty()) return null;
-            assertTrue(analysisTable.get(closureId).get(symbol).size() == 1);
-            return analysisTable.get(closureId).get(symbol).iterator().next();
         }
 
     }

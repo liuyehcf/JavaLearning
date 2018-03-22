@@ -4,7 +4,6 @@ import org.junit.Test;
 import org.liuyehcf.grammar.GrammarCase;
 import org.liuyehcf.grammar.JdkLexicalAnalyzer;
 import org.liuyehcf.grammar.LexicalAnalyzer;
-import org.liuyehcf.grammar.core.definition.Grammar;
 
 import static org.junit.Assert.*;
 
@@ -18,11 +17,11 @@ public class TestLR0 {
 
         LRParser parser = LR0.create(analyzer, GrammarCase.GRAMMAR_CASE_10);
 
-        Grammar convertedGrammar = parser.getGrammar();
+        assertTrue(parser.isLegal());
 
         assertEquals(
                 "{\"productions\":[\"__START__ → · S | S ·\",\"B → · a B | a · B | a B · | · b | b ·\",\"S → · B B | B · B | B B ·\"]}",
-                convertedGrammar.toJSONString()
+                parser.getGrammar().toJSONString()
         );
 
         assertEquals(
@@ -63,6 +62,8 @@ public class TestLR0 {
                 .build();
 
         LRParser parser = LR0.create(analyzer, GrammarCase.GRAMMAR_CASE_11);
+
+        assertFalse(parser.isLegal());
 
         assertEquals(
                 "| 状态\\文法符号 | ( | ) | * | + | id | __DOLLAR__ | T | E | F |\n" +

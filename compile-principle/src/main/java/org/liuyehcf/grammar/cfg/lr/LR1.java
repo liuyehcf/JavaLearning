@@ -18,7 +18,7 @@ public class LR1 extends AbstractLRParser {
     }
 
     public static LRParser create(LexicalAnalyzer lexicalAnalyzer, Grammar originalGrammar) {
-        LRParser parser = new LR1(lexicalAnalyzer, originalGrammar);
+        LR1 parser = new LR1(lexicalAnalyzer, originalGrammar);
 
         parser.init();
 
@@ -93,20 +93,24 @@ public class LR1 extends AbstractLRParser {
         PrimaryProduction _PPRaw = removeDot(_PP);
 
         if ((Symbol.START.equals(_PP.getLeft()))) {
-            analysisTable.get(closure.getId())
-                    .get(Symbol.DOLLAR)
-                    .add(new Operation(
+            addOperationToAnalysisTable(
+                    closure.getId(),
+                    Symbol.DOLLAR,
+                    new Operation(
                             -1,
                             _PPRaw,
-                            Operation.OperationCode.ACCEPT));
+                            Operation.OperationCode.ACCEPT)
+            );
         } else {
             for (Symbol terminator : item.getLookAHeads()) {
-                analysisTable.get(closure.getId())
-                        .get(terminator)
-                        .add(new Operation(
+                addOperationToAnalysisTable(
+                        closure.getId(),
+                        terminator,
+                        new Operation(
                                 -1,
                                 _PPRaw,
-                                Operation.OperationCode.REDUCTION));
+                                Operation.OperationCode.REDUCTION)
+                );
             }
         }
     }

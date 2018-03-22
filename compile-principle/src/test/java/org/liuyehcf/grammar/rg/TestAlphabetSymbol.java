@@ -3,7 +3,7 @@ package org.liuyehcf.grammar.rg;
 import org.junit.Test;
 import org.liuyehcf.grammar.rg.utils.SymbolUtils;
 
-import static org.liuyehcf.grammar.utils.AssertUtils.assertTrue;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by Liuye on 2017/10/26.

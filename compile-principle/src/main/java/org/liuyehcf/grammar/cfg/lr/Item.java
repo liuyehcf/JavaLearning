@@ -35,11 +35,6 @@ public class Item {
         return lookAHeads;
     }
 
-    public boolean isOfSamePrimaryProduction(PrimaryProduction _PP) {
-        return primaryProduction.equals(_PP);
-    }
-
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

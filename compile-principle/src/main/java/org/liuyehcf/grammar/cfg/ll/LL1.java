@@ -16,7 +16,8 @@ import org.liuyehcf.grammar.utils.SetUtils;
 
 import java.util.*;
 
-import static org.liuyehcf.grammar.utils.AssertUtils.*;
+import static org.liuyehcf.grammar.utils.AssertUtils.assertFalse;
+import static org.liuyehcf.grammar.utils.AssertUtils.assertNotNull;
 
 
 /**
@@ -25,21 +26,18 @@ import static org.liuyehcf.grammar.utils.AssertUtils.*;
 public class LL1 extends AbstractCfgParser implements LLParser {
 
     // select集
-    private Map<Symbol, Map<PrimaryProduction, Set<Symbol>>> selects;
+    private Map<Symbol, Map<PrimaryProduction, Set<Symbol>>> selects = new HashMap<>();
 
     private LL1(LexicalAnalyzer lexicalAnalyzer, Grammar originalGrammar) {
-
         super(lexicalAnalyzer, originalGrammar, GrammarConverterPipelineImpl
                 .builder()
                 .registerGrammarConverter(MergeGrammarConverter.class)
                 .registerGrammarConverter(LreElfGrammarConverter.class)
                 .build());
-
-        selects = new HashMap<>();
     }
 
     public static LLParser create(LexicalAnalyzer lexicalAnalyzer, Grammar originalGrammar) {
-        LLParser parser = new LL1(lexicalAnalyzer, originalGrammar);
+        LL1 parser = new LL1(lexicalAnalyzer, originalGrammar);
 
         parser.init();
 
@@ -90,8 +88,10 @@ public class LL1 extends AbstractCfgParser implements LLParser {
                 }
             }
         }
+    }
 
-
+    @Override
+    protected void checkIsLegal() {
         // 检查select集的唯一性：具有相同左部的产生式其SELECT集不相交
         for (Symbol _A : this.grammar.getNonTerminators()) {
             Map<PrimaryProduction, Set<Symbol>> map = selects.get(_A);
@@ -101,14 +101,19 @@ public class LL1 extends AbstractCfgParser implements LLParser {
 
             for (Map.Entry<PrimaryProduction, Set<Symbol>> entry : map.entrySet()) {
                 for (Symbol eachSelectSymbol : entry.getValue()) {
-                    assertTrue(selectsOfA.add(eachSelectSymbol));
+                    if (!selectsOfA.add(eachSelectSymbol)) {
+                        setLegal(false);
+                        return;
+                    }
                 }
             }
         }
+
+        setLegal(true);
     }
 
     @Override
-    public boolean matches(String input) {
+    protected boolean doMatches(String input) {
         LexicalAnalyzer.TokenIterator tokenIterator = lexicalAnalyzer.iterator(input);
 
         LinkedList<Symbol> symbolStack = new LinkedList<>();

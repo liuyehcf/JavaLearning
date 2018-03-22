@@ -5,7 +5,7 @@ import org.liuyehcf.grammar.GrammarCase;
 import org.liuyehcf.grammar.JdkLexicalAnalyzer;
 import org.liuyehcf.grammar.LexicalAnalyzer;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class TestSLR {
     @Test
@@ -19,6 +19,8 @@ public class TestSLR {
                 .build();
 
         LRParser parser = SLR.create(analyzer, GrammarCase.GRAMMAR_CASE_11);
+
+        assertTrue(parser.isLegal());
 
         assertEquals(
                 "| 状态\\文法符号 | ( | ) | * | + | id | __DOLLAR__ | T | E | F |\n" +
@@ -48,6 +50,8 @@ public class TestSLR {
                 .build();
 
         LRParser parser = SLR.create(analyzer, GrammarCase.GRAMMAR_CASE_12);
+
+        assertTrue(parser.isLegal());
 
         assertEquals(
                 "{\"nonTerminator\":{\"__START__\":\"__DOLLAR__\",\"B\":\"d\",\"T\":\"b,__DOLLAR__\"}}",
@@ -87,6 +91,8 @@ public class TestSLR {
                 .build();
 
         LRParser parser = SLR.create(analyzer, GrammarCase.GRAMMAR_CASE_13);
+
+        assertFalse(parser.isLegal());
 
         assertEquals(
                 "{\"nonTerminator\":{\"L\":\"__DOLLAR__,=\",\"__START__\":\"__DOLLAR__\",\"R\":\"__DOLLAR__,=\",\"S\":\"__DOLLAR__\"}}",

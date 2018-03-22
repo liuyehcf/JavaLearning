@@ -13,15 +13,16 @@ import static org.liuyehcf.grammar.cfg.TestLexicalAnalyzer.getIdRegex;
 
 public class TestLL1 {
     @Test
-    public void testFirstFollowSelectCase1() {
+    public void testStatus1() {
         Grammar grammar = GrammarCase.GRAMMAR_CASE_3;
 
         LLParser parser = LL1.create(getDefaultLexicalAnalyzer(), grammar);
-        Grammar convertedGrammar = parser.getGrammar();
+
+        assertTrue(parser.isLegal());
 
         assertEquals(
                 "{\"productions\":[\"E′ → + T E′ | __EPSILON__\",\"T′ → * F T′ | __EPSILON__\",\"T → ( E ) T′ | id T′\",\"E → ( E ) T′ E′ | id T′ E′\",\"F → ( E ) | id\"]}",
-                convertedGrammar.toJSONString()
+                parser.getGrammar().toJSONString()
         );
 
         assertEquals(
@@ -52,15 +53,16 @@ public class TestLL1 {
     }
 
     @Test
-    public void testFirstFollowSelectCase2() {
+    public void testStatus2() {
         Grammar grammar = GrammarCase.GRAMMAR_CASE_4;
 
         LLParser parser = LL1.create(getDefaultLexicalAnalyzer(), grammar);
-        Grammar convertedGrammar = parser.getGrammar();
+
+        assertTrue(parser.isLegal());
 
         assertEquals(
                 "{\"productions\":[\"PROGRAM → program DECLIST : TYPE ; STLIST end\",\"DECLISTN → , id DECLISTN | __EPSILON__\",\"STLIST → s STLISTN\",\"TYPE → real | int\",\"STLISTN → ; s STLISTN | __EPSILON__\",\"DECLIST → id DECLISTN\"]}",
-                convertedGrammar.toJSONString()
+                parser.getGrammar().toJSONString()
         );
 
         assertEquals(
@@ -92,7 +94,7 @@ public class TestLL1 {
     }
 
     @Test
-    public void testParseCase1WithJdkLexicalAnalyzer() {
+    public void testMatchCase1WithJdkLexicalAnalyzer() {
         Grammar grammar = GrammarCase.GRAMMAR_CASE_3;
 
         LexicalAnalyzer analyzer = JdkLexicalAnalyzer.builder()
@@ -105,6 +107,8 @@ public class TestLL1 {
 
         LLParser parser = LL1.create(analyzer, grammar);
 
+        assertTrue(parser.isLegal());
+
         assertTrue(parser.matches("id+id*id"));
         assertTrue(parser.matches("(id+id)*id"));
         assertTrue(parser.matches("id+(id*id)"));
@@ -112,7 +116,7 @@ public class TestLL1 {
     }
 
     @Test
-    public void testParseCase1WithNfaLexicalAnalyzer() {
+    public void testMatchCase1WithNfaLexicalAnalyzer() {
         Grammar grammar = GrammarCase.GRAMMAR_CASE_3;
 
         LexicalAnalyzer analyzer = NfaLexicalAnalyzer.builder()
@@ -125,6 +129,8 @@ public class TestLL1 {
 
         LLParser parser = LL1.create(analyzer, grammar);
 
+        assertTrue(parser.isLegal());
+
         assertTrue(parser.matches("id+id*id"));
         assertTrue(parser.matches("(id+id)*id"));
         assertTrue(parser.matches("id+(id*id)"));
@@ -132,7 +138,7 @@ public class TestLL1 {
     }
 
     @Test
-    public void testParseCase2WithJdkLexicalAnalyzer() {
+    public void testMatchCase2WithJdkLexicalAnalyzer() {
         Grammar grammar = GrammarCase.GRAMMAR_CASE_4;
 
         LexicalAnalyzer analyzer = JdkLexicalAnalyzer.builder()
@@ -149,6 +155,8 @@ public class TestLL1 {
 
         LLParser parser = LL1.create(analyzer, grammar);
 
+        assertTrue(parser.isLegal());
+
         assertTrue(parser.matches("program id, id, id: real; s; s end"));
         assertTrue(parser.matches("program id: int; s; s end"));
         assertTrue(parser.matches("program id, id: int; s end"));
@@ -161,7 +169,7 @@ public class TestLL1 {
     }
 
     @Test
-    public void testParseCase2WithNfaLexicalAnalyzer() {
+    public void testMatchCase2WithNfaLexicalAnalyzer() {
         Grammar grammar = GrammarCase.GRAMMAR_CASE_4;
 
         LexicalAnalyzer analyzer = NfaLexicalAnalyzer.builder()
@@ -178,6 +186,8 @@ public class TestLL1 {
 
         LLParser parser = LL1.create(analyzer, grammar);
 
+        assertTrue(parser.isLegal());
+
         assertTrue(parser.matches("program id, id, id: real; s; s end"));
         assertTrue(parser.matches("program id: int; s; s end"));
         assertTrue(parser.matches("program id, id: int; s end"));
@@ -190,7 +200,7 @@ public class TestLL1 {
     }
 
     @Test
-    public void testParseCase3WithJdkLexicalAnalyzer() {
+    public void testMatchCase3WithJdkLexicalAnalyzer() {
         Grammar grammar = GrammarCase.GRAMMAR_CASE_2;
 
         LexicalAnalyzer analyzer = JdkLexicalAnalyzer.builder()
@@ -204,6 +214,8 @@ public class TestLL1 {
 
         LLParser parser = LL1.create(analyzer, grammar);
 
+        assertTrue(parser.isLegal());
+
         assertTrue(parser.matches("A12+B*D"));
         assertTrue(parser.matches("(a+b01)*d03"));
         assertTrue(parser.matches("(asdfsdfDASDF323+ASDFC0102D*d23234+(asdf+dd)*(d1d*k9))"));
@@ -212,7 +224,7 @@ public class TestLL1 {
     }
 
     @Test
-    public void testParseCase3WithNfaLexicalAnalyzer() {
+    public void testMatchCase3WithNfaLexicalAnalyzer() {
         Grammar grammar = GrammarCase.GRAMMAR_CASE_2;
 
         LexicalAnalyzer analyzer = NfaLexicalAnalyzer.builder()
@@ -226,6 +238,8 @@ public class TestLL1 {
 
         LLParser parser = LL1.create(analyzer, grammar);
 
+        assertTrue(parser.isLegal());
+
         assertTrue(parser.matches("A12+B*D"));
         assertTrue(parser.matches("(a+b01)*d03"));
         assertTrue(parser.matches("(asdfsdfDASDF323+ASDFC0102D*d23234+(asdf+dd)*(d1d*k9))"));
@@ -234,7 +248,7 @@ public class TestLL1 {
     }
 
     @Test
-    public void testParseCase4WithJdkLexicalAnalyzer() {
+    public void testMatchCase4WithJdkLexicalAnalyzer() {
         Grammar grammar = GrammarCase.GRAMMAR_CASE_5;
 
         LexicalAnalyzer analyzer = JdkLexicalAnalyzer.builder()
@@ -251,6 +265,8 @@ public class TestLL1 {
                 .build();
 
         LLParser parser = LL1.create(analyzer, grammar);
+
+        assertTrue(parser.isLegal());
 
         assertTrue(parser.matches("a"));
         assertTrue(parser.matches("ab"));
@@ -270,7 +286,7 @@ public class TestLL1 {
     }
 
     @Test
-    public void testParseCase4WithNfaLexicalAnalyzer() {
+    public void testMatchCase4WithNfaLexicalAnalyzer() {
         Grammar grammar = GrammarCase.GRAMMAR_CASE_5;
 
         LexicalAnalyzer analyzer = NfaLexicalAnalyzer.builder()
@@ -287,6 +303,8 @@ public class TestLL1 {
                 .build();
 
         LLParser parser = LL1.create(analyzer, grammar);
+
+        assertTrue(parser.isLegal());
 
         assertTrue(parser.matches("a"));
         assertTrue(parser.matches("ab"));
