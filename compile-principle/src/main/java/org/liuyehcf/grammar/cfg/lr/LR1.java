@@ -61,16 +61,20 @@ public class LR1 extends AbstractLRParser {
 
         Set<Symbol> lookAHeadsB;
 
-        // 这里需要合并具有相同产生式的Item
-        // 形如 "[B → · γ, b]"与"[B → · γ, c]" 合并成 "[B → · γ, b/c]"
-
-        if (secondNextSymbol != null
-                && !getFirsts().get(secondNextSymbol).contains(Symbol.EPSILON)) {
-            // 此时展望符就是FIRST(secondNextSymbol)
-            lookAHeadsB = new HashSet<>(getFirsts().get(secondNextSymbol));
+        // 此时展望符包含A，"β -*> ε"
+        if (secondNextSymbol == null
+                || getFirsts().get(secondNextSymbol).contains(Symbol.EPSILON)) {
+            // 此时展望符就是 "FIRST(β) + a - ε"
+            lookAHeadsB = SetUtils.extract(
+                    SetUtils.of(
+                            lookAHeadsA,
+                            secondNextSymbol == null ? new HashSet<>() : getFirsts().get(secondNextSymbol)
+                    )
+                    , Symbol.EPSILON
+            );
         } else {
-            // 否则展望符继承自a
-            lookAHeadsB = new HashSet<>(lookAHeadsA);
+            // 此时展望符就是 "FIRST(β)"
+            lookAHeadsB = new HashSet<>(getFirsts().get(secondNextSymbol));
         }
 
         Production _P = getProductionMap().get(nextSymbol);

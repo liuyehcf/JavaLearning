@@ -122,4 +122,166 @@ public class TestLR1 {
             assertFalse(parser.matches(input));
         }
     }
+
+    @Test
+    public void testLL1Case1() {
+        LRParser parser = LR1.create(GrammarCase.LL1_CASE1.JDK_LEXICAL_ANALYZER, GrammarCase.LL1_CASE1.GRAMMAR);
+
+        assertTrue(parser.isLegal());
+
+        for (String input : GrammarCase.LL1_CASE1.TRUE_CASES) {
+            assertTrue(parser.matches(input));
+        }
+
+        for (String input : GrammarCase.LL1_CASE1.FALSE_CASES) {
+            assertFalse(parser.matches(input));
+        }
+
+        parser = LR1.create(GrammarCase.LL1_CASE1.NFA_LEXICAL_ANALYZER, GrammarCase.LL1_CASE1.GRAMMAR);
+
+        assertTrue(parser.isLegal());
+
+        for (String input : GrammarCase.LL1_CASE1.TRUE_CASES) {
+            assertTrue(parser.matches(input));
+        }
+
+        for (String input : GrammarCase.LL1_CASE1.FALSE_CASES) {
+            assertFalse(parser.matches(input));
+        }
+    }
+
+    @Test
+    public void testLL1Case2() {
+        LRParser parser = LR1.create(GrammarCase.LL1_CASE2.JDK_LEXICAL_ANALYZER, GrammarCase.LL1_CASE2.GRAMMAR);
+
+        assertTrue(parser.isLegal());
+
+        for (String input : GrammarCase.LL1_CASE2.TRUE_CASES) {
+            assertTrue(parser.matches(input));
+        }
+
+        for (String input : GrammarCase.LL1_CASE2.FALSE_CASES) {
+            assertFalse(parser.matches(input));
+        }
+
+        parser = LR1.create(GrammarCase.LL1_CASE2.NFA_LEXICAL_ANALYZER, GrammarCase.LL1_CASE2.GRAMMAR);
+
+        assertTrue(parser.isLegal());
+
+        for (String input : GrammarCase.LL1_CASE2.TRUE_CASES) {
+            assertTrue(parser.matches(input));
+        }
+
+        for (String input : GrammarCase.LL1_CASE2.FALSE_CASES) {
+            assertFalse(parser.matches(input));
+        }
+    }
+
+    @Test
+    public void testLL1Case3() {
+        LRParser parser = LR1.create(GrammarCase.LL1_CASE3.JDK_LEXICAL_ANALYZER, GrammarCase.LL1_CASE3.GRAMMAR);
+
+        assertTrue(parser.isLegal());
+
+        for (String input : GrammarCase.LL1_CASE3.TRUE_CASES) {
+            assertTrue(parser.matches(input));
+        }
+
+        for (String input : GrammarCase.LL1_CASE3.FALSE_CASES) {
+            assertFalse(parser.matches(input));
+        }
+
+        parser = LR1.create(GrammarCase.LL1_CASE3.NFA_LEXICAL_ANALYZER, GrammarCase.LL1_CASE3.GRAMMAR);
+
+        assertTrue(parser.isLegal());
+
+        for (String input : GrammarCase.LL1_CASE3.TRUE_CASES) {
+            assertTrue(parser.matches(input));
+        }
+
+        for (String input : GrammarCase.LL1_CASE3.FALSE_CASES) {
+            assertFalse(parser.matches(input));
+        }
+    }
+
+    @Test
+    public void testLR0Case1() {
+        LRParser parser = LR1.create(GrammarCase.LR0_CASE1.JDK_LEXICAL_ANALYZER, GrammarCase.LR0_CASE1.GRAMMAR);
+
+        assertTrue(parser.isLegal());
+
+        for (String input : GrammarCase.LR0_CASE1.TRUE_CASES) {
+            assertTrue(parser.matches(input));
+        }
+
+        for (String input : GrammarCase.LR0_CASE1.FALSE_CASES) {
+            assertFalse(parser.matches(input));
+        }
+
+        parser = LR1.create(GrammarCase.LR0_CASE1.NFA_LEXICAL_ANALYZER, GrammarCase.LR0_CASE1.GRAMMAR);
+
+        assertTrue(parser.isLegal());
+
+        for (String input : GrammarCase.LR0_CASE1.TRUE_CASES) {
+            assertTrue(parser.matches(input));
+        }
+
+        for (String input : GrammarCase.LR0_CASE1.FALSE_CASES) {
+            assertFalse(parser.matches(input));
+        }
+    }
+
+    @Test
+    public void testSLRCase1() {
+        LRParser parser = LR1.create(GrammarCase.SLR_CASE1.JDK_LEXICAL_ANALYZER, GrammarCase.SLR_CASE1.GRAMMAR);
+
+        assertTrue(parser.isLegal());
+
+        for (String input : GrammarCase.SLR_CASE1.TRUE_CASES) {
+            assertTrue(parser.matches(input));
+        }
+
+        for (String input : GrammarCase.SLR_CASE1.FALSE_CASES) {
+            assertFalse(parser.matches(input));
+        }
+
+        parser = LR1.create(GrammarCase.SLR_CASE1.NFA_LEXICAL_ANALYZER, GrammarCase.SLR_CASE1.GRAMMAR);
+
+        assertTrue(parser.isLegal());
+
+        for (String input : GrammarCase.SLR_CASE1.TRUE_CASES) {
+            assertTrue(parser.matches(input));
+        }
+
+        for (String input : GrammarCase.SLR_CASE1.FALSE_CASES) {
+            assertFalse(parser.matches(input));
+        }
+    }
+
+    @Test
+    public void testSLRCase2() {
+        LRParser parser = LR1.create(GrammarCase.SLR_CASE2.JDK_LEXICAL_ANALYZER, GrammarCase.SLR_CASE2.GRAMMAR);
+
+        assertTrue(parser.isLegal());
+
+        for (String input : GrammarCase.SLR_CASE2.TRUE_CASES) {
+            assertTrue(parser.matches(input));
+        }
+
+        for (String input : GrammarCase.SLR_CASE2.FALSE_CASES) {
+            assertFalse(parser.matches(input));
+        }
+
+        parser = LR1.create(GrammarCase.SLR_CASE2.NFA_LEXICAL_ANALYZER, GrammarCase.SLR_CASE2.GRAMMAR);
+
+        assertTrue(parser.isLegal());
+
+        for (String input : GrammarCase.SLR_CASE2.TRUE_CASES) {
+            assertTrue(parser.matches(input));
+        }
+
+        for (String input : GrammarCase.SLR_CASE2.FALSE_CASES) {
+            assertFalse(parser.matches(input));
+        }
+    }
 }

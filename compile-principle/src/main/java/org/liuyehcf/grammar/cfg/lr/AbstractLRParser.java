@@ -396,6 +396,7 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
         }
 
         // 合并具有相同产生式的Item，即合并展望符。同时保持Item的顺序，因此用LinkedHashMap
+        // 形如 "[B → · γ, b]"与"[B → · γ, c]" 合并成 "[B → · γ, b/c]"
         Map<PrimaryProduction, Item> helpMap = new LinkedHashMap<>();
 
         for (Item item : items) {
@@ -444,7 +445,6 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
                 analysisTable.get(closure.getId()).put(symbol, new LinkedHashSet<>());
             }
         }
-
 
         // 遍历每个Closure
         for (Closure closure : closures) {
