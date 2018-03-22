@@ -2,8 +2,6 @@ package org.liuyehcf.grammar.cfg.lr;
 
 import org.junit.Test;
 import org.liuyehcf.grammar.GrammarCase;
-import org.liuyehcf.grammar.JdkLexicalAnalyzer;
-import org.liuyehcf.grammar.LexicalAnalyzer;
 
 import static org.junit.Assert.*;
 
@@ -160,7 +158,6 @@ public class TestSLR {
         }
 
         for (String input : GrammarCase.SLR_CASE2.FALSE_CASES) {
-            System.out.println(input);
             assertFalse(parser.matches(input));
         }
 

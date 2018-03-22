@@ -52,7 +52,6 @@ public class TestLR1 {
         );
     }
 
-
     @Test
     public void testLR1Status1() {
 
