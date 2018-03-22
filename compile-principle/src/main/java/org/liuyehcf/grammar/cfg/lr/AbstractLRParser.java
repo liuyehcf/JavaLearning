@@ -432,7 +432,6 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
 
     private void initAnalysisTable() {
         analysisTerminators.addAll(this.grammar.getTerminators().stream().filter(symbol -> !Symbol.EPSILON.equals(symbol)).collect(Collectors.toList()));
-        analysisTerminators = Collections.unmodifiableList(analysisTerminators);
         analysisSymbols.addAll(analysisTerminators);
         analysisSymbols.add(Symbol.DOLLAR);
         analysisSymbols.addAll(this.grammar.getNonTerminators().stream().filter((symbol -> !Symbol.START.equals(symbol))).collect(Collectors.toList()));
