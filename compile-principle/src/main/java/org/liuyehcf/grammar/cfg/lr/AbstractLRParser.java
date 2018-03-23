@@ -20,10 +20,13 @@ import java.util.stream.Collectors;
 import static org.liuyehcf.grammar.utils.AssertUtils.*;
 
 abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
+
     // 是否合并同心闭包（只有LALR才是true）
     private final boolean needMerge;
+
     // 项目集闭包 closureId -> Closure
     private Map<Integer, Closure> closures;
+
     // 状态转移表 [ClosureId, Symbol] -> ClosureId
     private Map<Integer, Map<Symbol, Integer>> closureTransferTable;
 
@@ -414,8 +417,8 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
             return;
         }
 
-        // removedClosure --> savedClosure
-        Map<Closure, Closure> mergePairs = new HashMap<>();
+        // 首先找出所有需要合并的同心闭包。removedClosure --> savedClosure
+        Map<Closure, Closure> mergedClosurePairs = new HashMap<>();
 
         List<Integer> closureIds = ListUtils.sort(new ArrayList<>(closures.keySet()));
 
@@ -429,41 +432,36 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
 
                 if (Closure.isConcentric(savedClosure, removedClosure)) {
                     // 现在假设不可能有3个以上的冲突项
-                    assertFalse(mergePairs.containsKey(removedClosure));
-                    mergePairs.put(removedClosure, savedClosure);
+                    assertFalse(mergedClosurePairs.containsKey(removedClosure));
+                    mergedClosurePairs.put(removedClosure, savedClosure);
                 }
             }
         }
 
+        // 修改状态转移表
         Map<Integer, Map<Symbol, Integer>> newClosureTransferTable = new HashMap<>();
-
         for (Map.Entry<Integer, Map<Symbol, Integer>> outerEntry : closureTransferTable.entrySet()) {
             int fromClosureId = outerEntry.getKey();
             Closure fromClosure = closures.get(fromClosureId);
 
-            // 若这个Closure需要被移除，那么每一条连线都得改变
-            if (mergePairs.containsKey(fromClosure)) {
-                newClosureTransferTable.putIfAbsent(mergePairs.get(fromClosure).getId(), new HashMap<>());
+            // 若这个fromClosure需要被移除
+            if (mergedClosurePairs.containsKey(fromClosure)) {
+                newClosureTransferTable.putIfAbsent(mergedClosurePairs.get(fromClosure).getId(), new HashMap<>());
 
                 for (Map.Entry<Symbol, Integer> innerEntry : outerEntry.getValue().entrySet()) {
                     Symbol nextSymbol = innerEntry.getKey();
                     int toClosureId = innerEntry.getValue();
                     Closure toClosure = closures.get(toClosureId);
 
-                    // toClosure 仍然是需要被移除的Closure
-                    if (mergePairs.containsKey(toClosure)) {
-                        assertTrue(!newClosureTransferTable.get(mergePairs.get(fromClosure).getId()).containsKey(nextSymbol)
-                                || newClosureTransferTable.get(mergePairs.get(fromClosure).getId()).get(nextSymbol).equals(mergePairs.get(toClosure).getId()));
+                    int actualFromClosureId = mergedClosurePairs.get(fromClosure).getId();
+                    // toClosure也可能是需要被移除的
+                    int actualToClosureId = mergedClosurePairs.containsKey(toClosure) ? mergedClosurePairs.get(toClosure).getId() : toClosureId;
 
-                        newClosureTransferTable.get(mergePairs.get(fromClosure).getId())
-                                .put(nextSymbol, mergePairs.get(toClosure).getId());
-                    } else {
-                        assertTrue(!newClosureTransferTable.get(mergePairs.get(fromClosure).getId()).containsKey(nextSymbol)
-                                || newClosureTransferTable.get(mergePairs.get(fromClosure).getId()).get(nextSymbol).equals(toClosureId));
+                    assertTrue(!newClosureTransferTable.get(actualFromClosureId).containsKey(nextSymbol)
+                            || newClosureTransferTable.get(actualFromClosureId).get(nextSymbol).equals(actualToClosureId));
 
-                        newClosureTransferTable.get(mergePairs.get(fromClosure).getId())
-                                .put(nextSymbol, toClosureId);
-                    }
+                    newClosureTransferTable.get(actualFromClosureId)
+                            .put(nextSymbol, actualToClosureId);
                 }
             } else {
                 newClosureTransferTable.putIfAbsent(fromClosureId, new HashMap<>());
@@ -473,28 +471,21 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
                     int toClosureId = innerEntry.getValue();
                     Closure toClosure = closures.get(toClosureId);
 
-                    // toClosure 是需要被移除的Closure
-                    if (mergePairs.containsKey(toClosure)) {
-                        assertTrue(!newClosureTransferTable.get(fromClosureId).containsKey(nextSymbol)
-                                || newClosureTransferTable.get(mergePairs.get(fromClosure).getId()).get(nextSymbol).equals(mergePairs.get(toClosure).getId()));
+                    int actualFromClosureId = fromClosureId;
+                    // toClosure也可能是需要被移除的
+                    int actualToClosureId = mergedClosurePairs.containsKey(toClosure) ? mergedClosurePairs.get(toClosure).getId() : toClosureId;
 
+                    assertTrue(!newClosureTransferTable.get(actualFromClosureId).containsKey(nextSymbol)
+                            || newClosureTransferTable.get(actualFromClosureId).get(nextSymbol).equals(actualToClosureId));
 
-                        newClosureTransferTable.get(fromClosureId)
-                                .put(nextSymbol, mergePairs.get(toClosure).getId());
-                    } else {
-                        assertTrue(!newClosureTransferTable.get(fromClosureId).containsKey(nextSymbol)
-                                || newClosureTransferTable.get(mergePairs.get(fromClosure).getId()).get(nextSymbol).equals(toClosureId));
-
-
-                        newClosureTransferTable.get(fromClosureId)
-                                .put(nextSymbol, toClosureId);
-                    }
+                    newClosureTransferTable.get(actualFromClosureId)
+                            .put(nextSymbol, actualToClosureId);
                 }
             }
         }
 
         // 合并同心闭包的展望符集合
-        for (Map.Entry<Closure, Closure> entry : mergePairs.entrySet()) {
+        for (Map.Entry<Closure, Closure> entry : mergedClosurePairs.entrySet()) {
             Closure savedClosure = entry.getValue();
             Closure removedClosure = entry.getKey();
 
@@ -543,7 +534,7 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
         }
 
         this.closureTransferTable = newClosureTransferTable;
-        for (int id : mergePairs.keySet().stream().map(Closure::getId).collect(Collectors.toList())) {
+        for (int id : mergedClosurePairs.keySet().stream().map(Closure::getId).collect(Collectors.toList())) {
             closures.remove(id);
         }
     }
@@ -610,7 +601,6 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
     abstract void initAnalysisTableWithReduction(Closure closure, Item item);
 
     private void initAnalysisTableWithMoveIn(Closure closure, Symbol nextSymbol) {
-        assertNotNull(closureTransferTable.get(closure.getId()));
         analysisTable.get(closure.getId())
                 .get(nextSymbol)
                 .add(new Operation(
