@@ -12,7 +12,7 @@ import static org.liuyehcf.grammar.utils.AssertUtils.assertTrue;
 /**
  * 具有相同左部的产生式集合
  */
-public class Production {
+public class Production implements Comparable<Production> {
     private static final String OR = "|";
 
     private final Symbol left;
@@ -20,7 +20,7 @@ public class Production {
     private final List<PrimaryProduction> primaryProductions;
 
     private Production(List<PrimaryProduction> primaryProductions) {
-        this.primaryProductions = Collections.unmodifiableList(primaryProductions);
+        this.primaryProductions = Collections.unmodifiableList(ListUtils.sort(primaryProductions));
 
         Symbol left = null;
         for (PrimaryProduction _PP : primaryProductions) {
@@ -85,5 +85,29 @@ public class Production {
     public int hashCode() {
 
         return Objects.hash(left, primaryProductions);
+    }
+
+    @Override
+    public int compareTo(Production o) {
+        int res = this.left.compareTo(o.left);
+        if (res == 0) {
+            int i = 0;
+            while (i < this.primaryProductions.size()
+                    && i < o.primaryProductions.size()) {
+                res = this.primaryProductions.get(i).compareTo(o.primaryProductions.get(i));
+                if (res != 0) {
+                    return res;
+                }
+                i++;
+            }
+            if (i < this.primaryProductions.size()) {
+                return 1;
+            } else if (i < o.primaryProductions.size()) {
+                return -1;
+            } else {
+                return 0;
+            }
+        }
+        return res;
     }
 }

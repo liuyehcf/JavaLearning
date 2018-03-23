@@ -3,11 +3,11 @@ package org.liuyehcf.grammar.cfg.lr;
 import org.liuyehcf.grammar.core.definition.PrimaryProduction;
 import org.liuyehcf.grammar.core.definition.Symbol;
 
-import java.util.Collections;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
-public class Item {
+import static org.liuyehcf.grammar.utils.AssertUtils.assertFalse;
+
+public class Item implements Comparable<Item> {
     /**
      * 产生式
      */
@@ -23,7 +23,7 @@ public class Item {
         if (lookAHeads == null) {
             this.lookAHeads = null;
         } else {
-            this.lookAHeads = Collections.unmodifiableSet(lookAHeads);
+            this.lookAHeads = Collections.unmodifiableSet(new TreeSet<>(lookAHeads));
         }
     }
 
@@ -52,9 +52,42 @@ public class Item {
 
     @Override
     public String toString() {
-        return "Item{" +
-                "primaryProduction=" + primaryProduction +
-                ", lookAHeads=" + lookAHeads +
-                '}';
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(primaryProduction);
+
+        if (lookAHeads != null) {
+            assertFalse(lookAHeads.isEmpty());
+            sb.append(", ");
+            sb.append(lookAHeads);
+        }
+
+        return sb.toString();
+    }
+
+    @Override
+    public int compareTo(Item o) {
+        int res = this.primaryProduction.compareTo(o.primaryProduction);
+        if (res == 0) {
+            Iterator<Symbol> thisIterator = this.lookAHeads.iterator();
+            Iterator<Symbol> oIterator = o.lookAHeads.iterator();
+
+            while (thisIterator.hasNext()
+                    && oIterator.hasNext()) {
+                res = thisIterator.next().compareTo(oIterator.next());
+                if (res != 0) {
+                    return res;
+                }
+            }
+
+            if (thisIterator.hasNext()) {
+                return 1;
+            } else if (oIterator.hasNext()) {
+                return -1;
+            } else {
+                return 0;
+            }
+        }
+        return res;
     }
 }

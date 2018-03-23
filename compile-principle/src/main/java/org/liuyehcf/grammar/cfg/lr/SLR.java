@@ -34,7 +34,6 @@ public class SLR extends LR0 {
                             Operation.OperationCode.ACCEPT)
             );
         } else {
-
             for (Symbol terminator : getAnalysisTerminators()) {
                 if (getFollows().get(_PPRaw.getLeft()).contains(terminator)) {
                     addOperationToAnalysisTable(
@@ -46,16 +45,6 @@ public class SLR extends LR0 {
                                     Operation.OperationCode.REDUCTION)
                     );
                 }
-            }
-            if (getFollows().get(_PPRaw.getLeft()).contains(Symbol.DOLLAR)) {
-                addOperationToAnalysisTable(
-                        closure.getId(),
-                        Symbol.DOLLAR,
-                        new Operation(
-                                -1,
-                                _PPRaw,
-                                Operation.OperationCode.REDUCTION)
-                );
             }
         }
     }

@@ -7,11 +7,11 @@ import org.liuyehcf.grammar.core.MorphemeType;
  * 特殊符号用"__"作为前后缀，且全部字母大写，同时禁止普通Symbol带有"__"前后缀
  * 该类型与String一样，都是无状态的。只要字段数值一样，那么equals必定相同，hashCode也相同
  */
-public class Symbol {
+public class Symbol implements Comparable<Symbol> {
 
-    public static final Symbol START = new Symbol(false, "__START__", 0, MorphemeType.NORMAL);
-    public static final Symbol EPSILON = new Symbol(true, "__EPSILON__", 0, MorphemeType.NORMAL);
-    public static final Symbol DOLLAR = new Symbol(true, "__DOLLAR__", 0, MorphemeType.NORMAL);
+    public static final Symbol START = new Symbol(false, "__S__", 0, MorphemeType.NORMAL);
+    public static final Symbol EPSILON = new Symbol(true, "__ε__", 0, MorphemeType.NORMAL);
+    public static final Symbol DOLLAR = new Symbol(true, "__$__", 0, MorphemeType.NORMAL);
 
 
     private static final String SPECIAL_PREFIX = "__";
@@ -102,13 +102,6 @@ public class Symbol {
     }
 
     /**
-     * 是否为异变符号
-     */
-    public boolean isPrimedSymbol() {
-        return primeCount != 0;
-    }
-
-    /**
      * 根据异变次数生成后缀符号，例如1次异变就是"′"
      */
     private String toPrimeString() {
@@ -150,5 +143,23 @@ public class Symbol {
     @Override
     public String toString() {
         return getPrimedValue();
+    }
+
+    @Override
+    public int compareTo(Symbol o) {
+        int res = (this.isTerminator ? 0 : 1)
+                - (o.isTerminator ? 0 : 1);
+        if (res == 0) {
+            res = this.value.compareTo(o.value);
+            if (res == 0) {
+                res = this.primeCount - o.primeCount;
+                if (res == 0) {
+                    return this.type.getOrder() - o.type.getOrder();
+                }
+                return res;
+            }
+            return res;
+        }
+        return res;
     }
 }

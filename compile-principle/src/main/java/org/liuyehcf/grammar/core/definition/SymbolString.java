@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * 文法符号串
  */
-public class SymbolString {
+public class SymbolString implements Comparable<SymbolString> {
     // 会包含ε的文法符号串
     public static final SymbolString EPSILON_RAW = create(Symbol.EPSILON);
 
@@ -98,5 +98,26 @@ public class SymbolString {
             }
         }
         return false;
+    }
+
+    @Override
+    public int compareTo(SymbolString o) {
+        int res;
+        int i = 0;
+        while (i < this.symbols.size()
+                && i < o.symbols.size()) {
+            res = this.symbols.get(i).compareTo(o.symbols.get(i));
+            if (res != 0) {
+                return res;
+            }
+            i++;
+        }
+        if (i < this.symbols.size()) {
+            return 1;
+        } else if (i < o.symbols.size()) {
+            return -1;
+        } else {
+            return this.indexOfDot - o.indexOfDot;
+        }
     }
 }

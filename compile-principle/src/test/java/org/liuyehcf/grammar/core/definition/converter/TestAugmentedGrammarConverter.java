@@ -31,7 +31,7 @@ public class TestAugmentedGrammarConverter {
         Grammar convertedGrammar = new AugmentedGrammarConverter(grammar).getConvertedGrammar();
 
         assertEquals(
-                "{\"productions\":[\"__START__ → S\",\"S → b B B\"]}",
+                "{\"productions\":[\"S → b B B\",\"__S__ → S\"]}",
                 convertedGrammar.toString()
         );
     }
@@ -42,7 +42,7 @@ public class TestAugmentedGrammarConverter {
         Grammar convertedGrammar = new AugmentedGrammarConverter(GrammarCase.Ambiguity_CASE1.GRAMMAR).getConvertedGrammar();
 
         assertEquals(
-                "{\"productions\":[\"__START__ → E\",\"E → E + E\",\"E → E * E\",\"E → ( E )\",\"E → id\"]}",
+                "{\"productions\":[\"E → ( E )\",\"E → id\",\"E → E * E\",\"E → E + E\",\"__S__ → E\"]}",
                 convertedGrammar.toString()
         );
     }

@@ -22,14 +22,13 @@ public class AugmentedGrammarConverter extends AbstractGrammarConverter {
         List<Production> newProductions = new ArrayList<>();
 
         assertFalse(originalGrammar.getProductions().isEmpty());
-        Symbol originStartSymbol = originalGrammar.getProductions().get(0).getLeft();
 
         newProductions.add(
                 Production.create(
                         PrimaryProduction.create(
                                 Symbol.START,
                                 SymbolString.create(
-                                        ListUtils.of(originStartSymbol)
+                                        ListUtils.of(originalGrammar.getStart())
                                 )
                         )
                 )

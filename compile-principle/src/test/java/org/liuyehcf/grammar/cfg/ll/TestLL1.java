@@ -13,33 +13,33 @@ public class TestLL1 {
         assertTrue(parser.isLegal());
 
         assertEquals(
-                "{\"productions\":[\"E′ → + T E′ | __EPSILON__\",\"T′ → * F T′ | __EPSILON__\",\"T → ( E ) T′ | id T′\",\"E → ( E ) T′ E′ | id T′ E′\",\"F → ( E ) | id\"]}",
+                "{\"productions\":[\"E → ( E ) T′ E′ | id T′ E′\",\"E′ → + T E′ | __ε__\",\"F → ( E ) | id\",\"T → ( E ) T′ | id T′\",\"T′ → * F T′ | __ε__\"]}",
                 parser.getGrammar().toString()
         );
 
         assertEquals(
-                "{\"terminator\":{\"__EPSILON__\":\"__EPSILON__\",\"id\":\"id\",\"(\":\"(\",\")\":\")\",\"*\":\"*\",\"+\":\"+\"},\"nonTerminator\":{\"E′\":\"__EPSILON__,+\",\"T′\":\"__EPSILON__,*\",\"T\":\"id,(\",\"E\":\"id,(\",\"F\":\"id,(\"}}",
+                "{\"terminator\":{\"(\":\"(\",\")\":\")\",\"*\":\"*\",\"+\":\"+\",\"__ε__\":\"__ε__\",\"id\":\"id\"},\"nonTerminator\":{\"E\":\"id,(\",\"E′\":\"__ε__,+\",\"F\":\"id,(\",\"T\":\"id,(\",\"T′\":\"__ε__,*\"}}",
                 parser.getFirstJSONString()
         );
 
         assertEquals(
-                "{\"nonTerminator\":{\"E′\":\"),__DOLLAR__\",\"T′\":\"),+,__DOLLAR__\",\"T\":\"),+,__DOLLAR__\",\"E\":\"),__DOLLAR__\",\"F\":\"),*,+,__DOLLAR__\"}}",
+                "{\"nonTerminator\":{\"E\":\"__$__,)\",\"E′\":\"__$__,)\",\"F\":\"__$__,),*,+\",\"T\":\"__$__,),+\",\"T′\":\"__$__,),+\"}}",
                 parser.getFollowJSONString()
         );
 
         assertEquals(
-                "{\"E′\":{\"E′ → + T E′\":\"+\",\"E′ → __EPSILON__\":\"),__DOLLAR__\"},\"T′\":{\"T′ → * F T′\":\"*\",\"T′ → __EPSILON__\":\"),+,__DOLLAR__\"},\"T\":{\"T → ( E ) T′\":\"(\",\"T → id T′\":\"id\"},\"E\":{\"E → ( E ) T′ E′\":\"(\",\"E → id T′ E′\":\"id\"},\"F\":{\"F → ( E )\":\"(\",\"F → id\":\"id\"}}",
+                "{\"E′\":{\"E′ → + T E′\":\"+\",\"E′ → __ε__\":\"__$__,)\"},\"T′\":{\"T′ → * F T′\":\"*\",\"T′ → __ε__\":\"__$__,),+\"},\"T\":{\"T → ( E ) T′\":\"(\",\"T → id T′\":\"id\"},\"E\":{\"E → ( E ) T′ E′\":\"(\",\"E → id T′ E′\":\"id\"},\"F\":{\"F → ( E )\":\"(\",\"F → id\":\"id\"}}",
                 parser.getSelectJSONString()
         );
 
         assertEquals(
-                "| 非终结符\\终结符 | __EPSILON__ | id | ( | ) | * | + |\n" +
+                "| 非终结符\\终结符 | ( | ) | * | + | __ε__ | id |\n" +
                         "|:--|:--|:--|:--|:--|:--|:--|\n" +
-                        "| E′ | \\ | \\ | \\ | E′ → __EPSILON__ | \\ | E′ → + T E′ |\n" +
-                        "| T′ | \\ | \\ | \\ | T′ → __EPSILON__ | T′ → * F T′ | T′ → __EPSILON__ |\n" +
-                        "| T | \\ | T → id T′ | T → ( E ) T′ | \\ | \\ | \\ |\n" +
-                        "| E | \\ | E → id T′ E′ | E → ( E ) T′ E′ | \\ | \\ | \\ |\n" +
-                        "| F | \\ | F → id | F → ( E ) | \\ | \\ | \\ |\n",
+                        "| E | E → ( E ) T′ E′ | \\ | \\ | \\ | \\ | E → id T′ E′ |\n" +
+                        "| E′ | \\ | E′ → __ε__ | \\ | E′ → + T E′ | \\ | \\ |\n" +
+                        "| F | F → ( E ) | \\ | \\ | \\ | \\ | F → id |\n" +
+                        "| T | T → ( E ) T′ | \\ | \\ | \\ | \\ | T → id T′ |\n" +
+                        "| T′ | \\ | T′ → __ε__ | T′ → * F T′ | T′ → __ε__ | \\ | \\ |\n",
                 parser.getAnalysisTableMarkdownString()
         );
     }
@@ -51,34 +51,34 @@ public class TestLL1 {
         assertTrue(parser.isLegal());
 
         assertEquals(
-                "{\"productions\":[\"PROGRAM → program  DECLIST : TYPE ; STLIST  end\",\"DECLISTN → , id DECLISTN | __EPSILON__\",\"STLIST → s STLISTN\",\"TYPE → real | int\",\"STLISTN → ; s STLISTN | __EPSILON__\",\"DECLIST → id DECLISTN\"]}",
+                "{\"productions\":[\"DECLIST → id DECLISTN\",\"DECLISTN → , id DECLISTN | __ε__\",\"PROGRAM → program  DECLIST : TYPE ; STLIST  end\",\"STLIST → s STLISTN\",\"STLISTN → ; s STLISTN | __ε__\",\"TYPE → int | real\"]}",
                 parser.getGrammar().toString()
         );
 
         assertEquals(
-                "{\"terminator\":{\"__EPSILON__\":\"__EPSILON__\",\"s\":\"s\",\"program \":\"program \",\":\":\":\",\";\":\";\",\" end\":\" end\",\"id\":\"id\",\"real\":\"real\",\",\":\",\",\"int\":\"int\"},\"nonTerminator\":{\"PROGRAM\":\"program \",\"STLIST\":\"s\",\"DECLISTN\":\"__EPSILON__,,\",\"TYPE\":\"real,int\",\"STLISTN\":\"__EPSILON__,;\",\"DECLIST\":\"id\"}}",
+                "{\"terminator\":{\" end\":\" end\",\",\":\",\",\":\":\":\",\";\":\";\",\"__ε__\":\"__ε__\",\"id\":\"id\",\"int\":\"int\",\"program \":\"program \",\"real\":\"real\",\"s\":\"s\"},\"nonTerminator\":{\"DECLIST\":\"id\",\"DECLISTN\":\"__ε__,,\",\"PROGRAM\":\"program \",\"STLIST\":\"s\",\"STLISTN\":\"__ε__,;\",\"TYPE\":\"real,int\"}}",
                 parser.getFirstJSONString()
         );
 
         assertEquals(
-                "{\"nonTerminator\":{\"PROGRAM\":\"__DOLLAR__\",\"STLIST\":\" end\",\"DECLISTN\":\":\",\"TYPE\":\";\",\"STLISTN\":\" end\",\"DECLIST\":\":\"}}",
+                "{\"nonTerminator\":{\"DECLIST\":\":\",\"DECLISTN\":\":\",\"PROGRAM\":\"__$__\",\"STLIST\":\" end\",\"STLISTN\":\" end\",\"TYPE\":\";\"}}",
                 parser.getFollowJSONString()
         );
 
         assertEquals(
-                "{\"PROGRAM\":{\"PROGRAM → program  DECLIST : TYPE ; STLIST  end\":\"program \"},\"STLIST\":{\"STLIST → s STLISTN\":\"s\"},\"DECLISTN\":{\"DECLISTN → __EPSILON__\":\":\",\"DECLISTN → , id DECLISTN\":\",\"},\"TYPE\":{\"TYPE → real\":\"real\",\"TYPE → int\":\"int\"},\"STLISTN\":{\"STLISTN → __EPSILON__\":\" end\",\"STLISTN → ; s STLISTN\":\";\"},\"DECLIST\":{\"DECLIST → id DECLISTN\":\"id\"}}",
+                "{\"DECLISTN\":{\"DECLISTN → __ε__\":\":\",\"DECLISTN → , id DECLISTN\":\",\"},\"PROGRAM\":{\"PROGRAM → program  DECLIST : TYPE ; STLIST  end\":\"program \"},\"STLIST\":{\"STLIST → s STLISTN\":\"s\"},\"TYPE\":{\"TYPE → real\":\"real\",\"TYPE → int\":\"int\"},\"STLISTN\":{\"STLISTN → ; s STLISTN\":\";\",\"STLISTN → __ε__\":\" end\"},\"DECLIST\":{\"DECLIST → id DECLISTN\":\"id\"}}",
                 parser.getSelectJSONString()
         );
 
         assertEquals(
-                "| 非终结符\\终结符 | __EPSILON__ | s | program  | : | ; |  end | id | real | , | int |\n" +
+                "| 非终结符\\终结符 |  end | , | : | ; | __ε__ | id | int | program  | real | s |\n" +
                         "|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|\n" +
-                        "| PROGRAM | \\ | \\ | PROGRAM → program  DECLIST : TYPE ; STLIST  end | \\ | \\ | \\ | \\ | \\ | \\ | \\ |\n" +
-                        "| STLIST | \\ | STLIST → s STLISTN | \\ | \\ | \\ | \\ | \\ | \\ | \\ | \\ |\n" +
-                        "| DECLISTN | \\ | \\ | \\ | DECLISTN → __EPSILON__ | \\ | \\ | \\ | \\ | DECLISTN → , id DECLISTN | \\ |\n" +
-                        "| TYPE | \\ | \\ | \\ | \\ | \\ | \\ | \\ | TYPE → real | \\ | TYPE → int |\n" +
-                        "| STLISTN | \\ | \\ | \\ | \\ | STLISTN → ; s STLISTN | STLISTN → __EPSILON__ | \\ | \\ | \\ | \\ |\n" +
-                        "| DECLIST | \\ | \\ | \\ | \\ | \\ | \\ | DECLIST → id DECLISTN | \\ | \\ | \\ |\n",
+                        "| DECLIST | \\ | \\ | \\ | \\ | \\ | DECLIST → id DECLISTN | \\ | \\ | \\ | \\ |\n" +
+                        "| DECLISTN | \\ | DECLISTN → , id DECLISTN | DECLISTN → __ε__ | \\ | \\ | \\ | \\ | \\ | \\ | \\ |\n" +
+                        "| PROGRAM | \\ | \\ | \\ | \\ | \\ | \\ | \\ | PROGRAM → program  DECLIST : TYPE ; STLIST  end | \\ | \\ |\n" +
+                        "| STLIST | \\ | \\ | \\ | \\ | \\ | \\ | \\ | \\ | \\ | STLIST → s STLISTN |\n" +
+                        "| STLISTN | STLISTN → __ε__ | \\ | \\ | STLISTN → ; s STLISTN | \\ | \\ | \\ | \\ | \\ | \\ |\n" +
+                        "| TYPE | \\ | \\ | \\ | \\ | \\ | \\ | TYPE → int | \\ | TYPE → real | \\ |\n",
                 parser.getAnalysisTableMarkdownString()
         );
     }

@@ -7,7 +7,7 @@ import java.util.Objects;
  * 只研究二型文法（包括三型文法）
  * 等式左边是非终结符，等式右边是文法符号串
  */
-public class PrimaryProduction {
+public class PrimaryProduction implements Comparable<PrimaryProduction> {
     // 产生式左侧非终结符
     private final Symbol left;
 
@@ -49,5 +49,14 @@ public class PrimaryProduction {
     @Override
     public String toString() {
         return left + " → " + right;
+    }
+
+    @Override
+    public int compareTo(PrimaryProduction o) {
+        int res = this.left.compareTo(o.left);
+        if (res == 0) {
+            return this.right.compareTo(o.right);
+        }
+        return res;
     }
 }

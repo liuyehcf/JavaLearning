@@ -2,6 +2,7 @@ package org.liuyehcf.grammar.utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public abstract class ListUtils {
@@ -36,5 +37,10 @@ public abstract class ListUtils {
         List<T> newList = new ArrayList<>(list1);
         newList.addAll(list2);
         return newList;
+    }
+
+    public static <T extends Comparable<T>> List<T> sort(List<T> list) {
+        Collections.sort(list);
+        return list;
     }
 }

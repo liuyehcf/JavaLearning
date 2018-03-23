@@ -43,7 +43,7 @@ public class TestStatusExpandGrammarConverter {
         Grammar convertedGrammar = getGrammarConverterPipeline().convert(GrammarCase.Ambiguity_CASE1.GRAMMAR);
 
         assertEquals(
-                "{\"productions\":[\"E → · E + E\",\"E → E · + E\",\"E → E + · E\",\"E → E + E ·\",\"E → · E * E\",\"E → E · * E\",\"E → E * · E\",\"E → E * E ·\",\"E → · ( E )\",\"E → ( · E )\",\"E → ( E · )\",\"E → ( E ) ·\",\"E → · id\",\"E → id ·\"]}",
+                "{\"productions\":[\"E → · ( E )\",\"E → ( · E )\",\"E → ( E · )\",\"E → ( E ) ·\",\"E → · id\",\"E → id ·\",\"E → · E * E\",\"E → E · * E\",\"E → E * · E\",\"E → E * E ·\",\"E → · E + E\",\"E → E · + E\",\"E → E + · E\",\"E → E + E ·\"]}",
                 convertedGrammar.toString()
         );
     }

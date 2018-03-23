@@ -90,14 +90,6 @@ public class LR0 extends AbstractLRParser {
                                 Operation.OperationCode.REDUCTION)
                 );
             }
-            addOperationToAnalysisTable(
-                    closure.getId(),
-                    Symbol.DOLLAR,
-                    new Operation(
-                            -1,
-                            _PPRaw,
-                            Operation.OperationCode.REDUCTION)
-            );
         }
     }
 

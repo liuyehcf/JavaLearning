@@ -1,5 +1,8 @@
 package org.liuyehcf.grammar.cfg.lr;
 
+import org.liuyehcf.grammar.utils.ListUtils;
+
+import java.util.Collections;
 import java.util.List;
 
 public class Closure {
@@ -14,15 +17,20 @@ public class Closure {
     private final List<Item> coreItems;
 
     /**
-     * 包括核心项目在内的所有项目
+     * 不包括核心项目在内的其他等价项目
+     */
+    private final List<Item> equalItems;
+
+    /**
+     * 括核心项目在内的所有项目
      */
     private final List<Item> items;
 
-
-    Closure(int id, List<Item> coreItems, List<Item> items) {
+    Closure(int id, List<Item> coreItems, List<Item> equalItems) {
         this.id = id;
-        this.coreItems = coreItems;
-        this.items = items;
+        this.coreItems = Collections.unmodifiableList(ListUtils.sort(coreItems));
+        this.equalItems = Collections.unmodifiableList(ListUtils.sort(equalItems));
+        this.items = Collections.unmodifiableList(ListUtils.of(coreItems, equalItems));
     }
 
     public int getId() {
@@ -43,10 +51,40 @@ public class Closure {
 
     @Override
     public String toString() {
-        return "Closure{" +
-                "id=" + id +
-                ", coreItems=" + coreItems +
-                ", items=" + items +
-                '}';
+        StringBuilder sb = new StringBuilder();
+
+        sb.append('{');
+
+        sb.append('\"')
+                .append("id")
+                .append('\"')
+                .append(':')
+                .append('\"')
+                .append(id)
+                .append('\"');
+
+        sb.append(',');
+
+        sb.append('\"')
+                .append("coreItems")
+                .append('\"')
+                .append(':')
+                .append('\"')
+                .append(coreItems)
+                .append('\"');
+
+        sb.append(',');
+
+        sb.append('\"')
+                .append("equalItems")
+                .append('\"')
+                .append(':')
+                .append('\"')
+                .append(equalItems)
+                .append('\"');
+
+        sb.append('}');
+
+        return sb.toString();
     }
 }

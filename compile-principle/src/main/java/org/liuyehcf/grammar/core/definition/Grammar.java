@@ -1,12 +1,11 @@
 package org.liuyehcf.grammar.core.definition;
 
 import org.liuyehcf.grammar.utils.ListUtils;
-import org.liuyehcf.grammar.utils.SetUtils;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import static org.liuyehcf.grammar.utils.AssertUtils.assertFalse;
 
@@ -32,10 +31,11 @@ public class Grammar {
 
     private Grammar(Symbol start, List<Production> productions) {
         this.start = start;
-        this.productions = Collections.unmodifiableList(productions);
+        this.productions = Collections.unmodifiableList(ListUtils.sort(productions));
 
-        Set<Symbol> terminators = new HashSet<>();
-        Set<Symbol> nonTerminators = new HashSet<>();
+        Set<Symbol> terminators = new TreeSet<>();
+        Set<Symbol> nonTerminators = new TreeSet<>();
+        Set<Symbol> symbols = new TreeSet<>();
 
         for (Production _P : productions) {
             for (PrimaryProduction _PP : _P.getPrimaryProductions()) {
@@ -52,9 +52,12 @@ public class Grammar {
             }
         }
 
+        symbols.addAll(terminators);
+        symbols.addAll(nonTerminators);
+
         this.terminators = Collections.unmodifiableSet(terminators);
         this.nonTerminators = Collections.unmodifiableSet(nonTerminators);
-        this.symbols = Collections.unmodifiableSet(SetUtils.of(this.terminators, this.nonTerminators));
+        this.symbols = Collections.unmodifiableSet(symbols);
     }
 
     public static Grammar create(Symbol start, Production... productions) {

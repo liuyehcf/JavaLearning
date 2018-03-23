@@ -18,7 +18,7 @@ public class TestLreElfGrammarConverter {
         Grammar convertedGrammar = getGrammarConverterPipeline().convert(GrammarCase.Ambiguity_CASE1.GRAMMAR);
 
         assertEquals(
-                "{\"productions\":[\"E → ( E ) (E)′ | id (E)′\",\"(E)′ → + E (E)′ | * E (E)′ | __EPSILON__\"]}",
+                "{\"productions\":[\"E → ( E ) (E)′ | id (E)′\",\"(E)′ → * E (E)′ | + E (E)′ | __ε__\"]}",
                 convertedGrammar.toString()
         );
     }
@@ -78,7 +78,7 @@ public class TestLreElfGrammarConverter {
         Grammar convertedGrammar = getGrammarConverterPipeline().convert(grammar);
 
         assertEquals(
-                "{\"productions\":[\"D → ( E ) (E)′ | id (E)′\",\"E → ( E ) (E)′ | id (E)′\",\"(E)′ → + E (E)′ | * E (E)′ | __EPSILON__\"]}",
+                "{\"productions\":[\"D → ( E ) (E)′ | id (E)′\",\"E → ( E ) (E)′ | id (E)′\",\"(E)′ → * E (E)′ | + E (E)′ | __ε__\"]}",
                 convertedGrammar.toString()
         );
     }
@@ -148,7 +148,7 @@ public class TestLreElfGrammarConverter {
         Grammar convertedGrammar = getGrammarConverterPipeline().convert(grammar);
 
         assertEquals(
-                "{\"productions\":[\"D → ( E ) (E)′ e | id (E)′ e | e E\",\"E → ( E ) (E)′ | id (E)′\",\"(E)′ → + E (E)′ | * E (E)′ | __EPSILON__\"]}",
+                "{\"productions\":[\"D → ( E ) (E)′ e | e E | id (E)′ e\",\"E → ( E ) (E)′ | id (E)′\",\"(E)′ → * E (E)′ | + E (E)′ | __ε__\"]}",
                 convertedGrammar.toString()
         );
     }
@@ -199,7 +199,7 @@ public class TestLreElfGrammarConverter {
         Grammar convertedGrammar = getGrammarConverterPipeline().convert(grammar);
 
         assertEquals(
-                "{\"productions\":[\"A → b (A)′′ | a (A)′\",\"(A)′ → b (A)′′′\",\"(A)′′ → d | c\",\"(A)′′′ → __EPSILON__ | c\"]}",
+                "{\"productions\":[\"A → a (A)′ | b (A)′′\",\"(A)′ → b (A)′′′\",\"(A)′′ → c | d\",\"(A)′′′ → __ε__ | c\"]}",
                 convertedGrammar.toString()
         );
     }
@@ -368,7 +368,7 @@ public class TestLreElfGrammarConverter {
         Grammar convertedGrammar = getGrammarConverterPipeline().convert(grammar);
 
         assertEquals(
-                "{\"productions\":[\"A → c (A)′′′ | b (A)′′ | a (A)′ | d\",\"(A)′ → b (A)′′′′′ | __EPSILON__\",\"(A)′′ → c (A)′′′′ | __EPSILON__\",\"(A)′′′ → __EPSILON__ | d\",\"(A)′′′′ → __EPSILON__ | d\",\"(A)′′′′′ → c (A)′′′′′′ | __EPSILON__\",\"(A)′′′′′′ → __EPSILON__ | d\"]}",
+                "{\"productions\":[\"A → a (A)′ | b (A)′′ | c (A)′′′ | d\",\"(A)′ → __ε__ | b (A)′′′′′\",\"(A)′′ → __ε__ | c (A)′′′′\",\"(A)′′′ → __ε__ | d\",\"(A)′′′′ → __ε__ | d\",\"(A)′′′′′ → __ε__ | c (A)′′′′′′\",\"(A)′′′′′′ → __ε__ | d\"]}",
                 convertedGrammar.toString()
         );
     }

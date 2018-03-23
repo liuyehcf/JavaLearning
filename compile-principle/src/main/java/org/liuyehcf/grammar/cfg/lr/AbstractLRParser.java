@@ -21,19 +21,19 @@ import static org.liuyehcf.grammar.utils.AssertUtils.*;
 
 abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
     // 项目集闭包
-    private List<Closure> closures = new ArrayList<>();
+    private List<Closure> closures;
 
     // 状态转移表 [ClosureId, Symbol] -> ClosureId
-    private Map<Integer, Map<Symbol, Integer>> closureTransferTable = new HashMap<>();
+    private Map<Integer, Map<Symbol, Integer>> closureTransferTable;
 
     // 预测分析表正常情况下，表项只有一个，若出现多个，则说明有冲突
     // [ClosureId, Symbol] -> Operation
-    private Map<Integer, Map<Symbol, LinkedHashSet<Operation>>> analysisTable = new HashMap<>();
+    private Map<Integer, Map<Symbol, LinkedHashSet<Operation>>> analysisTable;
 
     // 预测分析表中的所有输入符号，与Grammar中的符号有些不一样
-    private List<Symbol> analysisSymbols = new ArrayList<>();
-    private List<Symbol> analysisTerminators = new ArrayList<>();
-    private int closureCnt = 0;
+    private List<Symbol> analysisTerminators;
+    private List<Symbol> analysisSymbols;
+    private int closureCnt;
 
     AbstractLRParser(LexicalAnalyzer lexicalAnalyzer, Grammar originalGrammar) {
         super(lexicalAnalyzer, originalGrammar, GrammarConverterPipelineImpl
@@ -42,6 +42,13 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
                 .registerGrammarConverter(StatusExpandGrammarConverter.class)
                 .registerGrammarConverter(MergeGrammarConverter.class)
                 .build());
+
+        closures = new ArrayList<>();
+        closureTransferTable = new HashMap<>();
+        analysisTable = new HashMap<>();
+        analysisTerminators = new ArrayList<>();
+        analysisSymbols = new ArrayList<>();
+        closureCnt = 0;
     }
 
     static Item successor(Item preItem) {
@@ -104,45 +111,12 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
 
         sb.append('{');
 
-        for (int i = 0; i < closures.size(); i++) {
-            sb.append('\"')
-                    .append(i)
-                    .append('\"')
-                    .append(':')
-                    .append('[');
+        sb.append('\"')
+                .append("closures:")
+                .append('\"')
+                .append(':');
 
-            for (int j = 0; j < closures.get(i).getItems().size(); j++) {
-                if (closures.get(i).getItems().get(j).getLookAHeads() == null) {
-                    sb.append('\"')
-                            .append(closures.get(i).getItems().get(j).getPrimaryProduction())
-                            .append('\"');
-                } else {
-                    assertFalse(closures.get(i).getItems().get(j).getLookAHeads().isEmpty());
-                    sb.append('\"')
-                            .append(closures.get(i).getItems().get(j).getPrimaryProduction())
-                            .append(", ")
-                            .append('[');
-
-                    for (Symbol symbol : closures.get(i).getItems().get(j).getLookAHeads()) {
-                        sb.append(symbol)
-                                .append(", ");
-                    }
-                    sb.setLength(sb.length() - 2);
-
-                    sb.append(']')
-                            .append('\"');
-
-                }
-
-                sb.append(',');
-            }
-
-            sb.setLength(sb.length() - 1);
-
-            sb.append(']')
-                    .append(',');
-        }
-        sb.setLength(sb.length() - 1);
+        sb.append(closures);
 
         sb.append('}');
 
@@ -168,12 +142,6 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
                     .append(symbol)
                     .append(' ');
         }
-
-        sb.append(separator)
-                .append(' ')
-                .append(Symbol.DOLLAR)
-                .append(' ');
-
 
         for (Symbol symbol : this.grammar.getNonTerminators()) {
             if (Symbol.START.equals(symbol)) {
@@ -414,7 +382,13 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
             }
         }
 
-        return new Closure(closureCnt++, coreItems, new ArrayList<>(helpMap.values()));
+        return new Closure(
+                closureCnt++,
+                coreItems,
+                new ArrayList<>(
+                        helpMap.values().stream().filter(item -> !coreItems.contains(item)).collect(Collectors.toList())
+                )
+        );
     }
 
     /**
@@ -433,10 +407,24 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
 
 
     private void initAnalysisTable() {
-        analysisTerminators.addAll(this.grammar.getTerminators().stream().filter(symbol -> !Symbol.EPSILON.equals(symbol)).collect(Collectors.toList()));
-        analysisSymbols.addAll(analysisTerminators);
-        analysisSymbols.add(Symbol.DOLLAR);
-        analysisSymbols.addAll(this.grammar.getNonTerminators().stream().filter((symbol -> !Symbol.START.equals(symbol))).collect(Collectors.toList()));
+        analysisTerminators.addAll(
+                ListUtils.sort(
+                        ListUtils.of(
+                                // 除Symbol.EPSILON之外的所有终结符
+                                this.grammar.getTerminators().stream().filter(symbol -> !Symbol.EPSILON.equals(symbol)).collect(Collectors.toList()),
+                                Symbol.DOLLAR
+                        )
+                )
+        );
+        analysisSymbols.addAll(
+                ListUtils.sort(
+                        ListUtils.of(
+                                analysisTerminators,
+                                // 除Symbol.START之外的所有非终结符
+                                (List<Symbol>) this.grammar.getNonTerminators().stream().filter((symbol -> !Symbol.START.equals(symbol))).collect(Collectors.toList())
+                        )
+                )
+        );
 
         // 初始化
         for (Closure closure : closures) {
