@@ -308,13 +308,13 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
 
 
                     Closure nextClosure;
-                    int existsClosureId;
+                    int existsClosureIndex;
 
-                    if ((existsClosureId = indexOf(coreItemsOfNextClosure)) == -1) {
+                    if ((existsClosureIndex = indexOf(coreItemsOfNextClosure)) == -1) {
                         closures.add(closure(coreItemsOfNextClosure));
                         nextClosure = closures.get(closures.size() - 1);
                     } else {
-                        nextClosure = closures.get(existsClosureId);
+                        nextClosure = closures.get(existsClosureIndex);
                     }
 
                     if (!closureTransferTable.containsKey(preClosure.getId())) {

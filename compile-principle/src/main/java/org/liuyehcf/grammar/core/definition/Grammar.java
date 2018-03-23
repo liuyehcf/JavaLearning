@@ -26,16 +26,12 @@ public class Grammar {
     // 非终结符集合
     private final Set<Symbol> nonTerminators;
 
-    // 文法符号集合
-    private final Set<Symbol> symbols;
-
     private Grammar(Symbol start, List<Production> productions) {
         this.start = start;
         this.productions = Collections.unmodifiableList(ListUtils.sort(productions));
 
         Set<Symbol> terminators = new TreeSet<>();
         Set<Symbol> nonTerminators = new TreeSet<>();
-        Set<Symbol> symbols = new TreeSet<>();
 
         for (Production _P : productions) {
             for (PrimaryProduction _PP : _P.getPrimaryProductions()) {
@@ -52,12 +48,8 @@ public class Grammar {
             }
         }
 
-        symbols.addAll(terminators);
-        symbols.addAll(nonTerminators);
-
         this.terminators = Collections.unmodifiableSet(terminators);
         this.nonTerminators = Collections.unmodifiableSet(nonTerminators);
-        this.symbols = Collections.unmodifiableSet(symbols);
     }
 
     public static Grammar create(Symbol start, Production... productions) {
@@ -82,10 +74,6 @@ public class Grammar {
 
     public Set<Symbol> getNonTerminators() {
         return nonTerminators;
-    }
-
-    public Set<Symbol> getSymbols() {
-        return symbols;
     }
 
     @Override
