@@ -30,7 +30,11 @@ public class Closure {
         this.id = id;
         this.coreItems = Collections.unmodifiableList(ListUtils.sort(coreItems));
         this.equalItems = Collections.unmodifiableList(ListUtils.sort(equalItems));
-        this.items = Collections.unmodifiableList(ListUtils.of(coreItems, equalItems));
+        this.items = Collections.unmodifiableList(
+                ListUtils.sort(
+                        ListUtils.of(this.coreItems, this.equalItems)
+                )
+        );
     }
 
     /**
@@ -75,6 +79,7 @@ public class Closure {
 
         sb.append('{');
 
+        // id
         sb.append('\"')
                 .append("id")
                 .append('\"')
@@ -85,23 +90,52 @@ public class Closure {
 
         sb.append(',');
 
+        // coreItems
         sb.append('\"')
                 .append("coreItems")
                 .append('\"')
                 .append(':')
-                .append('\"')
-                .append(coreItems)
-                .append('\"');
+                .append('{');
+        if (!coreItems.isEmpty()) {
+            int cnt = 1;
+            for (Item item : coreItems) {
+                sb.append('\"')
+                        .append(cnt++)
+                        .append('\"')
+                        .append(':')
+                        .append('\"')
+                        .append(item)
+                        .append('\"')
+                        .append(',');
+            }
+            sb.setLength(sb.length() - 1);
+        }
+        sb.append('}');
 
         sb.append(',');
 
+        // equalItems
         sb.append('\"')
                 .append("equalItems")
                 .append('\"')
                 .append(':')
-                .append('\"')
-                .append(equalItems)
-                .append('\"');
+                .append('{');
+        if (!equalItems.isEmpty()) {
+            int cnt = 1;
+            for (Item item : equalItems) {
+                sb.append('\"')
+                        .append(cnt++)
+                        .append('\"')
+                        .append(':')
+                        .append('\"')
+                        .append(item)
+                        .append('\"')
+                        .append(',');
+            }
+            sb.setLength(sb.length() - 1);
+        }
+        sb.append('}');
+
 
         sb.append('}');
 

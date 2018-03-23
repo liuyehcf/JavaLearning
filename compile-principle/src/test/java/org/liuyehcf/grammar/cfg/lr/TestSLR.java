@@ -24,7 +24,7 @@ public class TestSLR {
         );
 
         assertEquals(
-                "{\"closures:\":[{\"id\":\"0\",\"coreItems\":\"[__S__ → · E]\",\"equalItems\":\"[E → · E + T, E → · T, F → · ( E ), F → · id, T → · F, T → · T * F]\"}, {\"id\":\"1\",\"coreItems\":\"[E → E · + T, __S__ → E ·]\",\"equalItems\":\"[]\"}, {\"id\":\"2\",\"coreItems\":\"[E → T ·, T → T · * F]\",\"equalItems\":\"[]\"}, {\"id\":\"3\",\"coreItems\":\"[F → ( · E )]\",\"equalItems\":\"[E → · E + T, E → · T, F → · ( E ), F → · id, T → · F, T → · T * F]\"}, {\"id\":\"4\",\"coreItems\":\"[F → id ·]\",\"equalItems\":\"[]\"}, {\"id\":\"5\",\"coreItems\":\"[T → F ·]\",\"equalItems\":\"[]\"}, {\"id\":\"6\",\"coreItems\":\"[E → E + · T]\",\"equalItems\":\"[F → · ( E ), F → · id, T → · F, T → · T * F]\"}, {\"id\":\"7\",\"coreItems\":\"[T → T * · F]\",\"equalItems\":\"[F → · ( E ), F → · id]\"}, {\"id\":\"8\",\"coreItems\":\"[E → E · + T, F → ( E · )]\",\"equalItems\":\"[]\"}, {\"id\":\"9\",\"coreItems\":\"[E → E + T ·, T → T · * F]\",\"equalItems\":\"[]\"}, {\"id\":\"10\",\"coreItems\":\"[T → T * F ·]\",\"equalItems\":\"[]\"}, {\"id\":\"11\",\"coreItems\":\"[F → ( E ) ·]\",\"equalItems\":\"[]\"}]}",
+                "{\"closures:\":[{\"id\":\"0\",\"coreItems\":{\"1\":\"__S__ → · E\"},\"equalItems\":{\"1\":\"E → · E + T\",\"2\":\"E → · T\",\"3\":\"F → · ( E )\",\"4\":\"F → · id\",\"5\":\"T → · F\",\"6\":\"T → · T * F\"}}, {\"id\":\"1\",\"coreItems\":{\"1\":\"E → E · + T\",\"2\":\"__S__ → E ·\"},\"equalItems\":{}}, {\"id\":\"2\",\"coreItems\":{\"1\":\"E → T ·\",\"2\":\"T → T · * F\"},\"equalItems\":{}}, {\"id\":\"3\",\"coreItems\":{\"1\":\"F → ( · E )\"},\"equalItems\":{\"1\":\"E → · E + T\",\"2\":\"E → · T\",\"3\":\"F → · ( E )\",\"4\":\"F → · id\",\"5\":\"T → · F\",\"6\":\"T → · T * F\"}}, {\"id\":\"4\",\"coreItems\":{\"1\":\"F → id ·\"},\"equalItems\":{}}, {\"id\":\"5\",\"coreItems\":{\"1\":\"T → F ·\"},\"equalItems\":{}}, {\"id\":\"6\",\"coreItems\":{\"1\":\"E → E + · T\"},\"equalItems\":{\"1\":\"F → · ( E )\",\"2\":\"F → · id\",\"3\":\"T → · F\",\"4\":\"T → · T * F\"}}, {\"id\":\"7\",\"coreItems\":{\"1\":\"T → T * · F\"},\"equalItems\":{\"1\":\"F → · ( E )\",\"2\":\"F → · id\"}}, {\"id\":\"8\",\"coreItems\":{\"1\":\"E → E · + T\",\"2\":\"F → ( E · )\"},\"equalItems\":{}}, {\"id\":\"9\",\"coreItems\":{\"1\":\"E → E + T ·\",\"2\":\"T → T · * F\"},\"equalItems\":{}}, {\"id\":\"10\",\"coreItems\":{\"1\":\"T → T * F ·\"},\"equalItems\":{}}, {\"id\":\"11\",\"coreItems\":{\"1\":\"F → ( E ) ·\"},\"equalItems\":{}}]}",
                 parser.getClosureJSONString()
         );
 
@@ -59,25 +59,25 @@ public class TestSLR {
         );
 
         assertEquals(
-                "{\"1\":\"[0, a] → 2\",\"2\":\"[0, T] → 1\",\"3\":\"[2, a] → 2\",\"4\":\"[2, B] → 3\",\"5\":\"[2, T] → 4\",\"6\":\"[3, d] → 5\",\"7\":\"[4, b] → 6\"}",
+                "{\"1\":\"[0, a] → 1\",\"2\":\"[0, T] → 2\",\"3\":\"[1, a] → 1\",\"4\":\"[1, B] → 4\",\"5\":\"[1, T] → 3\",\"6\":\"[3, b] → 5\",\"7\":\"[4, d] → 6\"}",
                 parser.getClosureTransferTableJSONString()
         );
 
         assertEquals(
-                "{\"closures:\":[{\"id\":\"0\",\"coreItems\":\"[__S__ → · T]\",\"equalItems\":\"[T → __ε__ ·, T → · a B d]\"}, {\"id\":\"1\",\"coreItems\":\"[__S__ → T ·]\",\"equalItems\":\"[]\"}, {\"id\":\"2\",\"coreItems\":\"[T → a · B d]\",\"equalItems\":\"[B → __ε__ ·, B → · T b, T → __ε__ ·, T → · a B d]\"}, {\"id\":\"3\",\"coreItems\":\"[T → a B · d]\",\"equalItems\":\"[]\"}, {\"id\":\"4\",\"coreItems\":\"[B → T · b]\",\"equalItems\":\"[]\"}, {\"id\":\"5\",\"coreItems\":\"[T → a B d ·]\",\"equalItems\":\"[]\"}, {\"id\":\"6\",\"coreItems\":\"[B → T b ·]\",\"equalItems\":\"[]\"}]}",
+                "{\"closures:\":[{\"id\":\"0\",\"coreItems\":{\"1\":\"__S__ → · T\"},\"equalItems\":{\"1\":\"T → __ε__ ·\",\"2\":\"T → · a B d\"}}, {\"id\":\"1\",\"coreItems\":{\"1\":\"T → a · B d\"},\"equalItems\":{\"1\":\"B → __ε__ ·\",\"2\":\"B → · T b\",\"3\":\"T → __ε__ ·\",\"4\":\"T → · a B d\"}}, {\"id\":\"2\",\"coreItems\":{\"1\":\"__S__ → T ·\"},\"equalItems\":{}}, {\"id\":\"3\",\"coreItems\":{\"1\":\"B → T · b\"},\"equalItems\":{}}, {\"id\":\"4\",\"coreItems\":{\"1\":\"T → a B · d\"},\"equalItems\":{}}, {\"id\":\"5\",\"coreItems\":{\"1\":\"B → T b ·\"},\"equalItems\":{}}, {\"id\":\"6\",\"coreItems\":{\"1\":\"T → a B d ·\"},\"equalItems\":{}}]}",
                 parser.getClosureJSONString()
         );
 
         assertEquals(
                 "| 状态\\文法符号 | __$__ | a | b | d | B | T |\n" +
                         "|:--|:--|:--|:--|:--|:--|:--|\n" +
-                        "| 0 | REDUCTION \"T → __ε__\" | MOVE_IN \"2\" | REDUCTION \"T → __ε__\" | \\ | \\ | JUMP \"1\" |\n" +
-                        "| 1 | ACCEPT \"__S__ → T\" | \\ | \\ | \\ | \\ | \\ |\n" +
-                        "| 2 | REDUCTION \"T → __ε__\" | MOVE_IN \"2\" | REDUCTION \"T → __ε__\" | REDUCTION \"B → __ε__\" | JUMP \"3\" | JUMP \"4\" |\n" +
-                        "| 3 | \\ | \\ | \\ | MOVE_IN \"5\" | \\ | \\ |\n" +
-                        "| 4 | \\ | \\ | MOVE_IN \"6\" | \\ | \\ | \\ |\n" +
-                        "| 5 | REDUCTION \"T → a B d\" | \\ | REDUCTION \"T → a B d\" | \\ | \\ | \\ |\n" +
-                        "| 6 | \\ | \\ | \\ | REDUCTION \"B → T b\" | \\ | \\ |\n",
+                        "| 0 | REDUCTION \"T → __ε__\" | MOVE_IN \"1\" | REDUCTION \"T → __ε__\" | \\ | \\ | JUMP \"2\" |\n" +
+                        "| 1 | REDUCTION \"T → __ε__\" | MOVE_IN \"1\" | REDUCTION \"T → __ε__\" | REDUCTION \"B → __ε__\" | JUMP \"4\" | JUMP \"3\" |\n" +
+                        "| 2 | ACCEPT \"__S__ → T\" | \\ | \\ | \\ | \\ | \\ |\n" +
+                        "| 3 | \\ | \\ | MOVE_IN \"5\" | \\ | \\ | \\ |\n" +
+                        "| 4 | \\ | \\ | \\ | MOVE_IN \"6\" | \\ | \\ |\n" +
+                        "| 5 | \\ | \\ | \\ | REDUCTION \"B → T b\" | \\ | \\ |\n" +
+                        "| 6 | REDUCTION \"T → a B d\" | \\ | REDUCTION \"T → a B d\" | \\ | \\ | \\ |\n",
                 parser.getAnalysisTableMarkdownString()
         );
     }
@@ -94,27 +94,27 @@ public class TestSLR {
         );
 
         assertEquals(
-                "{\"1\":\"[0, *] → 2\",\"2\":\"[0, id] → 3\",\"3\":\"[0, L] → 4\",\"4\":\"[0, R] → 5\",\"5\":\"[0, S] → 1\",\"6\":\"[2, *] → 2\",\"7\":\"[2, id] → 3\",\"8\":\"[2, L] → 7\",\"9\":\"[2, R] → 6\",\"10\":\"[4, =] → 8\",\"11\":\"[8, *] → 2\",\"12\":\"[8, id] → 3\",\"13\":\"[8, L] → 7\",\"14\":\"[8, R] → 9\"}",
+                "{\"1\":\"[0, *] → 1\",\"2\":\"[0, id] → 2\",\"3\":\"[0, L] → 3\",\"4\":\"[0, R] → 4\",\"5\":\"[0, S] → 5\",\"6\":\"[1, *] → 1\",\"7\":\"[1, id] → 2\",\"8\":\"[1, L] → 7\",\"9\":\"[1, R] → 6\",\"10\":\"[3, =] → 8\",\"11\":\"[8, *] → 1\",\"12\":\"[8, id] → 2\",\"13\":\"[8, L] → 7\",\"14\":\"[8, R] → 9\"}",
                 parser.getClosureTransferTableJSONString()
         );
 
         assertEquals(
-                "{\"closures:\":[{\"id\":\"0\",\"coreItems\":\"[__S__ → · S]\",\"equalItems\":\"[L → · * R, L → · id, R → · L, S → · L = R, S → · R]\"}, {\"id\":\"1\",\"coreItems\":\"[__S__ → S ·]\",\"equalItems\":\"[]\"}, {\"id\":\"2\",\"coreItems\":\"[L → * · R]\",\"equalItems\":\"[L → · * R, L → · id, R → · L]\"}, {\"id\":\"3\",\"coreItems\":\"[L → id ·]\",\"equalItems\":\"[]\"}, {\"id\":\"4\",\"coreItems\":\"[R → L ·, S → L · = R]\",\"equalItems\":\"[]\"}, {\"id\":\"5\",\"coreItems\":\"[S → R ·]\",\"equalItems\":\"[]\"}, {\"id\":\"6\",\"coreItems\":\"[L → * R ·]\",\"equalItems\":\"[]\"}, {\"id\":\"7\",\"coreItems\":\"[R → L ·]\",\"equalItems\":\"[]\"}, {\"id\":\"8\",\"coreItems\":\"[S → L = · R]\",\"equalItems\":\"[L → · * R, L → · id, R → · L]\"}, {\"id\":\"9\",\"coreItems\":\"[S → L = R ·]\",\"equalItems\":\"[]\"}]}",
+                "{\"closures:\":[{\"id\":\"0\",\"coreItems\":{\"1\":\"__S__ → · S\"},\"equalItems\":{\"1\":\"L → · * R\",\"2\":\"L → · id\",\"3\":\"R → · L\",\"4\":\"S → · L = R\",\"5\":\"S → · R\"}}, {\"id\":\"1\",\"coreItems\":{\"1\":\"L → * · R\"},\"equalItems\":{\"1\":\"L → · * R\",\"2\":\"L → · id\",\"3\":\"R → · L\"}}, {\"id\":\"2\",\"coreItems\":{\"1\":\"L → id ·\"},\"equalItems\":{}}, {\"id\":\"3\",\"coreItems\":{\"1\":\"R → L ·\",\"2\":\"S → L · = R\"},\"equalItems\":{}}, {\"id\":\"4\",\"coreItems\":{\"1\":\"S → R ·\"},\"equalItems\":{}}, {\"id\":\"5\",\"coreItems\":{\"1\":\"__S__ → S ·\"},\"equalItems\":{}}, {\"id\":\"6\",\"coreItems\":{\"1\":\"L → * R ·\"},\"equalItems\":{}}, {\"id\":\"7\",\"coreItems\":{\"1\":\"R → L ·\"},\"equalItems\":{}}, {\"id\":\"8\",\"coreItems\":{\"1\":\"S → L = · R\"},\"equalItems\":{\"1\":\"L → · * R\",\"2\":\"L → · id\",\"3\":\"R → · L\"}}, {\"id\":\"9\",\"coreItems\":{\"1\":\"S → L = R ·\"},\"equalItems\":{}}]}",
                 parser.getClosureJSONString()
         );
 
         assertEquals(
                 "| 状态\\文法符号 | * | = | __$__ | id | L | R | S |\n" +
                         "|:--|:--|:--|:--|:--|:--|:--|:--|\n" +
-                        "| 0 | MOVE_IN \"2\" | \\ | \\ | MOVE_IN \"3\" | JUMP \"4\" | JUMP \"5\" | JUMP \"1\" |\n" +
-                        "| 1 | \\ | \\ | ACCEPT \"__S__ → S\" | \\ | \\ | \\ | \\ |\n" +
-                        "| 2 | MOVE_IN \"2\" | \\ | \\ | MOVE_IN \"3\" | JUMP \"7\" | JUMP \"6\" | \\ |\n" +
-                        "| 3 | \\ | REDUCTION \"L → id\" | REDUCTION \"L → id\" | \\ | \\ | \\ | \\ |\n" +
-                        "| 4 | \\ | REDUCTION \"R → L\" / MOVE_IN \"8\" | REDUCTION \"R → L\" | \\ | \\ | \\ | \\ |\n" +
-                        "| 5 | \\ | \\ | REDUCTION \"S → R\" | \\ | \\ | \\ | \\ |\n" +
+                        "| 0 | MOVE_IN \"1\" | \\ | \\ | MOVE_IN \"2\" | JUMP \"3\" | JUMP \"4\" | JUMP \"5\" |\n" +
+                        "| 1 | MOVE_IN \"1\" | \\ | \\ | MOVE_IN \"2\" | JUMP \"7\" | JUMP \"6\" | \\ |\n" +
+                        "| 2 | \\ | REDUCTION \"L → id\" | REDUCTION \"L → id\" | \\ | \\ | \\ | \\ |\n" +
+                        "| 3 | \\ | REDUCTION \"R → L\" / MOVE_IN \"8\" | REDUCTION \"R → L\" | \\ | \\ | \\ | \\ |\n" +
+                        "| 4 | \\ | \\ | REDUCTION \"S → R\" | \\ | \\ | \\ | \\ |\n" +
+                        "| 5 | \\ | \\ | ACCEPT \"__S__ → S\" | \\ | \\ | \\ | \\ |\n" +
                         "| 6 | \\ | REDUCTION \"L → * R\" | REDUCTION \"L → * R\" | \\ | \\ | \\ | \\ |\n" +
                         "| 7 | \\ | REDUCTION \"R → L\" | REDUCTION \"R → L\" | \\ | \\ | \\ | \\ |\n" +
-                        "| 8 | MOVE_IN \"2\" | \\ | \\ | MOVE_IN \"3\" | JUMP \"7\" | JUMP \"9\" | \\ |\n" +
+                        "| 8 | MOVE_IN \"1\" | \\ | \\ | MOVE_IN \"2\" | JUMP \"7\" | JUMP \"9\" | \\ |\n" +
                         "| 9 | \\ | \\ | REDUCTION \"S → L = R\" | \\ | \\ | \\ | \\ |\n",
                 parser.getAnalysisTableMarkdownString()
         );

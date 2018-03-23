@@ -416,67 +416,79 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
             return;
         }
 
-//        // [removedClosure, savedClosure]
-//        Map<Closure, Closure> mergePairs = new HashMap<>();
-//
-//        for (int i = 0; i < closures.size(); i++) {
-//            for (int j = i + 1; j < closures.size(); j++) {
-//                Closure savedClosure = closures.get(i);
-//                Closure removedClosure = closures.get(j);
-//                if (Closure.isConcentric(savedClosure, removedClosure)) {
-//                    mergePairs.put(removedClosure, savedClosure);
-//                }
-//            }
-//        }
-//
-//        Map<Integer, Map<Symbol, Integer>> newClosureTransferTable = new HashMap<>();
-//
-//        for (Map.Entry<Closure, Closure> pair : mergePairs.entrySet()) {
-//            Closure savedClosure = pair.getValue();
-//            Closure removedClosure = pair.getKey();
-//
-//            // 首先处理 closureTransferTable
-//            for (Map.Entry<Integer, Map<Symbol, Integer>> outerEntry : closureTransferTable.entrySet()) {
-//                int fromClosureId = outerEntry.getKey();
-//
-//                // 若这个Closure需要被移除，那么每一条连线都得改变
-//                if (fromClosureId == removedClosure.getId()) {
-//                    newClosureTransferTable.put(savedClosure.getId(), new HashMap<>());
-//
-//                    for (Map.Entry<Symbol, Integer> innerEntry : outerEntry.getValue().entrySet()) {
-//                        Symbol nextSymbol = innerEntry.getKey();
-//                        int toClosureId = innerEntry.getValue();
-//
-//                        // toClosure 仍然是需要被移除的Closure
-//                        if (mergePairs.containsKey(toClosureId)) {
-//                            newClosureTransferTable.get(savedClosure.getId())
-//                                    .put(nextSymbol, mergePairs.get(toClosureId));
-//                        } else {
-//                            newClosureTransferTable.get(savedClosure.getId())
-//                                    .put(nextSymbol, toClosureId);
-//                        }
-//                    }
-//                } else {
-//                    newClosureTransferTable.put(fromClosureId, new HashMap<>());
-//
-//                    for (Map.Entry<Symbol, Integer> innerEntry : outerEntry.getValue().entrySet()) {
-//                        Symbol nextSymbol = innerEntry.getKey();
-//                        int toClosureId = innerEntry.getValue();
-//
-//                        // toClosure 是需要被移除的Closure
-//                        if (mergePairs.containsKey(toClosureId)) {
-//                            newClosureTransferTable.get(fromClosureId)
-//                                    .put(nextSymbol, mergePairs.get(toClosureId));
-//                        } else {
-//                            newClosureTransferTable.get(fromClosureId)
-//                                    .put(nextSymbol, toClosureId);
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//
-//        this.closureTransferTable = newClosureTransferTable;
+        // [removedClosure, savedClosure]
+        // todo 如果是3个及以上冲突怎么办
+        Map<Closure, Closure> mergePairs = new HashMap<>();
+
+        List<Integer> closureIds = ListUtils.sort(new ArrayList<>(closures.keySet()));
+
+        for (int i = 0; i < closureIds.size(); i++) {
+            int closureIdI = closureIds.get(i);
+            for (int j = i + 1; j < closures.size(); j++) {
+                int closureIdJ = closureIds.get(j);
+
+                Closure savedClosure = closures.get(closureIdI);
+                Closure removedClosure = closures.get(closureIdJ);
+
+                if (Closure.isConcentric(savedClosure, removedClosure)) {
+                    mergePairs.put(removedClosure, savedClosure);
+                }
+            }
+        }
+
+        Map<Integer, Map<Symbol, Integer>> newClosureTransferTable = new HashMap<>();
+
+        for (Map.Entry<Closure, Closure> pair : mergePairs.entrySet()) {
+            Closure savedClosure = pair.getValue();
+            Closure removedClosure = pair.getKey();
+
+            // 首先处理 closureTransferTable
+            for (Map.Entry<Integer, Map<Symbol, Integer>> outerEntry : closureTransferTable.entrySet()) {
+                int fromClosureId = outerEntry.getKey();
+
+                // 若这个Closure需要被移除，那么每一条连线都得改变
+                if (fromClosureId == removedClosure.getId()) {
+                    newClosureTransferTable.put(savedClosure.getId(), new HashMap<>());
+
+                    for (Map.Entry<Symbol, Integer> innerEntry : outerEntry.getValue().entrySet()) {
+                        Symbol nextSymbol = innerEntry.getKey();
+                        int toClosureId = innerEntry.getValue();
+                        Closure toClosure = closures.get(toClosureId);
+
+                        // toClosure 仍然是需要被移除的Closure
+                        if (mergePairs.containsKey(toClosure)) {
+                            newClosureTransferTable.get(savedClosure.getId())
+                                    .put(nextSymbol, mergePairs.get(toClosure).getId());
+                        } else {
+                            newClosureTransferTable.get(savedClosure.getId())
+                                    .put(nextSymbol, toClosureId);
+                        }
+                    }
+                } else {
+                    newClosureTransferTable.put(fromClosureId, new HashMap<>());
+
+                    for (Map.Entry<Symbol, Integer> innerEntry : outerEntry.getValue().entrySet()) {
+                        Symbol nextSymbol = innerEntry.getKey();
+                        int toClosureId = innerEntry.getValue();
+                        Closure toClosure = closures.get(toClosureId);
+
+                        // toClosure 是需要被移除的Closure
+                        if (mergePairs.containsKey(toClosure)) {
+                            newClosureTransferTable.get(fromClosureId)
+                                    .put(nextSymbol, mergePairs.get(toClosure).getId());
+                        } else {
+                            newClosureTransferTable.get(fromClosureId)
+                                    .put(nextSymbol, toClosureId);
+                        }
+                    }
+                }
+            }
+        }
+
+        this.closureTransferTable = newClosureTransferTable;
+        for (int id : mergePairs.keySet().stream().map(Closure::getId).collect(Collectors.toList())) {
+            closures.remove(id);
+        }
     }
 
     private void initAnalysisTable() {

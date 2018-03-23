@@ -18,18 +18,18 @@ public class TestLR0 {
         );
 
         assertEquals(
-                "{\"closures:\":[{\"id\":\"0\",\"coreItems\":\"[__S__ → · S]\",\"equalItems\":\"[B → · a B, B → · b, S → · B B]\"}, {\"id\":\"1\",\"coreItems\":\"[__S__ → S ·]\",\"equalItems\":\"[]\"}, {\"id\":\"2\",\"coreItems\":\"[B → a · B]\",\"equalItems\":\"[B → · a B, B → · b]\"}, {\"id\":\"3\",\"coreItems\":\"[B → b ·]\",\"equalItems\":\"[]\"}, {\"id\":\"4\",\"coreItems\":\"[S → B · B]\",\"equalItems\":\"[B → · a B, B → · b]\"}, {\"id\":\"5\",\"coreItems\":\"[B → a B ·]\",\"equalItems\":\"[]\"}, {\"id\":\"6\",\"coreItems\":\"[S → B B ·]\",\"equalItems\":\"[]\"}]}",
+                "{\"closures:\":[{\"id\":\"0\",\"coreItems\":{\"1\":\"__S__ → · S\"},\"equalItems\":{\"1\":\"B → · a B\",\"2\":\"B → · b\",\"3\":\"S → · B B\"}}, {\"id\":\"1\",\"coreItems\":{\"1\":\"B → a · B\"},\"equalItems\":{\"1\":\"B → · a B\",\"2\":\"B → · b\"}}, {\"id\":\"2\",\"coreItems\":{\"1\":\"B → b ·\"},\"equalItems\":{}}, {\"id\":\"3\",\"coreItems\":{\"1\":\"S → B · B\"},\"equalItems\":{\"1\":\"B → · a B\",\"2\":\"B → · b\"}}, {\"id\":\"4\",\"coreItems\":{\"1\":\"__S__ → S ·\"},\"equalItems\":{}}, {\"id\":\"5\",\"coreItems\":{\"1\":\"B → a B ·\"},\"equalItems\":{}}, {\"id\":\"6\",\"coreItems\":{\"1\":\"S → B B ·\"},\"equalItems\":{}}]}",
                 parser.getClosureJSONString()
         );
 
         assertEquals(
                 "| 状态\\文法符号 | __$__ | a | b | B | S |\n" +
                         "|:--|:--|:--|:--|:--|:--|\n" +
-                        "| 0 | \\ | MOVE_IN \"2\" | MOVE_IN \"3\" | JUMP \"4\" | JUMP \"1\" |\n" +
-                        "| 1 | ACCEPT \"__S__ → S\" | \\ | \\ | \\ | \\ |\n" +
-                        "| 2 | \\ | MOVE_IN \"2\" | MOVE_IN \"3\" | JUMP \"5\" | \\ |\n" +
-                        "| 3 | REDUCTION \"B → b\" | REDUCTION \"B → b\" | REDUCTION \"B → b\" | \\ | \\ |\n" +
-                        "| 4 | \\ | MOVE_IN \"2\" | MOVE_IN \"3\" | JUMP \"6\" | \\ |\n" +
+                        "| 0 | \\ | MOVE_IN \"1\" | MOVE_IN \"2\" | JUMP \"3\" | JUMP \"4\" |\n" +
+                        "| 1 | \\ | MOVE_IN \"1\" | MOVE_IN \"2\" | JUMP \"5\" | \\ |\n" +
+                        "| 2 | REDUCTION \"B → b\" | REDUCTION \"B → b\" | REDUCTION \"B → b\" | \\ | \\ |\n" +
+                        "| 3 | \\ | MOVE_IN \"1\" | MOVE_IN \"2\" | JUMP \"6\" | \\ |\n" +
+                        "| 4 | ACCEPT \"__S__ → S\" | \\ | \\ | \\ | \\ |\n" +
                         "| 5 | REDUCTION \"B → a B\" | REDUCTION \"B → a B\" | REDUCTION \"B → a B\" | \\ | \\ |\n" +
                         "| 6 | REDUCTION \"S → B B\" | REDUCTION \"S → B B\" | REDUCTION \"S → B B\" | \\ | \\ |\n",
                 parser.getAnalysisTableMarkdownString()
