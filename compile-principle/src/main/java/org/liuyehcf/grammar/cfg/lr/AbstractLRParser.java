@@ -20,8 +20,11 @@ import java.util.stream.Collectors;
 import static org.liuyehcf.grammar.utils.AssertUtils.*;
 
 abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
-    // 项目集闭包
-    private List<Closure> closures;
+    // 项目集闭包 closureId -> Closure
+    private Map<Integer,Closure> closures;
+
+    // 是否合并同心闭包（只有LALR才是true）
+    private final boolean needMerge;
 
     // 状态转移表 [ClosureId, Symbol] -> ClosureId
     private Map<Integer, Map<Symbol, Integer>> closureTransferTable;
@@ -35,7 +38,7 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
     private List<Symbol> analysisSymbols;
     private int closureCnt;
 
-    AbstractLRParser(LexicalAnalyzer lexicalAnalyzer, Grammar originalGrammar) {
+    AbstractLRParser(LexicalAnalyzer lexicalAnalyzer, Grammar originalGrammar, boolean needMerge) {
         super(lexicalAnalyzer, originalGrammar, GrammarConverterPipelineImpl
                 .builder()
                 .registerGrammarConverter(AugmentedGrammarConverter.class)
@@ -43,12 +46,13 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
                 .registerGrammarConverter(MergeGrammarConverter.class)
                 .build());
 
-        closures = new ArrayList<>();
-        closureTransferTable = new HashMap<>();
-        analysisTable = new HashMap<>();
-        analysisTerminators = new ArrayList<>();
-        analysisSymbols = new ArrayList<>();
-        closureCnt = 0;
+        this.closures = new LinkedHashMap<>();
+        this.needMerge = needMerge;
+        this.closureTransferTable = new HashMap<>();
+        this.analysisTable = new HashMap<>();
+        this.analysisTerminators = new ArrayList<>();
+        this.analysisSymbols = new ArrayList<>();
+        this.closureCnt = 0;
     }
 
     static Item successor(Item preItem) {
@@ -116,7 +120,7 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
                 .append('\"')
                 .append(':');
 
-        sb.append(closures);
+        sb.append(closures.values());
 
         sb.append('}');
 
@@ -168,16 +172,14 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
         sb.append('\n');
 
         // 其余行：转义表
-        for (int i = 0; i < closures.size(); i++) {
-            int closureId = closures.get(i).getId();
-
+        for (Closure closure:closures.values()) {
             sb.append(separator)
                     .append(' ')
-                    .append(i)
+                    .append(closure.getId())
                     .append(' ');
 
             for (Symbol symbol : analysisSymbols) {
-                LinkedHashSet<Operation> operations = analysisTable.get(closureId).get(symbol);
+                LinkedHashSet<Operation> operations = analysisTable.get(closure.getId()).get(symbol);
                 if (operations.isEmpty()) {
                     sb.append(separator)
                             .append(' ')
@@ -222,7 +224,7 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
 
         sb.append('{');
 
-        for (Closure closure : closures) {
+        for (Closure closure : closures.values()) {
 
             for (Symbol symbol : analysisSymbols) {
                 if (closureTransferTable.get(closure.getId()) != null
@@ -261,24 +263,26 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
         // 初始化项目集闭包
         initClosure();
 
+        // 合并同心闭包
+        mergeConcentricClosure();
+
         // 初始化分析表
         initAnalysisTable();
     }
 
     private void initClosure() {
         // 初始化，添加闭包0
-        closures.add(closure(ListUtils.of(createFirstItem())));
+        Closure firstClosure=closure(ListUtils.of(createFirstItem()));
+        closures.put(firstClosure.getId(),firstClosure);
 
         boolean canBreak = false;
 
         while (!canBreak) {
             canBreak = true;
 
-            int preSize = closures.size();
+            Map<Integer, Closure> newClosures = new LinkedHashMap<>(closures);
 
-            // 避免遍历时修改容器，因此不用foreach
-            for (int i = 0; i < preSize; i++) {
-                Closure preClosure = closures.get(i);
+            for (Closure preClosure:closures.values()) {
 
                 // 同一个闭包下的不同项目，如果下一个符号相同，那么这些项目的后继项目作为下一个闭包的核心项目集合
                 // 这个Map就是用于保存: 输入符号 -> 后继闭包的核心项目集合 的映射关系
@@ -308,13 +312,13 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
 
 
                     Closure nextClosure;
-                    int existsClosureIndex;
+                    int existsClosureId;
 
-                    if ((existsClosureIndex = indexOf(coreItemsOfNextClosure)) == -1) {
-                        closures.add(closure(coreItemsOfNextClosure));
-                        nextClosure = closures.get(closures.size() - 1);
+                    if ((existsClosureId = closureIdOf(coreItemsOfNextClosure)) == -1) {
+                        nextClosure=closure(coreItemsOfNextClosure);
+                        newClosures.put(nextClosure.getId(),nextClosure);
                     } else {
-                        nextClosure = closures.get(existsClosureIndex);
+                        nextClosure = newClosures.get(existsClosureId);
                     }
 
                     if (!closureTransferTable.containsKey(preClosure.getId())) {
@@ -330,6 +334,8 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
                     }
                 }
             }
+
+            closures = newClosures;
         }
     }
 
@@ -396,15 +402,82 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
      */
     abstract List<Item> findEqualItems(Item item);
 
-    private int indexOf(List<Item> coreItems) {
-        for (int i = 0; i < closures.size(); i++) {
-            if (closures.get(i).isSame(coreItems)) {
-                return i;
+    private int closureIdOf(List<Item> coreItems) {
+        for (Closure closure:closures.values()) {
+            if (closure.isSame(coreItems)) {
+                return closure.getId();
             }
         }
         return -1;
     }
 
+    private void mergeConcentricClosure() {
+        if (!needMerge) {
+            return;
+        }
+
+//        // [removedClosure, savedClosure]
+//        Map<Closure, Closure> mergePairs = new HashMap<>();
+//
+//        for (int i = 0; i < closures.size(); i++) {
+//            for (int j = i + 1; j < closures.size(); j++) {
+//                Closure savedClosure = closures.get(i);
+//                Closure removedClosure = closures.get(j);
+//                if (Closure.isConcentric(savedClosure, removedClosure)) {
+//                    mergePairs.put(removedClosure, savedClosure);
+//                }
+//            }
+//        }
+//
+//        Map<Integer, Map<Symbol, Integer>> newClosureTransferTable = new HashMap<>();
+//
+//        for (Map.Entry<Closure, Closure> pair : mergePairs.entrySet()) {
+//            Closure savedClosure = pair.getValue();
+//            Closure removedClosure = pair.getKey();
+//
+//            // 首先处理 closureTransferTable
+//            for (Map.Entry<Integer, Map<Symbol, Integer>> outerEntry : closureTransferTable.entrySet()) {
+//                int fromClosureId = outerEntry.getKey();
+//
+//                // 若这个Closure需要被移除，那么每一条连线都得改变
+//                if (fromClosureId == removedClosure.getId()) {
+//                    newClosureTransferTable.put(savedClosure.getId(), new HashMap<>());
+//
+//                    for (Map.Entry<Symbol, Integer> innerEntry : outerEntry.getValue().entrySet()) {
+//                        Symbol nextSymbol = innerEntry.getKey();
+//                        int toClosureId = innerEntry.getValue();
+//
+//                        // toClosure 仍然是需要被移除的Closure
+//                        if (mergePairs.containsKey(toClosureId)) {
+//                            newClosureTransferTable.get(savedClosure.getId())
+//                                    .put(nextSymbol, mergePairs.get(toClosureId));
+//                        } else {
+//                            newClosureTransferTable.get(savedClosure.getId())
+//                                    .put(nextSymbol, toClosureId);
+//                        }
+//                    }
+//                } else {
+//                    newClosureTransferTable.put(fromClosureId, new HashMap<>());
+//
+//                    for (Map.Entry<Symbol, Integer> innerEntry : outerEntry.getValue().entrySet()) {
+//                        Symbol nextSymbol = innerEntry.getKey();
+//                        int toClosureId = innerEntry.getValue();
+//
+//                        // toClosure 是需要被移除的Closure
+//                        if (mergePairs.containsKey(toClosureId)) {
+//                            newClosureTransferTable.get(fromClosureId)
+//                                    .put(nextSymbol, mergePairs.get(toClosureId));
+//                        } else {
+//                            newClosureTransferTable.get(fromClosureId)
+//                                    .put(nextSymbol, toClosureId);
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//
+//        this.closureTransferTable = newClosureTransferTable;
+    }
 
     private void initAnalysisTable() {
         analysisTerminators.addAll(
@@ -427,7 +500,7 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
         );
 
         // 初始化
-        for (Closure closure : closures) {
+        for (Closure closure : closures.values()) {
             analysisTable.put(closure.getId(), new HashMap<>());
             for (Symbol symbol : analysisSymbols) {
                 analysisTable.get(closure.getId()).put(symbol, new LinkedHashSet<>());
@@ -435,7 +508,7 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
         }
 
         // 遍历每个Closure
-        for (Closure closure : closures) {
+        for (Closure closure : closures.values()) {
             // 遍历Closure中的每个项目
             for (Item item : closure.getItems()) {
                 Symbol nextSymbol = nextSymbol(item);
@@ -454,7 +527,7 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
     @Override
     protected void checkIsLegal() {
         // 检查合法性，即检查表项动作是否唯一
-        for (Closure closure : closures) {
+        for (Closure closure : closures.values()) {
             for (Symbol symbol : analysisSymbols) {
                 if (analysisTable.get(closure.getId()).get(symbol).size() > 1) {
                     setLegal(false);

@@ -13,7 +13,7 @@ public class LR0 extends AbstractLRParser {
 
 
     LR0(LexicalAnalyzer lexicalAnalyzer, Grammar originalGrammar) {
-        super(lexicalAnalyzer, originalGrammar);
+        super(lexicalAnalyzer, originalGrammar, false);
     }
 
     public static LRParser create(LexicalAnalyzer lexicalAnalyzer, Grammar originalGrammar) {

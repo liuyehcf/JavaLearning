@@ -33,6 +33,26 @@ public class Closure {
         this.items = Collections.unmodifiableList(ListUtils.of(coreItems, equalItems));
     }
 
+    /**
+     * 两个闭包是否同心
+     */
+    static boolean isConcentric(Closure closureI, Closure closureJ) {
+        if (closureI == closureJ) return true;
+
+        if (closureI.getItems().size() != closureJ.getItems().size()) {
+            return false;
+        }
+
+        for (int i = 0; i < closureI.getItems().size(); i++) {
+            if (!closureI.items.get(i).getPrimaryProduction().equals(
+                    closureJ.items.get(i).getPrimaryProduction())) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public int getId() {
         return id;
     }

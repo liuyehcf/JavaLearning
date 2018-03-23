@@ -13,12 +13,12 @@ import static org.liuyehcf.grammar.utils.AssertUtils.*;
 
 public class LR1 extends AbstractLRParser {
 
-    private LR1(LexicalAnalyzer lexicalAnalyzer, Grammar originalGrammar) {
-        super(lexicalAnalyzer, originalGrammar);
+    LR1(LexicalAnalyzer lexicalAnalyzer, Grammar originalGrammar, boolean needMerge) {
+        super(lexicalAnalyzer, originalGrammar, needMerge);
     }
 
     public static LRParser create(LexicalAnalyzer lexicalAnalyzer, Grammar originalGrammar) {
-        LR1 parser = new LR1(lexicalAnalyzer, originalGrammar);
+        LR1 parser = new LR1(lexicalAnalyzer, originalGrammar, false);
 
         parser.init();
 
