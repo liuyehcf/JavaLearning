@@ -20,12 +20,10 @@ import java.util.stream.Collectors;
 import static org.liuyehcf.grammar.utils.AssertUtils.*;
 
 abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
-    // 项目集闭包 closureId -> Closure
-    private Map<Integer,Closure> closures;
-
     // 是否合并同心闭包（只有LALR才是true）
     private final boolean needMerge;
-
+    // 项目集闭包 closureId -> Closure
+    private Map<Integer, Closure> closures;
     // 状态转移表 [ClosureId, Symbol] -> ClosureId
     private Map<Integer, Map<Symbol, Integer>> closureTransferTable;
 
@@ -172,7 +170,7 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
         sb.append('\n');
 
         // 其余行：转义表
-        for (Closure closure:closures.values()) {
+        for (Closure closure : closures.values()) {
             sb.append(separator)
                     .append(' ')
                     .append(closure.getId())
@@ -272,8 +270,8 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
 
     private void initClosure() {
         // 初始化，添加闭包0
-        Closure firstClosure=closure(ListUtils.of(createFirstItem()));
-        closures.put(firstClosure.getId(),firstClosure);
+        Closure firstClosure = closure(ListUtils.of(createFirstItem()));
+        closures.put(firstClosure.getId(), firstClosure);
 
         boolean canBreak = false;
 
@@ -282,7 +280,7 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
 
             Map<Integer, Closure> newClosures = new LinkedHashMap<>(closures);
 
-            for (Closure preClosure:closures.values()) {
+            for (Closure preClosure : closures.values()) {
 
                 // 同一个闭包下的不同项目，如果下一个符号相同，那么这些项目的后继项目作为下一个闭包的核心项目集合
                 // 这个Map就是用于保存: 输入符号 -> 后继闭包的核心项目集合 的映射关系
@@ -315,8 +313,8 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
                     int existsClosureId;
 
                     if ((existsClosureId = closureIdOf(coreItemsOfNextClosure)) == -1) {
-                        nextClosure=closure(coreItemsOfNextClosure);
-                        newClosures.put(nextClosure.getId(),nextClosure);
+                        nextClosure = closure(coreItemsOfNextClosure);
+                        newClosures.put(nextClosure.getId(), nextClosure);
                     } else {
                         nextClosure = newClosures.get(existsClosureId);
                     }
@@ -403,7 +401,7 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
     abstract List<Item> findEqualItems(Item item);
 
     private int closureIdOf(List<Item> coreItems) {
-        for (Closure closure:closures.values()) {
+        for (Closure closure : closures.values()) {
             if (closure.isSame(coreItems)) {
                 return closure.getId();
             }
@@ -417,7 +415,6 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
         }
 
         // [removedClosure, savedClosure]
-        // todo 如果是3个及以上冲突怎么办
         Map<Closure, Closure> mergePairs = new HashMap<>();
 
         List<Integer> closureIds = ListUtils.sort(new ArrayList<>(closures.keySet()));
@@ -431,6 +428,8 @@ abstract class AbstractLRParser extends AbstractCfgParser implements LRParser {
                 Closure removedClosure = closures.get(closureIdJ);
 
                 if (Closure.isConcentric(savedClosure, removedClosure)) {
+                    // 现在假设不可能有3个以上的冲突项
+                    assertFalse(mergePairs.containsKey(removedClosure));
                     mergePairs.put(removedClosure, savedClosure);
                 }
             }
