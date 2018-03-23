@@ -61,6 +61,14 @@ public class Closure {
         return id;
     }
 
+    public List<Item> getCoreItems() {
+        return coreItems;
+    }
+
+    public List<Item> getEqualItems() {
+        return equalItems;
+    }
+
     public List<Item> getItems() {
         return items;
     }
