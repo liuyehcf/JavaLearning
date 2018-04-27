@@ -9,19 +9,17 @@ public class NoClassDefFoundErrorDemo {
             e.printStackTrace();
         }
 
-        System.out.println(InitializeThrowError.i);
-
+        new InitializeThrowError();
     }
 }
 
 class InitializeThrowError {
-    public static final int i = initError();
 
-    private static int initError() {
-        throw new RuntimeException("Initialize Error");
+    static {
+        error();
     }
 
-    public void sayHello() {
-        System.out.println("hello, world!");
+    private static void error() {
+        throw new RuntimeException("Initialize Error");
     }
 }
