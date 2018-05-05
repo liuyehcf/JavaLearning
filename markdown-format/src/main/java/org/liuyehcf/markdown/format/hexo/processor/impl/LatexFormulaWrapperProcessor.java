@@ -238,11 +238,10 @@ public class LatexFormulaWrapperProcessor extends AbstractFileProcessor implemen
                             sb.append(FORMULA_WRAPPER_START);
                         }
                         sb.append("$$");
-
                     } else {
                         sb.append("$$");
                         if (!hasFormulaEnd()) {
-                            sb.append("$$").append(FORMULA_WRAPPER_END);
+                            sb.append(FORMULA_WRAPPER_END);
                         }
                     }
                     cursor += 2;
