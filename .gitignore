@@ -58,3 +58,5 @@ crashlytics-build.properties
 # special pom file
 
 **/dependency-reduced-pom.xml
+
+.DS_Store
