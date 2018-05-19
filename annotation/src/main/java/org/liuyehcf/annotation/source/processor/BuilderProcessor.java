@@ -1,23 +1,25 @@
-package org.liuyehcf.annotation.source;
+package org.liuyehcf.annotation.source.processor;
 
-import com.sun.tools.javac.api.JavacTrees;
 import com.sun.tools.javac.code.Flags;
-import com.sun.tools.javac.processing.JavacProcessingEnvironment;
 import com.sun.tools.javac.tree.JCTree;
-import com.sun.tools.javac.tree.TreeMaker;
 import com.sun.tools.javac.tree.TreeTranslator;
-import com.sun.tools.javac.util.*;
+import com.sun.tools.javac.util.List;
+import com.sun.tools.javac.util.ListBuffer;
+import com.sun.tools.javac.util.Name;
+import org.liuyehcf.annotation.source.annotation.Builder;
 
-import javax.annotation.processing.*;
+import javax.annotation.processing.RoundEnvironment;
+import javax.annotation.processing.SupportedAnnotationTypes;
+import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 import java.util.Set;
 
-@SupportedAnnotationTypes("org.liuyehcf.annotation.source.Builder")
+@SupportedAnnotationTypes("org.liuyehcf.annotation.source.annotation.Builder")
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
-public class BuilderProcessor extends AbstractProcessor {
+public class BuilderProcessor extends BaseProcessor {
 
     private static final String THIS = "this";
 
@@ -32,26 +34,6 @@ public class BuilderProcessor extends AbstractProcessor {
      * 建造方法名
      */
     private static final String BUILD_METHOD_NAME = "build";
-
-    /**
-     * 用于在编译器打印消息的组件
-     */
-    private Messager messager;
-
-    /**
-     * 语法树
-     */
-    private JavacTrees trees;
-
-    /**
-     * 用来构造语法树节点
-     */
-    private TreeMaker treeMaker;
-
-    /**
-     * 用于创建标识符的对象
-     */
-    private Names names;
 
     /**
      * 原始类名
@@ -457,18 +439,6 @@ public class BuilderProcessor extends AbstractProcessor {
         return treeMaker.VarDef(prototypeJCVariable.sym, prototypeJCVariable.getNameExpression());
     }
 
-    /**
-     * 获取一些注解处理器执行处理逻辑时需要用到的一些关键对象
-     *
-     * @param processingEnv 处理环境
-     */
-    @Override
-    public synchronized void init(ProcessingEnvironment processingEnv) {
-        super.init(processingEnv);
-        this.messager = processingEnv.getMessager();
-        this.trees = JavacTrees.instance(processingEnv);
-        Context context = ((JavacProcessingEnvironment) processingEnv).getContext();
-        this.treeMaker = TreeMaker.instance(context);
-        this.names = Names.instance(context);
-    }
+
+
 }

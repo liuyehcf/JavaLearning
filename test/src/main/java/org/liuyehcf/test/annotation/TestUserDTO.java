@@ -1,6 +1,6 @@
 package org.liuyehcf.test.annotation;
 
-import org.liuyehcf.annotation.source.Builder;
+import org.liuyehcf.annotation.source.annotation.Builder;
 
 @Builder
 public class TestUserDTO {
