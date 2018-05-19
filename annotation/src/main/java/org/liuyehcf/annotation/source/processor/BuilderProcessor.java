@@ -71,7 +71,7 @@ public class BuilderProcessor extends BaseProcessor {
             jcTree.accept(new TreeTranslator() {
                 @Override
                 public void visitClassDef(JCTree.JCClassDecl jcClass) {
-                    messager.printMessage(Diagnostic.Kind.NOTE, "process class [" + jcClass.getSimpleName().toString() + "], start");
+                    messager.printMessage(Diagnostic.Kind.NOTE, "@Builder process [" + jcClass.getSimpleName().toString() + "] begin!");
 
                     // 进行一些初始化操作
                     before(jcClass);
@@ -91,7 +91,7 @@ public class BuilderProcessor extends BaseProcessor {
                             createJCClass()
                     );
 
-                    messager.printMessage(Diagnostic.Kind.NOTE, "process class [" + jcClass.getSimpleName().toString() + "], end");
+                    messager.printMessage(Diagnostic.Kind.NOTE, "@Builder process [" + jcClass.getSimpleName().toString() + "] end!");
                 }
             });
         });

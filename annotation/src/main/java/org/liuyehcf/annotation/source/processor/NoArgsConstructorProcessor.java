@@ -39,7 +39,7 @@ public class NoArgsConstructorProcessor extends BaseProcessor {
             jcTree.accept(new TreeTranslator() {
                 @Override
                 public void visitClassDef(JCTree.JCClassDecl jcClass) {
-                    messager.printMessage(Diagnostic.Kind.NOTE, "process class [" + jcClass.getSimpleName().toString() + "], start");
+                    messager.printMessage(Diagnostic.Kind.NOTE, "@NoArgsConstructor process [" + jcClass.getSimpleName().toString() + "] begin!");
 
                     before(jcClass);
 
@@ -48,7 +48,7 @@ public class NoArgsConstructorProcessor extends BaseProcessor {
                             createNoArgsConstructor()
                     );
 
-                    messager.printMessage(Diagnostic.Kind.NOTE, "process class [" + jcClass.getSimpleName().toString() + "], end");
+                    messager.printMessage(Diagnostic.Kind.NOTE, "@NoArgsConstructor process [" + jcClass.getSimpleName().toString() + "] end!");
                 }
             });
         });

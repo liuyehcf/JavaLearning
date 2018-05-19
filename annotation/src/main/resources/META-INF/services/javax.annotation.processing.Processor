@@ -1,4 +1,4 @@
+org.liuyehcf.annotation.source.processor.DataProcessor
 org.liuyehcf.annotation.source.processor.NoArgsConstructorProcessor
 org.liuyehcf.annotation.source.processor.AllArgsConstructorProcessor
-org.liuyehcf.annotation.source.processor.DataProcessor
 org.liuyehcf.annotation.source.processor.BuilderProcessor
