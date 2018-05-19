@@ -36,9 +36,8 @@ public class TestUserDTO {
     }
 
     public static void main(String[] args) {
-        TestUserDTO.TestUserDTOBuilder builder = TestUserDTO.builder();
-
-        TestUserDTO userDTO = builder.firstName("明")
+        TestUserDTO userDTO = TestUserDTO.builder()
+                .firstName("明")
                 .lastName("小")
                 .age(25)
                 .address("火星")
