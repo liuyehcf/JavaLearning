@@ -12,6 +12,16 @@ public class TestUserDTO {
 
     private String address;
 
+    public TestUserDTO() {
+    }
+
+    public TestUserDTO(String firstName, String lastName, Integer age, String address) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.age = age;
+        this.address = address;
+    }
+
     public static void main(String[] args) {
         TestUserDTO.TestUserDTOBuilder builder = TestUserDTO.builder();
 

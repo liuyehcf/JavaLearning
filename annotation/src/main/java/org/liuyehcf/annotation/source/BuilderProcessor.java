@@ -401,10 +401,10 @@ public class BuilderProcessor extends AbstractProcessor {
     }
 
     private JCTree.JCMethodDecl createBuildJCMethod() {
-        ListBuffer<JCTree.JCExpression> expressions = new ListBuffer<>();
+        ListBuffer<JCTree.JCExpression> jcVariableExpressions = new ListBuffer<>();
 
         for (JCTree.JCMethodDecl jcMethod : setJCMethods) {
-            expressions.append(
+            jcVariableExpressions.append(
                     treeMaker.Select(
                             treeMaker.Ident(names.fromString(THIS)),
                             getNameFromSetJCMethod(jcMethod)
@@ -421,7 +421,7 @@ public class BuilderProcessor extends AbstractProcessor {
                                 null, // 尚不清楚含义
                                 List.nil(), // 泛型参数列表
                                 treeMaker.Ident(className), // 创建的类名
-                                List.nil(), // 参数列表
+                                jcVariableExpressions.toList(), // 参数列表
                                 null // 类定义，估计是用于创建匿名内部类
                         )
                 )
