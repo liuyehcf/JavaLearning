@@ -23,9 +23,9 @@ import static org.liuyehcf.annotation.source.processor.ProcessUtil.*;
 public class AllArgsConstructorProcessor extends BaseProcessor {
 
     /**
-     * set方法的语法树节点集合
+     * 字段的语法树节点的集合
      */
-    private List<JCTree.JCMethodDecl> setJCMethods;
+    private List<JCTree.JCVariableDecl> fieldJCVariables;
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
@@ -43,13 +43,16 @@ public class AllArgsConstructorProcessor extends BaseProcessor {
                 public void visitClassDef(JCTree.JCClassDecl jcClass) {
                     messager.printMessage(Diagnostic.Kind.NOTE, "process class [" + jcClass.name.toString() + "], start");
 
-                    // 进行一些初始化操作
                     before(jcClass);
 
                     // 添加全参构造方法
-                    jcClass.defs = jcClass.defs.append(
-                            createAllArgsConstructor()
-                    );
+                    if (!hasAllArgsConstructor(fieldJCVariables, jcClass)) {
+                        jcClass.defs = jcClass.defs.append(
+                                createAllArgsConstructor()
+                        );
+                    }
+
+                    after();
 
                     messager.printMessage(Diagnostic.Kind.NOTE, "process class [" + jcClass.name.toString() + "], end");
                 }
@@ -60,12 +63,19 @@ public class AllArgsConstructorProcessor extends BaseProcessor {
     }
 
     /**
-     * 进行一些预处理
+     * 进行一些初始化工作
      *
      * @param jcClass 类的语法树节点
      */
     private void before(JCTree.JCClassDecl jcClass) {
-        this.setJCMethods = getSetJCMethods(jcClass);
+        this.fieldJCVariables = getJCVariables(jcClass);
+    }
+
+    /**
+     * 进行一些清理工作
+     */
+    private void after() {
+        this.fieldJCVariables = null;
     }
 
     /**
@@ -74,30 +84,23 @@ public class AllArgsConstructorProcessor extends BaseProcessor {
      * @return 全参构造方法语法树节点
      */
     private JCTree.JCMethodDecl createAllArgsConstructor() {
-        List<JCTree.JCVariableDecl> jcVariables = List.nil();
-
-        for (JCTree.JCMethodDecl jcMethod : setJCMethods) {
-            jcVariables = jcVariables.append(jcMethod.params.get(0));
-        }
-
 
         ListBuffer<JCTree.JCStatement> jcStatements = new ListBuffer<>();
-        for (JCTree.JCMethodDecl jcMethod : setJCMethods) {
+        for (JCTree.JCVariableDecl jcVariable : fieldJCVariables) {
             // 添加构造方法的赋值语句 " this.xxx = xxx; "
             jcStatements.append(
                     treeMaker.Exec(
                             treeMaker.Assign(
                                     treeMaker.Select(
                                             treeMaker.Ident(names.fromString(THIS)),
-                                            names.fromString(fromSetMethodNameToPropertyName(jcMethod.name.toString()))
+                                            names.fromString(jcVariable.name.toString())
                                     ),
-                                    treeMaker.Ident(names.fromString(fromSetMethodNameToPropertyName(jcMethod.name.toString())))
+                                    treeMaker.Ident(names.fromString(jcVariable.name.toString()))
                             )
                     )
             );
         }
 
-        // 转换成代码块
         JCTree.JCBlock jcBlock = treeMaker.Block(
                 0 // 访问标志
                 , jcStatements.toList() // 所有的语句
@@ -108,7 +111,7 @@ public class AllArgsConstructorProcessor extends BaseProcessor {
                 names.fromString(CONSTRUCTOR_NAME), // 名字
                 null, //返回类型
                 List.nil(), // 泛型形参列表
-                jcVariables, // 参数列表，这里必须创建一个新的JCVariable，否则注解处理时就会抛异常，原因目前还不清楚
+                cloneJCVariablesAsParams(treeMaker, fieldJCVariables), // 参数列表
                 List.nil(), // 异常列表
                 jcBlock, // 方法体
                 null // 默认方法（可能是interface中的那个default）

@@ -61,7 +61,6 @@ public class BuilderProcessor extends BaseProcessor {
                 public void visitClassDef(JCTree.JCClassDecl jcClass) {
                     messager.printMessage(Diagnostic.Kind.NOTE, "@Builder process [" + jcClass.name.toString() + "] begin!");
 
-                    // 进行一些初始化操作
                     before(jcClass);
 
                     // 添加builder方法
@@ -74,6 +73,8 @@ public class BuilderProcessor extends BaseProcessor {
                             createJCClass()
                     );
 
+                    after();
+
                     messager.printMessage(Diagnostic.Kind.NOTE, "@Builder process [" + jcClass.name.toString() + "] end!");
                 }
             });
@@ -83,7 +84,7 @@ public class BuilderProcessor extends BaseProcessor {
     }
 
     /**
-     * 进行一些预处理
+     * 进行一些初始化工作
      *
      * @param jcClass 类的语法树节点
      */
@@ -91,6 +92,15 @@ public class BuilderProcessor extends BaseProcessor {
         this.className = names.fromString(jcClass.name.toString());
         this.builderClassName = names.fromString(this.className + "Builder");
         this.setJCMethods = getSetJCMethods(jcClass);
+    }
+
+    /**
+     * 进行一些清理工作
+     */
+    private void after() {
+        this.className = null;
+        this.builderClassName = null;
+        this.setJCMethods = null;
     }
 
     /**
@@ -115,7 +125,6 @@ public class BuilderProcessor extends BaseProcessor {
                 )
         );
 
-        // 转换成代码块
         JCTree.JCBlock jcBlock = treeMaker.Block(
                 0 // 访问标志
                 , jcStatements.toList() // 所有的语句
@@ -126,7 +135,7 @@ public class BuilderProcessor extends BaseProcessor {
                 names.fromString(BUILDER_STATIC_METHOD_NAME), // 名字
                 treeMaker.Ident(builderClassName), //返回类型
                 List.nil(), // 泛型形参列表
-                List.nil(), // 参数列表，这里必须创建一个新的JCVariable，否则注解处理时就会抛异常，原因目前还不清楚
+                List.nil(), // 参数列表
                 List.nil(), // 异常列表
                 jcBlock, // 方法体
                 null // 默认方法（可能是interface中的那个default）
@@ -156,10 +165,10 @@ public class BuilderProcessor extends BaseProcessor {
     }
 
     /**
-     * 根据方法集合创建对应的域的语法树节点集合
+     * 根据方法集合创建对应的字段的语法树节点集合
      *
      * @param jcMethods 待插入的set方法的语法树节点集合
-     * @return 域的语法树节点集合
+     * @return 字段的语法树节点集合
      */
     private List<JCTree> createVariables(List<JCTree.JCMethodDecl> jcMethods) {
         List<JCTree> jcVariables = List.nil();
@@ -226,7 +235,6 @@ public class BuilderProcessor extends BaseProcessor {
                 )
         );
 
-        // 转换成代码块
         JCTree.JCBlock jcBlock = treeMaker.Block(
                 0 // 访问标志
                 , jcStatements.toList() // 所有的语句
@@ -276,7 +284,6 @@ public class BuilderProcessor extends BaseProcessor {
                 )
         );
 
-        // 转换成代码块
         JCTree.JCBlock jcBlock = treeMaker.Block(
                 0 // 访问标志
                 , jcStatements.toList() // 所有的语句

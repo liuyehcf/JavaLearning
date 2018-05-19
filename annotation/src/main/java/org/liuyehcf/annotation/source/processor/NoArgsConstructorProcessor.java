@@ -16,6 +16,7 @@ import javax.tools.Diagnostic;
 import java.util.Set;
 
 import static org.liuyehcf.annotation.source.processor.ProcessUtil.CONSTRUCTOR_NAME;
+import static org.liuyehcf.annotation.source.processor.ProcessUtil.hasNoArgsConstructor;
 
 @SupportedAnnotationTypes("org.liuyehcf.annotation.source.annotation.NoArgsConstructor")
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
@@ -37,10 +38,12 @@ public class NoArgsConstructorProcessor extends BaseProcessor {
                 public void visitClassDef(JCTree.JCClassDecl jcClass) {
                     messager.printMessage(Diagnostic.Kind.NOTE, "@NoArgsConstructor process [" + jcClass.name.toString() + "] begin!");
 
-                    // 添加全参构造方法
-                    jcClass.defs = jcClass.defs.append(
-                            createNoArgsConstructor()
-                    );
+                    // 添加无参构造方法
+                    if (!hasNoArgsConstructor(jcClass)) {
+                        jcClass.defs = jcClass.defs.append(
+                                createNoArgsConstructor()
+                        );
+                    }
 
                     messager.printMessage(Diagnostic.Kind.NOTE, "@NoArgsConstructor process [" + jcClass.name.toString() + "] end!");
                 }
@@ -56,7 +59,7 @@ public class NoArgsConstructorProcessor extends BaseProcessor {
      * @return 无参构造方法语法树节点
      */
     private JCTree.JCMethodDecl createNoArgsConstructor() {
-        // 转换成代码块
+
         JCTree.JCBlock jcBlock = treeMaker.Block(
                 0 // 访问标志
                 , List.nil() // 所有的语句
@@ -67,7 +70,7 @@ public class NoArgsConstructorProcessor extends BaseProcessor {
                 names.fromString(CONSTRUCTOR_NAME), // 名字
                 null, //返回类型
                 List.nil(), // 泛型形参列表
-                List.nil(), // 参数列表，这里必须创建一个新的JCVariable，否则注解处理时就会抛异常，原因目前还不清楚
+                List.nil(), // 参数列表
                 List.nil(), // 异常列表
                 jcBlock, // 方法体
                 null // 默认方法（可能是interface中的那个default）

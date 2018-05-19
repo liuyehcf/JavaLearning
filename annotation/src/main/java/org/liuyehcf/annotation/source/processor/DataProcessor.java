@@ -12,6 +12,7 @@ import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 import java.util.Set;
@@ -22,6 +23,14 @@ import static org.liuyehcf.annotation.source.processor.ProcessUtil.*;
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class DataProcessor extends BaseProcessor {
 
+    /**
+     * 类的语法树节点
+     */
+    private JCTree.JCClassDecl jcClass;
+
+    /**
+     * 字段的语法树节点的集合
+     */
     private List<JCTree.JCVariableDecl> fieldJCVariables;
 
     @Override
@@ -40,13 +49,14 @@ public class DataProcessor extends BaseProcessor {
                 public void visitClassDef(JCTree.JCClassDecl jcClass) {
                     messager.printMessage(Diagnostic.Kind.NOTE, "@Data process [" + jcClass.name.toString() + "] begin!");
 
-                    // 进行一些初始化操作
                     before(jcClass);
 
                     // 添加全参构造方法
                     jcClass.defs = jcClass.defs.appendList(
                             createDataMethods()
                     );
+
+                    after();
 
                     messager.printMessage(Diagnostic.Kind.NOTE, "@Data process [" + jcClass.name.toString() + "] end!");
                 }
@@ -57,29 +67,50 @@ public class DataProcessor extends BaseProcessor {
     }
 
     /**
-     * 进行一些预处理
+     * 进行一些初始化工作
      *
      * @param jcClass 类的语法树节点
      */
     private void before(JCTree.JCClassDecl jcClass) {
+        this.jcClass = jcClass;
         this.fieldJCVariables = getJCVariables(jcClass);
     }
 
+    /**
+     * 进行一些清理工作
+     */
+    private void after() {
+        this.jcClass = null;
+        this.fieldJCVariables = null;
+    }
+
+    /**
+     * 创建get/set方法
+     *
+     * @return get/set方法的语法树节点集合
+     */
     private List<JCTree> createDataMethods() {
         ListBuffer<JCTree> dataMethods = new ListBuffer<>();
 
         for (JCTree.JCVariableDecl jcVariable : fieldJCVariables) {
-            dataMethods.append(createSetJCMethod(jcVariable));
-            dataMethods.append(createGetJCMethod(jcVariable));
+            if (!jcVariable.mods.getFlags().contains(Modifier.FINAL)
+                    && !hasSetMethod(jcVariable, jcClass)) {
+                dataMethods.append(createSetJCMethod(jcVariable));
+            }
+
+            if (!hasGetMethod(jcVariable, jcClass)) {
+                dataMethods.append(createGetJCMethod(jcVariable));
+            }
         }
 
         return dataMethods.toList();
     }
 
+
     /**
-     * 根据域的语法树节点，创建对应的set方法
+     * 根据字段的语法树节点，创建对应的set方法
      *
-     * @param jcVariable 域的语法树节点
+     * @param jcVariable 字段的语法树节点
      * @return set方法的语法树节点
      */
     private JCTree.JCMethodDecl createSetJCMethod(JCTree.JCVariableDecl jcVariable) {
@@ -99,7 +130,6 @@ public class DataProcessor extends BaseProcessor {
                 )
         );
 
-        // 转换成代码块
         JCTree.JCBlock jcBlock = treeMaker.Block(
                 0 // 访问标志
                 , jcStatements.toList() // 所有的语句
@@ -118,9 +148,9 @@ public class DataProcessor extends BaseProcessor {
     }
 
     /**
-     * 根据域的语法树节点，创建对应的get方法的语法树节点
+     * 根据字段的语法树节点，创建对应的get方法的语法树节点
      *
-     * @param jcVariable 域的语法树节点
+     * @param jcVariable 字段的语法树节点
      * @return get方法的语法树节点
      */
     private JCTree.JCMethodDecl createGetJCMethod(JCTree.JCVariableDecl jcVariable) {
@@ -136,7 +166,6 @@ public class DataProcessor extends BaseProcessor {
                 )
         );
 
-        // 转换成代码块
         JCTree.JCBlock jcBlock = treeMaker.Block(
                 0 // 访问标志
                 , jcStatements.toList() // 所有的语句
