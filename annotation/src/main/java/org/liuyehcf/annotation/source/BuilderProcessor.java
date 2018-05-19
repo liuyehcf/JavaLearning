@@ -12,6 +12,7 @@ import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
+import javax.tools.Diagnostic;
 import java.util.Set;
 
 @SupportedAnnotationTypes("org.liuyehcf.annotation.source.Builder")
@@ -19,8 +20,6 @@ import java.util.Set;
 public class BuilderProcessor extends AbstractProcessor {
 
     private static final String THIS = "this";
-
-    private static final String DATA = "data";
 
     private static final String SET = "set";
 
@@ -64,6 +63,10 @@ public class BuilderProcessor extends AbstractProcessor {
      */
     private Name builderClassName;
 
+    /**
+     * 原始类的set方法的语法树节点集合
+     */
+    private List<JCTree.JCMethodDecl> setJCMethods;
 
     /**
      * 插入式注解处理器的处理逻辑
@@ -86,22 +89,32 @@ public class BuilderProcessor extends AbstractProcessor {
             jcTree.accept(new TreeTranslator() {
                 @Override
                 public void visitClassDef(JCTree.JCClassDecl jcClass) {
+                    messager.printMessage(Diagnostic.Kind.NOTE, "process class [" + jcClass.getSimpleName().toString() + "], start");
 
                     // 进行一些初始化操作
                     before(jcClass);
 
-                    // 为当前jcClass添加JMethod节点
+                    // 添加无参构造方法
+                    jcClass.defs = jcClass.defs.append(
+                            createNoArgsConstructor()
+                    );
+
+                    // 添加全参构造方法
+                    jcClass.defs = jcClass.defs.append(
+                            createAllArgsConstructor()
+                    );
+
+                    // 添加builder方法
                     jcClass.defs = jcClass.defs.append(
                             createStaticBuilderMethod()
                     );
 
-                    // 为当前jcClass添加JCTree节点
+                    // 添加静态内部类
                     jcClass.defs = jcClass.defs.append(
-                            // 创建了一个静态内部类作为一个Builder
-                            createJCClass(
-                                    getSetJCMethods(jcClass)
-                            )
+                            createJCClass()
                     );
+
+                    messager.printMessage(Diagnostic.Kind.NOTE, "process class [" + jcClass.getSimpleName().toString() + "], end");
                 }
             });
         });
@@ -117,6 +130,79 @@ public class BuilderProcessor extends AbstractProcessor {
     private void before(JCTree.JCClassDecl jcClass) {
         this.className = names.fromString(jcClass.getSimpleName().toString());
         this.builderClassName = names.fromString(this.className + "Builder");
+        this.setJCMethods = getSetJCMethods(jcClass);
+    }
+
+    /**
+     * 创建无参数构造方法
+     *
+     * @return 无参构造方法语法树节点
+     */
+    private JCTree.JCMethodDecl createNoArgsConstructor() {
+        // 转换成代码块
+        JCTree.JCBlock jcBlock = treeMaker.Block(
+                0 // 访问标志
+                , List.nil() // 所有的语句
+        );
+
+        return treeMaker.MethodDef(
+                treeMaker.Modifiers(Flags.PUBLIC), // 访问标志
+                className, // 名字
+                null, //返回类型
+                List.nil(), // 泛型形参列表
+                List.nil(), // 参数列表，这里必须创建一个新的JCVariable，否则注解处理时就会抛异常，原因目前还不清楚
+                List.nil(), // 异常列表
+                jcBlock, // 方法体
+                null // 默认方法（可能是interface中的那个default）
+        );
+    }
+
+
+    /**
+     * 创建全参数构造方法
+     *
+     * @return 全参构造方法语法树节点
+     */
+    private JCTree.JCMethodDecl createAllArgsConstructor() {
+        List<JCTree.JCVariableDecl> jcVariables = List.nil();
+
+        for (JCTree.JCMethodDecl jcMethod : setJCMethods) {
+            jcVariables = jcVariables.append(jcMethod.getParameters().get(0));
+        }
+
+
+        ListBuffer<JCTree.JCStatement> jcStatements = new ListBuffer<>();
+        for (JCTree.JCMethodDecl jcMethod : setJCMethods) {
+            // 添加构造方法的赋值语句 " this.xxx = xxx; "
+            jcStatements.append(
+                    treeMaker.Exec(
+                            treeMaker.Assign(
+                                    treeMaker.Select(
+                                            treeMaker.Ident(names.fromString(THIS)),
+                                            getNameFromSetJCMethod(jcMethod)
+                                    ),
+                                    treeMaker.Ident(getNameFromSetJCMethod(jcMethod))
+                            )
+                    )
+            );
+        }
+
+        // 转换成代码块
+        JCTree.JCBlock jcBlock = treeMaker.Block(
+                0 // 访问标志
+                , jcStatements.toList() // 所有的语句
+        );
+
+        return treeMaker.MethodDef(
+                treeMaker.Modifiers(Flags.PUBLIC), // 访问标志
+                className, // 名字
+                null, //返回类型
+                List.nil(), // 泛型形参列表
+                jcVariables, // 参数列表，这里必须创建一个新的JCVariable，否则注解处理时就会抛异常，原因目前还不清楚
+                List.nil(), // 异常列表
+                jcBlock, // 方法体
+                null // 默认方法（可能是interface中的那个default）
+        );
     }
 
 
@@ -134,9 +220,9 @@ public class BuilderProcessor extends AbstractProcessor {
                 treeMaker.Return(
                         treeMaker.NewClass(
                                 null, // 尚不清楚含义
-                                List.nil(), // 构造器方法参数
+                                List.nil(), // 泛型参数列表
                                 treeMaker.Ident(builderClassName), // 创建的类名
-                                List.nil(), // 构造器方法列表
+                                List.nil(), // 参数列表
                                 null // 类定义，估计是用于创建匿名内部类
                         )
                 )
@@ -174,7 +260,7 @@ public class BuilderProcessor extends AbstractProcessor {
             // 找出所有set方法节点，并添加
             if (isSetJCMethod(jTree)) {
                 // 注意这个com.sun.tools.javac.util.List的用法，不支持链式操作，更改后必须赋值
-                setJCMethods = setJCMethods.prepend((JCTree.JCMethodDecl) jTree);
+                setJCMethods = setJCMethods.append((JCTree.JCMethodDecl) jTree);
             }
         }
 
@@ -199,17 +285,14 @@ public class BuilderProcessor extends AbstractProcessor {
     /**
      * 创建一个类的语法树节点。作为Builder模式中的Builder类
      *
-     * @param jcMethods 待插入的set方法的语法树节点集合
      * @return 创建出来的类的语法树节点
      */
-    private JCTree.JCClassDecl createJCClass(List<JCTree.JCMethodDecl> jcMethods) {
+    private JCTree.JCClassDecl createJCClass() {
 
         List<JCTree> jcTrees = List.nil();
 
-        JCTree.JCVariableDecl jcVariable = createDataField();
-        jcTrees = jcTrees.append(jcVariable);
-        jcTrees = jcTrees.appendList(createVariablesFromSetMethods(jcMethods));
-        jcTrees = jcTrees.appendList(createSetJCMethods(jcMethods));
+        jcTrees = jcTrees.appendList(createVariables(setJCMethods));
+        jcTrees = jcTrees.appendList(createSetJCMethods(setJCMethods));
         jcTrees = jcTrees.append(createBuildJCMethod());
 
         return treeMaker.ClassDef(
@@ -225,13 +308,13 @@ public class BuilderProcessor extends AbstractProcessor {
      * 根据方法集合创建对应的域的语法树节点集合
      *
      * @param jcMethods 待插入的set方法的语法树节点集合
-     * @return
+     * @return 域的语法树节点集合
      */
-    private List<JCTree> createVariablesFromSetMethods(List<JCTree.JCMethodDecl> jcMethods) {
+    private List<JCTree> createVariables(List<JCTree.JCMethodDecl> jcMethods) {
         List<JCTree> jcVariables = List.nil();
 
         for (JCTree.JCMethodDecl jcMethod : jcMethods) {
-            jcVariables = jcVariables.prepend(
+            jcVariables = jcVariables.append(
                     treeMaker.VarDef(
                             treeMaker.Modifiers(Flags.PRIVATE), // 访问标志
                             getNameFromSetJCMethod(jcMethod), // 名字
@@ -247,35 +330,6 @@ public class BuilderProcessor extends AbstractProcessor {
     private Name getNameFromSetJCMethod(JCTree.JCMethodDecl jcMethod) {
         String s = jcMethod.getName().toString();
         return names.fromString(s.substring(3, 4).toLowerCase() + s.substring(4));
-    }
-
-    /**
-     * 创建一个域的语法树节点。作为Builder模式中被Build的对象
-     *
-     * @return 域节点
-     */
-    private JCTree.JCVariableDecl createDataField() {
-        return treeMaker.VarDef(
-                treeMaker.Modifiers(Flags.PRIVATE), // 访问标志
-                names.fromString(DATA), // 名字
-                treeMaker.Ident(className), // 类型
-                createInitializeJCExpression() // 初始化表达式
-        );
-    }
-
-    /**
-     * 创建一个表达式的语法树节点。即" new XXX(); "的语句
-     *
-     * @return 表达式的语法树节点
-     */
-    private JCTree.JCExpression createInitializeJCExpression() {
-        return treeMaker.NewClass(
-                null, // 尚不清楚含义
-                List.nil(), // 构造器方法参数
-                treeMaker.Ident(className), // 创建的类名
-                List.nil(), // 构造器方法列表
-                null // 类定义，估计是用于创建匿名内部类
-        );
     }
 
     /**
@@ -305,16 +359,15 @@ public class BuilderProcessor extends AbstractProcessor {
 
         ListBuffer<JCTree.JCStatement> jcStatements = new ListBuffer<>();
 
-        // 添加调用语句" data.setXXX(xxx); "
+        // 添加语句 " this.xxx = xxx; "
         jcStatements.append(
                 treeMaker.Exec(
-                        treeMaker.Apply(
-                                List.nil(),
+                        treeMaker.Assign(
                                 treeMaker.Select(
-                                        treeMaker.Ident(names.fromString(DATA)),
-                                        jcMethod.getName()
+                                        treeMaker.Ident(names.fromString(THIS)),
+                                        getNameFromSetJCMethod(jcMethod)
                                 ),
-                                List.of(treeMaker.Ident(jcVariable.getName()))
+                                treeMaker.Ident(getNameFromSetJCMethod(jcMethod))
                         )
                 )
         );
@@ -349,11 +402,15 @@ public class BuilderProcessor extends AbstractProcessor {
     private JCTree.JCMethodDecl createBuildJCMethod() {
         ListBuffer<JCTree.JCStatement> jcStatements = new ListBuffer<>();
 
-        // 添加返回语句 " return data; "
+        // 添加返回语句 " return new XXX(arg1, arg2, ...); "
         jcStatements.append(
                 treeMaker.Return(
-                        treeMaker.Ident(
-                                names.fromString(DATA)
+                        treeMaker.NewClass(
+                                null, // 尚不清楚含义
+                                List.nil(), // 泛型参数列表
+                                treeMaker.Ident(className), // 创建的类名
+                                List.nil(), // 参数列表
+                                null // 类定义，估计是用于创建匿名内部类
                         )
                 )
         );
@@ -379,7 +436,7 @@ public class BuilderProcessor extends AbstractProcessor {
 
     /**
      * 克隆一个域的语法树节点
-     * 语法树节点是不能复用的！
+     * 具有位置信息的语法树节点是不能复用的！
      *
      * @param prototypeJCVariable 原始域节点
      * @return 克隆后的域节点
