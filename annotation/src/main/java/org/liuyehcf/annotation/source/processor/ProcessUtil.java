@@ -9,7 +9,7 @@ import com.sun.tools.javac.util.ListBuffer;
 import javax.lang.model.element.Modifier;
 import java.util.Set;
 
-public class ProcessUtil {
+class ProcessUtil {
     static final String THIS = "this";
 
     private static final String SET = "set";
@@ -26,6 +26,9 @@ public class ProcessUtil {
      */
     static final String BUILD_METHOD_NAME = "build";
 
+    /**
+     * 构造方法名字，比较特殊
+     */
     static final String CONSTRUCTOR_NAME = "<init>";
 
     /**
@@ -78,7 +81,6 @@ public class ProcessUtil {
         return false;
     }
 
-
     /**
      * 获取字段的语法树节点的集合
      *
@@ -100,7 +102,6 @@ public class ProcessUtil {
         return jcVariables.toList();
     }
 
-
     /**
      * 判断是否为set方法
      *
@@ -116,7 +117,6 @@ public class ProcessUtil {
         }
         return false;
     }
-
 
     /**
      * 提取出所有set方法的语法树节点
@@ -158,7 +158,6 @@ public class ProcessUtil {
         }
         return false;
     }
-
 
     /**
      * 是否存在全参的构造方法
@@ -231,16 +230,6 @@ public class ProcessUtil {
             }
         }
         return false;
-    }
-
-    /**
-     * set方法名转换为字段名
-     *
-     * @param setMethodName set方法名
-     * @return 字段名
-     */
-    static String fromSetMethodNameToPropertyName(String setMethodName) {
-        return setMethodName.substring(3, 4).toLowerCase() + setMethodName.substring(4);
     }
 
     /**

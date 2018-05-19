@@ -46,5 +46,4 @@ public abstract class BaseProcessor extends AbstractProcessor {
         this.treeMaker = TreeMaker.instance(context);
         this.names = Names.instance(context);
     }
-
 }

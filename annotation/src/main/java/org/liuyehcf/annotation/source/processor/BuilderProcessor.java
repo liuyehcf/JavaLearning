@@ -34,9 +34,9 @@ public class BuilderProcessor extends BaseProcessor {
     private Name builderClassName;
 
     /**
-     * set方法的语法树节点集合
+     * 字段的语法树节点的集合
      */
-    private List<JCTree.JCMethodDecl> setJCMethods;
+    private List<JCTree.JCVariableDecl> fieldJCVariables;
 
     /**
      * 插入式注解处理器的处理逻辑
@@ -91,7 +91,7 @@ public class BuilderProcessor extends BaseProcessor {
     private void before(JCTree.JCClassDecl jcClass) {
         this.className = names.fromString(jcClass.name.toString());
         this.builderClassName = names.fromString(this.className + "Builder");
-        this.setJCMethods = getSetJCMethods(jcClass);
+        this.fieldJCVariables = getJCVariables(jcClass);
     }
 
     /**
@@ -100,7 +100,7 @@ public class BuilderProcessor extends BaseProcessor {
     private void after() {
         this.className = null;
         this.builderClassName = null;
-        this.setJCMethods = null;
+        this.fieldJCVariables = null;
     }
 
     /**
@@ -151,8 +151,8 @@ public class BuilderProcessor extends BaseProcessor {
 
         ListBuffer<JCTree> jcTrees = new ListBuffer<>();
 
-        jcTrees.appendList(createVariables(setJCMethods));
-        jcTrees.appendList(createSetJCMethods(setJCMethods));
+        jcTrees.appendList(createVariables());
+        jcTrees.appendList(createSetJCMethods());
         jcTrees.append(createBuildJCMethod());
 
         return treeMaker.ClassDef(
@@ -167,18 +167,17 @@ public class BuilderProcessor extends BaseProcessor {
     /**
      * 根据方法集合创建对应的字段的语法树节点集合
      *
-     * @param jcMethods 待插入的set方法的语法树节点集合
-     * @return 字段的语法树节点集合
+     * @return 静态内部类的字段的语法树节点集合
      */
-    private List<JCTree> createVariables(List<JCTree.JCMethodDecl> jcMethods) {
+    private List<JCTree> createVariables() {
         ListBuffer<JCTree> jcVariables = new ListBuffer<>();
 
-        for (JCTree.JCMethodDecl jcMethod : jcMethods) {
+        for (JCTree.JCVariableDecl fieldJCVariable : fieldJCVariables) {
             jcVariables.append(
                     treeMaker.VarDef(
                             treeMaker.Modifiers(Flags.PRIVATE), // 访问标志
-                            names.fromString(fromSetMethodNameToPropertyName(jcMethod.name.toString())), // 名字
-                            jcMethod.params.head.vartype // 类型
+                            names.fromString((fieldJCVariable.name.toString())), // 名字
+                            fieldJCVariable.vartype // 类型
                             , null // 初始化语句
                     )
             );
@@ -190,14 +189,13 @@ public class BuilderProcessor extends BaseProcessor {
     /**
      * 创建方法的语法树节点的集合。作为Builder模式中的setXXX方法
      *
-     * @param jcMethods 方法节点集合
      * @return 方法节点集合
      */
-    private List<JCTree> createSetJCMethods(List<JCTree.JCMethodDecl> jcMethods) {
+    private List<JCTree> createSetJCMethods() {
         ListBuffer<JCTree> setJCMethods = new ListBuffer<>();
 
-        for (JCTree.JCMethodDecl jcMethod : jcMethods) {
-            setJCMethods.append(createSetJCMethod(jcMethod));
+        for (JCTree.JCVariableDecl fieldJCVariable : fieldJCVariables) {
+            setJCMethods.append(createSetJCMethod(fieldJCVariable));
         }
 
         return setJCMethods.toList();
@@ -206,11 +204,9 @@ public class BuilderProcessor extends BaseProcessor {
     /**
      * 创建一个方法的语法树节点。作为Builder模式中的setXXX方法
      *
-     * @param jcMethod 方法节点
      * @return 方法节点
      */
-    private JCTree.JCMethodDecl createSetJCMethod(JCTree.JCMethodDecl jcMethod) {
-        JCTree.JCVariableDecl jcVariable = jcMethod.params.get(0);
+    private JCTree.JCMethodDecl createSetJCMethod(JCTree.JCVariableDecl jcVariable) {
 
         ListBuffer<JCTree.JCStatement> jcStatements = new ListBuffer<>();
 
@@ -220,9 +216,9 @@ public class BuilderProcessor extends BaseProcessor {
                         treeMaker.Assign(
                                 treeMaker.Select(
                                         treeMaker.Ident(names.fromString(THIS)),
-                                        names.fromString(fromSetMethodNameToPropertyName(jcMethod.name.toString()))
+                                        names.fromString(jcVariable.name.toString())
                                 ),
-                                treeMaker.Ident(names.fromString(fromSetMethodNameToPropertyName(jcMethod.name.toString())))
+                                treeMaker.Ident(names.fromString(jcVariable.name.toString()))
                         )
                 )
         );
@@ -242,7 +238,7 @@ public class BuilderProcessor extends BaseProcessor {
 
         return treeMaker.MethodDef(
                 treeMaker.Modifiers(Flags.PUBLIC), // 访问标志
-                names.fromString(fromSetMethodNameToPropertyName(jcMethod.name.toString())), // 名字
+                names.fromString(jcVariable.name.toString()), // 名字
                 treeMaker.Ident(builderClassName), //返回类型
                 List.nil(), // 泛型形参列表
                 List.of(cloneJCVariableAsParam(treeMaker, jcVariable)), // 参数列表
@@ -260,11 +256,11 @@ public class BuilderProcessor extends BaseProcessor {
     private JCTree.JCMethodDecl createBuildJCMethod() {
         ListBuffer<JCTree.JCExpression> jcVariableExpressions = new ListBuffer<>();
 
-        for (JCTree.JCMethodDecl jcMethod : setJCMethods) {
+        for (JCTree.JCVariableDecl jcVariable : fieldJCVariables) {
             jcVariableExpressions.append(
                     treeMaker.Select(
                             treeMaker.Ident(names.fromString(THIS)),
-                            names.fromString(fromSetMethodNameToPropertyName(jcMethod.name.toString()))
+                            names.fromString(jcVariable.name.toString())
                     )
             );
         }
@@ -288,7 +284,6 @@ public class BuilderProcessor extends BaseProcessor {
                 0 // 访问标志
                 , jcStatements.toList() // 所有的语句
         );
-
 
         return treeMaker.MethodDef(
                 treeMaker.Modifiers(Flags.PUBLIC), // 访问标志
