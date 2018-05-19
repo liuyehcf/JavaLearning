@@ -3,10 +3,11 @@ package org.liuyehcf.test.annotation;
 import org.liuyehcf.annotation.source.annotation.AllArgsConstructor;
 import org.liuyehcf.annotation.source.annotation.Builder;
 import org.liuyehcf.annotation.source.annotation.Data;
+import org.liuyehcf.annotation.source.annotation.NoArgsConstructor;
 
 
 @Data
-//@NoArgsConstructor
+@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class TestUserDTO {
