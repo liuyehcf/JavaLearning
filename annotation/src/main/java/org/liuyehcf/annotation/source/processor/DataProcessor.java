@@ -44,7 +44,7 @@ public class DataProcessor extends BaseProcessor {
             jcTree.accept(new TreeTranslator() {
                 @Override
                 public void visitClassDef(JCTree.JCClassDecl jcClass) {
-                    messager.printMessage(Diagnostic.Kind.NOTE, "@Data process [" + jcClass.getSimpleName().toString() + "] begin!");
+                    messager.printMessage(Diagnostic.Kind.NOTE, "@Data process [" + jcClass.name.toString() + "] begin!");
 
                     // 进行一些初始化操作
                     before(jcClass);
@@ -54,7 +54,7 @@ public class DataProcessor extends BaseProcessor {
                             createDataMethods()
                     );
 
-                    messager.printMessage(Diagnostic.Kind.NOTE, "@Data process [" + jcClass.getSimpleName().toString() + "] end!");
+                    messager.printMessage(Diagnostic.Kind.NOTE, "@Data process [" + jcClass.name.toString() + "] end!");
                 }
             });
         });
@@ -91,7 +91,7 @@ public class DataProcessor extends BaseProcessor {
         if (jTree.getKind().equals(JCTree.Kind.VARIABLE)) {
             JCTree.JCVariableDecl jcVariable = (JCTree.JCVariableDecl) jTree;
 
-            Set<Modifier> flagSets = jcVariable.getModifiers().getFlags();
+            Set<Modifier> flagSets = jcVariable.mods.getFlags();
             return (!flagSets.contains(STATIC)
                     && !flagSets.contains(FINAL));
         }
@@ -120,9 +120,9 @@ public class DataProcessor extends BaseProcessor {
                         treeMaker.Assign(
                                 treeMaker.Select(
                                         treeMaker.Ident(names.fromString(THIS)),
-                                        jcVariable.getName()
+                                        jcVariable.name
                                 ),
-                                treeMaker.Ident(jcVariable.getName())
+                                treeMaker.Ident(jcVariable.name)
                         )
                 )
         );
@@ -146,7 +146,7 @@ public class DataProcessor extends BaseProcessor {
     }
 
     private String createSetMethodName(JCTree.JCVariableDecl jcVariable) {
-        String fieldName = jcVariable.getName().toString();
+        String fieldName = jcVariable.name.toString();
         return "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
     }
 
@@ -158,7 +158,7 @@ public class DataProcessor extends BaseProcessor {
                 treeMaker.Return(
                         treeMaker.Select(
                                 treeMaker.Ident(names.fromString(THIS)),
-                                jcVariable.getName()
+                                jcVariable.name
                         )
                 )
         );
@@ -182,7 +182,7 @@ public class DataProcessor extends BaseProcessor {
     }
 
     private String createGetMethodName(JCTree.JCVariableDecl jcVariable) {
-        String fieldName = jcVariable.getName().toString();
+        String fieldName = jcVariable.name.toString();
         return "get" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
     }
 

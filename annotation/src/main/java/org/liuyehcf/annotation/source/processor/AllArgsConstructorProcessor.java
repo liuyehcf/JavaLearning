@@ -49,7 +49,7 @@ public class AllArgsConstructorProcessor extends BaseProcessor {
             jcTree.accept(new TreeTranslator() {
                 @Override
                 public void visitClassDef(JCTree.JCClassDecl jcClass) {
-                    messager.printMessage(Diagnostic.Kind.NOTE, "process class [" + jcClass.getSimpleName().toString() + "], start");
+                    messager.printMessage(Diagnostic.Kind.NOTE, "process class [" + jcClass.name.toString() + "], start");
 
                     // 进行一些初始化操作
                     before(jcClass);
@@ -59,7 +59,7 @@ public class AllArgsConstructorProcessor extends BaseProcessor {
                             createAllArgsConstructor()
                     );
 
-                    messager.printMessage(Diagnostic.Kind.NOTE, "process class [" + jcClass.getSimpleName().toString() + "], end");
+                    messager.printMessage(Diagnostic.Kind.NOTE, "process class [" + jcClass.name.toString() + "], end");
                 }
             });
         });
@@ -73,7 +73,7 @@ public class AllArgsConstructorProcessor extends BaseProcessor {
      * @param jcClass 原始类的语法树节点
      */
     private void before(JCTree.JCClassDecl jcClass) {
-        this.className = names.fromString(jcClass.getSimpleName().toString());
+        this.className = names.fromString(jcClass.name.toString());
         this.setJCMethods = getSetJCMethods(jcClass);
     }
 
@@ -108,8 +108,8 @@ public class AllArgsConstructorProcessor extends BaseProcessor {
     private boolean isSetJCMethod(JCTree jTree) {
         if (jTree.getKind().equals(JCTree.Kind.METHOD)) {
             JCTree.JCMethodDecl jcMethod = (JCTree.JCMethodDecl) jTree;
-            return jcMethod.getName().startsWith(names.fromString(SET))
-                    && jcMethod.getParameters().size() == 1;
+            return jcMethod.name.startsWith(names.fromString(SET))
+                    && jcMethod.params.size() == 1;
         }
         return false;
     }
@@ -123,7 +123,7 @@ public class AllArgsConstructorProcessor extends BaseProcessor {
         List<JCTree.JCVariableDecl> jcVariables = List.nil();
 
         for (JCTree.JCMethodDecl jcMethod : setJCMethods) {
-            jcVariables = jcVariables.append(jcMethod.getParameters().get(0));
+            jcVariables = jcVariables.append(jcMethod.params.get(0));
         }
 
 
@@ -162,7 +162,7 @@ public class AllArgsConstructorProcessor extends BaseProcessor {
     }
 
     private Name getNameFromSetJCMethod(JCTree.JCMethodDecl jcMethod) {
-        String s = jcMethod.getName().toString();
+        String s = jcMethod.name.toString();
         return names.fromString(s.substring(3, 4).toLowerCase() + s.substring(4));
     }
 }

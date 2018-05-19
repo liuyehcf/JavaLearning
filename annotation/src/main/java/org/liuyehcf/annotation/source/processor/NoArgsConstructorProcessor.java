@@ -39,7 +39,7 @@ public class NoArgsConstructorProcessor extends BaseProcessor {
             jcTree.accept(new TreeTranslator() {
                 @Override
                 public void visitClassDef(JCTree.JCClassDecl jcClass) {
-                    messager.printMessage(Diagnostic.Kind.NOTE, "@NoArgsConstructor process [" + jcClass.getSimpleName().toString() + "] begin!");
+                    messager.printMessage(Diagnostic.Kind.NOTE, "@NoArgsConstructor process [" + jcClass.name.toString() + "] begin!");
 
                     // 进行一些初始化操作
                     before(jcClass);
@@ -49,7 +49,7 @@ public class NoArgsConstructorProcessor extends BaseProcessor {
                             createNoArgsConstructor()
                     );
 
-                    messager.printMessage(Diagnostic.Kind.NOTE, "@NoArgsConstructor process [" + jcClass.getSimpleName().toString() + "] end!");
+                    messager.printMessage(Diagnostic.Kind.NOTE, "@NoArgsConstructor process [" + jcClass.name.toString() + "] end!");
                 }
             });
         });
@@ -63,7 +63,7 @@ public class NoArgsConstructorProcessor extends BaseProcessor {
      * @param jcClass 原始类的语法树节点
      */
     private void before(JCTree.JCClassDecl jcClass) {
-        this.className = names.fromString(jcClass.getSimpleName().toString());
+        this.className = names.fromString(jcClass.name.toString());
     }
 
     /**
