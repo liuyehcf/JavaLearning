@@ -291,7 +291,8 @@ public class BuilderProcessor extends AbstractProcessor {
 
         List<JCTree> jcTrees = List.nil();
 
-        jcTrees = jcTrees.appendList(createVariables(setJCMethods));
+        List<JCTree> var = createVariables(setJCMethods);
+        jcTrees = jcTrees.appendList(var);
         jcTrees = jcTrees.appendList(createSetJCMethods(setJCMethods));
         jcTrees = jcTrees.append(createBuildJCMethod());
 
@@ -400,6 +401,17 @@ public class BuilderProcessor extends AbstractProcessor {
     }
 
     private JCTree.JCMethodDecl createBuildJCMethod() {
+        ListBuffer<JCTree.JCExpression> expressions = new ListBuffer<>();
+
+        for (JCTree.JCMethodDecl jcMethod : setJCMethods) {
+            expressions.append(
+                    treeMaker.Select(
+                            treeMaker.Ident(names.fromString(THIS)),
+                            getNameFromSetJCMethod(jcMethod)
+                    )
+            );
+        }
+
         ListBuffer<JCTree.JCStatement> jcStatements = new ListBuffer<>();
 
         // 添加返回语句 " return new XXX(arg1, arg2, ...); "
