@@ -44,8 +44,9 @@ public class DataProcessor extends BaseProcessor {
             jcTree.accept(new TreeTranslator() {
                 @Override
                 public void visitClassDef(JCTree.JCClassDecl jcClass) {
-//                    messager.printMessage(Diagnostic.Kind.NOTE, "@Data process [" + jcClass.getSimpleName().toString() + "] begin!");
+                    messager.printMessage(Diagnostic.Kind.NOTE, "@Data process [" + jcClass.getSimpleName().toString() + "] begin!");
 
+                    // 进行一些初始化操作
                     before(jcClass);
 
                     // 添加全参构造方法
@@ -53,7 +54,7 @@ public class DataProcessor extends BaseProcessor {
                             createDataMethods()
                     );
 
-//                    messager.printMessage(Diagnostic.Kind.NOTE, "@Data process [" + jcClass.getSimpleName().toString() + "] end!");
+                    messager.printMessage(Diagnostic.Kind.NOTE, "@Data process [" + jcClass.getSimpleName().toString() + "] end!");
                 }
             });
         });
@@ -137,7 +138,7 @@ public class DataProcessor extends BaseProcessor {
                 names.fromString(createSetMethodName(jcVariable)), // 名字
                 null, //返回类型
                 List.nil(), // 泛型形参列表
-                List.nil(), // 参数列表
+                List.of(cloneJCVariable(jcVariable)), // 参数列表
                 List.nil(), // 异常列表
                 jcBlock, // 方法体
                 null // 默认方法（可能是interface中的那个default）
@@ -168,8 +169,6 @@ public class DataProcessor extends BaseProcessor {
                 , jcStatements.toList() // 所有的语句
         );
 
-        messager.printMessage(Diagnostic.Kind.WARNING, "chenlu");
-
         return treeMaker.MethodDef(
                 treeMaker.Modifiers(Flags.PUBLIC), // 访问标志
                 names.fromString(createGetMethodName(jcVariable)), // 名字
@@ -189,8 +188,8 @@ public class DataProcessor extends BaseProcessor {
 
     private JCTree.JCVariableDecl cloneJCVariable(JCTree.JCVariableDecl prototypeJCVariable) {
         return treeMaker.VarDef(
-                treeMaker.Modifiers(0),
-                prototypeJCVariable.getName(),
+                treeMaker.Modifiers(Flags.PARAMETER), // 极其坑爹！！！
+                prototypeJCVariable.name,
                 prototypeJCVariable.vartype,
                 null
         );

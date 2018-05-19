@@ -1,12 +1,15 @@
 package org.liuyehcf.test.annotation;
 
+import org.liuyehcf.annotation.source.annotation.AllArgsConstructor;
 import org.liuyehcf.annotation.source.annotation.Builder;
 import org.liuyehcf.annotation.source.annotation.Data;
 import org.liuyehcf.annotation.source.annotation.NoArgsConstructor;
 
-//@Builder
+
 @Data
-//@NoArgsConstructor
+@NoArgsConstructor
+//@AllArgsConstructor
+//@Builder
 public class TestUserDTO {
     private String firstName;
 
@@ -34,6 +37,7 @@ public class TestUserDTO {
 //
 //        System.out.println(userDTO);
 //    }
+
 
     @Override
     public String toString() {

@@ -76,11 +76,6 @@ public class BuilderProcessor extends BaseProcessor {
                     // 进行一些初始化操作
                     before(jcClass);
 
-                    // 添加全参构造方法
-                    jcClass.defs = jcClass.defs.append(
-                            createAllArgsConstructor()
-                    );
-
                     // 添加builder方法
                     jcClass.defs = jcClass.defs.append(
                             createStaticBuilderMethod()
@@ -109,54 +104,6 @@ public class BuilderProcessor extends BaseProcessor {
         this.builderClassName = names.fromString(this.className + "Builder");
         this.setJCMethods = getSetJCMethods(jcClass);
     }
-
-    /**
-     * 创建全参数构造方法
-     *
-     * @return 全参构造方法语法树节点
-     */
-    private JCTree.JCMethodDecl createAllArgsConstructor() {
-        List<JCTree.JCVariableDecl> jcVariables = List.nil();
-
-        for (JCTree.JCMethodDecl jcMethod : setJCMethods) {
-            jcVariables = jcVariables.append(jcMethod.getParameters().get(0));
-        }
-
-
-        ListBuffer<JCTree.JCStatement> jcStatements = new ListBuffer<>();
-        for (JCTree.JCMethodDecl jcMethod : setJCMethods) {
-            // 添加构造方法的赋值语句 " this.xxx = xxx; "
-            jcStatements.append(
-                    treeMaker.Exec(
-                            treeMaker.Assign(
-                                    treeMaker.Select(
-                                            treeMaker.Ident(names.fromString(THIS)),
-                                            getNameFromSetJCMethod(jcMethod)
-                                    ),
-                                    treeMaker.Ident(getNameFromSetJCMethod(jcMethod))
-                            )
-                    )
-            );
-        }
-
-        // 转换成代码块
-        JCTree.JCBlock jcBlock = treeMaker.Block(
-                0 // 访问标志
-                , jcStatements.toList() // 所有的语句
-        );
-
-        return treeMaker.MethodDef(
-                treeMaker.Modifiers(Flags.PUBLIC), // 访问标志
-                className, // 名字
-                null, //返回类型
-                List.nil(), // 泛型形参列表
-                jcVariables, // 参数列表，这里必须创建一个新的JCVariable，否则注解处理时就会抛异常，原因目前还不清楚
-                List.nil(), // 异常列表
-                jcBlock, // 方法体
-                null // 默认方法（可能是interface中的那个default）
-        );
-    }
-
 
     /**
      * 创建静态方法，即builder方法，返回静态内部类的实例
@@ -243,8 +190,7 @@ public class BuilderProcessor extends BaseProcessor {
 
         List<JCTree> jcTrees = List.nil();
 
-        List<JCTree> var = createVariables(setJCMethods);
-        jcTrees = jcTrees.appendList(var);
+        jcTrees = jcTrees.appendList(createVariables(setJCMethods));
         jcTrees = jcTrees.appendList(createSetJCMethods(setJCMethods));
         jcTrees = jcTrees.append(createBuildJCMethod());
 
@@ -339,14 +285,13 @@ public class BuilderProcessor extends BaseProcessor {
                 , jcStatements.toList() // 所有的语句
         );
 
-
         return treeMaker.MethodDef(
-                jcMethod.getModifiers(), // 访问标志
+                treeMaker.Modifiers(Flags.PUBLIC), // 访问标志
                 getNameFromSetJCMethod(jcMethod), // 名字
                 treeMaker.Ident(builderClassName), //返回类型
-                jcMethod.getTypeParameters(), // 泛型形参列表
+                List.nil(), // 泛型形参列表
                 List.of(cloneJCVariable(jcVariable)), // 参数列表
-                jcMethod.getThrows(), // 异常列表
+                List.nil(), // 异常列表
                 jcBlock, // 方法体
                 null // 默认方法（可能是interface中的那个default）
         );
@@ -405,9 +350,15 @@ public class BuilderProcessor extends BaseProcessor {
      * @param prototypeJCVariable 原始域节点
      * @return 克隆后的域节点
      */
+//    private JCTree.JCVariableDecl cloneJCVariable(JCTree.JCVariableDecl prototypeJCVariable) {
+//        return treeMaker.VarDef(
+//                treeMaker.Modifiers(Flags.PARAMETER), // 极其坑爹！！！
+//                prototypeJCVariable.name,
+//                prototypeJCVariable.vartype,
+//                null
+//        );
+//    }
     private JCTree.JCVariableDecl cloneJCVariable(JCTree.JCVariableDecl prototypeJCVariable) {
         return treeMaker.VarDef(prototypeJCVariable.sym, prototypeJCVariable.getNameExpression());
     }
-
-
 }

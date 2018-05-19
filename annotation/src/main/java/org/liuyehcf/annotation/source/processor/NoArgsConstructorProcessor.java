@@ -41,6 +41,7 @@ public class NoArgsConstructorProcessor extends BaseProcessor {
                 public void visitClassDef(JCTree.JCClassDecl jcClass) {
                     messager.printMessage(Diagnostic.Kind.NOTE, "@NoArgsConstructor process [" + jcClass.getSimpleName().toString() + "] begin!");
 
+                    // 进行一些初始化操作
                     before(jcClass);
 
                     // 添加全参构造方法
@@ -79,7 +80,7 @@ public class NoArgsConstructorProcessor extends BaseProcessor {
 
         return treeMaker.MethodDef(
                 treeMaker.Modifiers(Flags.PUBLIC), // 访问标志
-                className, // 名字
+                names.fromString("<init>"), // 名字
                 null, //返回类型
                 List.nil(), // 泛型形参列表
                 List.nil(), // 参数列表，这里必须创建一个新的JCVariable，否则注解处理时就会抛异常，原因目前还不清楚
