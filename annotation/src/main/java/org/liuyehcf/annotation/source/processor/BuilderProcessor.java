@@ -76,11 +76,6 @@ public class BuilderProcessor extends BaseProcessor {
                     // 进行一些初始化操作
                     before(jcClass);
 
-                    // 添加无参构造方法
-                    jcClass.defs = jcClass.defs.append(
-                            createNoArgsConstructor()
-                    );
-
                     // 添加全参构造方法
                     jcClass.defs = jcClass.defs.append(
                             createAllArgsConstructor()
@@ -114,31 +109,6 @@ public class BuilderProcessor extends BaseProcessor {
         this.builderClassName = names.fromString(this.className + "Builder");
         this.setJCMethods = getSetJCMethods(jcClass);
     }
-
-    /**
-     * 创建无参数构造方法
-     *
-     * @return 无参构造方法语法树节点
-     */
-    private JCTree.JCMethodDecl createNoArgsConstructor() {
-        // 转换成代码块
-        JCTree.JCBlock jcBlock = treeMaker.Block(
-                0 // 访问标志
-                , List.nil() // 所有的语句
-        );
-
-        return treeMaker.MethodDef(
-                treeMaker.Modifiers(Flags.PUBLIC), // 访问标志
-                className, // 名字
-                null, //返回类型
-                List.nil(), // 泛型形参列表
-                List.nil(), // 参数列表，这里必须创建一个新的JCVariable，否则注解处理时就会抛异常，原因目前还不清楚
-                List.nil(), // 异常列表
-                jcBlock, // 方法体
-                null // 默认方法（可能是interface中的那个default）
-        );
-    }
-
 
     /**
      * 创建全参数构造方法
@@ -438,7 +408,6 @@ public class BuilderProcessor extends BaseProcessor {
     private JCTree.JCVariableDecl cloneJCVariable(JCTree.JCVariableDecl prototypeJCVariable) {
         return treeMaker.VarDef(prototypeJCVariable.sym, prototypeJCVariable.getNameExpression());
     }
-
 
 
 }

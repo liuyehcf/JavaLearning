@@ -8,7 +8,7 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
 import java.util.Set;
 
-@SupportedAnnotationTypes("org.liuyehcf.annotation.source.annotation.Builder")
+@SupportedAnnotationTypes("org.liuyehcf.annotation.source.annotation.Data")
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class DataProcessor extends AbstractProcessor {
     @Override

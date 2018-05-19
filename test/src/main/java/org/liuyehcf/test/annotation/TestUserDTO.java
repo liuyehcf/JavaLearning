@@ -1,8 +1,10 @@
 package org.liuyehcf.test.annotation;
 
 import org.liuyehcf.annotation.source.annotation.Builder;
+import org.liuyehcf.annotation.source.annotation.NoArgsConstructor;
 
 @Builder
+@NoArgsConstructor
 public class TestUserDTO {
     private String firstName;
 
@@ -11,9 +13,6 @@ public class TestUserDTO {
     private Integer age;
 
     private String address;
-
-    public TestUserDTO() {
-    }
 
     public TestUserDTO(String firstName, String lastName, Integer age, String address) {
         this.firstName = firstName;
