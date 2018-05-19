@@ -9,7 +9,7 @@ import org.liuyehcf.annotation.source.annotation.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+//@Builder
 public class TestUserDTO {
     private String firstName;
 
@@ -19,18 +19,44 @@ public class TestUserDTO {
 
     private String address;
 
-
-    public static void main(String[] args) {
-        TestUserDTO.TestUserDTOBuilder builder = TestUserDTO.builder();
-
-        TestUserDTO userDTO = builder.firstName("辰枫")
-                .lastName("贺")
-                .age(25)
-                .address("杭州")
-                .build();
-
-        System.out.println(userDTO);
+    public String getLastName() {
+        return lastName;
     }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public TestUserDTO() {
+    }
+
+    public TestUserDTO(String firstName, String lastName, Integer age, String address) {
+
+        this.address = address;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.age = age;
+    }
+
+    //    public static void main(String[] args) {
+//        TestUserDTO.TestUserDTOBuilder builder = TestUserDTO.builder();
+//
+//        TestUserDTO userDTO = builder.firstName("辰枫")
+//                .lastName("贺")
+//                .age(25)
+//                .address("杭州")
+//                .build();
+//
+//        System.out.println(userDTO);
+//    }
 
     @Override
     public String toString() {

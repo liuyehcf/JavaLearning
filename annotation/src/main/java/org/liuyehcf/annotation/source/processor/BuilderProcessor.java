@@ -149,11 +149,11 @@ public class BuilderProcessor extends BaseProcessor {
      */
     private JCTree.JCClassDecl createJCClass() {
 
-        List<JCTree> jcTrees = List.nil();
+        ListBuffer<JCTree> jcTrees = new ListBuffer<>();
 
-        jcTrees = jcTrees.appendList(createVariables(setJCMethods));
-        jcTrees = jcTrees.appendList(createSetJCMethods(setJCMethods));
-        jcTrees = jcTrees.append(createBuildJCMethod());
+        jcTrees.appendList(createVariables(setJCMethods));
+        jcTrees.appendList(createSetJCMethods(setJCMethods));
+        jcTrees.append(createBuildJCMethod());
 
         return treeMaker.ClassDef(
                 treeMaker.Modifiers(Flags.PUBLIC + Flags.STATIC + Flags.FINAL), // 访问标志
@@ -161,7 +161,7 @@ public class BuilderProcessor extends BaseProcessor {
                 List.nil(), // 泛型形参列表
                 null, // 继承
                 List.nil(), // 接口列表
-                jcTrees); // 定义
+                jcTrees.toList()); // 定义
     }
 
     /**
@@ -171,10 +171,10 @@ public class BuilderProcessor extends BaseProcessor {
      * @return 字段的语法树节点集合
      */
     private List<JCTree> createVariables(List<JCTree.JCMethodDecl> jcMethods) {
-        List<JCTree> jcVariables = List.nil();
+        ListBuffer<JCTree> jcVariables = new ListBuffer<>();
 
         for (JCTree.JCMethodDecl jcMethod : jcMethods) {
-            jcVariables = jcVariables.append(
+            jcVariables.append(
                     treeMaker.VarDef(
                             treeMaker.Modifiers(Flags.PRIVATE), // 访问标志
                             names.fromString(fromSetMethodNameToPropertyName(jcMethod.name.toString())), // 名字
@@ -184,7 +184,7 @@ public class BuilderProcessor extends BaseProcessor {
             );
         }
 
-        return jcVariables;
+        return jcVariables.toList();
     }
 
     /**
@@ -194,13 +194,13 @@ public class BuilderProcessor extends BaseProcessor {
      * @return 方法节点集合
      */
     private List<JCTree> createSetJCMethods(List<JCTree.JCMethodDecl> jcMethods) {
-        List<JCTree> setJCMethods = List.nil();
+        ListBuffer<JCTree> setJCMethods = new ListBuffer<>();
 
         for (JCTree.JCMethodDecl jcMethod : jcMethods) {
-            setJCMethods = setJCMethods.append(createSetJCMethod(jcMethod));
+            setJCMethods.append(createSetJCMethod(jcMethod));
         }
 
-        return setJCMethods;
+        return setJCMethods.toList();
     }
 
     /**

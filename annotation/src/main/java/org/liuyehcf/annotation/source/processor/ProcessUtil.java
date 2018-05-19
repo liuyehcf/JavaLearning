@@ -93,7 +93,7 @@ public class ProcessUtil {
             // 找出所有set方法节点，并添加
             if (isValidField(jcTree)) {
                 // 注意这个com.sun.tools.javac.util.List的用法，不支持链式操作，更改后必须赋值
-                jcVariables = jcVariables.append((JCTree.JCVariableDecl) jcTree);
+                jcVariables.append((JCTree.JCVariableDecl) jcTree);
             }
         }
 
@@ -125,18 +125,18 @@ public class ProcessUtil {
      * @return set方法的语法树节点的集合
      */
     static List<JCTree.JCMethodDecl> getSetJCMethods(JCTree.JCClassDecl jcClass) {
-        List<JCTree.JCMethodDecl> setJCMethods = List.nil();
+        ListBuffer<JCTree.JCMethodDecl> setJCMethods = new ListBuffer<>();
 
         // 遍历jcClass的所有内部节点，可能是字段，方法等等
         for (JCTree jcTree : jcClass.defs) {
             // 找出所有set方法节点，并添加
             if (isSetJCMethod(jcTree)) {
                 // 注意这个com.sun.tools.javac.util.List的用法，不支持链式操作，更改后必须赋值
-                setJCMethods = setJCMethods.append((JCTree.JCMethodDecl) jcTree);
+                setJCMethods.append((JCTree.JCMethodDecl) jcTree);
             }
         }
 
-        return setJCMethods;
+        return setJCMethods.toList();
     }
 
     /**
@@ -175,7 +175,7 @@ public class ProcessUtil {
                     if (jcVariables.size() == jcMethod.params.size()) {
                         boolean isEqual = true;
                         for (int i = 0; i < jcVariables.size(); i++) {
-                            if (!jcVariables.get(i).vartype.equals(jcMethod.params.get(i).vartype)) {
+                            if (!jcVariables.get(i).vartype.type.equals(jcMethod.params.get(i).vartype.type)) {
                                 isEqual = false;
                                 break;
                             }
@@ -204,7 +204,7 @@ public class ProcessUtil {
                 JCTree.JCMethodDecl jcMethod = (JCTree.JCMethodDecl) jcTree;
                 if (setMethodName.equals(jcMethod.name.toString())
                         && jcMethod.params.size() == 1
-                        && jcMethod.params.get(0).vartype.equals(jcVariable.vartype)) {
+                        && jcMethod.params.get(0).vartype.type.equals(jcVariable.vartype.type)) {
                     return true;
                 }
             }
