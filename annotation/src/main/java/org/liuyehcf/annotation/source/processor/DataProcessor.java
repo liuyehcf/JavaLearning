@@ -12,21 +12,15 @@ import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 import java.util.Set;
 
-import static javax.lang.model.element.Modifier.FINAL;
-import static javax.lang.model.element.Modifier.STATIC;
+import static org.liuyehcf.annotation.source.processor.ProcessUtil.*;
 
 @SupportedAnnotationTypes("org.liuyehcf.annotation.source.annotation.Data")
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class DataProcessor extends BaseProcessor {
-
-    private static final String VOID = "void";
-
-    private static final String THIS = "this";
 
     private List<JCTree.JCVariableDecl> fieldJCVariables;
 
@@ -65,38 +59,10 @@ public class DataProcessor extends BaseProcessor {
     /**
      * 进行一些预处理
      *
-     * @param jcClass 原始类的语法树节点
+     * @param jcClass 类的语法树节点
      */
     private void before(JCTree.JCClassDecl jcClass) {
         this.fieldJCVariables = getJCVariables(jcClass);
-    }
-
-    private List<JCTree.JCVariableDecl> getJCVariables(JCTree.JCClassDecl jcClass) {
-        ListBuffer<JCTree.JCVariableDecl> jcVariables = new ListBuffer<>();
-
-        // 遍历jcClass的所有内部节点，可能是字段，方法等等
-        for (JCTree jTree : jcClass.defs) {
-            // 找出所有set方法节点，并添加
-            if (isValidField(jTree)) {
-                // 注意这个com.sun.tools.javac.util.List的用法，不支持链式操作，更改后必须赋值
-                jcVariables = jcVariables.append((JCTree.JCVariableDecl) jTree);
-            }
-        }
-
-        return jcVariables.toList();
-    }
-
-
-    private boolean isValidField(JCTree jTree) {
-        if (jTree.getKind().equals(JCTree.Kind.VARIABLE)) {
-            JCTree.JCVariableDecl jcVariable = (JCTree.JCVariableDecl) jTree;
-
-            Set<Modifier> flagSets = jcVariable.mods.getFlags();
-            return (!flagSets.contains(STATIC)
-                    && !flagSets.contains(FINAL));
-        }
-
-        return false;
     }
 
     private List<JCTree> createDataMethods() {
@@ -110,6 +76,12 @@ public class DataProcessor extends BaseProcessor {
         return dataMethods.toList();
     }
 
+    /**
+     * 根据域的语法树节点，创建对应的set方法
+     *
+     * @param jcVariable 域的语法树节点
+     * @return set方法的语法树节点
+     */
     private JCTree.JCMethodDecl createSetJCMethod(JCTree.JCVariableDecl jcVariable) {
 
         ListBuffer<JCTree.JCStatement> jcStatements = new ListBuffer<>();
@@ -135,21 +107,22 @@ public class DataProcessor extends BaseProcessor {
 
         return treeMaker.MethodDef(
                 treeMaker.Modifiers(Flags.PUBLIC), // 访问标志
-                names.fromString(createSetMethodName(jcVariable)), // 名字
+                names.fromString(fromPropertyNameToSetMethodName(jcVariable.name.toString())), // 名字
                 null, //返回类型
                 List.nil(), // 泛型形参列表
-                List.of(cloneJCVariable(jcVariable)), // 参数列表
+                List.of(cloneJCVariableAsParam(treeMaker, jcVariable)), // 参数列表
                 List.nil(), // 异常列表
                 jcBlock, // 方法体
                 null // 默认方法（可能是interface中的那个default）
         );
     }
 
-    private String createSetMethodName(JCTree.JCVariableDecl jcVariable) {
-        String fieldName = jcVariable.name.toString();
-        return "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
-    }
-
+    /**
+     * 根据域的语法树节点，创建对应的get方法的语法树节点
+     *
+     * @param jcVariable 域的语法树节点
+     * @return get方法的语法树节点
+     */
     private JCTree.JCMethodDecl createGetJCMethod(JCTree.JCVariableDecl jcVariable) {
         ListBuffer<JCTree.JCStatement> jcStatements = new ListBuffer<>();
 
@@ -171,27 +144,13 @@ public class DataProcessor extends BaseProcessor {
 
         return treeMaker.MethodDef(
                 treeMaker.Modifiers(Flags.PUBLIC), // 访问标志
-                names.fromString(createGetMethodName(jcVariable)), // 名字
+                names.fromString(fromPropertyNameToGetMethodName(jcVariable.name.toString())), // 名字
                 jcVariable.vartype, //返回类型
                 List.nil(), // 泛型形参列表
                 List.nil(), // 参数列表
                 List.nil(), // 异常列表
                 jcBlock, // 方法体
                 null // 默认方法（可能是interface中的那个default）
-        );
-    }
-
-    private String createGetMethodName(JCTree.JCVariableDecl jcVariable) {
-        String fieldName = jcVariable.name.toString();
-        return "get" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
-    }
-
-    private JCTree.JCVariableDecl cloneJCVariable(JCTree.JCVariableDecl prototypeJCVariable) {
-        return treeMaker.VarDef(
-                treeMaker.Modifiers(Flags.PARAMETER), // 极其坑爹！！！
-                prototypeJCVariable.name,
-                prototypeJCVariable.vartype,
-                null
         );
     }
 }

@@ -17,26 +17,14 @@ import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 import java.util.Set;
 
+import static org.liuyehcf.annotation.source.processor.ProcessUtil.*;
+
 @SupportedAnnotationTypes("org.liuyehcf.annotation.source.annotation.Builder")
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class BuilderProcessor extends BaseProcessor {
 
-    private static final String THIS = "this";
-
-    private static final String SET = "set";
-
     /**
-     * 创建建造者的静态方法名
-     */
-    private static final String BUILDER_STATIC_METHOD_NAME = "builder";
-
-    /**
-     * 建造方法名
-     */
-    private static final String BUILD_METHOD_NAME = "build";
-
-    /**
-     * 原始类名
+     * 类名
      */
     private Name className;
 
@@ -46,7 +34,7 @@ public class BuilderProcessor extends BaseProcessor {
     private Name builderClassName;
 
     /**
-     * 原始类的set方法的语法树节点集合
+     * set方法的语法树节点集合
      */
     private List<JCTree.JCMethodDecl> setJCMethods;
 
@@ -97,7 +85,7 @@ public class BuilderProcessor extends BaseProcessor {
     /**
      * 进行一些预处理
      *
-     * @param jcClass 原始类的语法树节点
+     * @param jcClass 类的语法树节点
      */
     private void before(JCTree.JCClassDecl jcClass) {
         this.className = names.fromString(jcClass.name.toString());
@@ -146,42 +134,6 @@ public class BuilderProcessor extends BaseProcessor {
     }
 
     /**
-     * 提取出所有set方法的语法树节点
-     *
-     * @param jcClass 原始类的语法树节点
-     * @return set方法的语法树节点的集合
-     */
-    private List<JCTree.JCMethodDecl> getSetJCMethods(JCTree.JCClassDecl jcClass) {
-        List<JCTree.JCMethodDecl> setJCMethods = List.nil();
-
-        // 遍历jcClass的所有内部节点，可能是字段，方法等等
-        for (JCTree jTree : jcClass.defs) {
-            // 找出所有set方法节点，并添加
-            if (isSetJCMethod(jTree)) {
-                // 注意这个com.sun.tools.javac.util.List的用法，不支持链式操作，更改后必须赋值
-                setJCMethods = setJCMethods.append((JCTree.JCMethodDecl) jTree);
-            }
-        }
-
-        return setJCMethods;
-    }
-
-    /**
-     * 判断是否为set方法
-     *
-     * @param jTree 原始类的语法树节点
-     * @return 判断是否是Set方法
-     */
-    private boolean isSetJCMethod(JCTree jTree) {
-        if (jTree.getKind().equals(JCTree.Kind.METHOD)) {
-            JCTree.JCMethodDecl jcMethod = (JCTree.JCMethodDecl) jTree;
-            return jcMethod.name.startsWith(names.fromString(SET))
-                    && jcMethod.params.size() == 1;
-        }
-        return false;
-    }
-
-    /**
      * 创建一个类的语法树节点。作为Builder模式中的Builder类
      *
      * @return 创建出来的类的语法树节点
@@ -216,7 +168,7 @@ public class BuilderProcessor extends BaseProcessor {
             jcVariables = jcVariables.append(
                     treeMaker.VarDef(
                             treeMaker.Modifiers(Flags.PRIVATE), // 访问标志
-                            getNameFromSetJCMethod(jcMethod), // 名字
+                            names.fromString(fromSetMethodNameToPropertyName(jcMethod.name.toString())), // 名字
                             jcMethod.params.head.vartype // 类型
                             , null // 初始化语句
                     )
@@ -224,11 +176,6 @@ public class BuilderProcessor extends BaseProcessor {
         }
 
         return jcVariables;
-    }
-
-    private Name getNameFromSetJCMethod(JCTree.JCMethodDecl jcMethod) {
-        String s = jcMethod.name.toString();
-        return names.fromString(s.substring(3, 4).toLowerCase() + s.substring(4));
     }
 
     /**
@@ -264,9 +211,9 @@ public class BuilderProcessor extends BaseProcessor {
                         treeMaker.Assign(
                                 treeMaker.Select(
                                         treeMaker.Ident(names.fromString(THIS)),
-                                        getNameFromSetJCMethod(jcMethod)
+                                        names.fromString(fromSetMethodNameToPropertyName(jcMethod.name.toString()))
                                 ),
-                                treeMaker.Ident(getNameFromSetJCMethod(jcMethod))
+                                treeMaker.Ident(names.fromString(fromSetMethodNameToPropertyName(jcMethod.name.toString())))
                         )
                 )
         );
@@ -287,16 +234,21 @@ public class BuilderProcessor extends BaseProcessor {
 
         return treeMaker.MethodDef(
                 treeMaker.Modifiers(Flags.PUBLIC), // 访问标志
-                getNameFromSetJCMethod(jcMethod), // 名字
+                names.fromString(fromSetMethodNameToPropertyName(jcMethod.name.toString())), // 名字
                 treeMaker.Ident(builderClassName), //返回类型
                 List.nil(), // 泛型形参列表
-                List.of(cloneJCVariable(jcVariable)), // 参数列表
+                List.of(cloneJCVariableAsParam(treeMaker, jcVariable)), // 参数列表
                 List.nil(), // 异常列表
                 jcBlock, // 方法体
                 null // 默认方法（可能是interface中的那个default）
         );
     }
 
+    /**
+     * 创建build方法的语法树节点
+     *
+     * @return build方法的语法树节点
+     */
     private JCTree.JCMethodDecl createBuildJCMethod() {
         ListBuffer<JCTree.JCExpression> jcVariableExpressions = new ListBuffer<>();
 
@@ -304,7 +256,7 @@ public class BuilderProcessor extends BaseProcessor {
             jcVariableExpressions.append(
                     treeMaker.Select(
                             treeMaker.Ident(names.fromString(THIS)),
-                            getNameFromSetJCMethod(jcMethod)
+                            names.fromString(fromSetMethodNameToPropertyName(jcMethod.name.toString()))
                     )
             );
         }
@@ -340,22 +292,6 @@ public class BuilderProcessor extends BaseProcessor {
                 List.nil(), // 异常列表
                 jcBlock, // 方法体
                 null // 默认方法（可能是interface中的那个default）
-        );
-    }
-
-    /**
-     * 克隆一个域的语法树节点
-     * 具有位置信息的语法树节点是不能复用的！
-     *
-     * @param prototypeJCVariable 原始域节点
-     * @return 克隆后的域节点
-     */
-    private JCTree.JCVariableDecl cloneJCVariable(JCTree.JCVariableDecl prototypeJCVariable) {
-        return treeMaker.VarDef(
-                treeMaker.Modifiers(Flags.PARAMETER), // 极其坑爹！！！
-                prototypeJCVariable.name,
-                prototypeJCVariable.vartype,
-                null
         );
     }
 }

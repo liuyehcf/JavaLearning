@@ -4,7 +4,6 @@ import com.sun.tools.javac.code.Flags;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.TreeTranslator;
 import com.sun.tools.javac.util.List;
-import com.sun.tools.javac.util.Name;
 import org.liuyehcf.annotation.source.annotation.NoArgsConstructor;
 
 import javax.annotation.processing.RoundEnvironment;
@@ -16,14 +15,11 @@ import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 import java.util.Set;
 
+import static org.liuyehcf.annotation.source.processor.ProcessUtil.CONSTRUCTOR_NAME;
+
 @SupportedAnnotationTypes("org.liuyehcf.annotation.source.annotation.NoArgsConstructor")
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class NoArgsConstructorProcessor extends BaseProcessor {
-
-    /**
-     * 原始类名
-     */
-    private Name className;
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
@@ -41,9 +37,6 @@ public class NoArgsConstructorProcessor extends BaseProcessor {
                 public void visitClassDef(JCTree.JCClassDecl jcClass) {
                     messager.printMessage(Diagnostic.Kind.NOTE, "@NoArgsConstructor process [" + jcClass.name.toString() + "] begin!");
 
-                    // 进行一些初始化操作
-                    before(jcClass);
-
                     // 添加全参构造方法
                     jcClass.defs = jcClass.defs.append(
                             createNoArgsConstructor()
@@ -55,15 +48,6 @@ public class NoArgsConstructorProcessor extends BaseProcessor {
         });
 
         return true;
-    }
-
-    /**
-     * 进行一些预处理
-     *
-     * @param jcClass 原始类的语法树节点
-     */
-    private void before(JCTree.JCClassDecl jcClass) {
-        this.className = names.fromString(jcClass.name.toString());
     }
 
     /**
@@ -80,7 +64,7 @@ public class NoArgsConstructorProcessor extends BaseProcessor {
 
         return treeMaker.MethodDef(
                 treeMaker.Modifiers(Flags.PUBLIC), // 访问标志
-                names.fromString("<init>"), // 名字
+                names.fromString(CONSTRUCTOR_NAME), // 名字
                 null, //返回类型
                 List.nil(), // 泛型形参列表
                 List.nil(), // 参数列表，这里必须创建一个新的JCVariable，否则注解处理时就会抛异常，原因目前还不清楚
