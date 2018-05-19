@@ -13,12 +13,12 @@ public class TestUserDTO {
     private String address;
 
     public static void main(String[] args) {
-        TestUserDTO.TestUserDTOBuilder builder = new TestUserDTO.TestUserDTOBuilder();
+        TestUserDTO.TestUserDTOBuilder builder = TestUserDTO.builder();
 
-        TestUserDTO userDTO = builder.setFirstName("辰枫")
-                .setLastName("贺")
-                .setAge(25)
-                .setAddress("杭州")
+        TestUserDTO userDTO = builder.firstName("辰枫")
+                .lastName("贺")
+                .age(25)
+                .address("杭州")
                 .build();
 
         System.out.println(userDTO);

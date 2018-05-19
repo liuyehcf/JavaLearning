@@ -26,6 +26,10 @@ public class BuilderProcessor extends AbstractProcessor {
 
     private static final String IDENTIFIER_BUILD = "build";
 
+    private static final String IDENTIFIER_BUILDER = "builder";
+
+    private static final String CLASS_SUFFIX = "Builder";
+
     /**
      * 用于在编译器打印消息的组件
      */
@@ -49,9 +53,9 @@ public class BuilderProcessor extends AbstractProcessor {
     /**
      * 插入式注解处理器的处理逻辑
      *
-     * @param annotations
-     * @param roundEnv
-     * @return
+     * @param annotations 注解
+     * @param roundEnv    环境
+     * @return 处理结果
      */
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
@@ -68,6 +72,11 @@ public class BuilderProcessor extends AbstractProcessor {
                 @Override
                 public void visitClassDef(JCTree.JCClassDecl jcClassDecl) {
 
+                    // 为当前jcClassDecl添加JMethod节点
+                    jcClassDecl.defs = jcClassDecl.defs.append(
+                            createStaticBuilderMethod(jcClassDecl)
+                    );
+
                     // 为当前jcClassDecl添加JCTree节点
                     jcClassDecl.defs = jcClassDecl.defs.append(
                             // 创建了一个静态内部类作为一个Builder
@@ -83,11 +92,54 @@ public class BuilderProcessor extends AbstractProcessor {
         return true;
     }
 
+
     /**
-     * 提取出所有set方法
+     * 创建静态方法，即builder方法，返回静态内部类的实例
      *
      * @param jcClassDecl
      * @return
+     */
+    private JCTree.JCMethodDecl createStaticBuilderMethod(JCTree.JCClassDecl jcClassDecl) {
+
+        ListBuffer<JCTree.JCStatement> jcStatements = new ListBuffer<>();
+
+        // 添加Builder模式中的返回语句 " return new XXXBuilder(); "
+        jcStatements.append(
+                treeMaker.Return(
+                        treeMaker.NewClass(
+                                null, // 尚不清楚含义
+                                List.nil(), // 构造器方法参数
+                                treeMaker.Ident(getNameFromString(jcClassDecl.getSimpleName().toString() + CLASS_SUFFIX)), // 创建的类名
+                                List.nil(), // 构造器方法列表
+                                null // 尚不清楚含义
+                        )
+                )
+        );
+
+        // 转换成代码块
+        JCTree.JCBlock jcBlock = treeMaker.Block(
+                0 // 访问标志
+                , jcStatements.toList() // 所有的语句
+        );
+
+        return treeMaker.MethodDef(
+                treeMaker.Modifiers(Flags.PUBLIC + Flags.STATIC), // 访问标志
+                getNameFromString(IDENTIFIER_BUILDER), // 名字
+                treeMaker.Ident(getNameFromString(jcClassDecl.getSimpleName().toString() + CLASS_SUFFIX)), //返回类型
+                List.nil(), // 泛型形参列表
+                List.nil(), // 参数列表，这里必须创建一个新的JCVariableDecl，否则注解处理时就会抛异常，原因目前还不清楚
+                List.nil(), // 异常列表
+                jcBlock, // 方法体
+                null // 默认值
+        );
+    }
+
+
+    /**
+     * 提取出所有set方法
+     *
+     * @param jcClassDecl 类节点
+     * @return 方法集合列表
      */
     private List<JCTree.JCMethodDecl> getSetJCMethodDecls(JCTree.JCClassDecl jcClassDecl) {
         List<JCTree.JCMethodDecl> setJCMethodDecls = List.nil();
@@ -107,16 +159,14 @@ public class BuilderProcessor extends AbstractProcessor {
     /**
      * 判断是否为set方法
      *
-     * @param jTree
-     * @return
+     * @param jTree 语法树节点
+     * @return 是否是Set方法
      */
     private boolean isSetJCMethodDecl(JCTree jTree) {
         if (jTree.getKind().equals(JCTree.Kind.METHOD)) {
             JCTree.JCMethodDecl jcMethodDecl = (JCTree.JCMethodDecl) jTree;
-            if (jcMethodDecl.getName().startsWith(getNameFromString(IDENTIFIER_SET))
-                    && jcMethodDecl.getParameters().size() == 1) {
-                return true;
-            }
+            return jcMethodDecl.getName().startsWith(getNameFromString(IDENTIFIER_SET))
+                    && jcMethodDecl.getParameters().size() == 1;
         }
         return false;
     }
@@ -128,9 +178,9 @@ public class BuilderProcessor extends AbstractProcessor {
     /**
      * 创建一个语法树节点，其类型为JCClassDecl。作为Builder模式中的Builder类
      *
-     * @param jcClassDecl
-     * @param jcMethodDecls
-     * @return
+     * @param jcClassDecl   类节点
+     * @param jcMethodDecls 方法节点
+     * @return 类节点
      */
     private JCTree.JCClassDecl createJCClassDecl(JCTree.JCClassDecl jcClassDecl, List<JCTree.JCMethodDecl> jcMethodDecls) {
 
@@ -143,7 +193,7 @@ public class BuilderProcessor extends AbstractProcessor {
 
         return treeMaker.ClassDef(
                 treeMaker.Modifiers(Flags.PUBLIC + Flags.STATIC + Flags.FINAL), // 访问标志
-                getNameFromString(jcClassDecl.getSimpleName().toString() + "Builder"), // 名字
+                getNameFromString(jcClassDecl.getSimpleName().toString() + CLASS_SUFFIX), // 名字
                 List.nil(), // 泛型形参列表
                 null, // 继承
                 List.nil(), // 接口列表
@@ -153,8 +203,8 @@ public class BuilderProcessor extends AbstractProcessor {
     /**
      * 创建一个语法树节点，其类型为JCVariableDecl。作为Builder模式中被Build的对象
      *
-     * @param jcClassDecl
-     * @return
+     * @param jcClassDecl 类节点
+     * @return 域节点
      */
     private JCTree.JCVariableDecl createDataField(JCTree.JCClassDecl jcClassDecl) {
         return treeMaker.VarDef(
@@ -168,7 +218,7 @@ public class BuilderProcessor extends AbstractProcessor {
     /**
      * 创建一个语法树节点，其类型为JCExpression。即" new XXX(); "的语句
      *
-     * @param jcClassDecl
+     * @param jcClassDecl 类节点
      * @return
      */
     private JCTree.JCExpression createInitializeJCExpression(JCTree.JCClassDecl jcClassDecl) {
@@ -184,10 +234,10 @@ public class BuilderProcessor extends AbstractProcessor {
     /**
      * 创建一些语法树节点，其类型为JCMethodDecl。作为Builder模式中的setXXX方法
      *
-     * @param jcClassDecl
-     * @param methodDecls
-     * @param jcVariableDecl
-     * @return
+     * @param jcClassDecl    类节点
+     * @param methodDecls    方法节点集合
+     * @param jcVariableDecl 域节点
+     * @return 方法节点集合
      */
     private List<JCTree> createSetJCMethodDecls(JCTree.JCClassDecl jcClassDecl, List<JCTree.JCMethodDecl> methodDecls, JCTree.JCVariableDecl jcVariableDecl) {
         List<JCTree> setJCMethodDecls = List.nil();
@@ -202,9 +252,9 @@ public class BuilderProcessor extends AbstractProcessor {
     /**
      * 创建一个语法树节点，其类型为JCMethodDecl。作为Builder模式中的setXXX方法
      *
-     * @param jcClassDecl
-     * @param jcMethodDecl
-     * @return
+     * @param jcClassDecl  类节点
+     * @param jcMethodDecl 方法节点
+     * @return 方法节点
      */
     private JCTree.JCMethodDecl createSetJCMethodDecl(JCTree.JCClassDecl jcClassDecl, JCTree.JCMethodDecl jcMethodDecl) {
         JCTree.JCVariableDecl jcVariableDecl = jcMethodDecl.getParameters().get(0);
@@ -242,14 +292,25 @@ public class BuilderProcessor extends AbstractProcessor {
 
         return treeMaker.MethodDef(
                 jcMethodDecl.getModifiers(), // 访问标志
-                jcMethodDecl.getName(), // 名字
-                treeMaker.Ident(getNameFromString(jcClassDecl.getSimpleName().toString() + "Builder")), //返回类型
+                getModifiedName(jcMethodDecl.getName()), // 名字
+                treeMaker.Ident(getNameFromString(jcClassDecl.getSimpleName().toString() + CLASS_SUFFIX)), //返回类型
                 jcMethodDecl.getTypeParameters(), // 泛型形参列表
                 List.of(copyJCVariableDecl(jcVariableDecl)), // 参数列表，这里必须创建一个新的JCVariableDecl，否则注解处理时就会抛异常，原因目前还不清楚
                 jcMethodDecl.getThrows(), // 异常列表
                 jcBlock, // 方法体
                 null // 默认值
         );
+    }
+
+    /**
+     * 修改名字，将setX，改成x
+     *
+     * @param originName 原始名字
+     * @return 修改后的名字
+     */
+    private Name getModifiedName(Name originName) {
+        String s = originName.toString();
+        return getNameFromString(s.substring(3, 4).toLowerCase() + s.substring(4));
     }
 
     private JCTree.JCMethodDecl createBuildJCMethodDecl(JCTree.JCClassDecl jcClassDecl) {
@@ -287,8 +348,8 @@ public class BuilderProcessor extends AbstractProcessor {
      * 克隆一个JCVariableDecl语法树节点
      * 我觉得TreeMaker.MethodDef()方法需要克隆参数列表的原因是：从JCMethodDecl拿到的JCVariableDecl会与这个JCMethodDecl有关联，因此需要创建一个与该JCMethodDecl无关的语法树节点（JCVariableDecl）
      *
-     * @param prototypeJCVariableDecl
-     * @return
+     * @param prototypeJCVariableDecl 域节点
+     * @return 域节点
      */
     private JCTree.JCVariableDecl copyJCVariableDecl(JCTree.JCVariableDecl prototypeJCVariableDecl) {
         return treeMaker.VarDef(prototypeJCVariableDecl.sym, prototypeJCVariableDecl.getNameExpression());
@@ -297,7 +358,7 @@ public class BuilderProcessor extends AbstractProcessor {
     /**
      * 获取一些注解处理器执行处理逻辑时需要用到的一些关键对象
      *
-     * @param processingEnv
+     * @param processingEnv 处理环境
      */
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
