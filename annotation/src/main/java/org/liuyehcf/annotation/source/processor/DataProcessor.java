@@ -1,6 +1,7 @@
 package org.liuyehcf.annotation.source.processor;
 
 import com.sun.tools.javac.code.Flags;
+import com.sun.tools.javac.code.TypeTag;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.TreeTranslator;
 import com.sun.tools.javac.util.List;
@@ -137,7 +138,7 @@ public class DataProcessor extends BaseProcessor {
         return treeMaker.MethodDef(
                 treeMaker.Modifiers(Flags.PUBLIC), // 访问标志
                 names.fromString(fromPropertyNameToSetMethodName(jcVariable.name.toString())), // 名字
-                null, //返回类型
+                treeMaker.TypeIdent(TypeTag.VOID), //返回类型
                 List.nil(), // 泛型形参列表
                 List.of(cloneJCVariableAsParam(treeMaker, jcVariable)), // 参数列表
                 List.nil(), // 异常列表
