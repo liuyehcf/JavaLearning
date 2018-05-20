@@ -21,7 +21,7 @@ LINE_NUM=$(cat META-INF/services/javax.annotation.processing.Processor | wc -l)
 LINE_NUM=$((LINE_NUM+1))
 
 # 将文件 `META-INF/services/javax.annotation.processing.Processor` 中的内容合并成串，以','分隔
-PROCESSORS=$(cat META-INF/services/javax.annotation.processing.Processor | awk '{ { printf $0 } if(NR < '"${LINE_NUM}"') { printf "," } }')
+PROCESSORS=$(cat META-INF/services/javax.annotation.processing.Processor | awk '{ { printf $0 } if(NR < "'"${LINE_NUM}"'") { printf "," } }')
 
 # 编译UserDTO.java，通过-process参数指定注解处理器
 javac -cp ${TARGET_DIR} -d ${TARGET_DIR} -processor ${PROCESSORS} UserDTO.java
