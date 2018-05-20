@@ -13,7 +13,8 @@ TOOLS_PATH="${JAVA_HOME}/lib/tools.jar"
 javac -cp ${TOOLS_PATH} $(find ../java -name "*.java")  -d classes/
 
 # 统计文件 `META-INF/services/javax.annotation.processing.Processor` 的行数
-LINE_NUM=$(cat META-INF/services/javax.annotation.processing.Processor | wc -l)+1
+LINE_NUM=$(cat META-INF/services/javax.annotation.processing.Processor | wc -l)
+LINE_NUM=$((LINE_NUM+1))
 
 # 将文件 `META-INF/services/javax.annotation.processing.Processor` 中的内容合并成串，以','分隔
 PROCESSORS=$(cat META-INF/services/javax.annotation.processing.Processor | awk '{ { printf $0 } if(NR < '"$LINE_NUM"') { printf "," } }')
