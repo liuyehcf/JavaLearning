@@ -19,22 +19,6 @@ public class TestUserDTO {
 
     private String address;
 
-    public String getLastName() {
-        return lastName;
-    }
-
-    public Integer getAge() {
-        return age;
-    }
-
-    public void setAge(Integer age) {
-        this.age = age;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
     public static void main(String[] args) {
         TestUserDTO userDTO = TestUserDTO.builder()
                 .firstName("明")
