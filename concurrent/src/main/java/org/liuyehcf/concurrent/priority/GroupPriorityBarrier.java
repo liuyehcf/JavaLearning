@@ -51,7 +51,7 @@ public class GroupPriorityBarrier {
         barrier = new CyclicBarrier(size);
     }
 
-    private static final class Syn extends AbstractQueuedSynchronizer2 {
+    private static final class Syn extends AbstractPriorityQueuedSynchronizer {
         private static final int UNINITIALIZED = 0;
         private static final int INITIALIZED = 1;
         private static final int ORIGIN_STATE = 1;
@@ -135,7 +135,7 @@ public class GroupPriorityBarrier {
         }
 
         @Override
-        protected void onPassDirect() {
+        protected void onAcquireDirect() {
             /*
              * 保证线程入队次序与priority严格一致
              * 搜索enqControl关键字，查看呼应逻辑
@@ -245,7 +245,7 @@ public class GroupPriorityBarrier {
         /*
          * 交由AQS管控
          */
-        syn.acquireShared(syn.priorityStates.get(priority));
+        syn.acquireSharedPriority(syn.priorityStates.get(priority));
     }
 
     public void exit() {
