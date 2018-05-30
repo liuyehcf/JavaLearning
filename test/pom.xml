@@ -20,7 +20,7 @@
 
         <dependency>
             <groupId>org.liuyehcf</groupId>
-            <artifactId>annotation</artifactId>
+            <artifactId>annotation-lombok</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
