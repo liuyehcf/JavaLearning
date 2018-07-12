@@ -4,12 +4,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.liuyehcf</groupId>
-    <artifactId>spring-cloud-eureka-client</artifactId>
+    <artifactId>spring-cloud-ribbon-consumer</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>spring-cloud-eureka-client</name>
-    <description>Demo project for Spring Cloud Eureka Client</description>
+    <name>spring-cloud-ribbon-consumer</name>
+    <description>Demo project for Spring Cloud Service Ribbon</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
