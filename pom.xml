@@ -41,6 +41,7 @@
         <module>mybatis-spring</module>
         <module>lambda-expression</module>
         <module>spring-validate</module>
+        <module>spring-cloud</module>
 
     </modules>
 
