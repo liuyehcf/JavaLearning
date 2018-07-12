@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: cloud.config.demo         # 指定配置中心配置文件的{application}
+  cloud:
+    config:
+      profile: dev                  # 指定配置中心配置文件的{profile}
+      label: temp                   # 指定配置中心配置文件的{label}
+      discovery:
+        enabled: true               # 使用注册中心里面已注册的配置中心
+        serviceId: ConfigServer     # 指定配置中心注册到注册中心的serviceId
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://127.0.0.1:1100/eureka/
