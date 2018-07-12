@@ -6,7 +6,7 @@ import org.liuyehcf.spring.validate.group.Create;
 import org.liuyehcf.spring.validate.group.Update;
 
 /**
- * @author chenlu
+ * @author hechenfeng
  * @date 2018/7/10
  */
 public class UserDTO {

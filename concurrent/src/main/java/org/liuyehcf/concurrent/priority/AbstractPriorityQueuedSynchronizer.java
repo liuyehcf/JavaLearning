@@ -6,7 +6,7 @@ import java.lang.reflect.Method;
 import java.util.concurrent.locks.AbstractQueuedSynchronizer;
 
 /**
- * @author chenlu
+ * @author hechenfeng
  * @date 2018/5/30
  */
 public abstract class AbstractPriorityQueuedSynchronizer extends AbstractQueuedSynchronizer {

@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * 分组优先级内存栅栏
  *
- * @author chenlu
+ * @author hechenfeng
  * @date 2018/5/28
  */
 public class GroupPriorityBarrier {

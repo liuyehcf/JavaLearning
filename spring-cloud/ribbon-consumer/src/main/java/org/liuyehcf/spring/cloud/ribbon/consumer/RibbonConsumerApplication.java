@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
 
 /**
- * @author chenlu
+ * @author hechenfeng
  * @date 2018/7/12
  */
 @EnableDiscoveryClient

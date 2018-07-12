@@ -1,7 +1,7 @@
 package org.liuyehcf.spring.validate.group;
 
 /**
- * @author chenlu
+ * @author hechenfeng
  * @date 2018/7/10
  */
 public interface Update {
