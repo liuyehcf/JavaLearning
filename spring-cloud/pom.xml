@@ -15,6 +15,8 @@
         <module>eureka-provider</module>
         <module>feign-consumer</module>
         <module>ribbon-consumer</module>
+        <module>config-server</module>
+        <module>config-client</module>
     </modules>
 
     <build>
