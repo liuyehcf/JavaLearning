@@ -1,4 +1,4 @@
-package org.liuyehcf.spring.cloud.service.ribbon;
+package org.liuyehcf.spring.cloud.ribbon.consumer;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;

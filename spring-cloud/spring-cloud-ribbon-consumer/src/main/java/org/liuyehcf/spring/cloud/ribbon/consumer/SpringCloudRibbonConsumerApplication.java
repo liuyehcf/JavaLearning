@@ -1,4 +1,4 @@
-package org.liuyehcf.spring.cloud.service.ribbon;
+package org.liuyehcf.spring.cloud.ribbon.consumer;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -9,9 +9,9 @@ import org.springframework.web.client.RestTemplate;
 
 @EnableDiscoveryClient
 @SpringBootApplication
-public class SpringCloudServiceRibbonApplication {
+public class SpringCloudRibbonConsumerApplication {
     public static void main(String[] args) {
-        SpringApplication.run(SpringCloudServiceRibbonApplication.class, args);
+        SpringApplication.run(SpringCloudRibbonConsumerApplication.class, args);
     }
 
     //开启软均衡负载

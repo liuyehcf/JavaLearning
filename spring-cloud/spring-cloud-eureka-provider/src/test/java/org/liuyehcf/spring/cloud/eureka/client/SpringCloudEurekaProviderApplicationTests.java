@@ -1,4 +1,4 @@
-package org.liuyehcf.spring.cloud.service.ribbon;
+package org.liuyehcf.spring.cloud.eureka.client;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -7,7 +7,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class SpringCloudServiceRibbonApplicationTests {
+public class SpringCloudEurekaProviderApplicationTests {
 
     @Test
     public void contextLoads() {

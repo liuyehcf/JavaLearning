@@ -1,4 +1,4 @@
-package org.liuyehcf.spring.cloud.service.ribbon;
+package org.liuyehcf.spring.cloud.ribbon.consumer;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
