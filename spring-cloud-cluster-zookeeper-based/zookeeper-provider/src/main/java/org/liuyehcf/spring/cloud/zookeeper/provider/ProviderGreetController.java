@@ -12,7 +12,7 @@ import java.util.Date;
  * @date 2018/7/13
  */
 @RestController
-public class GreetController {
+public class ProviderGreetController {
     @Value("${server.port}")
     private String port;
 

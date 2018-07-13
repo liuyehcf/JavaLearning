@@ -10,7 +10,7 @@ import javax.annotation.Resource;
  * @date 2018/7/13
  */
 @Service
-public class GreetService {
+public class ConsumerGreetService {
     @Resource
     private RestTemplate restTemplate;
 

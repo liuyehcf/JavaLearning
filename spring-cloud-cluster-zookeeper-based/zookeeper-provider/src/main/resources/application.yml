@@ -1,3 +1,6 @@
+server:
+  port: 1110
+
 spring:
   application:
     name: ZookeeperProvider
@@ -5,5 +8,3 @@ spring:
   cloud:
     zookeeper:
       connect-string: localhost:2181
-
-server.port: 1110

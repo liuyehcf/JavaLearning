@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: cloud.config.demo         # 指定配置中心配置文件的{application}
+
+  cloud:
+    config:
+      profile: dev                  # 指定配置中心配置文件的{profile}
+      label: master                 # 指定配置中心配置文件的{label}
+      uri: http://localhost:1140
+      discovery:
+        enabled: true               # 使用注册中心里面已注册的配置中心
+        serviceId: ConfigServer     # 指定配置中心注册到注册中心的serviceId
+
+    zookeeper:
+      connect-string: localhost:2181

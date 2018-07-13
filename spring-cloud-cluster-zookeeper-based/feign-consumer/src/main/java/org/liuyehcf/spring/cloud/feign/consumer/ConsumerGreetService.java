@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @date 2018/7/13
  */
 @FeignClient(value = "ZookeeperProvider")
-public interface GreetService {
+public interface ConsumerGreetService {
     @RequestMapping(value = "hi", method = RequestMethod.GET)
     String sayHi(@RequestParam("name") String name);
 }
