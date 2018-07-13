@@ -1,4 +1,4 @@
-package org.liuyehcf.spring.cloud.ribbon.consumer;
+package org.liuyehcf.spring.cloud.feign.consumer;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -8,16 +8,16 @@ import javax.annotation.Resource;
 
 /**
  * @author hechenfeng
- * @date 2018/7/12
+ * @date 2018/7/13
  */
 @RestController
-@RequestMapping("/demo/ribbon")
-public class ConsumerController {
+@RequestMapping("/demo/feign")
+public class GreetController {
     @Resource
-    private CalculatorService calculatorService;
+    private GreetService greetService;
 
     @RequestMapping("/sayHi")
     String sayHi(@RequestParam String name) {
-        return calculatorService.sayHi(name);
+        return greetService.sayHi(name);
     }
 }

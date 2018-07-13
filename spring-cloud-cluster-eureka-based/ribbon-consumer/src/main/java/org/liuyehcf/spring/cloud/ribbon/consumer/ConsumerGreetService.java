@@ -10,12 +10,12 @@ import javax.annotation.Resource;
  * @date 2018/7/12
  */
 @Service
-class CalculatorService {
+class ConsumerGreetService {
     @Resource
     private RestTemplate restTemplate;
 
     String sayHi(String name) {
-        String reqURL = "http://CalculatorServer/hi?name=" + name;
+        String reqURL = "http://GreetService/hi?name=" + name;
         return restTemplate.getForEntity(reqURL, String.class).getBody();
     }
 }

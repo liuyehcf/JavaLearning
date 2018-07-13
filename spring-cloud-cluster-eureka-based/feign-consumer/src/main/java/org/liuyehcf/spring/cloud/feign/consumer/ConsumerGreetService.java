@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @author hechenfeng
  * @date 2018/7/12
  */
-@FeignClient(value = "CalculatorServer")
-interface CalculatorService {
+@FeignClient(value = "GreetService")
+interface ConsumerGreetService {
     @RequestMapping(value = "/hi", method = RequestMethod.GET)
     String sayHi(@RequestParam("name") String name);
 }

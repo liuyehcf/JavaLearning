@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: RibbonConsumer
+
+  cloud:
+    zookeeper:
+      connect-string: localhost:2181
+
+server.port: 1120

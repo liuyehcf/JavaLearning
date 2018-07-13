@@ -1,4 +1,4 @@
-package org.liuyehcf.spring.cloud.eureka.provider;
+package org.liuyehcf.spring.cloud.zookeeper.provider;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -9,10 +9,10 @@ import java.util.Date;
 
 /**
  * @author hechenfeng
- * @date 2018/7/12
+ * @date 2018/7/13
  */
 @RestController
-public class ProviderController {
+public class GreetController {
     @Value("${server.port}")
     private String port;
 

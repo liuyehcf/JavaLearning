@@ -12,12 +12,12 @@ import javax.annotation.Resource;
  */
 @RestController
 @RequestMapping("/demo/feign")
-public class ConsumerController {
+public class ConsumerGreetController {
     @Resource
-    private CalculatorService calculatorService;
+    private ConsumerGreetService consumerGreetService;
 
     @RequestMapping("/sayHi")
     String sayHi(@RequestParam String name) {
-        return calculatorService.sayHi(name);
+        return consumerGreetService.sayHi(name);
     }
 }

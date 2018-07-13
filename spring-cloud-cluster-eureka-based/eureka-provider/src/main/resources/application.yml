@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: CalculatorServer                        # 指定发布的微服务名（以后调用时，只需该名称即可访问该服务）
+    name: GreetService                            # 指定发布的微服务名（以后调用时，只需该名称即可访问该服务）
 
 eureka:
   client:
