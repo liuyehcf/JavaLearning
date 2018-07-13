@@ -29,7 +29,6 @@ public class DefaultProcessorContext implements ProcessorContext {
             processors.put(processorEnum, new ArrayList<>());
         }
 
-        addProcessor(new CodeProcessor());
         addProcessor(new ImageAddressCheckProcessor());
         addProcessor(new IndexProcessor());
         addProcessor(new InnerLinkCheckProcessor());
