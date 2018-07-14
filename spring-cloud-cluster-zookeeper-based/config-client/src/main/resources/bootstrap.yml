@@ -11,4 +11,6 @@ spring:
         serviceId: ConfigServer     # 指定配置中心注册到注册中心的serviceId
 
     zookeeper:
+      discovery:
+        register: true              # 当前应用注册到Zookeeper中，其默认值为true，但是由于配置了`spring.cloud.config`的相关属性，还需要手动设置为true
       connect-string: localhost:2181
