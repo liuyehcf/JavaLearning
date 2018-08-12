@@ -54,7 +54,7 @@
                 <version>1.5.9.RELEASE</version>
                 <configuration>
                     <fork>true</fork>
-                    <mainClass>org.liuyehcf.spring.boot.SampleApplication</mainClass>
+                    <mainClass>org.liuyehcf.swagger.UserApplication</mainClass>
                 </configuration>
                 <executions>
                     <execution>
