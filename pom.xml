@@ -12,7 +12,7 @@
         <module>mybatis</module>
         <module>concurrent</module>
         <module>algorithm</module>
-        <!--<module>test</module>-->
+        <module>test</module>
         <module>framework</module>
         <module>io</module>
         <module>office</module>
