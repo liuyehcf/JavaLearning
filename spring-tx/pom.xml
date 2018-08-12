@@ -73,7 +73,7 @@
                 <version>${spring.boot.version}</version>
                 <configuration>
                     <fork>true</fork>
-                    <mainClass>org.liuyehcf.spring.boot.SampleApplication</mainClass>
+                    <mainClass>org.liuyehcf.spring.tx.Application</mainClass>
                 </configuration>
                 <executions>
                     <execution>
