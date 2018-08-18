@@ -42,5 +42,6 @@
         <module>mybatis-spring</module>
         <module>lambda-expression</module>
         <module>spring-validate</module>
+        <module>crypto</module>
     </modules>
 </project>
