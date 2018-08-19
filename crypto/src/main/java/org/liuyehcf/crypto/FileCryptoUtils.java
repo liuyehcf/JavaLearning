@@ -1,6 +1,7 @@
 package org.liuyehcf.crypto;
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 
 import javax.crypto.Cipher;
@@ -14,6 +15,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.*;
 
+@Slf4j
 public class FileCryptoUtils {
 
     private static final String ENCRYPT_ALGORITHM = "DES";
@@ -55,9 +57,10 @@ public class FileCryptoUtils {
             if (!file.exists()) {
                 boolean res = file.mkdirs();
                 if (!res) {
+                    log.error("create dir failed. dirPath={}", absoluteDirPath);
                     throw new RuntimeException("create dir error");
                 }
-                System.out.println("create dir " + absoluteDirPath);
+                log.info("create dir succeeded. dirPath={}", absoluteDirPath);
             }
         });
     }
@@ -82,11 +85,13 @@ public class FileCryptoUtils {
             in = new FileInputStream(sourceFilePath);
             out = new CipherOutputStream(new FileOutputStream(targetFilePath), cipher);
 
+            log.info("encrypt file started. filePath={}", sourceFile);
+
             IOUtils.copyLarge(in, out);
 
-            System.out.println("encrypt file " + sourceFilePath + " succeeded!");
+            log.info("encrypt file ended. filePath={}", sourceFile);
         } catch (Throwable e) {
-            e.printStackTrace();
+            log.error("encrypt file error", e);
         } finally {
             if (in != null) {
                 try {
@@ -127,11 +132,13 @@ public class FileCryptoUtils {
             in = new FileInputStream(sourceFilePath);
             out = new CipherOutputStream(new FileOutputStream(targetFilePath), cipher);
 
+            log.info("decrypt file started. filePath={}", sourceFile);
+
             IOUtils.copyLarge(in, out);
 
-            System.out.println("decrypt file " + sourceFilePath + " succeeded!");
+            log.info("decrypt file ended. filePath={}", sourceFile);
         } catch (Throwable e) {
-            e.printStackTrace();
+            log.error("decrypt file error", e);
         } finally {
             if (in != null) {
                 try {
