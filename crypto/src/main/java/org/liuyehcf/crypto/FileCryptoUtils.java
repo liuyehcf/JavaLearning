@@ -70,6 +70,7 @@ public class FileCryptoUtils {
         InputStream in = null;
         CipherOutputStream out = null;
         final File sourceFile = new File(sourceFilePath);
+        String targetFilePath = null;
 
         try {
             final DESKeySpec desKey = new DESKeySpec(PASSWORD.getBytes());
@@ -80,18 +81,23 @@ public class FileCryptoUtils {
             final Cipher cipher = Cipher.getInstance(ENCRYPT_ALGORITHM);
             cipher.init(Cipher.ENCRYPT_MODE, secretKey);
 
-            final String targetFilePath = targetBaseDir.getAbsolutePath() + File.separator + FILE_RELATIVE_PATH_MAP.get(sourceFilePath) + File.separator + sourceFile.getName() + ENCRYPT_FILE_SUFFIX;
+            targetFilePath = targetBaseDir.getAbsolutePath() + File.separator + FILE_RELATIVE_PATH_MAP.get(sourceFilePath) + File.separator + sourceFile.getName() + ENCRYPT_FILE_SUFFIX;
+            File targetFile = new File(targetFilePath);
+            if (targetFile.exists()) {
+                log.error("targetFile already exists. targetFilePath={}", targetFilePath);
+                return;
+            }
 
             in = new FileInputStream(sourceFilePath);
             out = new CipherOutputStream(new FileOutputStream(targetFilePath), cipher);
 
-            log.info("encrypt file started. filePath={}", sourceFile);
+            log.info("encrypt started. sourceFilePath={}; targetFilePath={}", sourceFilePath, targetFilePath);
 
             IOUtils.copyLarge(in, out);
 
-            log.info("encrypt file ended. filePath={}", sourceFile);
+            log.info("encrypt ended. sourceFilePath={}; targetFilePath={}", sourceFilePath, targetFilePath);
         } catch (Throwable e) {
-            log.error("encrypt file error", e);
+            log.error("encrypt error. sourceFilePath={}; targetFilePath={}", sourceFilePath, targetFilePath, e);
         } finally {
             if (in != null) {
                 try {
@@ -110,11 +116,12 @@ public class FileCryptoUtils {
         }
     }
 
-    private static void decryptFile(final File targetBaseDir, final String sourceFilePath) {
+    private static void decryptFile(File targetBaseDir, String sourceFilePath) {
 
         InputStream in = null;
         CipherOutputStream out = null;
         final File sourceFile = new File(sourceFilePath);
+        String targetFilePath = null;
 
         try {
             final DESKeySpec desKey = new DESKeySpec(PASSWORD.getBytes());
@@ -125,20 +132,23 @@ public class FileCryptoUtils {
             final Cipher cipher = Cipher.getInstance(ENCRYPT_ALGORITHM);
             cipher.init(Cipher.DECRYPT_MODE, secretKey);
 
-            final String sourceFileName = sourceFile.getName();
-            final String targetFileName = sourceFileName.substring(0, sourceFileName.length() - ENCRYPT_FILE_SUFFIX.length());
-            final String targetFilePath = targetBaseDir.getAbsolutePath() + File.separator + FILE_RELATIVE_PATH_MAP.get(sourceFilePath) + File.separator + targetFileName;
+            targetFilePath = targetBaseDir.getAbsolutePath() + File.separator + FILE_RELATIVE_PATH_MAP.get(sourceFilePath) + File.separator + sourceFile.getName() + ENCRYPT_FILE_SUFFIX;
+            File targetFile = new File(targetFilePath);
+            if (targetFile.exists()) {
+                log.error("targetFile already exists. targetFilePath={}", targetFilePath);
+                return;
+            }
 
             in = new FileInputStream(sourceFilePath);
             out = new CipherOutputStream(new FileOutputStream(targetFilePath), cipher);
 
-            log.info("decrypt file started. filePath={}", sourceFile);
+            log.info("decrypt started. sourceFilePath={}; targetFilePath={}", sourceFilePath, targetFilePath);
 
             IOUtils.copyLarge(in, out);
 
-            log.info("decrypt file ended. filePath={}", sourceFile);
+            log.info("decrypt ended. sourceFilePath={}; targetFilePath={}", sourceFilePath, targetFilePath);
         } catch (Throwable e) {
-            log.error("decrypt file error", e);
+            log.error("decrypt error. sourceFilePath={}; targetFilePath={}", sourceFilePath, targetFilePath, e);
         } finally {
             if (in != null) {
                 try {
@@ -165,9 +175,17 @@ public class FileCryptoUtils {
 
             File sourceBaseDir = new File(args[0]);
             File targetBaseDir = new File(args[1]);
-            if (!sourceBaseDir.exists() || !sourceBaseDir.isDirectory()
-                    || !targetBaseDir.exists() || !targetBaseDir.isDirectory()) {
-                throw new RuntimeException("base dir error");
+            if (!sourceBaseDir.exists() || !sourceBaseDir.isDirectory()) {
+                log.error("sourceBaseDir does not exists. sourceBaseDirPath={}", sourceBaseDir.getAbsolutePath());
+                throw new RuntimeException("sourceBaseDir does not exists. sourceBaseDirPath=" + sourceBaseDir.getAbsolutePath());
+            }
+            if (!targetBaseDir.exists()) {
+                boolean res = targetBaseDir.mkdirs();
+                if (!res) {
+                    log.error("targetBaseDir does not exists create targetBaseDir error. targetBaseDir={}", targetBaseDir.getAbsolutePath());
+                    throw new RuntimeException("targetBaseDir does not exists create targetBaseDir error. targetBaseDir=" + targetBaseDir.getAbsolutePath());
+                }
+                log.info("targetBaseDir does not exists and now create. targetBaseDir={}", targetBaseDir.getAbsolutePath());
             }
 
             List<String> fileList = getFileList(sourceBaseDir, sourceBaseDir);
@@ -184,9 +202,17 @@ public class FileCryptoUtils {
 
             File sourceBaseDir = new File(args[0]);
             File targetBaseDir = new File(args[1]);
-            if (!sourceBaseDir.exists() || !sourceBaseDir.isDirectory()
-                    || !targetBaseDir.exists() || !targetBaseDir.isDirectory()) {
-                throw new RuntimeException("base dir error");
+            if (!sourceBaseDir.exists() || !sourceBaseDir.isDirectory()) {
+                log.error("sourceBaseDir does not exists. sourceBaseDirPath={}", sourceBaseDir.getAbsolutePath());
+                throw new RuntimeException("sourceBaseDir does not exists. sourceBaseDirPath=" + sourceBaseDir.getAbsolutePath());
+            }
+            if (!targetBaseDir.exists()) {
+                boolean res = targetBaseDir.mkdirs();
+                if (!res) {
+                    log.error("targetBaseDir does not exists create targetBaseDir error. targetBaseDir={}", targetBaseDir.getAbsolutePath());
+                    throw new RuntimeException("targetBaseDir does not exists create targetBaseDir error. targetBaseDir=" + targetBaseDir.getAbsolutePath());
+                }
+                log.info("targetBaseDir does not exists and now create. targetBaseDir={}", targetBaseDir.getAbsolutePath());
             }
 
             List<String> fileList = getFileList(sourceBaseDir, sourceBaseDir);

@@ -4,21 +4,18 @@
 
     <property name="APP_NAME" value="crypto"/>
     <property name="LOG_PATH" value="${user.home}/${APP_NAME}/logs"/>
+    <property name="LOG_PATTERN"
+              value="[%d{yyyy-MM-dd HH:mm:ss}]  %-5level %logger{0} - %m%n"/>
 
-    <appender name="std_out" class="ch.qos.logback.core.ConsoleAppender">
-        <target>System.err</target>
+    <appender name="sync-std-out" class="ch.qos.logback.core.ConsoleAppender">
+        <target>System.out</target>
 
-        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-            <layout class="ch.qos.logback.classic.PatternLayout">
-                <pattern><![CDATA[
-			 [%d{yyyy-MM-dd HH:mm:ss}]  %-5level %logger{0} - %m%n
-            ]]></pattern>
-            </layout>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
         </encoder>
     </appender>
 
-    <property name="LOG_PATTERN"
-              value="%%d{yyyy-MM-dd HH:mm:ss}]  %-5level %logger{0} - %m%n"/>
     <appender name="sync-default-appender"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_PATH}/application.log</file>
@@ -39,7 +36,7 @@
 
     <root>
         <level value="INFO"/>
-        <appender-ref ref="std_out"/>
+        <appender-ref ref="sync-std-out"/>
         <appender-ref ref="async-default-appender"/>
     </root>
 </configuration>
