@@ -1,48 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xmlns:flowable="http://flowable.org/bpmn"
-             typeLanguage="http://www.w3.org/2001/XMLSchema"
-             expressionLanguage="http://www.w3.org/1999/XPath"
              targetNamespace="http://www.flowable.org/processdef">
 
-    <process id="sample" name="sample" isExecutable="true">
+    <process id="process1" name="process1" isExecutable="true">
         <documentation>Example</documentation>
 
-        <startEvent id="startEvent"/>
+        <startEvent id="startEvent1">
+            <extensionElements>
+                <flowable:executionListener event="start" delegateExpression="${demoListener}"/>
+            </extensionElements>
+        </startEvent>
 
-        <userTask id="typeInfo" name="typeInfo" flowable:candidateGroups="group_auth"/>
+        <serviceTask id="serviceTask1" name="serviceTask1" flowable:async="true"
+                     flowable:delegateExpression="${demoServiceTask}">
+            <extensionElements>
+                <flowable:field name="field1" stringValue="someValue1"/>
 
-        <serviceTask id="userAuth" name="userAuth"
-                     flowable:class="org.liuyehcf.flowalbe.delegate.UserAuthentication"/>
+                <flowable:field name="field2">
+                    <flowable:string><![CDATA[someValue2]]></flowable:string>
+                </flowable:field>
+                <flowable:taskListener event="create" delegateExpression="${demoListener}"/>
+            </extensionElements>
+        </serviceTask>
 
-        <exclusiveGateway id="authExclusiveGateway"/>
+        <userTask id="userTask1" name="userTask1" flowable:assignee="tom">
+            <extensionElements>
+                <flowable:taskListener event="create" delegateExpression="${demoListener}"/>
+            </extensionElements>
+        </userTask>
 
-        <userTask id="shopping" name="shopping" flowable:candidateGroups="group_shopping"/>
+        <userTask id="userTask2" name="userTask2" flowable:candidateUsers="bob,jerry">
+            <extensionElements>
+                <flowable:taskListener event="create" delegateExpression="${demoListener}"/>
+            </extensionElements>
+        </userTask>
 
-        <serviceTask id="checkout" name="checkout"
-                     flowable:class="org.liuyehcf.flowalbe.delegate.Checkout"/>
+        <userTask id="userTask3" name="userTask3" flowable:candidateUsers="jerry,lucy">
+            <extensionElements>
+                <flowable:taskListener event="create" delegateExpression="${demoListener}"/>
+            </extensionElements>
+        </userTask>
 
-        <endEvent id="endEvent"/>
+        <endEvent id="endEvent1">
+            <extensionElements>
+                <flowable:executionListener event="start" delegateExpression="${demoListener}"/>
+            </extensionElements>
+        </endEvent>
 
-        <sequenceFlow id="flow1" sourceRef="startEvent" targetRef="typeInfo"/>
-        <sequenceFlow id="flow2" sourceRef="typeInfo" targetRef="userAuth"/>
-        <sequenceFlow id="flow3" sourceRef="userAuth" targetRef="authExclusiveGateway"/>
-        <sequenceFlow id="flow4" sourceRef="authExclusiveGateway" targetRef="typeInfo">
-            <conditionExpression xsi:type="tFormalExpression">
-                <![CDATA[
-                    ${!approved}
-                ]]>
-            </conditionExpression>
-        </sequenceFlow>
-        <sequenceFlow id="flow5" sourceRef="authExclusiveGateway" targetRef="shopping">
-            <conditionExpression xsi:type="tFormalExpression">
-                <![CDATA[
-                    ${approved}
-                ]]>
-            </conditionExpression>
-        </sequenceFlow>
-        <sequenceFlow id="flow6" sourceRef="shopping" targetRef="checkout"/>
-        <sequenceFlow id="flow7" sourceRef="checkout" targetRef="endEvent"/>
+        <sequenceFlow id="flow1" sourceRef="startEvent1" targetRef="serviceTask1"/>
+        <sequenceFlow id="flow2" sourceRef="serviceTask1" targetRef="userTask1"/>
+        <sequenceFlow id="flow3" sourceRef="userTask1" targetRef="userTask2"/>
+        <sequenceFlow id="flow4" sourceRef="userTask2" targetRef="userTask3"/>
+        <sequenceFlow id="flow5" sourceRef="userTask3" targetRef="endEvent1"/>
     </process>
 </definitions>
