@@ -132,7 +132,10 @@ public class FileCryptoUtils {
             final Cipher cipher = Cipher.getInstance(ENCRYPT_ALGORITHM);
             cipher.init(Cipher.DECRYPT_MODE, secretKey);
 
-            targetFilePath = targetBaseDir.getAbsolutePath() + File.separator + FILE_RELATIVE_PATH_MAP.get(sourceFilePath) + File.separator + sourceFile.getName() + ENCRYPT_FILE_SUFFIX;
+            final String sourceFileName = sourceFile.getName();
+            final String targetFileName = sourceFileName.substring(0, sourceFileName.length() - ENCRYPT_FILE_SUFFIX.length());
+            targetFilePath = targetBaseDir.getAbsolutePath() + File.separator + FILE_RELATIVE_PATH_MAP.get(sourceFilePath) + File.separator + targetFileName;
+
             File targetFile = new File(targetFilePath);
             if (targetFile.exists()) {
                 log.error("targetFile already exists. targetFilePath={}", targetFilePath);
