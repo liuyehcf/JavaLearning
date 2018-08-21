@@ -1,4 +1,4 @@
-package org.liuyehcf.flowalbe.config;
+package org.liuyehcf.flowable.config;
 
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;

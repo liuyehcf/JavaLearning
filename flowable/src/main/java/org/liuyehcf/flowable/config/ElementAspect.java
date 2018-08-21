@@ -1,4 +1,4 @@
-package org.liuyehcf.flowalbe.config;
+package org.liuyehcf.flowable.config;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Aspect
 @Component
 public class ElementAspect {
-    @Around("execution(* org.liuyehcf.flowalbe.element.*.*(..))")
+    @Around("execution(* org.liuyehcf.flowable.element.*.*(..))")
     public Object taskAround(ProceedingJoinPoint proceedingJoinPoint) {
 
         Object[] args = proceedingJoinPoint.getArgs();

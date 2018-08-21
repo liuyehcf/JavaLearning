@@ -1,6 +1,6 @@
-package org.liuyehcf.flowalbe.web;
+package org.liuyehcf.flowable.web;
 
-import org.liuyehcf.flowalbe.service.DemoService;
+import org.liuyehcf.flowable.service.DemoService;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
