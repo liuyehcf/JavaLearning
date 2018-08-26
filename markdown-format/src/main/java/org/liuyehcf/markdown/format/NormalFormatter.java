@@ -13,7 +13,7 @@ import static org.liuyehcf.markdown.format.constant.ErrorConstant.WRONG_PARAMS;
 import static org.liuyehcf.markdown.format.log.DefaultLogger.LOGGER;
 
 /**
- * @author chenlu
+ * @author hechenfeng
  * @date 2018/8/2
  */
 public class NormalFormatter {

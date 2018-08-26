@@ -3,7 +3,7 @@ package org.liuyehcf.markdown.format.model;
 import java.io.File;
 
 /**
- * @author chenlu
+ * @author hechenfeng
  * @date 2018/8/2
  */
 public class NormalParam {

@@ -12,7 +12,7 @@ import static org.liuyehcf.markdown.format.constant.StringConstant.MARKDOWN_SUFF
 import static org.liuyehcf.markdown.format.log.DefaultLogger.LOGGER;
 
 /**
- * @author chenlu
+ * @author hechenfeng
  * @date 2018/8/2
  */
 public class NormalFileContext implements FileContext {
