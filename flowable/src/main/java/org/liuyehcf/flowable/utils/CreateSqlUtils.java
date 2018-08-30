@@ -35,7 +35,7 @@ public class CreateSqlUtils {
     public static void createSqlFile(String targetPath) {
         File targetSqlFile;
         try {
-            targetSqlFile = getSqlFile(targetPath);
+            targetSqlFile = getSqlFile(targetPath, FILE_NAME);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -52,7 +52,7 @@ public class CreateSqlUtils {
         }
     }
 
-    private static File getSqlFile(String targetPath) throws IOException {
+    static File getSqlFile(String targetPath, String fileName) throws IOException {
         if (targetPath == null) {
             throw new NullPointerException();
         }
@@ -63,7 +63,7 @@ public class CreateSqlUtils {
             throw new FileNotFoundException(targetPath + " is not exists");
         }
 
-        File sqlFile = new File(targetDir.getAbsolutePath() + File.separator + FILE_NAME);
+        File sqlFile = new File(targetDir.getAbsolutePath() + File.separator + fileName);
 
         if (sqlFile.exists() && !sqlFile.delete()) {
             throw new IOException("failed to delete file " + sqlFile.getAbsolutePath());
@@ -90,12 +90,19 @@ public class CreateSqlUtils {
         outputStream.write("\n\n\n".getBytes());
     }
 
-    private static void appendCreateTableSql(OutputStream outputStream, String fileClassPath) throws IOException {
+    static void appendCreateTableSql(OutputStream outputStream, String fileClassPath) throws IOException {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
         String simpleFilePath = fileClassPath.substring(fileClassPath.lastIndexOf(File.separator) + 1).trim();
 
         InputStream inputStream = classLoader.getResourceAsStream(fileClassPath);
+
+        if (inputStream == null) {
+            System.err.println(fileClassPath);
+            return;
+        }
+
+        System.out.println(fileClassPath);
 
         outputStream.write(("/**************************************************************/\n" +
                 "/*    [START]\n" +
@@ -115,7 +122,7 @@ public class CreateSqlUtils {
     }
 
     public static void main(String[] args) {
-        createSqlFile("/Users/hechenfeng/Desktop");
+        createSqlFile("/Users/hechenfeng/Desktop/flowable");
     }
 
 }
