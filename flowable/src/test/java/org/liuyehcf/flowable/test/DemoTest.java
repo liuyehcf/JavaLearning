@@ -6,8 +6,6 @@ import org.junit.runner.RunWith;
 import org.liuyehcf.flowable.service.DemoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.ContextHierarchy;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.concurrent.TimeUnit;
@@ -15,9 +13,6 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {TestApplication.class})
-@ContextHierarchy({
-        @ContextConfiguration(classes = {EmbeddedDatabaseConfig.class})
-})
 public class DemoTest {
 
     @Autowired
