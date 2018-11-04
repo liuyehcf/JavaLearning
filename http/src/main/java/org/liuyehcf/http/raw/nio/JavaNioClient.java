@@ -1,4 +1,4 @@
-package org.liuyehcf.http.raw.nioapi;
+package org.liuyehcf.http.raw.nio;
 
 import org.liuyehcf.http.raw.HttpRequestBuilder;
 
@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Created by HCF on 2017/12/16.
  */
-public class RowJavaNioApiDemo {
+public class JavaNioClient {
 
     private static byte[] toByteArray(List<Byte> bytes) {
         byte[] byteArray = new byte[bytes.size()];
@@ -32,7 +32,7 @@ public class RowJavaNioApiDemo {
     }
 
     private static abstract class RawHttpRequestTemplate {
-        final public void doRequest() {
+        final void doRequest() {
             try {
                 SocketChannel socketChannel = SocketChannel.open();
 
@@ -105,7 +105,7 @@ public class RowJavaNioApiDemo {
 
         private String operator;
 
-        public ComputeHttpRequest(String value1, String value2, String operator) {
+        private ComputeHttpRequest(String value1, String value2, String operator) {
             this.value1 = value1;
             this.value2 = value2;
             this.operator = operator;
@@ -126,7 +126,7 @@ public class RowJavaNioApiDemo {
     private static final class LoginHttpRequest extends RawHttpRequestTemplate {
         private String name;
 
-        public LoginHttpRequest(String name) {
+        private LoginHttpRequest(String name) {
             this.name = name;
         }
 
