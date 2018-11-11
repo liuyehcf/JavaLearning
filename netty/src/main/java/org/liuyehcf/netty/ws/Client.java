@@ -43,8 +43,8 @@ public class Client {
                     protected void initChannel(SocketChannel socketChannel) {
                         ChannelPipeline pipeline = socketChannel.pipeline();
                         pipeline.addLast(new HttpClientCodec());
-                        pipeline.addLast(new ChunkedWriteHandler());
                         pipeline.addLast(new HttpObjectAggregator(65535));
+                        pipeline.addLast(new ChunkedWriteHandler());
                         pipeline.addLast(WebSocketClientCompressionHandler.INSTANCE);
                         pipeline.addLast(webSocketClientHandler);
                         pipeline.addLast(new ClientHandler());

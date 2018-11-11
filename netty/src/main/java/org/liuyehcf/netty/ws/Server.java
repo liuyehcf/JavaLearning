@@ -35,8 +35,8 @@ public class Server {
                             ChannelPipeline pipeline = socketChannel.pipeline();
                             pipeline.addLast(new IdleStateHandler(0, 0, 60, TimeUnit.SECONDS));
                             pipeline.addLast(new HttpServerCodec());
-                            pipeline.addLast(new ChunkedWriteHandler());
                             pipeline.addLast(new HttpObjectAggregator(65535));
+                            pipeline.addLast(new ChunkedWriteHandler());
                             pipeline.addLast(new WebSocketServerCompressionHandler());
                             pipeline.addLast(new WebSocketServerProtocolHandler("/", null, true));
                             pipeline.addLast(new ServerHandler());
