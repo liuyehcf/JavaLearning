@@ -21,42 +21,35 @@ import java.util.concurrent.TimeUnit;
  * @date 2018/11/3
  */
 public class Server {
-    public static void main(String[] args) {
-        EventLoopGroup boss = new NioEventLoopGroup();
-        EventLoopGroup worker = new NioEventLoopGroup();
+    public static void main(String[] args) throws Exception {
+        final EventLoopGroup boss = new NioEventLoopGroup();
+        final EventLoopGroup worker = new NioEventLoopGroup();
 
-        try {
-            ServerBootstrap bootstrap = new ServerBootstrap();
-            bootstrap.group(boss, worker)
-                    .channel(NioServerSocketChannel.class)
-                    .childHandler(new ChannelInitializer<SocketChannel>() {
-                        @Override
-                        protected void initChannel(SocketChannel socketChannel) {
-                            ChannelPipeline pipeline = socketChannel.pipeline();
-                            pipeline.addLast(new IdleStateHandler(0, 0, 60, TimeUnit.SECONDS));
-                            pipeline.addLast(new HttpServerCodec());
-                            pipeline.addLast(new HttpObjectAggregator(65535));
-                            pipeline.addLast(new ChunkedWriteHandler());
-                            pipeline.addLast(new WebSocketServerCompressionHandler());
-                            pipeline.addLast(new WebSocketServerProtocolHandler("/", null, true));
-                            pipeline.addLast(new ServerHandler());
-                        }
-                    })
-                    .option(ChannelOption.SO_BACKLOG, 128)
-                    .childOption(ChannelOption.SO_KEEPALIVE, true)
-                    .childOption(ChannelOption.TCP_NODELAY, true)
-                    .childOption(ChannelOption.SO_REUSEADDR, true);
+        final ServerBootstrap bootstrap = new ServerBootstrap();
+        bootstrap.group(boss, worker)
+                .channel(NioServerSocketChannel.class)
+                .childHandler(new ChannelInitializer<SocketChannel>() {
+                    @Override
+                    protected void initChannel(SocketChannel socketChannel) {
+                        ChannelPipeline pipeline = socketChannel.pipeline();
+                        pipeline.addLast(new IdleStateHandler(0, 0, 60, TimeUnit.SECONDS));
+                        pipeline.addLast(new HttpServerCodec());
+                        pipeline.addLast(new HttpObjectAggregator(65535));
+                        pipeline.addLast(new ChunkedWriteHandler());
+                        pipeline.addLast(new WebSocketServerCompressionHandler());
+                        pipeline.addLast(new WebSocketServerProtocolHandler("/", null, true));
+                        pipeline.addLast(new ServerHandler());
+                    }
+                })
+                .option(ChannelOption.SO_BACKLOG, 1024)
+                .childOption(ChannelOption.SO_KEEPALIVE, true)
+                .childOption(ChannelOption.TCP_NODELAY, true)
+                .childOption(ChannelOption.SO_REUSEADDR, true);
 
-            ChannelFuture future = bootstrap.bind(8866).sync();
-            System.out.println("server start ...... ");
+        final ChannelFuture future = bootstrap.bind(8866).sync();
+        System.out.println("server start ...... ");
 
-            future.channel().closeFuture().sync();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } finally {
-            boss.shutdownGracefully();
-            worker.shutdownGracefully();
-        }
+        future.channel().closeFuture().sync();
     }
 
     private static final class ServerHandler extends AbstractWebSocketHandler {

@@ -17,13 +17,19 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
         this.handShaker = handShaker;
     }
 
+    ChannelFuture handshakeFuture() {
+        return this.handshakeFuture;
+    }
+
     @Override
     public void handlerAdded(ChannelHandlerContext ctx) {
         this.handshakeFuture = ctx.newPromise();
     }
 
-    ChannelFuture handshakeFuture() {
-        return this.handshakeFuture;
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        handShaker.handshake(ctx.channel());
+        super.channelActive(ctx);
     }
 
     protected void channelRead0(ChannelHandlerContext ctx, Object msg) {
