@@ -10,14 +10,22 @@ import io.netty.util.CharsetUtil;
  * @date 2018/11/3
  */
 public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> {
+
+    /**
+     * netty build-in web socket hand shaker
+     */
     private final WebSocketClientHandshaker handShaker;
+
+    /**
+     * future on where hand shaker is completed
+     */
     private ChannelPromise handshakeFuture;
 
-    WebSocketClientHandler(WebSocketClientHandshaker handShaker) {
+    public WebSocketClientHandler(WebSocketClientHandshaker handShaker) {
         this.handShaker = handShaker;
     }
 
-    ChannelFuture handshakeFuture() {
+    public ChannelFuture handshakeFuture() {
         return this.handshakeFuture;
     }
 
@@ -28,10 +36,13 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        // execution timing must after all the handlers are added
+        // other wise exception may occurred (ChannelPipeline does not contain a HttpRequestEncoder or HttpClientCodec)
         handShaker.handshake(ctx.channel());
         super.channelActive(ctx);
     }
 
+    @Override
     protected void channelRead0(ChannelHandlerContext ctx, Object msg) {
         final Channel channel = ctx.channel();
         final FullHttpResponse response;

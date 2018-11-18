@@ -1,6 +1,7 @@
 package org.liuyehcf.netty.ws;
 
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
@@ -8,14 +9,13 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.http.DefaultHttpHeaders;
 import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.codec.http.HttpObjectAggregator;
-import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
-import io.netty.handler.codec.http.websocketx.WebSocketClientHandshakerFactory;
-import io.netty.handler.codec.http.websocketx.WebSocketVersion;
+import io.netty.handler.codec.http.websocketx.*;
 import io.netty.handler.codec.http.websocketx.extensions.compression.WebSocketClientCompressionHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -54,7 +54,7 @@ public class Client {
 
         channel.writeAndFlush(new TextWebSocketFrame("Hello, I'm client"));
 
-        TimeUnit.SECONDS.sleep(2);
+        TimeUnit.SECONDS.sleep(1);
         System.exit(0);
     }
 
@@ -66,9 +66,32 @@ public class Client {
         }
     }
 
-    private static final class ClientHandler extends AbstractWebSocketHandler {
+    private static final class ClientHandler extends SimpleChannelInboundHandler<WebSocketFrame> {
         @Override
-        void doChannelRead0(ChannelHandlerContext ctx, String content) {
+        @SuppressWarnings("all")
+        protected void channelRead0(ChannelHandlerContext ctx, WebSocketFrame msg) throws Exception {
+            final String content;
+            if (msg instanceof BinaryWebSocketFrame) {
+                BinaryWebSocketFrame binaryWebSocketFrame = (BinaryWebSocketFrame) msg;
+                ByteBuf byteBuf = binaryWebSocketFrame.content();
+                byte[] bytes = new byte[byteBuf.readableBytes()];
+                byteBuf.getBytes(0, bytes);
+                content = new String(bytes, Charset.defaultCharset());
+            } else if (msg instanceof TextWebSocketFrame) {
+                content = ((TextWebSocketFrame) msg).text();
+            } else if (msg instanceof PongWebSocketFrame) {
+                content = "Pong";
+            } else if (msg instanceof ContinuationWebSocketFrame) {
+                content = "Continue";
+            } else if (msg instanceof PingWebSocketFrame) {
+                content = "Ping";
+            } else if (msg instanceof CloseWebSocketFrame) {
+                content = "Close";
+                ctx.close();
+            } else {
+                throw new RuntimeException();
+            }
+
             System.out.println("client receive message: " + content);
         }
     }
