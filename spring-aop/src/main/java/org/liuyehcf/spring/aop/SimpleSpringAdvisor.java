@@ -2,7 +2,9 @@ package org.liuyehcf.spring.aop;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.*;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -36,11 +38,14 @@ public class SimpleSpringAdvisor {
         System.out.println("around start..");
         Class<?> clazz = null;
         String methodName = null;
+        Class returnType = null;
         Object[] args = null;
         Object result = null;
         try {
-            clazz = proceedingJoinPoint.getSignature().getDeclaringType();
-            methodName = proceedingJoinPoint.getSignature().getName();
+            Signature signature = proceedingJoinPoint.getSignature();
+            clazz = signature.getDeclaringType();
+            methodName = signature.getName();
+            returnType = ((MethodSignature) signature).getReturnType();
             args = proceedingJoinPoint.getArgs();
             result = proceedingJoinPoint.proceed(args);
         } catch (Throwable ex) {
@@ -49,6 +54,7 @@ public class SimpleSpringAdvisor {
         } finally {
             System.out.println("class: " + clazz);
             System.out.println("methodName: " + methodName);
+            System.out.println("returnType: " + returnType);
             System.out.println("args: " + Arrays.toString(args));
             System.out.println("result: " + result);
         }
