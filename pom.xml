@@ -43,5 +43,6 @@
         <module>lambda-expression</module>
         <module>spring-validate</module>
         <module>crypto</module>
+        <module>ssl</module>
     </modules>
 </project>
