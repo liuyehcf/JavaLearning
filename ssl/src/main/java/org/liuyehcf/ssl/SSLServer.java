@@ -11,8 +11,9 @@ import java.security.KeyStore;
 
 public class SSLServer extends Thread {
 
-    private static final String SERVER_KEY_STORE = "/Users/HCF/liuyehcf_server_ks";
-    private static final String SERVER_KEY_STORE_PASSWORD = "123456";
+    private static final String KEY_STORE_PATH = System.getProperty("user.home") + File.separator + "liuyehcf_server_ks";
+    private static final String KEY_STORE_PASSWORD = "123456";
+    private static final String PRIVATE_PASSWORD = "234567";
 
     private Socket socket;
 
@@ -35,13 +36,14 @@ public class SSLServer extends Thread {
     }
 
     public static void main(String[] args) throws Exception {
-        System.setProperty("javax.net.ssl.trustStore", SERVER_KEY_STORE);
-        SSLContext context = SSLContext.getInstance("TLS");
+        System.setProperty("javax.net.ssl.trustStore", KEY_STORE_PATH);
 
         KeyStore ks = KeyStore.getInstance("jceks");
-        ks.load(new FileInputStream(SERVER_KEY_STORE), null);
+        ks.load(new FileInputStream(KEY_STORE_PATH), KEY_STORE_PASSWORD.toCharArray());
         KeyManagerFactory kf = KeyManagerFactory.getInstance("SunX509");
-        kf.init(ks, SERVER_KEY_STORE_PASSWORD.toCharArray());
+        kf.init(ks, PRIVATE_PASSWORD.toCharArray());
+
+        SSLContext context = SSLContext.getInstance("TLS");
         context.init(kf.getKeyManagers(), null, null);
         ServerSocketFactory factory = context.getServerSocketFactory();
         ServerSocket socket = factory.createServerSocket(8443);

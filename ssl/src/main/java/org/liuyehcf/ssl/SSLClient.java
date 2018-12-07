@@ -4,20 +4,18 @@ import javax.net.SocketFactory;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 import java.security.KeyStore;
 
 public class SSLClient {
-    private static final String CLIENT_KEY_STORE = "/Users/HCF/liuyehcf_client_ks";
-    private static final String CLIENT_KEY_STORE_PASSWORD = "123456";
+    private static final String KEY_STORE_PATH = System.getProperty("user.home") + File.separator + "liuyehcf_client_ks";
+    private static final String KEY_STORE_PASSWORD = "345678";
+    private static final String KEY_PASSWORD = "456789";
 
     public static void main(String[] args) throws Exception {
         // Set the key store to use for validating the server cert.
-        System.setProperty("javax.net.ssl.trustStore", CLIENT_KEY_STORE);
+        System.setProperty("javax.net.ssl.trustStore", KEY_STORE_PATH);
         System.setProperty("javax.net.debug", "ssl,handshake");
         SSLClient client = new SSLClient();
         Socket s = client.clientWithoutCert();
@@ -36,14 +34,14 @@ public class SSLClient {
     }
 
     private Socket clientWithCert() throws Exception {
-        SSLContext context = SSLContext.getInstance("TLS");
         KeyStore ks = KeyStore.getInstance("jceks");
 
-        ks.load(new FileInputStream(CLIENT_KEY_STORE), null);
+        ks.load(new FileInputStream(KEY_STORE_PATH), KEY_STORE_PASSWORD.toCharArray());
         KeyManagerFactory kf = KeyManagerFactory.getInstance("SunX509");
-        kf.init(ks, CLIENT_KEY_STORE_PASSWORD.toCharArray());
-        context.init(kf.getKeyManagers(), null, null);
+        kf.init(ks, KEY_PASSWORD.toCharArray());
 
+        SSLContext context = SSLContext.getInstance("TLS");
+        context.init(kf.getKeyManagers(), null, null);
         SocketFactory factory = context.getSocketFactory();
         return factory.createSocket("localhost", 8443);
     }
