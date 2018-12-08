@@ -11,6 +11,7 @@ import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.websocketx.*;
 import io.netty.handler.codec.http.websocketx.extensions.compression.WebSocketClientCompressionHandler;
+import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
 
@@ -31,6 +32,10 @@ import java.util.concurrent.TimeUnit;
  * @date 2018/11/3
  */
 public class Client {
+
+    private static final String HOST = "localhost";
+    private static final int PORT = 8866;
+    private static final boolean OPEN_SSL = true;
 
     private static final String KEY_STORE_PATH = System.getProperty("user.home") + File.separator + "liuyehcf_client_ks";
     private static final String STORE_TYPE = "PKCS12";
@@ -53,7 +58,10 @@ public class Client {
                     @Override
                     protected void initChannel(SocketChannel socketChannel) throws Exception {
                         ChannelPipeline pipeline = socketChannel.pipeline();
-                        pipeline.addLast(new SslHandler(createClientSSLEngine()));
+                        if (OPEN_SSL) {
+                            pipeline.addLast(createSslHandlerUsingRawApi());
+//                            pipeline.addLast(createSslHandlerUsingNetty(pipeline));
+                        }
                         pipeline.addLast(new HttpClientCodec());
                         pipeline.addLast(new HttpObjectAggregator(65535));
                         pipeline.addLast(new ChunkedWriteHandler());
@@ -77,13 +85,13 @@ public class Client {
 
     private static URI getUri() {
         try {
-            return new URI("ws://localhost:8866");
+            return new URI(String.format("%s://%s:%d", OPEN_SSL ? "wss" : "ws", HOST, PORT));
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private static SSLEngine createClientSSLEngine() throws Exception {
+    private static ChannelHandler createSslHandlerUsingRawApi() throws Exception {
         // keyStore
         KeyStore keyStore = KeyStore.getInstance(STORE_TYPE);
         keyStore.load(new FileInputStream(KEY_STORE_PATH), KEY_STORE_PASSWORD.toCharArray());
@@ -102,7 +110,24 @@ public class Client {
 
         SSLEngine sslEngine = sslContext.createSSLEngine();
         sslEngine.setUseClientMode(true);
-        return sslEngine;
+        return new SslHandler(sslEngine);
+    }
+
+    private static ChannelHandler createSslHandlerUsingNetty(ChannelPipeline pipeline) throws Exception {
+        // keyStore
+        KeyStore keyStore = KeyStore.getInstance(STORE_TYPE);
+        keyStore.load(new FileInputStream(KEY_STORE_PATH), KEY_STORE_PASSWORD.toCharArray());
+
+        // keyManagerFactory
+        KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+        keyManagerFactory.init(keyStore, KEY_PASSWORD.toCharArray());
+
+        // trustManagerFactory
+        TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        trustManagerFactory.init(keyStore);
+
+        return SslContextBuilder.forClient().trustManager(trustManagerFactory).build()
+                .newHandler(pipeline.channel().alloc(), HOST, PORT);
     }
 
     private static final class ClientHandler extends SimpleChannelInboundHandler<WebSocketFrame> {

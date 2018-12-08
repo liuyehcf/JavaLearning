@@ -11,6 +11,7 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.websocketx.*;
 import io.netty.handler.codec.http.websocketx.extensions.compression.WebSocketServerCompressionHandler;
+import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import io.netty.handler.timeout.IdleStateHandler;
@@ -31,6 +32,10 @@ import java.util.concurrent.TimeUnit;
  */
 public class Server {
 
+    private static final String HOST = "localhost";
+    private static final int PORT = 8866;
+    private static final boolean OPEN_SSL = true;
+
     private static final String KEY_STORE_PATH = System.getProperty("user.home") + File.separator + "liuyehcf_server_ks";
     private static final String STORE_TYPE = "PKCS12";
     private static final String PROTOCOL = "TLS";
@@ -49,7 +54,10 @@ public class Server {
                     protected void initChannel(SocketChannel socketChannel) throws Exception {
                         ChannelPipeline pipeline = socketChannel.pipeline();
                         pipeline.addLast(new IdleStateHandler(0, 0, 60, TimeUnit.SECONDS));
-                        pipeline.addLast(new SslHandler(createServerSSLEngine()));
+                        if (OPEN_SSL) {
+                            pipeline.addLast(createSslHandlerUsingRawApi());
+//                            pipeline.addLast(createSslHandlerUsingNetty(pipeline));
+                        }
                         pipeline.addLast(new HttpServerCodec());
                         pipeline.addLast(new HttpObjectAggregator(65535));
                         pipeline.addLast(new ChunkedWriteHandler());
@@ -63,13 +71,13 @@ public class Server {
                 .childOption(ChannelOption.TCP_NODELAY, true)
                 .childOption(ChannelOption.SO_REUSEADDR, true);
 
-        final ChannelFuture future = bootstrap.bind(8866).sync();
+        final ChannelFuture future = bootstrap.bind(PORT).sync();
         System.out.println("server start ...... ");
 
         future.channel().closeFuture().sync();
     }
 
-    private static SSLEngine createServerSSLEngine() throws Exception {
+    private static ChannelHandler createSslHandlerUsingRawApi() throws Exception {
         // keyStore
         KeyStore keyStore = KeyStore.getInstance(STORE_TYPE);
         keyStore.load(new FileInputStream(KEY_STORE_PATH), KEY_STORE_PASSWORD.toCharArray());
@@ -88,7 +96,20 @@ public class Server {
 
         SSLEngine sslEngine = sslContext.createSSLEngine();
         sslEngine.setUseClientMode(false);
-        return sslEngine;
+        return new SslHandler(sslEngine);
+    }
+
+    private static ChannelHandler createSslHandlerUsingNetty(ChannelPipeline pipeline) throws Exception {
+        // keyStore
+        KeyStore keyStore = KeyStore.getInstance(STORE_TYPE);
+        keyStore.load(new FileInputStream(KEY_STORE_PATH), KEY_STORE_PASSWORD.toCharArray());
+
+        // keyManagerFactory
+        KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+        keyManagerFactory.init(keyStore, KEY_PASSWORD.toCharArray());
+
+        return SslContextBuilder.forServer(keyManagerFactory).build()
+                .newHandler(pipeline.channel().alloc(), HOST, PORT);
     }
 
     private static final class ServerHandler extends SimpleChannelInboundHandler<WebSocketFrame> {
