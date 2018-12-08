@@ -44,5 +44,6 @@
         <module>spring-validate</module>
         <module>crypto</module>
         <module>ssl</module>
+        <module>spi</module>
     </modules>
 </project>
