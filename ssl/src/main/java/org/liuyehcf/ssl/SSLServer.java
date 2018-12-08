@@ -4,21 +4,55 @@ import javax.net.ServerSocketFactory;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.TrustManagerFactory;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.security.KeyStore;
 
+/**
+ * @author hechenfeng
+ * @date 2018/12/7
+ */
 public class SSLServer extends Thread {
 
     private static final String KEY_STORE_PATH = System.getProperty("user.home") + File.separator + "liuyehcf_server_ks";
+    private static final String STORE_TYPE = "PKCS12";
+    private static final String PROTOCOL = "TLS";
     private static final String KEY_STORE_PASSWORD = "123456";
-    private static final String PRIVATE_PASSWORD = "234567";
+    private static final String KEY_PASSWORD = KEY_STORE_PASSWORD;
 
     private Socket socket;
 
     private SSLServer(Socket socket) {
         this.socket = socket;
+    }
+
+    public static void main(String[] args) throws Exception {
+        // keyStore
+        KeyStore keyStore = KeyStore.getInstance(STORE_TYPE);
+        keyStore.load(new FileInputStream(KEY_STORE_PATH), KEY_STORE_PASSWORD.toCharArray());
+
+        // keyManagerFactory
+        KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+        keyManagerFactory.init(keyStore, KEY_PASSWORD.toCharArray());
+
+        // trustManagerFactory
+        TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        trustManagerFactory.init(keyStore);
+
+        // sslContext
+        SSLContext sslContext = SSLContext.getInstance(PROTOCOL);
+        sslContext.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(), null);
+
+        // serverSocketFactory
+        ServerSocketFactory factory = sslContext.getServerSocketFactory();
+        ServerSocket socket = factory.createServerSocket(8443);
+        ((SSLServerSocket) socket).setNeedClientAuth(false);
+
+        while (!Thread.currentThread().isInterrupted()) {
+            new SSLServer(socket.accept()).start();
+        }
     }
 
     public void run() {
@@ -32,25 +66,6 @@ public class SSLServer extends Thread {
             socket.close();
         } catch (IOException e) {
             e.printStackTrace();
-        }
-    }
-
-    public static void main(String[] args) throws Exception {
-        System.setProperty("javax.net.ssl.trustStore", KEY_STORE_PATH);
-
-        KeyStore ks = KeyStore.getInstance("jceks");
-        ks.load(new FileInputStream(KEY_STORE_PATH), KEY_STORE_PASSWORD.toCharArray());
-        KeyManagerFactory kf = KeyManagerFactory.getInstance("SunX509");
-        kf.init(ks, PRIVATE_PASSWORD.toCharArray());
-
-        SSLContext context = SSLContext.getInstance("TLS");
-        context.init(kf.getKeyManagers(), null, null);
-        ServerSocketFactory factory = context.getServerSocketFactory();
-        ServerSocket socket = factory.createServerSocket(8443);
-        ((SSLServerSocket) socket).setNeedClientAuth(false);
-
-        while (!Thread.currentThread().isInterrupted()) {
-            new SSLServer(socket.accept()).start();
         }
     }
 }
