@@ -11,11 +11,19 @@ import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.websocketx.*;
 import io.netty.handler.codec.http.websocketx.extensions.compression.WebSocketClientCompressionHandler;
+import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
 
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.TrustManagerFactory;
+import java.io.File;
+import java.io.FileInputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
+import java.security.KeyStore;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -23,6 +31,13 @@ import java.util.concurrent.TimeUnit;
  * @date 2018/11/3
  */
 public class Client {
+
+    private static final String KEY_STORE_PATH = System.getProperty("user.home") + File.separator + "liuyehcf_client_ks";
+    private static final String STORE_TYPE = "PKCS12";
+    private static final String PROTOCOL = "TLS";
+    private static final String KEY_STORE_PASSWORD = "345678";
+    private static final String KEY_PASSWORD = KEY_STORE_PASSWORD;
+
     public static void main(String[] args) throws Exception {
         final URI webSocketURI = getUri();
 
@@ -36,8 +51,9 @@ public class Client {
                 .channel(NioSocketChannel.class)
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
-                    protected void initChannel(SocketChannel socketChannel) {
+                    protected void initChannel(SocketChannel socketChannel) throws Exception {
                         ChannelPipeline pipeline = socketChannel.pipeline();
+                        pipeline.addLast(new SslHandler(createClientSSLEngine()));
                         pipeline.addLast(new HttpClientCodec());
                         pipeline.addLast(new HttpObjectAggregator(65535));
                         pipeline.addLast(new ChunkedWriteHandler());
@@ -65,6 +81,28 @@ public class Client {
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static SSLEngine createClientSSLEngine() throws Exception {
+        // keyStore
+        KeyStore keyStore = KeyStore.getInstance(STORE_TYPE);
+        keyStore.load(new FileInputStream(KEY_STORE_PATH), KEY_STORE_PASSWORD.toCharArray());
+
+        // keyManagerFactory
+        KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+        keyManagerFactory.init(keyStore, KEY_PASSWORD.toCharArray());
+
+        // trustManagerFactory
+        TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        trustManagerFactory.init(keyStore);
+
+        // sslContext
+        SSLContext sslContext = SSLContext.getInstance(PROTOCOL);
+        sslContext.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(), null);
+
+        SSLEngine sslEngine = sslContext.createSSLEngine();
+        sslEngine.setUseClientMode(true);
+        return sslEngine;
     }
 
     private static final class ClientHandler extends SimpleChannelInboundHandler<WebSocketFrame> {
