@@ -45,5 +45,6 @@
         <module>crypto</module>
         <module>ssl</module>
         <module>spi</module>
+        <module>mina</module>
     </modules>
 </project>
