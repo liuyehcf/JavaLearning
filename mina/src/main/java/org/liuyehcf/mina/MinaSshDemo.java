@@ -11,6 +11,10 @@ import org.apache.sshd.common.util.io.NoCloseOutputStream;
 import java.io.IOException;
 import java.util.Collections;
 
+/**
+ * @author hechenfeng
+ * @date 2018/12/20
+ */
 public class MinaSshDemo extends BaseDemo {
 
     private MinaSshDemo() throws IOException {

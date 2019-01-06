@@ -9,7 +9,7 @@ import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
 
 /**
- * @author chenlu
+ * @author hechenfeng
  * @date 2018/12/24
  */
 public class StsDemo {

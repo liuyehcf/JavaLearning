@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 
 /**
- * @author chenlu
+ * @author hechenfeng
  * @date 2018/12/20
  */
 public class JschSshDemo extends BaseDemo {
