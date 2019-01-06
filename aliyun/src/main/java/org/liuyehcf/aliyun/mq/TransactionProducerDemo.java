@@ -8,7 +8,6 @@ import com.aliyun.openservices.ons.api.transaction.LocalTransactionChecker;
 import com.aliyun.openservices.ons.api.transaction.LocalTransactionExecuter;
 import com.aliyun.openservices.ons.api.transaction.TransactionProducer;
 import com.aliyun.openservices.ons.api.transaction.TransactionStatus;
-import com.aliyun.openservices.shade.com.alibaba.rocketmq.client.log.ClientLogger;
 import org.liuyehcf.aliyun.AccessUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,7 +81,6 @@ public class TransactionProducerDemo {
 
 
     private static final class LocalTransactionCheckerImpl implements LocalTransactionChecker {
-        private final static Logger log = ClientLogger.getLog();
         final BusinessService businessService = new BusinessService();
 
         @Override

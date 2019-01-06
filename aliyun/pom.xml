@@ -8,43 +8,43 @@
     <modelVersion>4.0.0</modelVersion>
 
     <dependencies>
+        <!-- log -->
         <dependency>
-            <!-- log -->
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
             <version>1.7.5</version>
         </dependency>
 
+        <!-- Common dependency -->
         <dependency>
-            <!-- Common dependency -->
             <groupId>com.aliyun</groupId>
             <artifactId>aliyun-java-sdk-core</artifactId>
             <version>3.5.0</version>
         </dependency>
 
+        <!-- MessageQueue -->
         <dependency>
-            <!-- MessageQueue -->
             <groupId>com.aliyun.openservices</groupId>
             <artifactId>ons-client</artifactId>
             <version>1.7.0.Final</version>
         </dependency>
 
+        <!-- Object Storage Service -->
         <dependency>
-            <!-- Object Storage Service -->
             <groupId>com.aliyun.oss</groupId>
             <artifactId>aliyun-sdk-oss</artifactId>
             <version>2.8.2</version>
         </dependency>
 
+        <!-- Key Management Service -->
         <dependency>
-            <!-- Key Management Service -->
             <groupId>com.aliyun</groupId>
             <artifactId>aliyun-java-sdk-kms</artifactId>
             <version>2.4.0</version>
         </dependency>
 
+        <!-- Short Message Service -->
         <dependency>
-            <!-- Short Message Service -->
             <groupId>com.alibaba</groupId>
             <artifactId>sdk-dysmsapi</artifactId>
             <version>1.0</version>
@@ -58,6 +58,9 @@
             <artifactId>httpclient</artifactId>
             <version>4.5.2</version>
         </dependency>
+
+        <!-- Sts -->
+
 
         <dependency>
             <groupId>commons-codec</groupId>
