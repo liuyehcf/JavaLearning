@@ -46,5 +46,6 @@
         <module>ssl</module>
         <module>spi</module>
         <module>mina</module>
+        <module>akka</module>
     </modules>
 </project>
