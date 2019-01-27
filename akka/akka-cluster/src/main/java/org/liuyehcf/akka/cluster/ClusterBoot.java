@@ -15,7 +15,7 @@ public class ClusterBoot {
         public static void main(String[] args) {
             Config clusterConfig = ConfigFactory.parseString(
                     String.format(
-                            AkkaConfigUtils.loadConfig("ClusterWithStaticSeedNode.conf"),
+                            AkkaConfigUtils.loadConfig("cluster-with-static-seed-node.conf"),
                             "127.0.0.1",
                             1100
                     )
@@ -29,7 +29,7 @@ public class ClusterBoot {
         public static void main(String[] args) {
             Config clusterConfig = ConfigFactory.parseString(
                     String.format(
-                            AkkaConfigUtils.loadConfig("ClusterWithStaticSeedNode.conf"),
+                            AkkaConfigUtils.loadConfig("cluster-with-static-seed-node.conf"),
                             IPUtils.getLocalIp(),
                             1101
                     )
@@ -44,7 +44,7 @@ public class ClusterBoot {
         public static void main(String[] args) {
             Config clusterConfig = ConfigFactory.parseString(
                     String.format(
-                            AkkaConfigUtils.loadConfig("ClusterWithStaticSeedNode.conf"),
+                            AkkaConfigUtils.loadConfig("cluster-with-static-seed-node.conf"),
                             IPUtils.getLocalIp(),
                             1102
                     )
@@ -59,7 +59,7 @@ public class ClusterBoot {
         public static void main(String[] args) {
             Config clusterConfig = ConfigFactory.parseString(
                     String.format(
-                            AkkaConfigUtils.loadConfig("ClusterWithNoneSeedNode.conf"),
+                            AkkaConfigUtils.loadConfig("cluster-with-none-seed-node.conf"),
                             IPUtils.getLocalIp(),
                             1103
                     )
