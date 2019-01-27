@@ -7,8 +7,7 @@
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>akka-remote-1</module>
-        <module>akka-remote-2</module>
+        <module>akka-remote</module>
     </modules>
     <modelVersion>4.0.0</modelVersion>
 

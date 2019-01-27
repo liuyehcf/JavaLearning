@@ -1,8 +1,6 @@
-package org.liuyehcf.akka.cluster;
+package org.liuyehcf.akka.remote;
 
 import akka.actor.AbstractActor;
-import akka.actor.ActorRef;
-import akka.actor.ActorSystem;
 import akka.actor.Props;
 
 /**
@@ -11,16 +9,16 @@ import akka.actor.Props;
  */
 public class RemoteActor1 extends AbstractActor {
 
-    private static Props props() {
+    static Props props() {
         return Props.create(RemoteActor1.class);
     }
 
     @Override
     public Receive createReceive() {
         return receiveBuilder()
-                .match(Object.class, msg -> {
+                .matchAny(msg -> {
                     System.out.println(msg);
-                    sender().tell("hi, I'm remote actor1", self());
+                    sender().tell("Hi, I'm remote actor1", self());
                 })
                 .build();
     }
@@ -32,13 +30,6 @@ public class RemoteActor1 extends AbstractActor {
 
     @Override
     public void postStop() {
-        System.out.println("remote actor2 stop");
+        System.out.println("remote actor1 stop");
     }
-
-    public static void main(String[] args) {
-        ActorSystem system = ActorSystem.create("RemoteSystem1");
-        ActorRef remoteActor = system.actorOf(props(), "RemoteActor1");
-        System.out.println(remoteActor.path());
-    }
-
 }
