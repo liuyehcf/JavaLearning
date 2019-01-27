@@ -7,7 +7,7 @@ import java.io.InputStream;
 import java.net.URL;
 
 /**
- * @author chenlu
+ * @author hechenfeng
  * @date 2019/1/25
  */
 public abstract class AkkaConfigUtils {

@@ -8,7 +8,7 @@ import org.liuyehcf.akka.common.util.AkkaConfigUtils;
 import org.liuyehcf.akka.common.util.IPUtils;
 
 /**
- * @author chenlu
+ * @author hechenfeng
  * @date 2019/1/25
  */
 public class RemoteCreateBoot {

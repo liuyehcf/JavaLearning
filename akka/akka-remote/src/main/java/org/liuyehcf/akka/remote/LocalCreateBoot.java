@@ -8,7 +8,7 @@ import com.typesafe.config.ConfigFactory;
 import org.liuyehcf.akka.common.util.AkkaConfigUtils;
 
 /**
- * @author chenlu
+ * @author hechenfeng
  * @date 2019/1/25
  */
 public class LocalCreateBoot {

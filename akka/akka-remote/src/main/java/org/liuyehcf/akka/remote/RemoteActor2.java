@@ -4,7 +4,7 @@ import akka.actor.AbstractActor;
 import akka.actor.Props;
 
 /**
- * @author chenlu
+ * @author hechenfeng
  * @date 2019/1/25
  */
 public class RemoteActor2 extends AbstractActor {

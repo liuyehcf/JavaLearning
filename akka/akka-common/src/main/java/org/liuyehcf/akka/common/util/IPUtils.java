@@ -6,7 +6,7 @@ import java.net.NetworkInterface;
 import java.util.Enumeration;
 
 /**
- * @author chenlu
+ * @author hechenfeng
  * @date 2019/1/25
  */
 public class IPUtils {
