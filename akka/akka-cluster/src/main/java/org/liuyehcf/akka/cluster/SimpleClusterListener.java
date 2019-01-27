@@ -1,6 +1,7 @@
 package org.liuyehcf.akka.cluster;
 
 import akka.actor.AbstractActor;
+import akka.actor.Props;
 import akka.cluster.Cluster;
 import akka.cluster.ClusterEvent;
 import akka.event.Logging;
@@ -10,6 +11,10 @@ public class SimpleClusterListener extends AbstractActor {
 
     private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
     private final Cluster cluster = Cluster.get(getContext().getSystem());
+
+    static Props props() {
+        return Props.create(SimpleClusterListener.class);
+    }
 
     //subscribe to cluster changes
     @Override
