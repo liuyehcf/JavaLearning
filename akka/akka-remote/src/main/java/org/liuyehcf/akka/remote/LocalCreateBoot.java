@@ -5,7 +5,7 @@ import akka.actor.ActorSelection;
 import akka.actor.ActorSystem;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import org.liuyehcf.akka.remote.util.ResourceUtils;
+import org.liuyehcf.akka.common.util.AkkaConfigUtils;
 
 /**
  * @author chenlu
@@ -16,7 +16,7 @@ public class LocalCreateBoot {
         public static void main(String[] args) {
             Config localCreatedConfig = ConfigFactory.parseString(
                     String.format(
-                            ResourceUtils.getAkkaConfig("remote.conf"),
+                            AkkaConfigUtils.loadConfig("remote.conf"),
                             "127.0.0.1",
                             10001
                     )
@@ -32,7 +32,7 @@ public class LocalCreateBoot {
         public static void main(String[] args) {
             Config localCreatedConfig = ConfigFactory.parseString(
                     String.format(
-                            ResourceUtils.getAkkaConfig("remote.conf"),
+                            AkkaConfigUtils.loadConfig("remote.conf"),
                             "127.0.0.1",
                             10002
                     )

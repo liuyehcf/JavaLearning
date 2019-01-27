@@ -1,4 +1,4 @@
-package org.liuyehcf.akka.remote.util;
+package org.liuyehcf.akka.common.util;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,10 +10,10 @@ import java.net.URL;
  * @author chenlu
  * @date 2019/1/25
  */
-public abstract class ResourceUtils {
-    public static String getAkkaConfig(String path) {
+public abstract class AkkaConfigUtils {
+    public static String loadConfig(String classpath) {
         ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
-        URL resource = systemClassLoader.getResource(path);
+        URL resource = systemClassLoader.getResource(classpath);
 
         if (resource == null) {
             throw new NullPointerException();

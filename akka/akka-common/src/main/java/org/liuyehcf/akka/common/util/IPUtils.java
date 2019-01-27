@@ -1,4 +1,4 @@
-package org.liuyehcf.akka.remote.util;
+package org.liuyehcf.akka.common.util;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;

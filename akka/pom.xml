@@ -9,6 +9,7 @@
     <modules>
         <module>akka-remote</module>
         <module>akka-cluster</module>
+        <module>akka-common</module>
     </modules>
     <modelVersion>4.0.0</modelVersion>
 </project>

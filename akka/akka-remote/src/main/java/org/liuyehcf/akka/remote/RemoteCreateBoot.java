@@ -4,8 +4,8 @@ import akka.actor.*;
 import akka.remote.RemoteScope;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import org.liuyehcf.akka.remote.util.IPUtils;
-import org.liuyehcf.akka.remote.util.ResourceUtils;
+import org.liuyehcf.akka.common.util.AkkaConfigUtils;
+import org.liuyehcf.akka.common.util.IPUtils;
 
 /**
  * @author chenlu
@@ -16,7 +16,7 @@ public class RemoteCreateBoot {
         public static void main(String[] args) {
             Config remoteCreatedConfig = ConfigFactory.parseString(
                     String.format(
-                            ResourceUtils.getAkkaConfig("remote.conf"),
+                            AkkaConfigUtils.loadConfig("remote.conf"),
                             IPUtils.getLocalIp(),
                             10003
                     )
@@ -31,7 +31,7 @@ public class RemoteCreateBoot {
         public static void main(String[] args) {
             Config remoteCreatedConfig = ConfigFactory.parseString(
                     String.format(
-                            ResourceUtils.getAkkaConfig("remote.conf"),
+                            AkkaConfigUtils.loadConfig("remote.conf"),
                             IPUtils.getLocalIp(),
                             10004
                     )
