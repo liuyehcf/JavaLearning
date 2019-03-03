@@ -1,0 +1,2 @@
+org.springframework.boot.env.EnvironmentPostProcessor=\
+org.liuyehcf.spring.boot.property.environment.ExtensionPropertyListener
