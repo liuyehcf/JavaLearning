@@ -10,12 +10,18 @@ import org.springframework.web.bind.annotation.*;
  */
 @Controller
 @RequestMapping("/")
-public class SampleController {
+public class MainController {
 
     @RequestMapping(value = "/home", method = RequestMethod.GET)
     @ResponseBody
     public String home() {
         return "Hello world!";
+    }
+
+    @RequestMapping(value = "/echo", method = RequestMethod.GET)
+    @ResponseBody
+    public String echo(@RequestParam String content) {
+        return content;
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
