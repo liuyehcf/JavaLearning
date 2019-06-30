@@ -10,11 +10,8 @@ import javax.lang.model.element.Modifier;
 import java.util.Set;
 
 class ProcessUtil {
+
     static final String THIS = "this";
-
-    private static final String SET = "set";
-
-    private static final String GET = "get";
 
     /**
      * 创建建造者的静态方法名
@@ -30,6 +27,9 @@ class ProcessUtil {
      * 构造方法名字，比较特殊
      */
     static final String CONSTRUCTOR_NAME = "<init>";
+
+    private static final String SET = "set";
+    private static final String GET = "get";
 
     /**
      * 克隆一个字段的语法树节点，该节点作为方法的参数

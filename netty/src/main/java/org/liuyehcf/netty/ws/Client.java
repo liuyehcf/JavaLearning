@@ -1,7 +1,6 @@
 package org.liuyehcf.netty.ws;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
@@ -9,7 +8,9 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.http.DefaultHttpHeaders;
 import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.codec.http.HttpObjectAggregator;
-import io.netty.handler.codec.http.websocketx.*;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.WebSocketClientHandshakerFactory;
+import io.netty.handler.codec.http.websocketx.WebSocketVersion;
 import io.netty.handler.codec.http.websocketx.extensions.compression.WebSocketClientCompressionHandler;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.SslHandler;
@@ -130,33 +131,11 @@ public class Client {
                 .newHandler(pipeline.channel().alloc(), HOST, PORT);
     }
 
-    private static final class ClientHandler extends SimpleChannelInboundHandler<WebSocketFrame> {
-        @Override
-        @SuppressWarnings("all")
-        protected void channelRead0(ChannelHandlerContext ctx, WebSocketFrame msg) throws Exception {
-            final String content;
-            if (msg instanceof BinaryWebSocketFrame) {
-                BinaryWebSocketFrame binaryWebSocketFrame = (BinaryWebSocketFrame) msg;
-                ByteBuf byteBuf = binaryWebSocketFrame.content();
-                byte[] bytes = new byte[byteBuf.readableBytes()];
-                byteBuf.getBytes(0, bytes);
-                content = new String(bytes, Charset.defaultCharset());
-            } else if (msg instanceof TextWebSocketFrame) {
-                content = ((TextWebSocketFrame) msg).text();
-            } else if (msg instanceof PongWebSocketFrame) {
-                content = "Pong";
-            } else if (msg instanceof ContinuationWebSocketFrame) {
-                content = "Continue";
-            } else if (msg instanceof PingWebSocketFrame) {
-                content = "Ping";
-            } else if (msg instanceof CloseWebSocketFrame) {
-                content = "Close";
-                ctx.close();
-            } else {
-                throw new RuntimeException();
-            }
+    private static final class ClientHandler extends AbstractWebSocketHandler {
 
-            System.out.println("client receive message: " + content);
+        @Override
+        protected void doChannelRead0(ChannelHandlerContext ctx, byte[] bytes) {
+            System.out.println("client receive message: " + new String(bytes, Charset.defaultCharset()));
         }
     }
 }

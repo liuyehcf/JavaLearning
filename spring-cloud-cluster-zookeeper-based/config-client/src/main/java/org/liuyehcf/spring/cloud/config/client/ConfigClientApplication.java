@@ -17,9 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/demo/config")
 public class ConfigClientApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(ConfigClientApplication.class, args);
-    }
 
     //获取配置中心的属性
     @Value("${host}")
@@ -28,6 +25,10 @@ public class ConfigClientApplication {
     //获取配置中心的属性
     @Value("${description}")
     private String description;
+
+    public static void main(String[] args) {
+        SpringApplication.run(ConfigClientApplication.class, args);
+    }
 
     @GetMapping("/getHost")
     public String getHost() {

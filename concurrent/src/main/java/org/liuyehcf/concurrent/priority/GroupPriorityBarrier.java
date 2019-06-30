@@ -51,105 +51,85 @@ public class GroupPriorityBarrier {
         barrier = new CyclicBarrier(size);
     }
 
-    private static final class Syn extends AbstractPriorityQueuedSynchronizer {
-        private static final int UNINITIALIZED = 0;
-        private static final int INITIALIZED = 1;
-        private static final int ORIGIN_STATE = 1;
-        private static final int LOCKED_STATE = 0;
+    public static void main(String[] args) {
+        int namespaceNum = 50;
+        int threadNum = 1000;
+        int sleepTime = 2000;
+        int priorityNum = 10;
 
-        /**
-         * 初始化控制，保证一个Sync的初始化只由一个线程完成
-         */
-        private AtomicInteger initControl = new AtomicInteger(UNINITIALIZED);
-
-        /**
-         * 控制不同priority的线程进入阻塞队列的顺序
-         */
-        private AtomicInteger enqControl = new AtomicInteger(1);
-
-        private Syn() {
-            setState(ORIGIN_STATE);
+        String[] namespaces = new String[namespaceNum];
+        for (int i = 0; i < namespaceNum; i++) {
+            namespaces[i] = UUID.randomUUID().toString();
         }
 
-        /**
-         * priority -> 数量的映射
-         */
-        private final Map<Integer, Integer> priorityCnt = new HashMap<>();
+        GroupPriorityBarrier groupPriorityBarrier = new GroupPriorityBarrier(threadNum);
+        Random random = new Random();
+        AtomicInteger cnt = new AtomicInteger();
+        List<Thread> threads = new ArrayList<>();
+        Map<String, List<Integer>> accessOrderMap = new ConcurrentHashMap<>();
 
-        /**
-         * priority -> 所需资源数的映射
-         */
-        private final Map<Integer, Integer> priorityStates = new HashMap<>();
+        for (int i = 0; i < namespaceNum; i++) {
+            accessOrderMap.put(namespaces[i], new ArrayList<>());
+        }
 
-        /**
-         * 该方法必须在可重入锁的保护下进行，非线程安全方法
+        for (int i = 0; i < threadNum; i++) {
+            Thread t = new Thread(
+                    () -> {
+                        int priority = random.nextInt(priorityNum) + 1;
+                        String namespace = namespaces[random.nextInt(namespaces.length)];
+                        try {
+                            TimeUnit.MILLISECONDS.sleep(random.nextInt(sleepTime));
+
+                            groupPriorityBarrier.enter(namespace, priority);
+
+                            System.out.println("(" + namespace + ", " + priority + ")" + " enter ");
+                            System.out.flush();
+
+                            TimeUnit.MILLISECONDS.sleep(random.nextInt(sleepTime));
+                        } catch (InterruptedException e) {
+                            // ignore
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        } finally {
+                            System.out.println("(" + namespace + ", " + priority + ")" + " exit ");
+                            System.out.flush();
+                            accessOrderMap.get(namespace).add(priority);
+
+                            groupPriorityBarrier.exit();
+
+                            cnt.incrementAndGet();
+                        }
+                    }, "Thread - " + i
+            );
+            threads.add(t);
+            t.start();
+        }
+
+        /*
+         * Join
          */
-        private void unsafeRegister(Integer priority) {
-            if (!priorityCnt.containsKey(priority)) {
-                priorityCnt.put(priority, 0);
+        try {
+            for (Thread thread : threads) {
+                thread.join();
             }
-            priorityCnt.put(priority, priorityCnt.get(priority) + 1);
+        } catch (InterruptedException e) {
+            // ignore
         }
 
-        private boolean tryInit() {
-            return initControl.compareAndSet(UNINITIALIZED, INITIALIZED);
-        }
+        System.out.println(cnt);
+        System.out.flush();
 
-        /**
-         * 目前仅用于register中，仅在初始化阶段能起到加锁效果
-         *
-         * @see GroupPriorityBarrier#register(String, int)
+        /*
+         * 校验访问顺序是否一致
          */
-        @Override
-        protected boolean tryAcquire(int arg) {
-            return compareAndSetState(ORIGIN_STATE, LOCKED_STATE);
-        }
+        for (Map.Entry<String, List<Integer>> entry : accessOrderMap.entrySet()) {
+            List<Integer> origin = entry.getValue();
+            List<Integer> copied = new ArrayList<>(origin);
 
-        /**
-         * 目前仅用于register中
-         *
-         * @see GroupPriorityBarrier#register(String, int)
-         */
-        @Override
-        protected boolean tryRelease(int arg) {
-            return compareAndSetState(LOCKED_STATE, ORIGIN_STATE);
-        }
-
-        @Override
-        protected int tryAcquireShared(int arg) {
-            if (getState() >= arg) {
-                return 1;
-            } else {
-                return -1;
+            Collections.sort(copied);
+            if (!origin.equals(copied)) {
+                throw new RuntimeException();
             }
-        }
-
-        @Override
-        protected boolean tryReleaseShared(int arg) {
-            for (; ; ) {
-                int c = getState();
-                if (compareAndSetState(c, c + 1)) {
-                    return true;
-                }
-            }
-        }
-
-        @Override
-        protected void onAcquireDirect() {
-            /*
-             * 保证线程入队次序与priority严格一致
-             * 搜索enqControl关键字，查看呼应逻辑
-             */
-            enqControl.incrementAndGet();
-        }
-
-        @Override
-        protected void onEnq() {
-            /*
-             * 保证线程入队次序与priority严格一致
-             * 搜索enqControl关键字，查看呼应逻辑
-             */
-            enqControl.incrementAndGet();
         }
     }
 
@@ -269,85 +249,101 @@ public class GroupPriorityBarrier {
         }
     }
 
-    public static void main(String[] args) {
-        int namespaceNum = 50;
-        int threadNum = 1000;
-        int sleepTime = 2000;
-        int priorityNum = 10;
-
-        String[] namespaces = new String[namespaceNum];
-        for (int i = 0; i < namespaceNum; i++) {
-            namespaces[i] = UUID.randomUUID().toString();
-        }
-
-        GroupPriorityBarrier groupPriorityBarrier = new GroupPriorityBarrier(threadNum);
-        Random random = new Random();
-        AtomicInteger cnt = new AtomicInteger();
-        List<Thread> threads = new ArrayList<>();
-        Map<String, List<Integer>> accessOrderMap = new ConcurrentHashMap<>();
-
-        for (int i = 0; i < namespaceNum; i++) {
-            accessOrderMap.put(namespaces[i], new ArrayList<>());
-        }
-
-        for (int i = 0; i < threadNum; i++) {
-            Thread t = new Thread(
-                    () -> {
-                        int priority = random.nextInt(priorityNum) + 1;
-                        String namespace = namespaces[random.nextInt(namespaces.length)];
-                        try {
-                            TimeUnit.MILLISECONDS.sleep(random.nextInt(sleepTime));
-
-                            groupPriorityBarrier.enter(namespace, priority);
-
-                            System.out.println("(" + namespace + ", " + priority + ")" + " enter ");
-                            System.out.flush();
-
-                            TimeUnit.MILLISECONDS.sleep(random.nextInt(sleepTime));
-                        } catch (InterruptedException e) {
-                            // ignore
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        } finally {
-                            System.out.println("(" + namespace + ", " + priority + ")" + " exit ");
-                            System.out.flush();
-                            accessOrderMap.get(namespace).add(priority);
-
-                            groupPriorityBarrier.exit();
-
-                            cnt.incrementAndGet();
-                        }
-                    }, "Thread - " + i
-            );
-            threads.add(t);
-            t.start();
-        }
-
-        /*
-         * Join
+    private static final class Syn extends AbstractPriorityQueuedSynchronizer {
+        private static final int UNINITIALIZED = 0;
+        private static final int INITIALIZED = 1;
+        private static final int ORIGIN_STATE = 1;
+        private static final int LOCKED_STATE = 0;
+        /**
+         * priority -> 数量的映射
          */
-        try {
-            for (Thread thread : threads) {
-                thread.join();
-            }
-        } catch (InterruptedException e) {
-            // ignore
+        private final Map<Integer, Integer> priorityCnt = new HashMap<>();
+        /**
+         * priority -> 所需资源数的映射
+         */
+        private final Map<Integer, Integer> priorityStates = new HashMap<>();
+        /**
+         * 初始化控制，保证一个Sync的初始化只由一个线程完成
+         */
+        private AtomicInteger initControl = new AtomicInteger(UNINITIALIZED);
+        /**
+         * 控制不同priority的线程进入阻塞队列的顺序
+         */
+        private AtomicInteger enqControl = new AtomicInteger(1);
+
+        private Syn() {
+            setState(ORIGIN_STATE);
         }
 
-        System.out.println(cnt);
-        System.out.flush();
-
-        /*
-         * 校验访问顺序是否一致
+        /**
+         * 该方法必须在可重入锁的保护下进行，非线程安全方法
          */
-        for (Map.Entry<String, List<Integer>> entry : accessOrderMap.entrySet()) {
-            List<Integer> origin = entry.getValue();
-            List<Integer> copied = new ArrayList<>(origin);
-
-            Collections.sort(copied);
-            if (!origin.equals(copied)) {
-                throw new RuntimeException();
+        private void unsafeRegister(Integer priority) {
+            if (!priorityCnt.containsKey(priority)) {
+                priorityCnt.put(priority, 0);
             }
+            priorityCnt.put(priority, priorityCnt.get(priority) + 1);
+        }
+
+        private boolean tryInit() {
+            return initControl.compareAndSet(UNINITIALIZED, INITIALIZED);
+        }
+
+        /**
+         * 目前仅用于register中，仅在初始化阶段能起到加锁效果
+         *
+         * @see GroupPriorityBarrier#register(String, int)
+         */
+        @Override
+        protected boolean tryAcquire(int arg) {
+            return compareAndSetState(ORIGIN_STATE, LOCKED_STATE);
+        }
+
+        /**
+         * 目前仅用于register中
+         *
+         * @see GroupPriorityBarrier#register(String, int)
+         */
+        @Override
+        protected boolean tryRelease(int arg) {
+            return compareAndSetState(LOCKED_STATE, ORIGIN_STATE);
+        }
+
+        @Override
+        protected int tryAcquireShared(int arg) {
+            if (getState() >= arg) {
+                return 1;
+            } else {
+                return -1;
+            }
+        }
+
+        @Override
+        protected boolean tryReleaseShared(int arg) {
+            for (; ; ) {
+                int c = getState();
+                if (compareAndSetState(c, c + 1)) {
+                    return true;
+                }
+            }
+        }
+
+        @Override
+        protected void onAcquireDirect() {
+            /*
+             * 保证线程入队次序与priority严格一致
+             * 搜索enqControl关键字，查看呼应逻辑
+             */
+            enqControl.incrementAndGet();
+        }
+
+        @Override
+        protected void onEnq() {
+            /*
+             * 保证线程入队次序与priority严格一致
+             * 搜索enqControl关键字，查看呼应逻辑
+             */
+            enqControl.incrementAndGet();
         }
     }
 }

@@ -1,8 +1,8 @@
 package org.liuyehcf.spring.validate.service;
 
+import org.liuyehcf.spring.validate.dto.UserDTO;
 import org.liuyehcf.spring.validate.group.Create;
 import org.liuyehcf.spring.validate.group.Update;
-import org.liuyehcf.spring.validate.dto.UserDTO;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;

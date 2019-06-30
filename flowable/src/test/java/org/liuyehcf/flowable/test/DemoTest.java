@@ -18,6 +18,14 @@ public class DemoTest {
     @Autowired
     private DemoService demoService;
 
+    private static void sleep(int second) {
+        try {
+            TimeUnit.SECONDS.sleep(second);
+        } catch (InterruptedException e) {
+            // ignore
+        }
+    }
+
     @Test
     public void test() {
         String processDefinition = demoService.deployProcess();
@@ -41,13 +49,5 @@ public class DemoTest {
 
         message = demoService.completeUserTaskByCandidateUser("lucy");
         log.info("completeUserTaskByCandidateUser. message={}", message);
-    }
-
-    private static void sleep(int second) {
-        try {
-            TimeUnit.SECONDS.sleep(second);
-        } catch (InterruptedException e) {
-            // ignore
-        }
     }
 }

@@ -24,6 +24,59 @@ public abstract class AbstractPriorityQueuedSynchronizer extends AbstractQueuedS
     private static final Method predecessor;
     private static final Field next;
 
+    static {
+        Class classNode = null;
+        for (Class clazz : AbstractQueuedSynchronizer.class.getDeclaredClasses()) {
+            if ("Node".equals(clazz.getSimpleName())) {
+                classNode = clazz;
+            }
+        }
+        if (classNode == null) {
+            throw new Error("can't find java.util.concurrent.locks.AbstractQueuedSynchronizer$Node");
+        }
+
+        Node = classNode;
+
+        try {
+            addWaiter = AbstractQueuedSynchronizer.class.getDeclaredMethod("addWaiter", Node);
+            addWaiter.setAccessible(true);
+
+            setHeadAndPropagate = AbstractQueuedSynchronizer.class.getDeclaredMethod("setHeadAndPropagate", Node, int.class);
+            setHeadAndPropagate.setAccessible(true);
+
+            selfInterrupt = AbstractQueuedSynchronizer.class.getDeclaredMethod("selfInterrupt");
+            selfInterrupt.setAccessible(true);
+
+            shouldParkAfterFailedAcquire = AbstractQueuedSynchronizer.class.getDeclaredMethod("shouldParkAfterFailedAcquire", Node, Node);
+            shouldParkAfterFailedAcquire.setAccessible(true);
+
+            parkAndCheckInterrupt = AbstractQueuedSynchronizer.class.getDeclaredMethod("parkAndCheckInterrupt");
+            parkAndCheckInterrupt.setAccessible(true);
+
+            cancelAcquire = AbstractQueuedSynchronizer.class.getDeclaredMethod("cancelAcquire", Node);
+            cancelAcquire.setAccessible(true);
+
+            head = AbstractQueuedSynchronizer.class.getDeclaredField("head");
+            head.setAccessible(true);
+
+            SHARED = Node.getDeclaredField("SHARED");
+            SHARED.setAccessible(true);
+
+            predecessor = Node.getDeclaredMethod("predecessor");
+            predecessor.setAccessible(true);
+
+            next = Node.getDeclaredField("next");
+            next.setAccessible(true);
+
+        } catch (NoSuchMethodException | NoSuchFieldException e) {
+            throw new Error(e);
+        }
+    }
+
+    public static void main(String[] args) {
+        System.out.println();
+    }
+
     /**
      * 需要埋入钩子方法{@link #onAcquireDirect}
      *
@@ -78,57 +131,4 @@ public abstract class AbstractPriorityQueuedSynchronizer extends AbstractQueuedS
     }
 
     protected abstract void onEnq();
-
-    static {
-        Class classNode = null;
-        for (Class clazz : AbstractQueuedSynchronizer.class.getDeclaredClasses()) {
-            if ("Node".equals(clazz.getSimpleName())) {
-                classNode = clazz;
-            }
-        }
-        if (classNode == null) {
-            throw new Error("can't find java.util.concurrent.locks.AbstractQueuedSynchronizer$Node");
-        }
-
-        Node = classNode;
-
-        try {
-            addWaiter = AbstractQueuedSynchronizer.class.getDeclaredMethod("addWaiter", Node);
-            addWaiter.setAccessible(true);
-
-            setHeadAndPropagate = AbstractQueuedSynchronizer.class.getDeclaredMethod("setHeadAndPropagate", Node, int.class);
-            setHeadAndPropagate.setAccessible(true);
-
-            selfInterrupt = AbstractQueuedSynchronizer.class.getDeclaredMethod("selfInterrupt");
-            selfInterrupt.setAccessible(true);
-
-            shouldParkAfterFailedAcquire = AbstractQueuedSynchronizer.class.getDeclaredMethod("shouldParkAfterFailedAcquire", Node, Node);
-            shouldParkAfterFailedAcquire.setAccessible(true);
-
-            parkAndCheckInterrupt = AbstractQueuedSynchronizer.class.getDeclaredMethod("parkAndCheckInterrupt");
-            parkAndCheckInterrupt.setAccessible(true);
-
-            cancelAcquire = AbstractQueuedSynchronizer.class.getDeclaredMethod("cancelAcquire", Node);
-            cancelAcquire.setAccessible(true);
-
-            head = AbstractQueuedSynchronizer.class.getDeclaredField("head");
-            head.setAccessible(true);
-
-            SHARED = Node.getDeclaredField("SHARED");
-            SHARED.setAccessible(true);
-
-            predecessor = Node.getDeclaredMethod("predecessor");
-            predecessor.setAccessible(true);
-
-            next = Node.getDeclaredField("next");
-            next.setAccessible(true);
-
-        } catch (NoSuchMethodException | NoSuchFieldException e) {
-            throw new Error(e);
-        }
-    }
-
-    public static void main(String[] args) {
-        System.out.println();
-    }
 }
