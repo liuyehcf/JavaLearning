@@ -5,7 +5,7 @@
     <groupId>org.liuyehcf</groupId>
     <artifactId>spring-boot</artifactId>
     <packaging>pom</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <modules>
         <module>spring-boot-property</module>
         <module>spring-boot-demo</module>

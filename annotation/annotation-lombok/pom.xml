@@ -2,14 +2,10 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <artifactId>annotation</artifactId>
-        <groupId>org.liuyehcf</groupId>
-        <version>1.0-SNAPSHOT</version>
-    </parent>
-    <modelVersion>4.0.0</modelVersion>
-
+    <groupId>org.liuyehcf</groupId>
     <artifactId>annotation-lombok</artifactId>
+    <version>1.0.0</version>
+    <modelVersion>4.0.0</modelVersion>
 
     <dependencies>
         <dependency>
@@ -22,6 +18,7 @@
     </dependencies>
 
     <build>
+        <finalName>${artifactId}</finalName>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>

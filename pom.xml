@@ -7,44 +7,47 @@
     <groupId>org.liuyehcf</groupId>
     <artifactId>JavaLearning</artifactId>
     <packaging>pom</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <modules>
-        <module>mybatis</module>
-        <module>concurrent</module>
+        <module>akka</module>
         <module>algorithm</module>
-        <module>test</module>
-        <module>framework</module>
-        <module>io</module>
-        <module>office</module>
-        <module>sun-source</module>
-        <module>mock</module>
-        <module>spring-tx</module>
-        <module>netty</module>
         <module>aliyun</module>
-        <module>slf4j</module>
-        <module>redis</module>
-        <module>fastjson</module>
-        <module>http</module>
-        <module>proxy</module>
-        <module>spring-aop</module>
+        <module>annotation</module>
         <module>classloader</module>
-        <module>security</module>
+        <module>concurrent</module>
+        <module>crypto</module>
+        <module>dom4j</module>
+        <module>fastjson</module>
+        <module>flowable</module>
+        <module>framework</module>
+        <module>http</module>
+        <module>io</module>
+        <module>jdbc</module>
         <module>jni</module>
+        <module>lambda-expression</module>
+        <module>logback</module>
+        <module>markdown-format</module>
+        <module>mina</module>
+        <module>mock</module>
+        <module>mybatis</module>
+        <module>mybatis-spring</module>
+        <module>netty</module>
+        <module>office</module>
+        <module>proxy</module>
+        <module>redis</module>
+        <module>reflect</module>
+        <module>security</module>
+        <module>slf4j</module>
+        <module>spi</module>
+        <module>spring-aop</module>
+        <module>spring-boot</module>
         <module>spring-ioc</module>
         <module>spring-mvc</module>
-        <module>markdown-format</module>
-        <module>logback</module>
-        <module>swagger</module>
-        <module>dom4j</module>
-        <module>reflect</module>
-        <module>jdbc</module>
-        <module>mybatis-spring</module>
-        <module>lambda-expression</module>
+        <module>spring-tx</module>
         <module>spring-validate</module>
-        <module>crypto</module>
         <module>ssl</module>
-        <module>spi</module>
-        <module>mina</module>
-        <module>akka</module>
+        <module>sun-source</module>
+        <module>swagger</module>
+        <module>test</module>
     </modules>
 </project>
