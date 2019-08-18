@@ -18,7 +18,7 @@ public class MainController {
         return "Hello world!";
     }
 
-    @RequestMapping(value = "/echo", method = RequestMethod.GET)
+    @RequestMapping(value = "/echo", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     public String echo(@RequestParam String content) {
         return content;
