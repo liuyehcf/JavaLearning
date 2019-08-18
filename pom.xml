@@ -12,7 +12,6 @@
         <module>akka</module>
         <module>algorithm</module>
         <module>aliyun</module>
-        <module>annotation</module>
         <module>classloader</module>
         <module>concurrent</module>
         <module>crypto</module>
