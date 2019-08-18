@@ -1,4 +1,4 @@
-package org.liuyehcf.spring.boot;
+package org.liuyehcf.spring.boot.demo;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;

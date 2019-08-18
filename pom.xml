@@ -18,7 +18,6 @@
         <module>office</module>
         <module>sun-source</module>
         <module>mock</module>
-        <module>spring-boot</module>
         <module>spring-tx</module>
         <module>netty</module>
         <module>aliyun</module>

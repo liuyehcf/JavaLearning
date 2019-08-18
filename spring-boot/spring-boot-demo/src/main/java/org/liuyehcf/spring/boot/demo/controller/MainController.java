@@ -1,7 +1,7 @@
-package org.liuyehcf.spring.boot.controller;
+package org.liuyehcf.spring.boot.demo.controller;
 
-import org.liuyehcf.spring.boot.dto.LoginRequestDTO;
-import org.liuyehcf.spring.boot.dto.LoginResponseDTO;
+import org.liuyehcf.spring.boot.demo.dto.LoginRequestDTO;
+import org.liuyehcf.spring.boot.demo.dto.LoginResponseDTO;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 

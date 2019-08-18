@@ -1,4 +1,4 @@
-package org.liuyehcf.spring.boot.dto;
+package org.liuyehcf.spring.boot.demo.dto;
 
 /**
  * Created by Liuye on 2017/12/15.
