@@ -23,7 +23,7 @@
                     <target>1.8</target>
                     <compilerArguments>
                         <verbose/>
-                        <bootclasspath>${JAVA_HOME}/jre/lib/rt.jar${path.separator}${JAVA_HOME}/jre/lib/jce.jar
+                        <bootclasspath>${java.home}/lib/rt.jar${path.separator}${java.home}/lib/jce.jar
                         </bootclasspath>
                     </compilerArguments>
                 </configuration>
