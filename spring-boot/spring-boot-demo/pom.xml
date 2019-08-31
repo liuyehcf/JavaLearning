@@ -44,7 +44,7 @@
                 <version>1.5.9.RELEASE</version>
                 <configuration>
                     <fork>true</fork>
-                    <mainClass>org.liuyehcf.spring.boot.Application</mainClass>
+                    <mainClass>org.liuyehcf.spring.boot.demo.Application</mainClass>
                 </configuration>
                 <executions>
                     <execution>

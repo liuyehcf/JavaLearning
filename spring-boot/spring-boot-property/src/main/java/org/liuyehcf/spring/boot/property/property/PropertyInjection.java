@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import javax.annotation.PostConstruct;
 
 /**
- * @author chenlu
+ * @author hechenfeng
  * @date 2019/2/27
  */
 @Configuration

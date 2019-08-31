@@ -24,6 +24,12 @@ public class MainController {
         return content;
     }
 
+    @RequestMapping(value = "/echoBody", method = {RequestMethod.POST})
+    @ResponseBody
+    public String echo(@RequestParam String queryContent, @RequestBody String bodyContent) {
+        return queryContent + ":" + bodyContent;
+    }
+
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     @ResponseBody
     public LoginResponseDTO login(@RequestBody LoginRequestDTO request) {
