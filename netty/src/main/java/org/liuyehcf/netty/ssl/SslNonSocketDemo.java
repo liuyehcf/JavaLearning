@@ -8,7 +8,7 @@ import java.util.concurrent.*;
  * @date 2019/8/29
  */
 @SuppressWarnings("all")
-public class SslConverterDemo {
+public class SslNonSocketDemo {
 
     private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(3);
 
