@@ -48,5 +48,6 @@
         <module>sun-source</module>
         <module>swagger</module>
         <module>test</module>
+        <module>jmh</module>
     </modules>
 </project>
