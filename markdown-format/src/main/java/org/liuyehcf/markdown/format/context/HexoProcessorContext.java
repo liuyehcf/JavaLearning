@@ -8,6 +8,7 @@ import org.liuyehcf.markdown.format.processor.impl.*;
 public class HexoProcessorContext extends AbstractProcessorContext {
     @Override
     void initProcessors() {
+        addProcessor(new TitleProcessor());
         addProcessor(new ImageAddressCheckProcessor());
         addProcessor(new IndexProcessor());
         addProcessor(new InnerLinkCheckProcessor());
