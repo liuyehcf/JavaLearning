@@ -61,4 +61,15 @@ public class MainController {
                 return "wrong operation";
         }
     }
+
+    @RequestMapping(value = "/user/get", method = RequestMethod.GET)
+    @ResponseBody
+    public String getUser(@RequestParam int id) {
+        return String.format("{\n" +
+                "    \"id\":%d,\n" +
+                "    \"firstName\":\"三\",\n" +
+                "    \"lastName\":\"张\",\n" +
+                "    \"age\":20\n" +
+                "}", id);
+    }
 }
