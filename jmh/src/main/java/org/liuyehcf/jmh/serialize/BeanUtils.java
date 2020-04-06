@@ -13,7 +13,7 @@ import java.math.BigInteger;
 import java.util.*;
 
 /**
- * @author chenfeng.hcf
+ * @author hechenfeng
  * @date 2019/10/18
  */
 public abstract class BeanUtils {
