@@ -49,5 +49,7 @@
         <module>swagger</module>
         <module>test</module>
         <module>jmh</module>
+        <module>kafka</module>
+        <module>kafka</module>
     </modules>
 </project>
