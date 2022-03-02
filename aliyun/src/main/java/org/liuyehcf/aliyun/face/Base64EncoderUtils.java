@@ -1,11 +1,10 @@
 package org.liuyehcf.aliyun.face;
 
-import sun.misc.BASE64Encoder;
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Base64;
 
 /**
  * Created by HCF on 2017/12/16.
@@ -37,7 +36,7 @@ public class Base64EncoderUtils {
             throw new RuntimeException(e);
         }
 
-        BASE64Encoder encoder = new BASE64Encoder();
-        return encoder.encode(bytes);
+        Base64.Encoder encoder = Base64.getEncoder();
+        return encoder.encodeToString(bytes);
     }
 }

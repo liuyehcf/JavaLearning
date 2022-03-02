@@ -1,7 +1,5 @@
 package org.liuyehcf.aliyun.face;
 
-import sun.misc.BASE64Encoder;
-
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.BufferedReader;
@@ -13,9 +11,9 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
+import java.util.Base64;
 import java.util.Date;
 import java.util.Locale;
-
 
 @SuppressWarnings("restriction")
 public class AESDecode {
@@ -23,8 +21,9 @@ public class AESDecode {
      * 计算MD5+BASE64
      */
     public static String MD5Base64(String s) {
-        if (s == null)
+        if (s == null) {
             return null;
+        }
         String encodeStr = "";
         byte[] utfBytes = s.getBytes();
         MessageDigest mdTemp;
@@ -32,8 +31,8 @@ public class AESDecode {
             mdTemp = MessageDigest.getInstance("MD5");
             mdTemp.update(utfBytes);
             byte[] md5Bytes = mdTemp.digest();
-            BASE64Encoder b64Encoder = new BASE64Encoder();
-            encodeStr = b64Encoder.encode(md5Bytes);
+            Base64.Encoder b64Encoder = Base64.getEncoder();
+            encodeStr = b64Encoder.encodeToString(md5Bytes);
         } catch (Exception e) {
             throw new Error("Failed to generate MD5 : " + e.getMessage());
         }
@@ -50,7 +49,7 @@ public class AESDecode {
             Mac mac = Mac.getInstance("HmacSHA1");
             mac.init(signingKey);
             byte[] rawHmac = mac.doFinal(data.getBytes());
-            result = (new BASE64Encoder()).encode(rawHmac);
+            result = Base64.getEncoder().encodeToString(rawHmac);
         } catch (Exception e) {
             throw new Error("Failed to generate HMAC : " + e.getMessage());
         }
@@ -202,16 +201,16 @@ public class AESDecode {
     }
 
     public static void main(String[] args) throws Exception {
-//        // 发送POST请求示例
-//        String ak_id1 = "NMV.............5jv"; //用户ak
-//        String ak_secret1 = "Fgs...............3zu"; // 用户ak_secret
-//        String url = "https://shujuapi.aliyun.com/org_code/service_code/api_name";
-//        String body = "{\"param1\": \"xxx\", \"param2\":\"xxx\"}";
-//        System.out.println("response body:" + sendPost(url, body, ak_id, ak_secret));
-//        // 发送GET请求
-//        String ak_id1 = "NMV.............5jv"; //用户ak
-//        String ak_secret1 = "Fgs...............3zu"; // 用户ak_secret
-//        String url1 = "https://shujuapi.aliyun.com/org_code/service_code/api_name?param1=xxx&param2=xxx";
-//        System.out.println("response body:" + sendGet(url1, ak_id1, ak_secret1));
+        //        // 发送POST请求示例
+        //        String ak_id1 = "NMV.............5jv"; //用户ak
+        //        String ak_secret1 = "Fgs...............3zu"; // 用户ak_secret
+        //        String url = "https://shujuapi.aliyun.com/org_code/service_code/api_name";
+        //        String body = "{\"param1\": \"xxx\", \"param2\":\"xxx\"}";
+        //        System.out.println("response body:" + sendPost(url, body, ak_id, ak_secret));
+        //        // 发送GET请求
+        //        String ak_id1 = "NMV.............5jv"; //用户ak
+        //        String ak_secret1 = "Fgs...............3zu"; // 用户ak_secret
+        //        String url1 = "https://shujuapi.aliyun.com/org_code/service_code/api_name?param1=xxx&param2=xxx";
+        //        System.out.println("response body:" + sendGet(url1, ak_id1, ak_secret1));
     }
 }
