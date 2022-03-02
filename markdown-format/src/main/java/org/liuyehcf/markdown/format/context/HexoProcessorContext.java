@@ -9,7 +9,7 @@ public class HexoProcessorContext extends AbstractProcessorContext {
     @Override
     void initProcessors() {
         addProcessor(new TitleProcessor());
-        addProcessor(new ImageAddressCheckProcessor());
+        addProcessor(new LocalAddressCheckProcessor());
         addProcessor(new IndexProcessor());
         addProcessor(new InnerLinkCheckProcessor());
         addProcessor(new LatexFormulaWrapperProcessor());

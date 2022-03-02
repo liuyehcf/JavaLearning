@@ -38,7 +38,7 @@ public class ResourceLinkProcessor extends AbstractFileProcessor implements PreF
     }
 
     private boolean isResourceLink(String content) {
-        Matcher matcher = RESOURCE_LINK_PATTERN.matcher(content);
+        Matcher matcher = RESOURCE_PATTERN.matcher(content);
         return matcher.find();
     }
 
