@@ -50,5 +50,6 @@
         <module>test</module>
         <module>jmh</module>
         <module>kafka</module>
+        <module>antlr4</module>
     </modules>
 </project>
