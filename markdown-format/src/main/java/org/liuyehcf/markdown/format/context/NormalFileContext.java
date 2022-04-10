@@ -106,16 +106,6 @@ public class NormalFileContext implements FileContext {
     }
 
     @Override
-    public File getFileDirectory() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public File getImageDirectory() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public boolean containsFile(String name) {
         throw new UnsupportedOperationException();
     }

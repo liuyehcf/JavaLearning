@@ -5,5 +5,4 @@ package org.liuyehcf.markdown.format.constant;
  */
 public class ParamConstant {
     public static final String DEFAULT_FILE_DIRECTORY_SIMPLE_NAME = "_posts";
-    public static final String DEFAULT_IMAGE_DIRECTORY_SIMPLE_NAME = "images";
 }

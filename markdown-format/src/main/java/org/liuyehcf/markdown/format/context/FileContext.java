@@ -1,5 +1,8 @@
 package org.liuyehcf.markdown.format.context;
 
+import org.liuyehcf.markdown.format.model.HexoParam;
+import org.liuyehcf.markdown.format.model.NormalParam;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -12,6 +15,13 @@ import static org.liuyehcf.markdown.format.log.DefaultLogger.LOGGER;
  * Created by HCF on 2018/1/13.
  */
 public interface FileContext {
+
+    static FileContext create(NormalParam param) {
+        if (param instanceof HexoParam) {
+            return new HexoFileContext((HexoParam) param);
+        }
+        return new NormalFileContext(param);
+    }
 
     static void readFile(BufferedReader reader, File file, LinkedList<LineElement> lineElements) throws IOException {
         String line;
@@ -64,16 +74,6 @@ public interface FileContext {
      * 获取根目录的File对象
      */
     File getRootDirectory();
-
-    /**
-     * 获取文件目录的File对象
-     */
-    File getFileDirectory();
-
-    /**
-     * 获取图像目录的File对象
-     */
-    File getImageDirectory();
 
     /**
      * 是否全部处理完毕

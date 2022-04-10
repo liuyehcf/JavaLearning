@@ -25,8 +25,6 @@ public class HexoFileContext implements FileContext {
 
     private final File fileDirectory;
 
-    private final File imageDirectory;
-
     private int index;
 
     private List<File> files;
@@ -38,7 +36,6 @@ public class HexoFileContext implements FileContext {
     public HexoFileContext(HexoParam hexoParam) {
         rootDirectory = hexoParam.getRootDirectory();
         fileDirectory = hexoParam.getFileDirectory();
-        imageDirectory = hexoParam.getImageDirectory();
         index = 0;
         initFiles();
     }
@@ -162,16 +159,6 @@ public class HexoFileContext implements FileContext {
     @Override
     public File getRootDirectory() {
         return rootDirectory;
-    }
-
-    @Override
-    public File getFileDirectory() {
-        return fileDirectory;
-    }
-
-    @Override
-    public File getImageDirectory() {
-        return imageDirectory;
     }
 
     @Override

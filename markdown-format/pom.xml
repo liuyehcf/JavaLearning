@@ -39,7 +39,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>2.1.4.RELEASE</version>
                 <configuration>
-                    <mainClass>org.liuyehcf.markdown.format.HexoFormatter</mainClass>
+                    <mainClass>org.liuyehcf.markdown.format.Formatter</mainClass>
                 </configuration>
                 <executions>
                     <execution>
