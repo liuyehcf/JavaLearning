@@ -4,8 +4,7 @@ import org.liuyehcf.markdown.format.context.FileContext;
 import org.liuyehcf.markdown.format.context.HexoProcessorContext;
 import org.liuyehcf.markdown.format.context.NormalProcessorContext;
 import org.liuyehcf.markdown.format.context.ProcessorContext;
-import org.liuyehcf.markdown.format.model.HexoParam;
-import org.liuyehcf.markdown.format.model.NormalParam;
+import org.liuyehcf.markdown.format.model.Param;
 
 import java.io.File;
 import java.util.Arrays;
@@ -23,19 +22,17 @@ public class Formatter {
             throw new RuntimeException(ILLEGAL_PARAMS);
         }
         String mode = args[0];
-        NormalParam param;
+        Param param = parseParams(args);
         ProcessorContext processorContext;
         if ("hexo".equalsIgnoreCase(mode)) {
-            param = parseHexoParams(args);
             processorContext = new HexoProcessorContext();
         } else if ("normal".equalsIgnoreCase(mode)) {
-            param = parseNormalParam(args);
             processorContext = new NormalProcessorContext();
         } else {
             throw new RuntimeException("illegal mode, only support 'hexo' or 'normal'");
         }
 
-        FileContext fileContext = FileContext.create(param);
+        FileContext fileContext = new FileContext(param);
         while (fileContext.hasNextFile()) {
             fileContext.initFileContext();
 
@@ -45,7 +42,7 @@ public class Formatter {
         }
     }
 
-    private static HexoParam parseHexoParams(String[] args) {
+    private static Param parseParams(String[] args) {
         if (args.length != 2 && args.length != 3) {
             LOGGER.error(ILLEGAL_PARAMS + ",args= {}", Arrays.toString(args));
             throw new RuntimeException(ILLEGAL_PARAMS);
@@ -70,27 +67,10 @@ public class Formatter {
             throw new RuntimeException(ILLEGAL_PARAMS);
         }
 
-        HexoParam hexoParam = new HexoParam();
-        hexoParam.setRootDirectory(rootDirectory);
-        hexoParam.setFileDirectory(fileDirectory);
+        Param param = new Param();
+        param.setRootDirectory(rootDirectory);
+        param.setFileDirectory(fileDirectory);
 
-        return hexoParam;
-    }
-
-    private static NormalParam parseNormalParam(String[] args) {
-        if (args.length != 2) {
-            LOGGER.error(ILLEGAL_PARAMS + ",args= {}", Arrays.toString(args));
-            throw new RuntimeException(ILLEGAL_PARAMS);
-        }
-
-        File rootDirectory = new File(args[1]);
-        if (!(rootDirectory.exists() && rootDirectory.isDirectory())) {
-            LOGGER.error(ILLEGAL_PARAMS + ",args= {}", Arrays.toString(args));
-            throw new RuntimeException(ILLEGAL_PARAMS);
-        }
-
-        NormalParam normalParam = new NormalParam();
-        normalParam.setRootDirectory(rootDirectory);
-        return normalParam;
+        return param;
     }
 }

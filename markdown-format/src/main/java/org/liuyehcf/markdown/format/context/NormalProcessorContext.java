@@ -9,7 +9,9 @@ import org.liuyehcf.markdown.format.processor.impl.*;
 public class NormalProcessorContext extends AbstractProcessorContext {
     @Override
     void initProcessors() {
+        addProcessor(new LocalAddressCheckProcessor());
         addProcessor(new IndexProcessor());
+        addProcessor(new InnerLinkCheckProcessor());
         addProcessor(new RedundantEmptyProcessor());
         addProcessor(new RemoveControlCharacterProcessor());
         addProcessor(new ResourceLinkProcessor());
