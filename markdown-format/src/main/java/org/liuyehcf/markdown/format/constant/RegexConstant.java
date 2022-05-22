@@ -3,7 +3,7 @@ package org.liuyehcf.markdown.format.constant;
 import java.util.regex.Pattern;
 
 public class RegexConstant {
-    private static final String RESOURCE_REGEX = "!?\\[.*?\\]\\((.*)\\)";
+    private static final String RESOURCE_REGEX = "!?\\[.*?\\]\\((.*?)\\)";
     public static final Pattern RESOURCE_PATTERN = Pattern.compile(RESOURCE_REGEX);
 
     private static final String INNER_LINK_REGEX = "\\{% post_link (.*?) %\\}";
