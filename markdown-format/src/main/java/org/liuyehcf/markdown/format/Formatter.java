@@ -24,15 +24,18 @@ public class Formatter {
         String mode = args[0];
         Param param = parseParams(args);
         ProcessorContext processorContext;
+        boolean isHexo;
         if ("hexo".equalsIgnoreCase(mode)) {
             processorContext = new HexoProcessorContext();
+            isHexo = true;
         } else if ("normal".equalsIgnoreCase(mode)) {
             processorContext = new NormalProcessorContext();
+            isHexo = false;
         } else {
             throw new RuntimeException("illegal mode, only support 'hexo' or 'normal'");
         }
 
-        FileContext fileContext = new FileContext(param);
+        FileContext fileContext = new FileContext(param, isHexo);
         while (fileContext.hasNextFile()) {
             fileContext.initFileContext();
 

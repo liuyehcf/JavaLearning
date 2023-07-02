@@ -21,14 +21,16 @@ import static org.liuyehcf.markdown.format.log.DefaultLogger.LOGGER;
 public class FileContext {
     private final File rootDirectory;
     private final File fileDirectory;
+    private final boolean isHexo;
     private int index;
     private List<File> files;
     private Map<String, String> properties;
     private LinkedList<LineElement> lineElements;
 
-    public FileContext(Param param) {
+    public FileContext(Param param, boolean isHexo) {
         rootDirectory = param.getRootDirectory();
         fileDirectory = param.getFileDirectory();
+        this.isHexo = isHexo;
         index = 0;
         initFiles();
     }
@@ -189,7 +191,9 @@ public class FileContext {
         lineElements = new LinkedList<>();
         properties = new HashMap<>();
 
-        readProperty(reader, getFile(), lineElements, properties);
+        if (isHexo) {
+            readProperty(reader, getFile(), lineElements, properties);
+        }
         FileContext.readFile(reader, getFile(), lineElements);
     }
 
